@@ -1,0 +1,60 @@
+.container {
+	width: 200mm;
+}
+
+.text-italic {
+	font-style: italic;
+}
+
+.table-application, .table-receipt {
+	margin-bottom: 0;
+}
+
+.table-application thead > tr > td, .table-application tbody > tr > td {
+	vertical-align: top;
+	padding: 0 8px 1px;
+	border: none;
+}
+
+.table-receipt thead > tr > td, .table-receipt tbody > tr > td {
+	vertical-align: top;
+}
+
+/*Background*/
+#background{
+    position:absolute;
+    z-index:-10;
+    background:white;
+    display:block;
+    height:100%;
+    width: 200mm;
+}
+
+#bg-text{
+    color:#e7c16f;
+	opacity: 60%;
+    font-size:180px;
+	width:160%;
+	text-align: center;
+	margin: 90% -30% 0;
+    transform:rotate(300deg);
+    -webkit-transform:rotate(300deg);
+}
+/*Background*/
+
+@media print {
+#letter-head {
+  /* visibility: hidden; */
+  display: none;
+}
+
+@page {
+	size: A4;
+	margin: 75mm 10mm 10mm;
+}
+
+.page-content {
+	page-break-inside: avoid;
+	page-break-after: auto;
+}
+}
