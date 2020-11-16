@@ -1031,6 +1031,9 @@ class ControllerSaleOrder extends Controller {
 				'text_loading',
 				'text_vendor',
 				'text_confirm',
+				'text_print_confirm',
+				'text_preview',
+				'text_print',
 				'entry_vendor',
 				'entry_order_status',
 				'entry_date',
@@ -1132,8 +1135,11 @@ class ControllerSaleOrder extends Controller {
 			);
 
 			$data['document'] = $this->url->link('sale/order/document', 'token=' . $this->session->data['token'], true);
-			$data['agreement'] = $this->url->link('sale/order/agreement', 'token=' . $this->session->data['token'] . '&order_id=' . (int)$this->request->get['order_id'], true);
+			$data['agreement_preview'] = $this->url->link('sale/order/agreement', 'token=' . $this->session->data['token'] . '&order_id=' . (int)$this->request->get['order_id'], true);
+			$data['agreement_print'] = $this->url->link('sale/order/agreement', 'token=' . $this->session->data['token'] . '&order_id=' . (int)$this->request->get['order_id'] . '&print=1', true);
 			$data['edit'] = $this->url->link('sale/order/edit', 'token=' . $this->session->data['token'] . '&order_id=' . (int)$this->request->get['order_id'] . $url, true);
+
+			$data['printed'] = $order_info['printed'] ? 1 : 0;
 
 			if (isset($this->request->get['filter_month'])) {
 				$data['cancel'] = $this->url->link('sale/order', 'token=' . $this->session->data['token'] . $url, true);
@@ -2292,6 +2298,12 @@ class ControllerSaleOrder extends Controller {
 			$order_id = 0;
 		}
 
+		if (isset($this->request->get['print']) && $this->request->get['print'] == 1) {
+			$print = 1;
+		} else {
+			$print = 0;
+		}
+
 		$order_info = $this->model_sale_order->getOrder($order_id);
 		
 		if ($order_info) {
@@ -2312,6 +2324,7 @@ class ControllerSaleOrder extends Controller {
 
 			$language_items = array(
 				'title_agreement',
+				'text_mark',
 				'text_invoice_no',
 				'text_customer',
 				'text_id_no',
@@ -2342,6 +2355,7 @@ class ControllerSaleOrder extends Controller {
 				'text_pembatalan_2',
 				'text_pembatalan_3',
 				'text_pihak_penyewa',
+				'text_dst',
 				'text_comment'
 			);
 			foreach ($language_items as $language_item) {
@@ -2571,6 +2585,16 @@ class ControllerSaleOrder extends Controller {
 			$data['manajemen'] = '( ' . $user_info['firstname'] . ' ' . $user_info['lastname'] . ' )';
 
 			$data['comment'] = nl2br($order_info['comment']);
+			
+			if ($order_info['printed'] || !$print) {
+				$data['preview'] = 1;
+				$data['letter_content'] = 'letter-content';
+			} else {
+				$data['preview'] = 0;
+				$data['letter_content'] = '';
+				
+				$this->model_sale_order->setOrderPrinted($order_id);
+			}
 			
 		} else {
 			return false;
@@ -3183,4 +3207,31 @@ class ControllerSaleOrder extends Controller {
 		$this->response->addHeader('Content-Type: application/json');
 		$this->response->setOutput(json_encode($json));
 	}
+
+	public function printDocument() {
+		$json = array();
+
+		// if (!$this->user->hasPermission('modify', 'sale/order')) { //Sementara dobel ijin sebelum membuat mini order oleh marketing
+
+		if (isset($this->request->get['order_id'])) {
+			$order_id = $this->request->get['order_id'];
+		} else {
+			$order_id = 0;
+		}
+
+		// $document_type = '';
+
+		$this->load->model('sale/order');
+		
+		$order_info = $this->model_sale_order->getOrder($order_id);
+		
+		if ($order_info && !$order_info['printed']) {
+			$json['print'] = $this->model_sale_order->setPrinted($order_id);
+		} else {
+			$json['print'] = 0;
+		}
+		
+		$this->response->addHeader('Content-Type: application/json');
+		$this->response->setOutput(json_encode($json));
+	}	
 }

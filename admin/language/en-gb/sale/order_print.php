@@ -29,7 +29,7 @@ $_['text_demikian']    		= 'Demikian kesepakatan ini dibuat dan untuk mendapat p
 $_['text_pihak_penyewa']    = 'Pihak Penyewa';
 $_['text_pihak_vendor']    	= 'Pihak Vendor';
 $_['text_tanda_tangan']    	= '(__________________________)';
-// $_['text_tanda_tangan']    	= '( %s )';
+$_['text_dst']    			= '....................... dst.';
 
 // Text Receipt
 $_['title_receipt']			= 'KUITANSI';

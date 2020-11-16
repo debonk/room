@@ -88,6 +88,7 @@ class ModelSaleOrder extends Model {
 				'order_id'                => $order_query->row['order_id'],
 				'invoice_no'              => $order_query->row['invoice_no'],
 				'invoice_prefix'          => $order_query->row['invoice_prefix'],
+				'printed'                 => $order_query->row['printed'],
 				'store_id'                => $order_query->row['store_id'],
 				'store_name'              => $order_query->row['store_name'],
 				'store_url'               => $order_query->row['store_url'],
@@ -500,6 +501,10 @@ class ModelSaleOrder extends Model {
 
 			return $order_info['invoice_prefix'] . str_pad($invoice_no,4,0,STR_PAD_LEFT);
 		}
+	}
+
+	public function setOrderPrinted($order_id) {
+		$this->db->query("UPDATE `" . DB_PREFIX . "order` SET printed = '1' WHERE order_id = '" . (int)$order_id . "'");
 	}
 
 	public function getPaymentPhases($order_id) {

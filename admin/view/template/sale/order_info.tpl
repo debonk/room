@@ -4,7 +4,15 @@
     <div class="container-fluid">
       <div class="pull-right">
 	    <a href="<?php echo $document; ?>" target="_blank" class="btn btn-primary"><i class="fa fa-file-text-o"></i> <?php echo $button_document; ?></a>
-	    <a href="<?php echo $agreement; ?>" target="_blank" class="btn btn-primary"><i class="fa fa-file-o"></i> <?php echo $button_agreement; ?></a>
+		<div class="btn-group">
+		  <button type="button" data-toggle="dropdown" class="btn btn-primary dropdown-toggle" id="button-agreement"><i class="fa fa-file-o"></i> <?php echo $button_agreement; ?></button>
+		  <ul class="dropdown-menu dropdown-menu-left">
+			<li><a href="<?php echo $agreement_preview; ?>" target="_blank"><?php echo $text_preview; ?></a></li>
+			<?php if (!$printed) { ?>
+			<li><a href="<?php echo $agreement_print; ?>" target="_blank" id="agreement-print"><?php echo $text_print; ?></a></li>
+			<?php } ?>
+		  </ul>
+		</div>
 		<a href="<?php echo $edit; ?>" data-toggle="tooltip" title="<?php echo $button_edit; ?>" class="btn btn-primary"><i class="fa fa-pencil"></i></a>
 		<a href="<?php echo $cancel; ?>" data-toggle="tooltip" title="<?php echo $button_cancel; ?>" class="btn btn-default"><i class="fa fa-reply"></i></a>
 	  </div>
@@ -423,6 +431,17 @@
     </div>
   </div>
   <script type="text/javascript"><!--
+$('#agreement-print').on('click', function(e) {
+	e.preventDefault();
+
+	if (confirm('<?php echo $text_print_confirm; ?>')) {
+		var url = this.href;
+		
+		this.closest('li').remove();
+		open(url);
+	}
+});
+
 $('#order-vendors-add ul').on('click', 'a[id^=\'vendor-add\']', function(e) {
 	e.preventDefault();
 	

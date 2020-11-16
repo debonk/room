@@ -13,11 +13,13 @@
 </head>
 <body>
 <div class="container">
+  <?php if ($preview) { ?>
   <div id="background">
-    <p id="bg-text">Preview Only!</p>
+    <p class="bg-text" id="bg-agreement"><?php echo $text_mark; ?></p>
   </div>
-  <div>
-    <div id="letter-head">
+  <?php } ?>
+  <div class="<?php echo $letter_content; ?>">
+    <div class="letter-head">
 	  <img src="<?php echo $letter_head; ?>" class="img-responsive" />
     </div>
     <div>
@@ -203,26 +205,31 @@
             <td>
 	  	    <ol>
 	  		  <?php foreach ($text_transactions as $text_transaction) { ?>
-                <li><?php echo $text_transaction; ?></li>
+              <li><?php echo $text_transaction; ?></li>
 	  		  <?php } ?>
 	  		  <?php if ($text_transactions) { ?>
-                <li><?php echo $text_transfer_ke; ?><div style="margin-left: 10px;"><b><?php echo $no_rekening; ?></b></div></li>
+              <li><?php echo $text_transfer_ke; ?><div style="margin-left: 10px;"><b><?php echo $no_rekening; ?></b></div></li>
 	  		  <?php } ?>
-                <li><?php echo $text_belum_ppn; ?></li>
-                <li><?php echo $text_tukar_bukti; ?></li>
-                <li><?php echo $text_ubah_tanggal; ?></li>
-                <li><?php echo $text_pembatalan_acara; ?>
-	  		    <div style="margin-left: 10px;"><b>
-	  			  <?php echo $text_pembatalan_1; ?><br />
-	  			  <?php echo $text_pembatalan_2; ?><br />
-	  			  <?php echo $text_pembatalan_3; ?>
-	  			</b></div>
+			  <?php if (!$preview) { ?>
+              <li><?php echo $text_belum_ppn; ?></li>
+              <li><?php echo $text_tukar_bukti; ?></li>
+              <li><?php echo $text_ubah_tanggal; ?></li>
+              <li><?php echo $text_pembatalan_acara; ?>
+	  		  <div style="margin-left: 10px;"><b>
+	  		    <?php echo $text_pembatalan_1; ?><br />
+	  		    <?php echo $text_pembatalan_2; ?><br />
+	  		    <?php echo $text_pembatalan_3; ?>
+	  		  </b></div>
 	  		  </li>
+			  <?php } else { ?>
+			  <li><?php echo $text_dst ?></li>
+			  <?php } ?>
 	  		</ol>
             </td>
           </tr>
         </tbody>
       </table>
+	  <?php if (!$preview) { ?>
       <table class="table table-application text-center page-content">
         <tbody>
           <tr>
@@ -253,6 +260,7 @@
           </tr>
         </tbody>
       </table>
+      <?php } ?>
       <?php } ?>
     </div>
   </div>

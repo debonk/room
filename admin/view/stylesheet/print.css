@@ -24,27 +24,36 @@
 #background{
     position:absolute;
     z-index:-10;
-    background:white;
-    display:block;
-    height:100%;
     width: 200mm;
 }
 
-#bg-text{
-    color:#e7c16f;
-	opacity: 60%;
+#bg-agreement{
     font-size:180px;
 	width:160%;
-	text-align: center;
 	margin: 90% -30% 0;
     transform:rotate(300deg);
     -webkit-transform:rotate(300deg);
 }
+.bg-text{
+    color:#e7c16f;
+	opacity: 60%;
+	text-align: center;
+}
+
 /*Background*/
 
 @media print {
-#letter-head {
-  /* visibility: hidden; */
+#background{
+    position:fixed;
+    z-index:10;
+}
+#bg-agreement{
+    font-size:140px;
+	width:100%;
+	margin: 25% 0 0;
+}
+
+.letter-head, .letter-content {
   display: none;
 }
 
