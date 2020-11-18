@@ -314,7 +314,7 @@ class ModelSaleOrder extends Model {
 	}
 
 	public function getOrderVendors($order_id) {
-		$query = $this->db->query("SELECT v.*, vt.name AS vendor_type, (SELECT SUM(t.amount) FROM " . DB_PREFIX . "transaction t WHERE t.order_id = ov.order_id AND t.label = 'vendor' AND t.label_id = v.vendor_id) AS total FROM " . DB_PREFIX . "order_vendor ov LEFT JOIN " . DB_PREFIX . "vendor v ON (v.vendor_id = ov.vendor_id) LEFT JOIN " . DB_PREFIX . "vendor_type vt ON (vt.vendor_type_id = v.vendor_type_id) WHERE ov.order_id = '" . (int)$order_id . "'");
+		$query = $this->db->query("SELECT ov.agreement_printed, ov.admission_printed, v.*, vt.name AS vendor_type, (SELECT SUM(t.amount) FROM " . DB_PREFIX . "transaction t WHERE t.order_id = ov.order_id AND t.label = 'vendor' AND t.label_id = v.vendor_id) AS total FROM " . DB_PREFIX . "order_vendor ov LEFT JOIN " . DB_PREFIX . "vendor v ON (v.vendor_id = ov.vendor_id) LEFT JOIN " . DB_PREFIX . "vendor_type vt ON (vt.vendor_type_id = v.vendor_type_id) WHERE ov.order_id = '" . (int)$order_id . "'");
 
 		return $query->rows;
 	}
@@ -505,6 +505,14 @@ class ModelSaleOrder extends Model {
 
 	public function setOrderPrinted($order_id) {
 		$this->db->query("UPDATE `" . DB_PREFIX . "order` SET printed = '1' WHERE order_id = '" . (int)$order_id . "'");
+	}
+
+	public function setOrderVendorPrinted($order_vendor_id, $type) {
+		if ($this->db->escape($type) == 'agreement') {
+			$this->db->query("UPDATE `" . DB_PREFIX . "order_vendor` SET agreement_printed = '1' WHERE order_vendor_id = '" . (int)$order_vendor_id . "'");
+		} elseif ($this->db->escape($type) == 'admission') {
+			$this->db->query("UPDATE `" . DB_PREFIX . "order_vendor` SET admission_printed = '1' WHERE order_vendor_id = '" . (int)$order_vendor_id . "'");
+		}
 	}
 
 	public function getPaymentPhases($order_id) {

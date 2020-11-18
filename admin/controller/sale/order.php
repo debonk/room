@@ -1318,11 +1318,12 @@ class ControllerSaleOrder extends Controller {
 			
 			foreach ($transactions as $transaction) {
 				$data['totals'][] = array(
-					'title' => $transaction['description'] . ' (' . date($this->language->get('date_format_short'), strtotime($transaction['date'])) . ')',
-					'text'  => $this->currency->format(-$transaction['amount'], $order_info['currency_code'], $order_info['currency_value']),
-					'receipt'	=> $this->url->link('sale/order/receipt', 'token=' . $this->session->data['token'] . '&transaction_id=' . (int)$transaction['transaction_id'], true)
+					'title' 	=> $transaction['description'] . ' (' . date($this->language->get('date_format_short'), strtotime($transaction['date'])) . ')',
+					'text'  	=> $this->currency->format(-$transaction['amount'], $order_info['currency_code'], $order_info['currency_value']),
+					'receipt'	=> $this->url->link('sale/order/receipt', 'token=' . $this->session->data['token'] . '&transaction_id=' . (int)$transaction['transaction_id'], true),
+					'print'		=> $transaction['printed'] ? 'preview' : 'print'
 				);
-				
+
 				$balance -= $transaction['amount'];
 			}
 
@@ -1358,7 +1359,9 @@ class ControllerSaleOrder extends Controller {
 					'vendor_id' 		=> $order_vendor['vendor_id'],
 					'title' 			=> $order_vendor['vendor_name'] . ' - ' . $order_vendor['vendor_type'],
 					'agreement_href'	=> $this->url->link('sale/order/vendorAgreement', 'token=' . $this->session->data['token'] . '&order_id=' . $order_id . '&vendor_id=' . $order_vendor['vendor_id'], true),
-					'admission_href'	=> $admission_href
+					'admission_href'	=> $admission_href,
+					'agreement_printed'	=> $order_vendor['agreement_printed'] ? 'preview' : 'print',
+					'admission_printed'	=> $order_vendor['admission_printed'] ? 'preview' : 'print'
 				);
 			}
 
@@ -2110,7 +2113,8 @@ class ControllerSaleOrder extends Controller {
 				'amount'			=> $this->currency->format($result['amount'], $order_info['currency_code'], $order_info['currency_value']),
 				'date_added'		=> date($this->language->get('date_format_short'), strtotime($result['date_added'])),
 				'username'			=> $result['username'],
-				'receipt'			=> $this->url->link('sale/order/receipt', 'token=' . $this->session->data['token'] . '&transaction_id=' . (int)$result['transaction_id'], true)
+				'receipt'	 		=> $this->url->link('sale/order/receipt', 'token=' . $this->session->data['token'] . '&transaction_id=' . (int)$result['transaction_id'], true),
+				'print'				=> $result['printed'] ? 'preview' : 'print'
 			);
 		}
 		
@@ -2586,7 +2590,7 @@ class ControllerSaleOrder extends Controller {
 
 			$data['comment'] = nl2br($order_info['comment']);
 			
-			if ($order_info['printed'] || !$print) {
+			if ($order_info['printed'] || !$print || !$this->user->hasPermission('modify', 'sale/order')) {
 				$data['preview'] = 1;
 				$data['letter_content'] = 'letter-content';
 			} else {
@@ -2636,6 +2640,7 @@ class ControllerSaleOrder extends Controller {
 
 			$language_items = array(
 				'title_receipt',
+				'text_mark',
 				'text_invoice_no',
 				'text_attn',
 				'text_address',
@@ -2769,6 +2774,16 @@ class ControllerSaleOrder extends Controller {
 			$data['manajemen'] = '( ' . $user_info['firstname'] . ' ' . $user_info['lastname'] . ' )';
 			$data['text_manajemen'] = $user_info['user_group'];
 
+			if ($transaction_info['printed'] || !$this->user->hasPermission('modify', 'sale/order')) {
+				$data['preview'] = 1;
+				$data['letter_content'] = 'letter-content';
+			} else {
+				$data['preview'] = 0;
+				$data['letter_content'] = '';
+				
+				$this->model_accounting_transaction->setTransactionPrinted($transaction_id);
+			}
+			
 		} else {
 			return false;
 		}
@@ -2838,6 +2853,7 @@ class ControllerSaleOrder extends Controller {
 
 			$language_items = array(
 				'title_admission',
+				'text_mark',
 				'text_invoice_no',
 				'text_day_date',
 				'text_slot',
@@ -2941,6 +2957,16 @@ class ControllerSaleOrder extends Controller {
 			$data['text_manajemen'] = $user_info['user_group'];
 			$data['manajemen'] = '( ' . $user_info['firstname'] . ' ' . $user_info['lastname'] . ' )';
 
+			if ($order_vendor_info['admission_printed'] || !$this->user->hasPermission('modify', 'sale/order') || !$this->user->hasPermission('modify', 'catalog/vendor')) {
+				$data['preview'] = 1;
+				$data['letter_content'] = 'letter-content';
+			} else {
+				$data['preview'] = 0;
+				$data['letter_content'] = '';
+				
+				$this->model_sale_order->setOrderVendorPrinted($order_vendor_info['order_vendor_id'], 'admission');
+			}
+			
 		} else {
 			return false;
 		}
@@ -2984,6 +3010,7 @@ class ControllerSaleOrder extends Controller {
 
 			$language_items = array(
 				'title_vendor_agreement',
+				'text_mark',
 				'text_invoice_no',
 				'text_customer',
 				'text_vendor_name',
@@ -3064,6 +3091,16 @@ class ControllerSaleOrder extends Controller {
 			$data['text_manajemen'] = $user_info['user_group'];
 			$data['manajemen'] = '( ' . $user_info['firstname'] . ' ' . $user_info['lastname'] . ' )';
 
+			if ($order_vendor_info['agreement_printed'] || !$this->user->hasPermission('modify', 'sale/order') || !$this->user->hasPermission('modify', 'catalog/vendor')) {
+				$data['preview'] = 1;
+				$data['letter_content'] = 'letter-content';
+			} else {
+				$data['preview'] = 0;
+				$data['letter_content'] = '';
+				
+				$this->model_sale_order->setOrderVendorPrinted($order_vendor_info['order_vendor_id'], 'agreement');
+			}
+			
 		} else {
 			return false;
 		}
@@ -3207,31 +3244,4 @@ class ControllerSaleOrder extends Controller {
 		$this->response->addHeader('Content-Type: application/json');
 		$this->response->setOutput(json_encode($json));
 	}
-
-	public function printDocument() {
-		$json = array();
-
-		// if (!$this->user->hasPermission('modify', 'sale/order')) { //Sementara dobel ijin sebelum membuat mini order oleh marketing
-
-		if (isset($this->request->get['order_id'])) {
-			$order_id = $this->request->get['order_id'];
-		} else {
-			$order_id = 0;
-		}
-
-		// $document_type = '';
-
-		$this->load->model('sale/order');
-		
-		$order_info = $this->model_sale_order->getOrder($order_id);
-		
-		if ($order_info && !$order_info['printed']) {
-			$json['print'] = $this->model_sale_order->setPrinted($order_id);
-		} else {
-			$json['print'] = 0;
-		}
-		
-		$this->response->addHeader('Content-Type: application/json');
-		$this->response->setOutput(json_encode($json));
-	}	
 }

@@ -21,36 +21,61 @@
 }
 
 /*Background*/
-#background{
-    position:absolute;
-    z-index:-10;
-    width: 200mm;
-}
-
-#bg-agreement{
-    font-size:180px;
-	width:160%;
-	margin: 90% -30% 0;
-    transform:rotate(300deg);
-    -webkit-transform:rotate(300deg);
-}
-.bg-text{
+.bg-text {
     color:#e7c16f;
 	opacity: 60%;
 	text-align: center;
+}
+#background {
+    position: absolute;
+    z-index: -10;
+    width: 200mm;
+}
+#bg-agreement {
+    font-size: 180px;
+	width: 160%;
+	margin: 90% -30% 0;
+    transform: rotate(300deg);
+    -webkit-transform: rotate(300deg);
+}
+#bg-receipt {
+    font-size: 120px;
+	width: 110%;
+	margin: 20% -5% 0;
+    transform: rotate(330deg);
+    -webkit-transform: rotate(330deg);
+}
+#bg-vendor-agreement {
+    font-size: 140px;
+	width: 120%;
+	margin: 80% -10% 0;
+    transform: rotate(310deg);
+    -webkit-transform: rotate(310deg);
+}
+#bg-admission {
+    font-size: 130px;
+	width: 120%;
+	margin: 65% -10% 0;
+    transform: rotate(320deg);
+    -webkit-transform: rotate(320deg);
 }
 
 /*Background*/
 
 @media print {
 #background{
-    position:fixed;
-    z-index:10;
+    position: fixed;
+    z-index: 10;
 }
-#bg-agreement{
-    font-size:140px;
-	width:100%;
+#bg-agreement, #bg-vendor-agreement, #bg-admission{
+    font-size: 140px;
+	width: 100%;
 	margin: 25% 0 0;
+}
+#bg-receipt{
+    font-size: 140px;
+	width: 100%;
+	margin: 5% 0 0;
 }
 
 .letter-head, .letter-content {

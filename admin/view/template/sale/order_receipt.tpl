@@ -18,7 +18,12 @@
 </head>
 <body>
 <div class="container">
-  <div style="page-break-after: always;">
+  <?php if ($preview) { ?>
+  <div id="background">
+    <p class="bg-text" id="bg-receipt"><?php echo $text_mark; ?></p>
+  </div>
+  <?php } ?>
+  <div style="page-break-after: always;" class="<?php echo $letter_content; ?>">
     <div class="col-xs-3">
       <div class="text-center"><img src="<?php echo $store_logo; ?>" />
         <h3><?php echo $store_name; ?></h3>

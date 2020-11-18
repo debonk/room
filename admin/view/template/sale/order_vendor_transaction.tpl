@@ -44,7 +44,7 @@
     <tr>
       <td class="text-left"><?php echo $vendor_transaction['date']; ?></td>
       <td class="text-left"><?php echo $vendor_transaction['payment_method']; ?></td>
-      <td class="text-left"><a href="<?php echo $vendor_transaction['receipt']; ?>" data-toggle="tooltip" title="<?php echo $button_receipt; ?>" target="_blank"><?php echo $vendor_transaction['description']; ?> <i class="fa fa-external-link"></i></a></td>
+      <td class="text-left"><a href="<?php echo $vendor_transaction['receipt']; ?>" data-toggle="tooltip" title="<?php echo $button_receipt; ?>" target="_blank" class="<?php echo $vendor_transaction['print']; ?>-receipt"><?php echo $vendor_transaction['description']; ?> <i class="fa fa-external-link"></i></a></td>
       <td class="text-right"><?php echo $vendor_transaction['amount']; ?></td>
       <td class="text-left"><?php echo $vendor_transaction['date_added']; ?></td>
       <td class="text-left"><?php echo $vendor_transaction['username']; ?></td>

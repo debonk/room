@@ -13,7 +13,12 @@
 </head>
 <body>
 <div class="container">
-  <div class="page-content">
+  <?php if ($preview) { ?>
+  <div id="background">
+    <p class="bg-text" id="bg-admission"><?php echo $text_mark; ?></p>
+  </div>
+  <?php } ?>
+  <div class="page-content <?php echo $letter_content; ?>">
     <div class="letter-head">
 	  <img src="<?php echo $letter_head; ?>" class="img-responsive" />
     </div>

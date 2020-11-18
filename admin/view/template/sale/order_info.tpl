@@ -71,9 +71,9 @@
               <tr>
                 <td><?php echo $order_vendor['title']; ?></td>
 				<td class="text-right">
-                  <a href="<?php echo $order_vendor['agreement_href']; ?>" target="_blank" data-toggle="tooltip" title="<?php echo $button_vendor_agreement; ?>" class="btn btn-success btn-xs" id="vendor-agreement<?php echo $order_vendor['vendor_id']; ?>" value="<?php echo $order_vendor['vendor_id']; ?>"><i class="fa fa-paperclip fa-fw"></i></a>
+                  <a href="<?php echo $order_vendor['agreement_href']; ?>" target="_blank" data-toggle="tooltip" title="<?php echo $button_vendor_agreement; ?>" class="<?php echo $order_vendor['agreement_printed']; ?>-agreement btn btn-success btn-xs" id="vendor-agreement<?php echo $order_vendor['vendor_id']; ?>" value="<?php echo $order_vendor['vendor_id']; ?>"><i class="fa fa-paperclip fa-fw"></i></a>
 				  <?php if ($order_vendor['admission_href']) { ?>
-                  <a href="<?php echo $order_vendor['admission_href']; ?>" target="_blank" data-toggle="tooltip" title="<?php echo $button_admission; ?>" class="btn btn-success btn-xs" id="vendor-admission<?php echo $order_vendor['vendor_id']; ?>" value="<?php echo $order_vendor['vendor_id']; ?>"><i class="fa fa-file-text-o fa-fw"></i></a>
+                  <a href="<?php echo $order_vendor['admission_href']; ?>" target="_blank" data-toggle="tooltip" title="<?php echo $button_admission; ?>" class="<?php echo $order_vendor['admission_printed']; ?>-admission btn btn-success btn-xs" id="vendor-admission<?php echo $order_vendor['vendor_id']; ?>" value="<?php echo $order_vendor['vendor_id']; ?>"><i class="fa fa-file-text-o fa-fw"></i></a>
 				  <?php } else { ?>
                   <button data-toggle="tooltip" title="<?php echo $button_vendor_remove; ?>" class="btn btn-danger btn-xs" id="vendor-remove<?php echo $order_vendor['vendor_id']; ?>" value="<?php echo $order_vendor['vendor_id']; ?>"><i class="fa fa-minus-circle fa-fw"></i></button>
 				  <?php } ?>
@@ -191,7 +191,7 @@
           </tbody>
         </table>
 		<div class="table-responsive">
-        <table class="table table-bordered">
+        <table class="table table-bordered" id="order-products">
           <thead>
             <tr>
               <td class="text-left"><?php echo $column_product_type; ?></td>
@@ -236,7 +236,7 @@
             <tr>
               <td colspan="5" class="text-right">
 			    <?php if ($total['receipt']) { ?>
-				<a href="<?php echo $total['receipt']; ?>" data-toggle="tooltip" title="<?php echo $button_receipt; ?>" target="_blank"><?php echo $total['title']; ?> <i class="fa fa-external-link"></i></a>
+				<a href="<?php echo $total['receipt']; ?>" data-toggle="tooltip" title="<?php echo $button_receipt; ?>" target="_blank" class="<?php echo $total['print']; ?>-receipt"><?php echo $total['title']; ?> <i class="fa fa-external-link"></i></a>
 			    <?php } else { ?>
 				<?php echo $total['title']; ?>
 			    <?php } ?>
@@ -431,6 +431,16 @@
     </div>
   </div>
   <script type="text/javascript"><!--
+$('#order-products, #order-vendors, #vendor-transaction').on('click', 'td a[class^=\'print\']', function(e) {
+	e.preventDefault();
+
+	if (confirm('<?php echo $text_print_confirm; ?>')) {
+		var url = this.href;
+
+		open(url);
+	}
+});
+
 $('#agreement-print').on('click', function(e) {
 	e.preventDefault();
 
@@ -463,7 +473,7 @@ $('#order-vendors-add ul').on('click', 'a[id^=\'vendor-add\']', function(e) {
                 html  = '<tr>';
                 html += '  <td>' + json['title'] + '</td>';
                 html += '  <td class="text-right">';
-                html += '  <a href="' + json['agreement_href'] + '" target="_blank" data-toggle="tooltip" title="<?php echo $button_vendor_agreement; ?>" class="btn btn-success btn-xs" id="vendor-agreement' + vendor_id + '" value="' + vendor_id + '"><i class="fa fa-paperclip fa-fw"></i></a>';
+                html += '  <a href="' + json['agreement_href'] + '" target="_blank" data-toggle="tooltip" title="<?php echo $button_vendor_agreement; ?>" class="print-agreement btn btn-success btn-xs" id="vendor-agreement' + vendor_id + '" value="' + vendor_id + '"><i class="fa fa-paperclip fa-fw"></i></a>';
                 html += '  <button data-toggle="tooltip" title="<?php echo $button_vendor_remove; ?>" class="btn btn-danger btn-xs" id="vendor-remove' + vendor_id + '" value="' + vendor_id + '"><i class="fa fa-minus-circle fa-fw"></i></button></td></tr>';
 
 				$('#order-vendors tbody').append(html);

@@ -577,6 +577,10 @@ class ModelAccountingTransaction extends Model {
 		return $query->rows;
 	}
 
+	public function setTransactionPrinted($transaction_id) {
+		$this->db->query("UPDATE `" . DB_PREFIX . "transaction` SET printed = '1' WHERE transaction_id = '" . (int)$transaction_id . "'");
+	}
+
 	public function editEditPermission($transaction_id, $edit_permission) {
 		$sql = "UPDATE " . DB_PREFIX . "transaction SET edit_permission = '" . (int)$edit_permission . "' WHERE transaction_id = '" . (int)$transaction_id . "'";
 
