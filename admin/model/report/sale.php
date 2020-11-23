@@ -435,4 +435,113 @@ class ModelReportSale extends Model {
 
 		return $query->row['total'];
 	}
+
+	public function createDocumentsView() {
+		$view_name = DB_PREFIX . 'view_order_document';
+		
+		$sql = "SELECT 1 AS exist FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = '" . DB_DATABASE . "' AND TABLE_NAME = '" . $this->db->escape($view_name) . "'";
+		
+		$query = $this->db->query($sql);
+		
+		if (!$query->num_rows) {
+			$implode_sql = array();
+			
+			$implode_sql[] = "SELECT 'order' AS type, o.order_id AS type_id, o.order_id, DATE(o.date_added) AS date, CONCAT(o.invoice_prefix, LPAD(o.invoice_no, 4, '0')) AS reference, CONCAT(o.firstname, ' ', o.lastname) AS customer, o.printed, u.username FROM `" . DB_PREFIX . "order` o LEFT JOIN `" . DB_PREFIX . "user` u ON (u.user_id = o.user_id) WHERE o.order_id > 0 AND o.invoice_no > 0 ";
+			
+			$implode_sql[] = "SELECT 'transaction' AS type, t.transaction_id AS type_id, t.order_id, t.date AS date, CONCAT(t.reference_no, LPAD(t.transaction_no, 4, '0')) AS reference, t.customer_name AS customer, t.printed, u.username FROM `" . DB_PREFIX . "transaction` t LEFT JOIN `" . DB_PREFIX . "user` u ON (u.user_id = t.user_id) WHERE t.label IN ('vendor', 'customer')";
+
+			$implode_sql[] = "SELECT 'vendor_agreement' AS type, ov1.order_vendor_id AS type_id, ov1.order_id, DATE(ov1.date_added) AS date, CONCAT(ov1.agreement_prefix, LPAD(ov1.reference_no, 4, '0')) AS reference, v.vendor_name AS customer, ov1.agreement_printed AS printed, u.username FROM `" . DB_PREFIX . "order_vendor` ov1 LEFT JOIN `" . DB_PREFIX . "vendor` v ON (v.vendor_id = ov1.vendor_id) LEFT JOIN `" . DB_PREFIX . "user` u ON (u.user_id = ov1.user_id)";
+
+			$implode_sql[] = "SELECT 'vendor_admission' AS type, ov2.order_vendor_id AS type_id, ov2.order_id, DATE(ov2.date_added) AS date, CONCAT(ov2.admission_prefix, LPAD(ov2.reference_no, 4, '0')) AS reference, v.vendor_name AS customer, ov2.admission_printed AS printed, u.username FROM `" . DB_PREFIX . "order_vendor` ov2 LEFT JOIN `" . DB_PREFIX . "vendor` v ON (v.vendor_id = ov2.vendor_id) LEFT JOIN `" . DB_PREFIX . "user` u ON (u.user_id = ov2.user_id)";
+
+			if ($implode_sql) {
+				$sql = " CREATE VIEW " . $view_name . " AS " . implode(" UNION ", $implode_sql);
+			}
+
+			$query = $this->db->query($sql);
+		}
+	}
+
+	public function getDocuments($data = array()) {
+		$this->createDocumentsView();
+
+		$sql = "SELECT * FROM `" . DB_PREFIX . "view_order_document`";
+
+		$implode = array();
+		
+		if (!empty($data['filter_order_id'])) {
+			$implode[] = " order_id = '" . (int)$data['filter_order_id'] . "'";
+		}
+	
+		if (!empty($data['filter_reference'])) {
+			$implode[] = " reference LIKE '%" . $this->db->escape($data['filter_reference']) . "%'";
+		}
+
+		if ($implode) {
+			$sql .= " WHERE " . implode(" AND ", $implode);
+		}
+		
+		$sort_data = array(
+			'type',
+			'order_id',
+			'date',
+			'reference',
+			'customer',
+			'printed',
+			'username'
+		);
+
+		if (isset($data['sort']) && in_array($data['sort'], $sort_data)) {
+			$sql .= " ORDER BY " . $data['sort'];
+		} else {
+			$sql .= " ORDER BY order_id, date, type_id";
+		}
+
+		if (isset($data['order']) && ($data['order'] == 'DESC')) {
+			$sql .= " DESC";
+		} else {
+			$sql .= " ASC";
+		}
+
+		if (isset($data['start']) || isset($data['limit'])) {
+			if ($data['start'] < 0) {
+				$data['start'] = 0;
+			}
+
+			if ($data['limit'] < 1) {
+				$data['limit'] = 20;
+			}
+
+			$sql .= " LIMIT " . (int)$data['start'] . "," . (int)$data['limit'];
+		}
+		
+		
+		$query = $this->db->query($sql);
+
+		return $query->rows;
+	}
+
+	public function getDocumentsCount($data = array()) {
+		$this->createDocumentsView();
+
+		$sql = "SELECT COUNT(*) AS total FROM `" . DB_PREFIX . "view_order_document`";
+
+		$implode = array();
+		
+		if (!empty($data['filter_order_id'])) {
+			$implode[] = " order_id = '" . (int)$data['filter_order_id'] . "'";
+		}
+	
+		if (!empty($data['filter_reference'])) {
+			$implode[] = " reference LIKE '%" . $this->db->escape($data['filter_reference']) . "%'";
+		}
+
+		if ($implode) {
+			$sql .= " WHERE " . implode(" AND ", $implode);
+		}
+		
+		$query = $this->db->query($sql);
+
+		return $query->row['total'];
+	}
 }

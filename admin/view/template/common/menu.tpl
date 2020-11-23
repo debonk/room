@@ -71,6 +71,7 @@
       <li><a class="parent"><?php echo $text_sale; ?></a>
         <ul>
           <li><a href="<?php echo $report_sale_order; ?>"><?php echo $text_report_sale_order; ?></a></li>
+          <li><a href="<?php echo $report_sale_document; ?>"><?php echo $text_report_sale_document; ?></a></li>
           <li><a href="<?php echo $report_sale_tax; ?>"><?php echo $text_report_sale_tax; ?></a></li>
           <li><a href="<?php echo $report_sale_coupon; ?>"><?php echo $text_report_sale_coupon; ?></a></li>
         </ul>

@@ -2597,7 +2597,7 @@ class ControllerSaleOrder extends Controller {
 				$data['preview'] = 0;
 				$data['letter_content'] = '';
 				
-				$this->model_sale_order->setOrderPrinted($order_id);
+				$this->model_sale_order->editOrderPrintStatus($order_id, 1);
 			}
 			
 		} else {
@@ -2781,7 +2781,7 @@ class ControllerSaleOrder extends Controller {
 				$data['preview'] = 0;
 				$data['letter_content'] = '';
 				
-				$this->model_accounting_transaction->setTransactionPrinted($transaction_id);
+				$this->model_accounting_transaction->editTransactionPrintStatus($transaction_id, 1);
 			}
 			
 		} else {
@@ -2964,7 +2964,7 @@ class ControllerSaleOrder extends Controller {
 				$data['preview'] = 0;
 				$data['letter_content'] = '';
 				
-				$this->model_sale_order->setOrderVendorPrinted($order_vendor_info['order_vendor_id'], 'admission');
+				$this->model_sale_order->setOrderVendorPrintStatus($order_vendor_info['order_vendor_id'], 'admission', 1);
 			}
 			
 		} else {
@@ -3098,7 +3098,7 @@ class ControllerSaleOrder extends Controller {
 				$data['preview'] = 0;
 				$data['letter_content'] = '';
 				
-				$this->model_sale_order->setOrderVendorPrinted($order_vendor_info['order_vendor_id'], 'agreement');
+				$this->model_sale_order->setOrderVendorPrintStatus($order_vendor_info['order_vendor_id'], 'agreement', 1);
 			}
 			
 		} else {

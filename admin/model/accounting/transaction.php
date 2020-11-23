@@ -577,6 +577,10 @@ class ModelAccountingTransaction extends Model {
 		return $query->rows;
 	}
 
+	public function editTransactionPrintStatus($transaction_id, $printed_status) {
+		$this->db->query("UPDATE `" . DB_PREFIX . "transaction` SET printed = '" . (int)$printed_status . "' WHERE transaction_id = '" . (int)$transaction_id . "'");
+	}
+
 	public function setTransactionPrinted($transaction_id) {
 		$this->db->query("UPDATE `" . DB_PREFIX . "transaction` SET printed = '1' WHERE transaction_id = '" . (int)$transaction_id . "'");
 	}
