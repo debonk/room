@@ -20,10 +20,6 @@ class ControllerAccountingBalance extends Controller {
 		$this->load->model('accounting/transaction');
 
 		if (($this->request->server['REQUEST_METHOD'] == 'POST') && $this->validateForm()) {
-			$this->request->post['label'] = 'balance';
-			$this->request->post['reference_no'] = 'B' . date('ym');
-			$this->request->post['transaction_no'] = $this->model_accounting_transaction->getTransactionNoMax($this->request->post['reference_no']) + 1;
-			
 			$this->model_accounting_transaction->addTransaction($this->request->post);
 
 			$this->session->data['success'] = $this->language->get('text_success');
@@ -398,7 +394,7 @@ class ControllerAccountingBalance extends Controller {
 		$limit = $this->config->get('config_limit_admin');
 
 		$filter_data = array(
-			'filter_label'	 		 => 'balance',
+			'filter_label'	 		 => 'asset',
 			'filter_date_start'	     => $filter_date_start,
 			'filter_date_end'	     => $filter_date_end,
 			'filter_account_from_id' => $filter_account_from_id,
@@ -550,9 +546,10 @@ class ControllerAccountingBalance extends Controller {
 		$data['token'] = $this->session->data['token'];
 
 		$this->load->model('accounting/account');
-		$data['accounts_from'] = $this->model_accounting_account->getAccountsMenuByComponent('asset');
-		$data['accounts_to'] = $this->model_accounting_account->getAccountsMenuByComponent('asset');
-		
+	
+		$data['accounts_from'] = $this->model_accounting_account->getAccountsMenuByComponent(['asset'], ['other_income']);
+		$data['accounts_to'] = $this->model_accounting_account->getAccountsMenuByComponent(['asset']);
+	
 		$data['filter_account_from_id'] = $filter_account_from_id;
 		$data['filter_account_to_id'] = $filter_account_to_id;
 		$data['filter_date_start'] = $filter_date_start;
@@ -737,8 +734,8 @@ class ControllerAccountingBalance extends Controller {
 		$data['token'] = $this->session->data['token'];
 
 		$this->load->model('accounting/account');
-		$data['accounts_from'] = $this->model_accounting_account->getAccountsMenuByComponent('asset');
-		$data['accounts_to'] = $this->model_accounting_account->getAccountsMenuByComponent('asset');
+		$data['accounts_from'] = $this->model_accounting_account->getAccountsMenuByComponent(['asset'], ['other_income']);
+		$data['accounts_to'] = $this->model_accounting_account->getAccountsMenuByComponent(['asset']);
 		
 		$data['header'] = $this->load->controller('common/header');
 		$data['column_left'] = $this->load->controller('common/column_left');

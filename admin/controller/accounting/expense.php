@@ -20,10 +20,6 @@ class ControllerAccountingExpense extends Controller {
 		$this->load->model('accounting/transaction');
 
 		if (($this->request->server['REQUEST_METHOD'] == 'POST') && $this->validateForm()) {
-			$this->request->post['label'] = 'expense';
-			$this->request->post['reference_no'] = 'E' . date('ym');
-			$this->request->post['transaction_no'] = $this->model_accounting_transaction->getTransactionNoMax($this->request->post['reference_no']) + 1;
-			
 			$this->model_accounting_transaction->addTransaction($this->request->post);
 
 			$this->session->data['success'] = $this->language->get('text_success');
@@ -550,8 +546,8 @@ class ControllerAccountingExpense extends Controller {
 		$data['token'] = $this->session->data['token'];
 
 		$this->load->model('accounting/account');
-		$data['accounts_from'] = $this->model_accounting_account->getAccountsMenuByComponent('asset');
-		$data['accounts_to'] = $this->model_accounting_account->getAccountsMenuByComponent('expense');
+		$data['accounts_from'] = $this->model_accounting_account->getAccountsMenuByComponent(['asset']);
+		$data['accounts_to'] = $this->model_accounting_account->getAccountsMenuByComponent(['expense'], ['direct_cost']);
 		
 		$data['filter_account_from_id'] = $filter_account_from_id;
 		$data['filter_account_to_id'] = $filter_account_to_id;
@@ -737,8 +733,8 @@ class ControllerAccountingExpense extends Controller {
 		$data['token'] = $this->session->data['token'];
 
 		$this->load->model('accounting/account');
-		$data['accounts_from'] = $this->model_accounting_account->getAccountsMenuByComponent('asset');
-		$data['accounts_to'] = $this->model_accounting_account->getAccountsMenuByComponent('expense');
+		$data['accounts_from'] = $this->model_accounting_account->getAccountsMenuByComponent(['asset']);
+		$data['accounts_to'] = $this->model_accounting_account->getAccountsMenuByComponent(['expense'], ['direct_cost']);
 		
 		$data['header'] = $this->load->controller('common/header');
 		$data['column_left'] = $this->load->controller('common/column_left');

@@ -21,7 +21,26 @@ class ModelAccountingAccount extends Model {
 	public function getAccount($account_id) {
 		$query = $this->db->query("SELECT DISTINCT * FROM " . DB_PREFIX . "account WHERE account_id = '" . (int)$account_id . "'");
 
-		return $query->row;
+		$components = array(
+			'asset' 		=> ['current_asset', 'fixed_asset', 'non_current_asset', 'prepayment'],
+			'equity' 		=> ['equity'],
+			'expense' 		=> ['depreciation', 'direct_cost', 'expense', 'overhead'],
+			'liability' 	=> ['current_liability', 'liability', 'non_current_liability'],
+			'revenue' 		=> ['sale', 'revenue', 'other_income']
+		);
+		
+		$account_data = $query->row;
+		
+		foreach ($components as $key => $component) {
+			if (in_array($account_data['type'], $component)) {
+				$account_data['component'] = $key;
+
+			break;
+			};
+
+		}
+		
+		return $account_data;
 	}
 
     public function getAccounts($data = array()) {
@@ -29,10 +48,6 @@ class ModelAccountingAccount extends Model {
             $sql = "SELECT * FROM " . DB_PREFIX . "account";
 
             $implode = array();
-
-            if (isset($data['filter_type'])) {
-                $implode[] = "type = '" . $this->db->escape($data['filter_type']) . "'";
-            }
 
             if (isset($data['filter_parent_id'])) {
                 $implode[] = "parent_id = '" . (int)$data['filter_parent_id'] . "'";
@@ -42,7 +57,9 @@ class ModelAccountingAccount extends Model {
                 $implode[] = "status = '" . (int)$data['filter_status'] . "'";
             }
 
-            if (isset($data['component'])) {
+            if (!empty($data['component']) || !empty($data['filter_type'])) {
+				$types_data = array();
+
 				$components = array(
 					'asset' 		=> ['current_asset', 'fixed_asset', 'non_current_asset', 'prepayment'],
 					'equity' 		=> ['equity'],
@@ -50,18 +67,28 @@ class ModelAccountingAccount extends Model {
 					'liability' 	=> ['current_liability', 'liability', 'non_current_liability'],
 					'revenue' 		=> ['sale', 'revenue', 'other_income']
 				);
-				
-				if ($data['component'] && in_array($data['component'], array_keys($components))) {
-					$component_data = "'" . implode("', '", $components[$data['component']]) . "'";
-					
-					$implode[] = "type IN (" . $component_data . ")";
+
+				if (!empty($data['component'])) {
+					foreach ($data['component'] as $component) {
+						if (in_array($component, array_keys($components))) {
+							$types_data = array_merge($types_data, $components[$component]);
+						}
+					}
 				}
-            }
 
+				if (!empty($data['filter_type'])) {
+					$types_data = array_merge($types_data, $data['filter_type']);
+				}
+
+				$types = "'" . implode("', '", array_unique($types_data)) . "'";
+
+				$implode[] = "type IN (" . $types . ")";
+			}
+			
             if ($implode) {
-                $sql .= " WHERE " . implode(" AND ", $implode);
+				$sql .= " WHERE " . implode(" AND ", $implode);
             }
-
+			
             $sort_data = array(
                 'account_id',
                 'name',
@@ -134,10 +161,6 @@ class ModelAccountingAccount extends Model {
 
 		$implode = array();
 
-		if (isset($data['filter_type'])) {
-			$implode[] = "type = '" . $this->db->escape($data['filter_type']) . "'";
-		}
-
 		if (isset($data['filter_parent_id'])) {
 			$implode[] = "parent_id = '" . (int)$data['filter_parent_id'] . "'";
 		}
@@ -146,22 +169,34 @@ class ModelAccountingAccount extends Model {
 			$implode[] = "status = '" . (int)$data['filter_status'] . "'";
 		}
 
-		if (isset($data['filter_component'])) {
-			$components_data = array(
+		if (!empty($data['component']) || !empty($data['filter_type'])) {
+			$types_data = array();
+
+			$components = array(
 				'asset' 		=> ['current_asset', 'fixed_asset', 'non_current_asset', 'prepayment'],
 				'equity' 		=> ['equity'],
 				'expense' 		=> ['depreciation', 'direct_cost', 'expense', 'overhead'],
 				'liability' 	=> ['current_liability', 'liability', 'non_current_liability'],
 				'revenue' 		=> ['sale', 'revenue', 'other_income']
 			);
-			
-			if ($data['filter_component'] && in_array($data['filter_component'], array_keys($components_data))) {
-				$component_data = "'" . implode("', '", $components_data[$data['filter_component']]) . "'";
-				
-				$implode[] = "type IN (" . $component_data . ")";
-			}
-		}
 
+			if (!empty($data['component'])) {
+				foreach ($data['component'] as $component) {
+					if (in_array($component, array_keys($components))) {
+						$types_data = array_merge($types_data, $components[$component]);
+					}
+				}
+			}
+
+			if (!empty($data['filter_type'])) {
+				$types_data = array_merge($types_data, $data['filter_type']);
+			}
+
+			$types = "'" . implode("', '", array_unique($types_data)) . "'";
+
+			$implode[] = "type IN (" . $types . ")";
+		}
+		
 		if ($implode) {
 			$sql .= " WHERE " . implode(" AND ", $implode);
 		}
@@ -171,12 +206,13 @@ class ModelAccountingAccount extends Model {
 		return $query->row['total'];
 	}
 	
-	public function getAccountsMenuByComponent($component = '') {
+	public function getAccountsMenuByComponent($component = [], $type = []) {
 		$accounts_data = array();
 		$childs_data = array();
 
 		$filter_data = array(
 			'component' 	=> $component,
+			'filter_type' 	=> $type,
 			'filter_status'	=> 1,
 			'sort' 			=> 'account_id'
 		);

@@ -1,6 +1,6 @@
 <?php
 // Heading
-$_['heading_title']     		= 'Mutasi Saldo (Asset to Asset)';
+$_['heading_title']     		= 'Mutasi Saldo (Asset)';
 		
 // Text		
 $_['text_success']       		= 'Success: You have modified balances!';

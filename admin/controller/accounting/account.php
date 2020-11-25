@@ -195,7 +195,13 @@ class ControllerAccountingAccount extends Controller {
 		$results = $this->model_accounting_account->getAccounts($filter_data);
 
 		foreach ($results as $result) {
-			$parent_info = $this->model_accounting_account->getAccount($result['parent_id']);
+			if (!empty($result['parent_id'])) {
+				$parent_info = $this->model_accounting_account->getAccount($result['parent_id']);
+
+				$parent = $parent_info['name'];
+			} else {
+				$parent = $this->language->get('text_none');
+			}
 			
 			$data['accounts'][] = array(
 				'account_id'        => $result['account_id'],
@@ -203,9 +209,8 @@ class ControllerAccountingAccount extends Controller {
 				'description'       => $result['description'],
 				'type'              => $result['type'],
 				'text_type' 		=> $this->language->get('text_' . $result['type']),
-				'parent'         	=> $parent_info ? $parent_info['name'] : $this->language->get('text_none'),
+				'parent'         	=> $parent,
 				'status'            => $result['status'] ? $this->language->get('text_enabled') : $this->language->get('text_disabled'),
-				// 'retained_earnings' => $result['retained_earnings'],
 				'edit'          	=> $this->url->link('accounting/account/edit', 'token=' . $this->session->data['token'] . '&account_id=' . $result['account_id'] . $url, true)
 			);
 		}
@@ -529,7 +534,7 @@ class ControllerAccountingAccount extends Controller {
         $this->load->model('accounting/account');
 
         $filter_data = array(
-            'filter_type' => $this->request->get['type'],
+            'filter_type' => [$this->request->get['type']],
 			'sort'		  => 'account_id'
         );
 
