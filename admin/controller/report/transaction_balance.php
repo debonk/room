@@ -77,7 +77,7 @@ class ControllerReportTransactionBalance extends Controller {
 		$data['token'] = $this->session->data['token'];
 
 		$this->load->model('accounting/account');
-		$data['accounts'] = $this->model_accounting_account->getAccountsMenuByComponent('asset');
+		$data['accounts'] = $this->model_accounting_account->getAccountsMenuByComponent(['asset']);
 		
 		$data['filter_account_id'] = $filter_account_id;
 		$data['filter_date_start'] = $filter_date_start;
