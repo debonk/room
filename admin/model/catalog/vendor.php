@@ -15,7 +15,7 @@ class ModelCatalogVendor extends Model {
 	}
 
 	public function getVendor($vendor_id) {
-		$query = $this->db->query("SELECT DISTINCT v.*, (SELECT vt.name FROM " . DB_PREFIX . "vendor_type vt WHERE vt.vendor_type_id = v.vendor_type_id) AS vendor_type FROM " . DB_PREFIX . "vendor v WHERE v.vendor_id = '" . (int)$vendor_id . "'");
+		$query = $this->db->query("SELECT DISTINCT v.*, vt.name AS vendor_type, vt.deposit FROM " . DB_PREFIX . "vendor v LEFT JOIN " . DB_PREFIX . "vendor_type vt ON (vt.vendor_type_id = v.vendor_type_id) WHERE v.vendor_id = '" . (int)$vendor_id . "'");
 
 		return $query->row;
 	}
@@ -27,7 +27,7 @@ class ModelCatalogVendor extends Model {
 	}
 
 	public function getVendors($data = array()) {
-		$sql = "SELECT v.*, vt.name AS vendor_type FROM " . DB_PREFIX . "vendor v LEFT JOIN " . DB_PREFIX . "vendor_type vt ON (vt.vendor_type_id = v.vendor_type_id)";
+		$sql = "SELECT v.*, vt.name AS vendor_type, vt.deposit FROM " . DB_PREFIX . "vendor v LEFT JOIN " . DB_PREFIX . "vendor_type vt ON (vt.vendor_type_id = v.vendor_type_id)";
 
 		$implode = array();
 

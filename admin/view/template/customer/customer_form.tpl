@@ -759,12 +759,16 @@ function addAddress() {
 
 	html += '  <div class="form-group required">';
 	html += '    <label class="col-sm-2 control-label" for="input-country' + address_row + '"><?php echo $entry_country; ?></label>';
-	html += '    <div class="col-sm-10"><select name="address[' + address_row + '][country_id]" id="input-country' + address_row + '" onchange="country(this, \'' + address_row + '\', \'0\');" class="form-control">';
-    html += '         <option value=""><?php echo $text_select; ?></option>';
-    <?php foreach ($countries as $country) { ?>
-    html += '         <option value="<?php echo $country['country_id']; ?>"><?php echo addslashes($country['name']); ?></option>';
-    <?php } ?>
-    html += '      </select></div>';
+	html += '    <div class="col-sm-10"><select name="address[' + address_row + '][country_id]" id="input-country' + address_row + '" onchange="country(this, \'' + address_row + '\', \'1517\');" class="form-control">';
+  html += '         <option value=""><?php echo $text_select; ?></option>';
+  <?php foreach ($countries as $country) { ?>
+  <?php if ($country['country_id'] == '100') { ?>
+  html += '         <option value="<?php echo $country['country_id']; ?>" selected><?php echo addslashes($country['name']); ?></option>';
+  <?php } else { ?>
+  html += '         <option value="<?php echo $country['country_id']; ?>"><?php echo addslashes($country['name']); ?></option>';
+  <?php } ?>
+  <?php } ?>
+  html += '      </select></div>';
 	html += '  </div>';
 
 	html += '  <div class="form-group required">';

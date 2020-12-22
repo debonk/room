@@ -780,9 +780,9 @@ class ControllerSettingSetting extends Controller {
 
 		$this->load->model('accounting/account');
 
-		$data['liability_accounts'] = $this->model_accounting_account->getAccountsMenuByComponent($component = 'liability');
-		$data['revenue_accounts'] = $this->model_accounting_account->getAccountsMenuByComponent($component = 'revenue');
-		$data['asset_accounts'] = $this->model_accounting_account->getAccountsMenuByComponent($component = 'asset');
+		$data['liability_accounts'] = $this->model_accounting_account->getAccountsMenuByComponent($component = ['liability']);
+		$data['revenue_accounts'] = $this->model_accounting_account->getAccountsMenuByComponent($component = ['revenue']);
+		$data['asset_accounts'] = $this->model_accounting_account->getAccountsMenuByComponent($component = ['asset']);
 
 		if (isset($this->request->post['config_deposit'])) {
 			$data['config_deposit'] = $this->request->post['config_deposit'];

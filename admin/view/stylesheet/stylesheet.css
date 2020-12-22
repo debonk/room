@@ -244,6 +244,12 @@ span.hidden-xs, span.hidden-sm, span.hidden-md, span.hidden-lg {
 #menu li.active li a {
 	color: #C4C4C4;
 }
+#menu li ul li a.bypass {
+	color: #c48787;
+}
+#menu li ul li a.modify {
+	color: #1cc75e;
+}
 #menu li li.active > a:last-child {
 	color: #FFFFFF;
 }
@@ -663,9 +669,6 @@ td.calendar-day-head {
 }
 /* shared */
 td.calendar-day, td.calendar-day-np {
-	/* height:80px; */
-	/* width:120px; */
-	/* max-width:14.28%; */
 	padding:5px;
 	border-bottom:1px solid #999;
 	border-right:1px solid #999;
@@ -673,11 +676,7 @@ td.calendar-day, td.calendar-day-np {
 	position:relative;
 }
 td.calendar-day-np {
-	/* height:80px; */
 	background-color:#eee;
-	/* margin:0; */
-	/* padding:0; */
-	/* height:80px; */
 }
 
 a.slot-prp, a.slot-prm, a.slot-prf {
@@ -712,14 +711,6 @@ a.slot-prf, a.slot-cdf, a.slot-krf, a.slot-pof {
 	color: #f24545;
 	background-color: #fff; }
 
-/* Calendar Module Modification */
-/* .calendar .months-container .month-container { */
-	/* height: 220px!important; */
-	/* padding-bottom: 10px!important; */
-/* } */
-/* .calendar table.month td.day { */
-	/* border-radius: 2px; */
-/* } */
 .calendar table.month:hover {
 	background: rgba(0,0,0,.2);
 	border-radius: 5px;

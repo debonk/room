@@ -1,8 +1,10 @@
 <?php
-class ControllerCatalogVendorType extends Controller {
+class ControllerCatalogVendorType extends Controller
+{
 	private $error = array();
 
-	public function index() {
+	public function index()
+	{
 		$this->load->language('catalog/vendor_type');
 
 		$this->document->setTitle($this->language->get('heading_title'));
@@ -12,7 +14,8 @@ class ControllerCatalogVendorType extends Controller {
 		$this->getList();
 	}
 
-	public function add() {
+	public function add()
+	{
 		$this->load->language('catalog/vendor_type');
 
 		$this->document->setTitle($this->language->get('heading_title'));
@@ -44,7 +47,8 @@ class ControllerCatalogVendorType extends Controller {
 		$this->getForm();
 	}
 
-	public function edit() {
+	public function edit()
+	{
 		$this->load->language('catalog/vendor_type');
 
 		$this->document->setTitle($this->language->get('heading_title'));
@@ -76,7 +80,8 @@ class ControllerCatalogVendorType extends Controller {
 		$this->getForm();
 	}
 
-	public function delete() {
+	public function delete()
+	{
 		$this->load->language('catalog/vendor_type');
 
 		$this->document->setTitle($this->language->get('heading_title'));
@@ -110,7 +115,8 @@ class ControllerCatalogVendorType extends Controller {
 		$this->getList();
 	}
 
-	protected function getList() {
+	protected function getList()
+	{
 		if (isset($this->request->get['sort'])) {
 			$sort = $this->request->get['sort'];
 		} else {
@@ -259,27 +265,33 @@ class ControllerCatalogVendorType extends Controller {
 		$this->response->setOutput($this->load->view('catalog/vendor_type_list', $data));
 	}
 
-	protected function getForm() {
-		$data['heading_title'] = $this->language->get('heading_title');
-
+	protected function getForm()
+	{
 		$data['text_form'] = !isset($this->request->get['vendor_type_id']) ? $this->language->get('text_add') : $this->language->get('text_edit');
 
-		$data['entry_name'] = $this->language->get('entry_name');
-		$data['entry_sort_order'] = $this->language->get('entry_sort_order');
-
-		$data['button_save'] = $this->language->get('button_save');
-		$data['button_cancel'] = $this->language->get('button_cancel');
-
-		if (isset($this->error['warning'])) {
-			$data['error_warning'] = $this->error['warning'];
-		} else {
-			$data['error_warning'] = '';
+		$language_items = array(
+			'heading_title',
+			'entry_name',
+			'entry_deposit',
+			'entry_sort_order',
+			'button_save',
+			'button_cancel'
+		);
+		foreach ($language_items as $language_item) {
+			$data[$language_item] = $this->language->get($language_item);
 		}
-
-		if (isset($this->error['name'])) {
-			$data['error_name'] = $this->error['name'];
-		} else {
-			$data['error_name'] = '';
+		
+		$error_items = array(
+			'warning',
+			'name',
+			'deposit'
+		);
+		foreach ($error_items as $error_item) {
+			if (isset($this->error[$error_item])) {
+				$data['error_' . $error_item] = $this->error[$error_item];
+			} else {
+				$data['error_' . $error_item] = '';
+			}
 		}
 
 		$url = '';
@@ -328,6 +340,14 @@ class ControllerCatalogVendorType extends Controller {
 			$data['name'] = '';
 		}
 
+		if (isset($this->request->post['deposit'])) {
+			$data['deposit'] = $this->request->post['deposit'];
+		} elseif (!empty($vendor_type_info)) {
+			$data['deposit'] = $vendor_type_info['deposit'];
+		} else {
+			$data['deposit'] = '';
+		}
+
 		if (isset($this->request->post['sort_order'])) {
 			$data['sort_order'] = $this->request->post['sort_order'];
 		} elseif (!empty($vendor_type_info)) {
@@ -343,7 +363,8 @@ class ControllerCatalogVendorType extends Controller {
 		$this->response->setOutput($this->load->view('catalog/vendor_type_form', $data));
 	}
 
-	protected function validateForm() {
+	protected function validateForm()
+	{
 		if (!$this->user->hasPermission('modify', 'catalog/vendor_type')) {
 			$this->error['warning'] = $this->language->get('error_permission');
 		}
@@ -352,10 +373,15 @@ class ControllerCatalogVendorType extends Controller {
 			$this->error['name'] = $this->language->get('error_name');
 		}
 
+		if ((int)$this->request->post['deposit'] < 0) {
+			$this->error['deposit'] = $this->language->get('error_deposit');
+		}
+
 		return !$this->error;
 	}
 
-	protected function validateDelete() {
+	protected function validateDelete()
+	{
 		if (!$this->user->hasPermission('modify', 'catalog/vendor_type')) {
 			$this->error['warning'] = $this->language->get('error_permission');
 		}

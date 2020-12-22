@@ -45,7 +45,7 @@ class ModelUserUser extends Model {
 	}
 
 	public function getUsers($data = array()) {
-		$sql = "SELECT * FROM `" . DB_PREFIX . "user`";
+		$sql = "SELECT u.*, ug.name AS user_group FROM `" . DB_PREFIX . "user` u LEFT JOIN `" . DB_PREFIX . "user_group` ug ON (ug.user_group_id = u.user_group_id)";
 
 		$sort_data = array(
 			'username',

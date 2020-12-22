@@ -175,6 +175,7 @@ class ControllerUserUser extends Controller {
 			$data['users'][] = array(
 				'user_id'    => $result['user_id'],
 				'username'   => $result['username'],
+				'user_group' => $result['user_group'],
 				'status'     => ($result['status'] ? $this->language->get('text_enabled') : $this->language->get('text_disabled')),
 				'date_added' => date($this->language->get('date_format_short'), strtotime($result['date_added'])),
 				'edit'       => $this->url->link('user/user/edit', 'token=' . $this->session->data['token'] . '&user_id=' . $result['user_id'] . $url, true)
@@ -188,6 +189,7 @@ class ControllerUserUser extends Controller {
 		$data['text_confirm'] = $this->language->get('text_confirm');
 
 		$data['column_username'] = $this->language->get('column_username');
+		$data['column_user_group'] = $this->language->get('column_user_group');
 		$data['column_status'] = $this->language->get('column_status');
 		$data['column_date_added'] = $this->language->get('column_date_added');
 		$data['column_action'] = $this->language->get('column_action');

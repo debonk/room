@@ -88,6 +88,10 @@ class User {
 		return $this->username;
 	}
 
+	public function getPermission() {
+		return $this->permission;
+	}
+
 	public function getGroupId() {
 		return $this->user_group_id;
 	}

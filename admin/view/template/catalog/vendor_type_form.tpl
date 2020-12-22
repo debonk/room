@@ -34,6 +34,15 @@
               <?php } ?>
             </div>
           </div>
+          <div class="form-group required">
+            <label class="col-sm-2 control-label"><?php echo $entry_deposit; ?></label>
+            <div class="col-sm-10">
+              <input type="text" name="deposit" value="<?php echo $deposit; ?>" placeholder="<?php echo $entry_deposit; ?>" id="input-deposit" class="form-control" />
+              <?php if ($error_deposit) { ?>
+              <div class="text-danger"><?php echo $error_deposit; ?></div>
+              <?php } ?>
+            </div>
+          </div>
           <div class="form-group">
             <label class="col-sm-2 control-label" for="input-sort-order"><?php echo $entry_sort_order; ?></label>
             <div class="col-sm-10">

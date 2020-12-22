@@ -10,6 +10,7 @@ $_['text_edit']         = 'Edit User';
 
 // Column
 $_['column_username']   = 'Username';
+$_['column_user_group'] = 'User Group';
 $_['column_status']     = 'Status';
 $_['column_date_added'] = 'Date Added';
 $_['column_action']     = 'Action';
