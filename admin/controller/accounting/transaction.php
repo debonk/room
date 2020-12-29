@@ -802,31 +802,18 @@ class ControllerAccountingTransaction extends Controller {
 			$this->error['account_to'] = $this->language->get('error_account_to');
 		}
 
-		if (empty($this->request->post['date'])) {
+		if (isset($this->request->post['date']) && empty($this->request->post['date'])) {
 			$this->error['date'] = $this->language->get('error_date');
 		}
 
-		if ((utf8_strlen($this->request->post['description']) < 5) || (utf8_strlen($this->request->post['description']) > 256)) {
+		if (isset($this->request->post['description']) && ((utf8_strlen($this->request->post['description']) < 5) || (utf8_strlen($this->request->post['description']) > 256))) {
 			$this->error['description'] = $this->language->get('error_description');
 		}
 
-		if (empty((float)$this->request->post['amount'])) {
+		if (isset($this->request->post['amount']) && empty((float)$this->request->post['amount'])) {
 			$this->error['amount'] = $this->language->get('error_amount');
 		}
 		
-		if (isset($this->request->get['transaction_id'])) {
-			$transaction_info = $this->model_accounting_transaction->getTransaction($this->request->get['transaction_id']);
-
-			if (!$transaction_info) {
-				$this->error['warning'] = $this->language->get('error_not_found');
-				
-			} elseif ($transaction_info['order_id']) {
-				unset($this->error['date']);
-				unset($this->error['description']);
-				unset($this->error['amount']);
-			}
-		}
-
 		if ($this->error && !isset($this->error['warning'])) {
 			$this->error['warning'] = $this->language->get('error_warning');
 		}

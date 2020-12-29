@@ -24,11 +24,14 @@ class ModelAccountingTransaction extends Model {
 			'E'	=> 'expense'
 		);
 		
-		$label = $account_to_info['component'];
+        if (!isset($data['label'])) {
+			$data['label'] = $account_to_info['component'];
+        }
+      
 		$reference_no = array_search($account_to_info['component'], $label_data) . date('ym');
 		$transaction_no = $this->getTransactionNoMax($reference_no) + 1;
 		
-		$this->db->query("INSERT INTO " . DB_PREFIX . "transaction SET account_from_id = '" . (int)$data['account_from_id'] . "', account_to_id = '" . (int)$data['account_to_id'] . "', label = '" . $this->db->escape($label) . "', label_id = '" . (int)$data['label_id'] . "', order_id = '" . (int)$data['order_id'] . "', date = DATE('" . $this->db->escape($data['date']) . "'), payment_method = '" . $this->db->escape($data['payment_method']) . "', description = '" . $this->db->escape($data['description']) . "', amount = '" . (float)$data['amount'] . "', customer_name = '" . $this->db->escape($data['customer_name']) . "', reference_no = '" . $this->db->escape($reference_no) . "', transaction_no = '" . (int)$transaction_no . "', edit_permission = '0', date_added = NOW(), user_id = '" . $this->user->getId() . "'");
+		$this->db->query("INSERT INTO " . DB_PREFIX . "transaction SET account_from_id = '" . (int)$data['account_from_id'] . "', account_to_id = '" . (int)$data['account_to_id'] . "', label = '" . $this->db->escape($data['label']) . "', label_id = '" . (int)$data['label_id'] . "', order_id = '" . (int)$data['order_id'] . "', date = DATE('" . $this->db->escape($data['date']) . "'), payment_method = '" . $this->db->escape($data['payment_method']) . "', description = '" . $this->db->escape($data['description']) . "', amount = '" . (float)$data['amount'] . "', customer_name = '" . $this->db->escape($data['customer_name']) . "', reference_no = '" . $this->db->escape($reference_no) . "', transaction_no = '" . (int)$transaction_no . "', edit_permission = '0', date_added = NOW(), user_id = '" . $this->user->getId() . "'");
 	}
 
 	public function editTransaction($transaction_id, $data) {

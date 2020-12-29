@@ -146,6 +146,7 @@ $_['entry_tax_customer']              = 'Use Customer Tax Address';
 $_['entry_tax_default']               = 'Use Store Tax Address';
 $_['entry_telephone']                 = 'Telephone';
 $_['entry_theme']                     = 'Theme';
+$_['entry_vendor_deposit_account']    = 'Vendor Deposit Account';
 $_['entry_voucher_max']               = 'Voucher Max';
 $_['entry_voucher_min']               = 'Voucher Min';
 $_['entry_weight_class']              = 'Weight Class';
@@ -225,6 +226,7 @@ $_['help_stock_display']              = 'Display stock quantity on the product p
 $_['help_stock_warning']              = 'Display out of stock message on the shopping cart page if a product is out of stock but stock checkout is yes. (Warning always shows if stock checkout is no)';
 $_['help_tax_customer']               = 'Use the customer\'s default address when they login to calculate taxes. You can choose to use the default address for the customer\'s shipping or payment address.';
 $_['help_tax_default']                = 'Use the store address to calculate taxes if customer is not logged in. You can choose to use the store address for the customer\'s shipping or payment address.';
+$_['help_vendor_deposit_account']     = 'Akun Penerimaan Jaminan yang dibayarkan oleh Vendor.';
 $_['help_voucher_max']                = 'Maximum amount a customer can purchase a voucher for.';
 $_['help_voucher_min']                = 'Minimum amount a customer can purchase a voucher for.';
 

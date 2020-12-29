@@ -100,6 +100,7 @@ class ControllerSettingSetting extends Controller {
 		$data['entry_account_mail'] = $this->language->get('entry_account_mail');
 		$data['entry_asset_account'] = $this->language->get('entry_asset_account');
 		$data['entry_prepaid_account'] = $this->language->get('entry_prepaid_account');
+		$data['entry_vendor_deposit_account'] = $this->language->get('entry_vendor_deposit_account');
 		$data['entry_adjustment_account'] = $this->language->get('entry_adjustment_account');
 		$data['entry_deposit'] = $this->language->get('entry_deposit');
 		$data['entry_complete_status_required'] = $this->language->get('entry_complete_status_required');
@@ -197,6 +198,7 @@ class ControllerSettingSetting extends Controller {
 		$data['help_account_mail'] = $this->language->get('help_account_mail');
 		$data['help_asset_account'] = $this->language->get('help_asset_account');
 		$data['help_prepaid_account'] = $this->language->get('help_prepaid_account');
+		$data['help_vendor_deposit_account'] = $this->language->get('help_vendor_deposit_account');
 		$data['help_adjustment_account'] = $this->language->get('help_adjustment_account');
 		$data['help_deposit'] = $this->language->get('help_deposit');
 		$data['help_complete_status_required'] = $this->language->get('help_complete_status_required');
@@ -770,6 +772,12 @@ class ControllerSettingSetting extends Controller {
 			$data['config_prepaid_account_id'] = $this->request->post['config_prepaid_account_id'];
 		} else {
 			$data['config_prepaid_account_id'] = $this->config->get('config_prepaid_account_id');
+		}
+
+		if (isset($this->request->post['config_vendor_deposit_account_id'])) {
+			$data['config_vendor_deposit_account_id'] = $this->request->post['config_vendor_deposit_account_id'];
+		} else {
+			$data['config_vendor_deposit_account_id'] = $this->config->get('config_vendor_deposit_account_id');
 		}
 
 		if (isset($this->request->post['config_adjustment_account_id'])) {

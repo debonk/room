@@ -1,5 +1,5 @@
 <?php
-class ModelAccountTransaction extends Model {
+class ModelAccountTransaction extends Model { //Utk transaksi customer (credit)
 	public function getTransactions($data = array()) {
 		$sql = "SELECT * FROM `" . DB_PREFIX . "customer_transaction` WHERE customer_id = '" . (int)$this->customer->getId() . "'";
 

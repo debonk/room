@@ -114,8 +114,12 @@ class ControllerCommonMenu extends Controller
 			}
 		}
 
-		$data['menu_groups']['sale']['sale/order']['url'] = $this->url->link('sale/order/yearView', 'token=' . $this->session->data['token'], true);
-		$data['child_groups']['paypal'][0]['url'] = $this->url->link('payment/pp_express/search', 'token=' . $this->session->data['token'], true);
+		if (isset($data['menu_groups']['sale']['sale/order'])) {
+			$data['menu_groups']['sale']['sale/order']['url'] = $this->url->link('sale/order/yearView', 'token=' . $this->session->data['token'], true);
+		}
+		if (isset($data['child_groups']['paypal'][0])) {
+			$data['child_groups']['paypal'][0]['url'] = $this->url->link('payment/pp_express/search', 'token=' . $this->session->data['token'], true);
+		}
 
 		return $this->load->view('common/menu', $data);
 	}

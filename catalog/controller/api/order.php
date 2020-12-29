@@ -1,6 +1,8 @@
 <?php
-class ControllerApiOrder extends Controller {
-	public function add() {
+class ControllerApiOrder extends Controller
+{
+	public function add()
+	{
 		$this->load->language('api/order');
 
 		$json = array();
@@ -87,7 +89,7 @@ class ControllerApiOrder extends Controller {
 			if (count($primary_products) != 1) {
 				$json['error'] = $this->language->get('error_primary_product');
 			}
-			
+
 			// Validate minimum quantity requirements.
 			$products = $this->cart->getProducts();
 
@@ -109,23 +111,23 @@ class ControllerApiOrder extends Controller {
 
 			if (!$json) {
 				$json['success'] = $this->language->get('text_success');
-				
+
 				$order_data = array();
 
 				// $inv_prefix = current($primary_products)['model'];
 				// $inv_prefix .= '-' . date('y/m', strtotime($this->session->data['event']['event_date'])) . '-';
-				
+
 				// $this->load->model('localisation/ceremony');
 				// $ceremony_code = $this->model_localisation_ceremony->getCeremony($this->session->data['event']['ceremony_id'])['code'];
 
 				// $inv_prefix .= $ceremony_code . '-';
-				
+
 				// $inv_prefix = str_ireplace('{YEAR}',date('Y', strtotime($this->session->data['event']['event_date'])),$this->config->get('config_invoice_prefix'));
 
 				// Store Details
 				// $order_data['invoice_prefix'] = $this->config->get('config_invoice_prefix');
 				// $order_data['invoice_prefix'] = $inv_prefix;
-				$order_data['invoice_prefix'] = str_ireplace('{YEAR}',date('Y'),$this->config->get('config_invoice_prefix'));
+				$order_data['invoice_prefix'] = str_ireplace('{YEAR}', date('Y'), $this->config->get('config_invoice_prefix'));
 				$order_data['store_id'] = $this->config->get('config_store_id');
 				$order_data['store_name'] = $this->config->get('config_name');
 				$order_data['store_url'] = $this->config->get('config_url');
@@ -145,7 +147,7 @@ class ControllerApiOrder extends Controller {
 				$order_data['event_date'] = $this->session->data['event']['event_date'];
 				$order_data['slot_id'] = $this->session->data['event']['slot_id'];
 				$order_data['ceremony_id'] = $this->session->data['event']['ceremony_id'];
-				
+
 				// Payment Details
 				$order_data['payment_firstname'] = $this->session->data['payment_address']['firstname'];
 				$order_data['payment_lastname'] = $this->session->data['payment_address']['lastname'];
@@ -288,7 +290,7 @@ class ControllerApiOrder extends Controller {
 					'taxes'  => &$taxes,
 					'total'  => &$total
 				);
-			
+
 				$sort_order = array();
 
 				$results = $this->model_extension_extension->getExtensions('total');
@@ -302,7 +304,7 @@ class ControllerApiOrder extends Controller {
 				foreach ($results as $result) {
 					if ($this->config->get($result['code'] . '_status')) {
 						$this->load->model('total/' . $result['code']);
-						
+
 						// We have to put the totals in an array so that they pass by reference.
 						$this->{'model_total_' . $result['code']}->getTotal($total_data);
 					}
@@ -377,7 +379,7 @@ class ControllerApiOrder extends Controller {
 				}
 
 				$order_data['user_id'] = $this->request->post['user_id'];
-						
+
 				$this->load->model('checkout/order');
 
 				$json['order_id'] = $this->model_checkout_order->addOrder($order_data);
@@ -390,7 +392,7 @@ class ControllerApiOrder extends Controller {
 				}
 
 				$this->model_checkout_order->addOrderHistory($json['order_id'], $order_status_id, '', 0, 0, '', 0, $this->request->post['user_id']);
-			
+
 				$this->cart->clear();
 				unset($this->session->data['event']);
 				unset($this->session->data['customer']);
@@ -409,7 +411,8 @@ class ControllerApiOrder extends Controller {
 		$this->response->setOutput(json_encode($json));
 	}
 
-	public function edit() {
+	public function edit()
+	{
 		$this->load->language('api/order');
 
 		$json = array();
@@ -506,10 +509,10 @@ class ControllerApiOrder extends Controller {
 				if (count($primary_products) != 1) {
 					$json['error'] = $this->language->get('error_primary_product');
 				}
-				
+
 				// Validate minimum quantity requirements.
 				$products = $this->cart->getProducts();
-				
+
 				foreach ($products as $product) {
 					$product_total = 0;
 
@@ -528,25 +531,25 @@ class ControllerApiOrder extends Controller {
 
 				if (!$json) {
 					$json['success'] = $this->language->get('text_success');
-					
+
 					$order_data = array();
 
 					// $inv_prefix = current($primary_products)['model'];
 					// $inv_prefix .= '-' . date('y/m', strtotime($this->session->data['event']['event_date'])) . '-';
-					
+
 					// $this->load->model('localisation/ceremony');
 					// $ceremony_code = $this->model_localisation_ceremony->getCeremony($this->session->data['event']['ceremony_id'])['code'];
 
 					// $inv_prefix .= $ceremony_code . '-';
-					
+
 					// if ($order_info['invoice_no']) {
-						// $inv_prefix .= str_pad($order_info['invoice_no'],4,0,STR_PAD_LEFT);
+					// $inv_prefix .= str_pad($order_info['invoice_no'],4,0,STR_PAD_LEFT);
 					// }
 
 					// Store Details
 					// $order_data['invoice_prefix'] = $this->config->get('config_invoice_prefix');
 					// $order_data['invoice_prefix'] = $inv_prefix;
-					$order_data['invoice_prefix'] = str_ireplace('{YEAR}',date('Y', strtotime($this->session->data['event']['event_date'])),$this->config->get('config_invoice_prefix'));
+					$order_data['invoice_prefix'] = str_ireplace('{YEAR}', date('Y', strtotime($this->session->data['event']['event_date'])), $this->config->get('config_invoice_prefix'));
 
 					if ($order_data['invoice_prefix'] == $order_info['invoice_prefix']) {
 						$order_data['invoice_no'] = $order_info['invoice_no'];
@@ -573,7 +576,7 @@ class ControllerApiOrder extends Controller {
 					$order_data['event_date'] = $this->session->data['event']['event_date'];
 					$order_data['slot_id'] = $this->session->data['event']['slot_id'];
 					$order_data['ceremony_id'] = $this->session->data['event']['ceremony_id'];
-					
+
 					// Payment Details
 					$order_data['payment_firstname'] = $this->session->data['payment_address']['firstname'];
 					$order_data['payment_lastname'] = $this->session->data['payment_address']['lastname'];
@@ -709,14 +712,14 @@ class ControllerApiOrder extends Controller {
 					$totals = array();
 					$taxes = $this->cart->getTaxes();
 					$total = 0;
-					
+
 					// Because __call can not keep var references so we put them into an array. 
 					$total_data = array(
 						'totals' => &$totals,
 						'taxes'  => &$taxes,
 						'total'  => &$total
 					);
-			
+
 					$sort_order = array();
 
 					$results = $this->model_extension_extension->getExtensions('total');
@@ -730,7 +733,7 @@ class ControllerApiOrder extends Controller {
 					foreach ($results as $result) {
 						if ($this->config->get($result['code'] . '_status')) {
 							$this->load->model('total/' . $result['code']);
-							
+
 							// We have to put the totals in an array so that they pass by reference.
 							$this->{'model_total_' . $result['code']}->getTotal($total_data);
 						}
@@ -782,7 +785,7 @@ class ControllerApiOrder extends Controller {
 					}
 
 					$this->model_checkout_order->addOrderHistory($order_id, $order_status_id, '', 0, 0, '', 0, $this->request->post['user_id']);
-					
+
 					$this->cart->clear();
 					unset($this->session->data['event']);
 					unset($this->session->data['customer']);
@@ -804,7 +807,8 @@ class ControllerApiOrder extends Controller {
 		$this->response->setOutput(json_encode($json));
 	}
 
-	public function delete() {
+	public function delete()
+	{
 		$this->load->language('api/order');
 
 		$json = array();
@@ -813,6 +817,7 @@ class ControllerApiOrder extends Controller {
 			$json['error'] = $this->language->get('error_permission');
 		} else {
 			$this->load->model('checkout/order');
+			$this->load->model('accounting/transaction');
 
 			if (isset($this->request->get['order_id'])) {
 				$order_id = $this->request->get['order_id'];
@@ -821,14 +826,14 @@ class ControllerApiOrder extends Controller {
 			}
 
 			$order_info = $this->model_checkout_order->getOrder($order_id);
-			$transactions = $this->model_checkout_order->getTransactionsByOrderId($order_id);
+			$transactions = $this->model_accounting_transaction->getTransactionsByOrderId($order_id);
 
 			if (!$order_info) {
 				$json['error'] = $this->language->get('error_not_found');
 			} elseif ($transactions) {
 				$json['error'] = $this->language->get('error_transaction');
 			} else {
-				$this->model_checkout_order->deleteOrder($order_id);
+				// $this->model_checkout_order->deleteOrder($order_id);
 
 				$json['success'] = $this->language->get('text_success');
 			}
@@ -845,14 +850,14 @@ class ControllerApiOrder extends Controller {
 		$this->response->setOutput(json_encode($json));
 	}
 
-	public function history() {
+	public function history()
+	{
 		$this->load->language('api/order');
 
 		$json = array();
 
 		if (!isset($this->session->data['api_id'])) {
 			$json['error'] = $this->language->get('error_permission');
-			
 		} elseif (isset($this->request->post['user_id'])) {
 			$this->load->model('user/user');
 			$user_group_id = $this->model_user_user->getUserGroupId($this->request->post['user_id']);
@@ -866,7 +871,7 @@ class ControllerApiOrder extends Controller {
 		} else {
 			$json['error'] = $this->language->get('error_user_not_found');
 		}
-		
+
 		if (!$json) {
 			// Add keys for missing post vars
 			$keys = array(
@@ -884,7 +889,7 @@ class ControllerApiOrder extends Controller {
 					$this->request->post[$key] = '';
 				}
 			}
-			
+
 			$this->load->model('checkout/order');
 
 			if (!empty($this->config->get('config_status_with_payment')) && in_array((int)$this->request->post['order_status_id'], $this->config->get('config_status_with_payment'))) {
@@ -906,32 +911,56 @@ class ControllerApiOrder extends Controller {
 
 		if (!$json) {
 			$order_info = $this->model_checkout_order->getOrder($order_id);
-			
+
 			if ($order_info) {
 				$asset_id = $this->config->get($order_info['payment_code'] . '_asset_id');
-			
+
 				$this->load->model('accounting/account');
-				
+
 				$asset_info = $this->model_accounting_account->getAccount($asset_id);
-				
+
 				if (empty($asset_info)) {
 					$asset_replacement_id = $this->config->get('config_asset_account_id');
-					
+
 					$asset_replacement_info = $this->model_accounting_account->getAccount($asset_replacement_id);
-					
+
 					if (empty($asset_replacement_info)) {
 						$json['error'] = $this->language->get('error_asset_not_found');
 					}
 				}
-				
+
 				$prepaid_account_id = $this->config->get('config_prepaid_account_id');
-				
+
 				$prepaid_account_info = $this->model_accounting_account->getAccount($prepaid_account_id);
-				
+
 				if (empty($prepaid_account_info)) {
 					$json['error'] = $this->language->get('error_liability_not_found');
 				}
-				
+
+				// If current order status is not complete but new status is complete then check for adjustment transaction
+				if (!in_array($order_info['order_status_id'], $this->config->get('config_complete_status')) && in_array($this->request->post['order_status_id'], $this->config->get('config_complete_status'))) {
+					$this->load->model('accounting/transaction');
+
+					$filter_data = array(
+						'filter_account_from_id' => $this->config->get('config_adjustment_account_id'),
+						'filter_order_id'	 	 => $order_id,
+						// 'filter_label'	 	 	 => 'revenue'
+					);
+
+					if ($this->model_accounting_transaction->getTransactionsTotalByOrderId($order_id, $filter_data)) {
+						$json['error'] = $this->language->get('error_adjustment');
+					}
+
+					$filter_data = array(
+						'filter_account_from_id' => $this->config->get('config_prepaid_account_id'),
+						'filter_order_id'	 	 => $order_id,
+						'filter_label'	 	 	 => 'customer'
+					);
+
+					if ($order_info['total'] <> $this->model_accounting_transaction->getTransactionsTotalByOrderId($order_id, $filter_data)) {
+						$json['error'] = $this->language->get('error_adjustment_amount');
+					}
+				}
 			} else {
 				$json['error'] = $this->language->get('error_not_found');
 			}
@@ -942,7 +971,7 @@ class ControllerApiOrder extends Controller {
 
 			$json['success'] = $this->language->get('text_success');
 		}
-		
+
 		if (isset($this->request->server['HTTP_ORIGIN'])) {
 			$this->response->addHeader('Access-Control-Allow-Origin: ' . $this->request->server['HTTP_ORIGIN']);
 			$this->response->addHeader('Access-Control-Allow-Methods: GET, PUT, POST, DELETE, OPTIONS');
@@ -954,7 +983,8 @@ class ControllerApiOrder extends Controller {
 		$this->response->setOutput(json_encode($json));
 	}
 
-	public function expired() {
+	public function expired()
+	{
 		$this->load->language('api/order');
 
 		$json = array();
@@ -962,12 +992,12 @@ class ControllerApiOrder extends Controller {
 		if (!isset($this->session->data['api_id'])) {
 			$json['error'] = $this->language->get('error_permission');
 		}
-		
+
 		if (!$json) {
 			if (!isset($this->request->post['user_id'])) {
 				$this->request->post['user_id'] = 0;
 			}
-			
+
 			$this->load->model('user/user');
 
 			if (!$this->model_user_user->checkUser($this->request->post['user_id'])) {
@@ -978,20 +1008,20 @@ class ControllerApiOrder extends Controller {
 				} else {
 					$order_id = 0;
 				}
-				
+
 				$this->load->model('checkout/order');
 				$order_info = $this->model_checkout_order->getOrder($order_id);
-				
+
 				if (!$order_info) {
 					$json['error'] = $this->language->get('error_not_found');
 				}
 			}
 		}
 
-		if (!$json ) {
+		if (!$json) {
 			if (in_array($order_info['order_status_id'], $this->config->get('config_processing_status'))) {
 				$payment_phases = $this->model_checkout_order->getPaymentPhases($order_id);
-				
+
 				$expired = false;
 
 				foreach ($payment_phases as $payment_phase) {
@@ -999,11 +1029,10 @@ class ControllerApiOrder extends Controller {
 						$expired = $payment_phase['auto_expired'];
 					}
 				}
-				
+
 				if (!$expired) {
 					$json['error'] = $this->language->get('error_action');
 				}
-
 			} else {
 				$json['error'] = $this->language->get('error_status');
 			}
@@ -1011,7 +1040,7 @@ class ControllerApiOrder extends Controller {
 
 		if (!$json) {
 			$this->request->post['order_status_id'] = $this->config->get('config_expired_status_id');
-			
+
 			// Add keys for missing post vars
 			$keys = array(
 				'date',
@@ -1027,7 +1056,7 @@ class ControllerApiOrder extends Controller {
 					$this->request->post[$key] = '';
 				}
 			}
-			
+
 			$this->model_checkout_order->addOrderHistory($order_id, $this->request->post['order_status_id'], $this->request->post['comment'], $this->request->post['notify'], $this->request->post['override'], $this->request->post['date'], $this->request->post['amount'], $this->request->post['user_id'], $this->request->post['payment_method']);
 
 			$json['success'] = $this->language->get('text_success');
@@ -1045,7 +1074,8 @@ class ControllerApiOrder extends Controller {
 	}
 
 	//used for order info from external domain
-	public function info() {
+	public function info()
+	{
 		$this->load->language('api/order');
 
 		$json = array();
@@ -1083,7 +1113,7 @@ class ControllerApiOrder extends Controller {
 		$this->response->setOutput(json_encode($json));
 	}
 
-/* 	public function test() {
+	/* 	public function test() {
 		$order_id = 18;
 		$order_status_id = 1;
 		$comment = 'Komentar';
@@ -1097,5 +1127,5 @@ class ControllerApiOrder extends Controller {
 		print_r( '<br>');
 		// $this->response->setOutput($this->load->view('mail/order', $data));
 	}
- */	
+ */
 }

@@ -636,66 +636,125 @@
                 </div>
               </fieldset>
               <fieldset>
-                <legend><?php echo $text_auto_transaction; ?></legend>
+                <legend>
+                  <?php echo $text_auto_transaction; ?>
+                </legend>
                 <div class="form-group">
-                  <label class="col-sm-2 control-label" for="input-prepaid-account"><span data-toggle="tooltip" title="<?php echo $help_prepaid_account; ?>"><?php echo $entry_prepaid_account; ?></span></label>
+                  <label class="col-sm-2 control-label" for="input-prepaid-account"><span data-toggle="tooltip"
+                      title="<?php echo $help_prepaid_account; ?>">
+                      <?php echo $entry_prepaid_account; ?>
+                    </span></label>
                   <div class="col-sm-10">
                     <select name="config_prepaid_account_id" id="input-prepaid-account" class="form-control">
-		              <option value=""><?php echo $text_select; ?></option>
+                      <option value="">
+                        <?php echo $text_select; ?>
+                      </option>
                       <?php foreach ($liability_accounts as $account) { ?>
-			          <optgroup label="<?php echo $account['text']; ?>">
-                      <?php if ($account['child']) { ?>
-                      <?php foreach ($account['child'] as $child) { ?>
+                      <optgroup label="<?php echo $account['text']; ?>">
+                        <?php if ($account['child']) { ?>
+                        <?php foreach ($account['child'] as $child) { ?>
                         <?php if ($child['account_id'] == $config_prepaid_account_id) { ?>
-                        <option value="<?php echo $child['account_id']; ?>" selected="selected"><?php echo $child['text']; ?></option>
+                        <option value="<?php echo $child['account_id']; ?>" selected="selected">
+                          <?php echo $child['text']; ?>
+                        </option>
                         <?php } else { ?>
-                        <option value="<?php echo $child['account_id']; ?>"><?php echo $child['text']; ?></option>
+                        <option value="<?php echo $child['account_id']; ?>">
+                          <?php echo $child['text']; ?>
+                        </option>
                         <?php } ?>
-                      <?php } ?>
-                      <?php } ?>
-				      </optgroup>
+                        <?php } ?>
+                        <?php } ?>
+                      </optgroup>
                       <?php } ?>
                     </select>
                   </div>
                 </div>
                 <div class="form-group">
-                  <label class="col-sm-2 control-label" for="input-adjustment-account"><span data-toggle="tooltip" title="<?php echo $help_adjustment_account; ?>"><?php echo $entry_adjustment_account; ?></span></label>
+                  <label class="col-sm-2 control-label" for="input-vendor-deposit-account"><span data-toggle="tooltip"
+                      title="<?php echo $help_vendor_deposit_account; ?>">
+                      <?php echo $entry_vendor_deposit_account; ?>
+                    </span></label>
+                  <div class="col-sm-10">
+                    <select name="config_vendor_deposit_account_id" id="input-vendor-deposit-account" class="form-control">
+                      <option value="">
+                        <?php echo $text_select; ?>
+                      </option>
+                      <?php foreach ($liability_accounts as $account) { ?>
+                      <optgroup label="<?php echo $account['text']; ?>">
+                        <?php if ($account['child']) { ?>
+                        <?php foreach ($account['child'] as $child) { ?>
+                        <?php if ($child['account_id'] == $config_vendor_deposit_account_id) { ?>
+                        <option value="<?php echo $child['account_id']; ?>" selected="selected">
+                          <?php echo $child['text']; ?>
+                        </option>
+                        <?php } else { ?>
+                        <option value="<?php echo $child['account_id']; ?>">
+                          <?php echo $child['text']; ?>
+                        </option>
+                        <?php } ?>
+                        <?php } ?>
+                        <?php } ?>
+                      </optgroup>
+                      <?php } ?>
+                    </select>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="col-sm-2 control-label" for="input-adjustment-account"><span data-toggle="tooltip"
+                      title="<?php echo $help_adjustment_account; ?>">
+                      <?php echo $entry_adjustment_account; ?>
+                    </span></label>
                   <div class="col-sm-10">
                     <select name="config_adjustment_account_id" id="input-adjustment-account" class="form-control">
-		              <option value=""><?php echo $text_select; ?></option>
+                      <option value="">
+                        <?php echo $text_select; ?>
+                      </option>
                       <?php foreach ($revenue_accounts as $account) { ?>
-			          <optgroup label="<?php echo $account['text']; ?>">
-                      <?php if ($account['child']) { ?>
-                      <?php foreach ($account['child'] as $child) { ?>
+                      <optgroup label="<?php echo $account['text']; ?>">
+                        <?php if ($account['child']) { ?>
+                        <?php foreach ($account['child'] as $child) { ?>
                         <?php if ($child['account_id'] == $config_adjustment_account_id) { ?>
-                        <option value="<?php echo $child['account_id']; ?>" selected="selected"><?php echo $child['text']; ?></option>
+                        <option value="<?php echo $child['account_id']; ?>" selected="selected">
+                          <?php echo $child['text']; ?>
+                        </option>
                         <?php } else { ?>
-                        <option value="<?php echo $child['account_id']; ?>"><?php echo $child['text']; ?></option>
+                        <option value="<?php echo $child['account_id']; ?>">
+                          <?php echo $child['text']; ?>
+                        </option>
                         <?php } ?>
-                      <?php } ?>
-                      <?php } ?>
-				      </optgroup>
+                        <?php } ?>
+                        <?php } ?>
+                      </optgroup>
                       <?php } ?>
                     </select>
                   </div>
                 </div>
                 <div class="form-group">
-                  <label class="col-sm-2 control-label" for="input-asset-account"><span data-toggle="tooltip" title="<?php echo $help_asset_account; ?>"><?php echo $entry_asset_account; ?></span></label>
+                  <label class="col-sm-2 control-label" for="input-asset-account"><span data-toggle="tooltip"
+                      title="<?php echo $help_asset_account; ?>">
+                      <?php echo $entry_asset_account; ?>
+                    </span></label>
                   <div class="col-sm-10">
                     <select name="config_asset_account_id" id="input-asset-account" class="form-control">
-		              <option value=""><?php echo $text_select; ?></option>
+                      <option value="">
+                        <?php echo $text_select; ?>
+                      </option>
                       <?php foreach ($asset_accounts as $account) { ?>
-			          <optgroup label="<?php echo $account['text']; ?>">
-                      <?php if ($account['child']) { ?>
-                      <?php foreach ($account['child'] as $child) { ?>
+                      <optgroup label="<?php echo $account['text']; ?>">
+                        <?php if ($account['child']) { ?>
+                        <?php foreach ($account['child'] as $child) { ?>
                         <?php if ($child['account_id'] == $config_asset_account_id) { ?>
-                        <option value="<?php echo $child['account_id']; ?>" selected="selected"><?php echo $child['text']; ?></option>
+                        <option value="<?php echo $child['account_id']; ?>" selected="selected">
+                          <?php echo $child['text']; ?>
+                        </option>
                         <?php } else { ?>
-                        <option value="<?php echo $child['account_id']; ?>"><?php echo $child['text']; ?></option>
+                        <option value="<?php echo $child['account_id']; ?>">
+                          <?php echo $child['text']; ?>
+                        </option>
                         <?php } ?>
-                      <?php } ?>
-                      <?php } ?>
-				      </optgroup>
+                        <?php } ?>
+                        <?php } ?>
+                      </optgroup>
                       <?php } ?>
                     </select>
                   </div>

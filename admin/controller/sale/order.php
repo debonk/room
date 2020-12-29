@@ -2257,7 +2257,7 @@ class ControllerSaleOrder extends Controller {
 
 			$transaction_data = array(
 				'order_id'			=> $order_id,
-				'account_from_id'	=> '0',
+				'account_from_id'	=> $this->config->get('config_vendor_deposit_account_id'),
 				'account_to_id'		=> $asset_id,
 				'label'				=> 'vendor',
 				'label_id'			=> $this->request->post['transaction_vendor_id'],
