@@ -34,7 +34,7 @@
               <?php } ?>
             </div>
           </div>
-          <div class="form-group required">
+          <div class="form-group">
             <label class="col-sm-2 control-label"><?php echo $entry_deposit; ?></label>
             <div class="col-sm-10">
               <input type="text" name="deposit" value="<?php echo $deposit; ?>" placeholder="<?php echo $entry_deposit; ?>" id="input-deposit" class="form-control" />

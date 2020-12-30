@@ -31,6 +31,7 @@
   <thead>
     <tr>
       <td class="text-left"><?php echo $column_date; ?></td>
+      <td class="text-left"><?php echo $column_vendor; ?></td>
       <td class="text-left"><?php echo $column_payment_method; ?></td>
       <td class="text-left"><?php echo $column_description; ?></td>
       <td class="text-right"><?php echo $column_amount; ?></td>
@@ -43,6 +44,7 @@
     <?php foreach ($vendor_transactions as $vendor_transaction) { ?>
     <tr>
       <td class="text-left"><?php echo $vendor_transaction['date']; ?></td>
+      <td class="text-left"><?php echo $vendor_transaction['customer_name']; ?></td>
       <td class="text-left"><?php echo $vendor_transaction['payment_method']; ?></td>
       <td class="text-left"><a href="<?php echo $vendor_transaction['receipt']; ?>" data-toggle="tooltip" title="<?php echo $button_receipt; ?>" target="_blank" class="<?php echo $vendor_transaction['print']; ?>-receipt"><?php echo $vendor_transaction['description']; ?> <i class="fa fa-external-link"></i></a></td>
       <td class="text-right"><?php echo $vendor_transaction['amount']; ?></td>

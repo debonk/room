@@ -2038,6 +2038,7 @@ class ControllerSaleOrder extends Controller {
 			'column_vendor_total',
 			'column_date',
 			'column_date_added',
+			'column_vendor',
 			'column_payment_method',
 			'column_description',
 			'column_amount',
@@ -2108,6 +2109,7 @@ class ControllerSaleOrder extends Controller {
 		foreach ($results as $result) {
 			$data['vendor_transactions'][] = array(
 				'date'				=> date($this->language->get('date_format_short'), strtotime($result['date'])),
+				'customer_name'		=> $result['customer_name'],
 				'payment_method'	=> $result['payment_method'],
 				'description'		=> $result['description'],
 				'amount'			=> $this->currency->format($result['amount'], $order_info['currency_code'], $order_info['currency_value']),
