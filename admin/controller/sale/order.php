@@ -1152,7 +1152,9 @@ class ControllerSaleOrder extends Controller {
 			$data['text_order'] = sprintf($this->language->get('text_order'), $this->request->get['order_id']);
 
 			$this->load->model('localisation/local_date');
-			$data['event_date'] = $this->model_localisation_local_date->getInFormatDate($order_info['event_date'])['long_date'];
+			$event_date = $this->model_localisation_local_date->getInFormatDate($order_info['event_date']);
+			$data['event_date'] = $event_date['day'] . ', ' . $event_date['long_date'];
+
 			$data['slot'] = $order_info['slot'];
 			$data['ceremony'] = $order_info['ceremony'];
 			$data['date_added'] = $this->model_localisation_local_date->getInFormatDate($order_info['date_added'])['long_date'];
@@ -2032,7 +2034,6 @@ class ControllerSaleOrder extends Controller {
 			'text_vendor_transaction_add',
 			'text_loading',
 			'text_select',
-			'column_vendor',
 			'column_telephone',
 			'column_email',
 			'column_vendor_total',
@@ -3190,8 +3191,7 @@ class ControllerSaleOrder extends Controller {
 			$json = array(
 				'product_id'    => $product_info['product_id'],
 				'name'          => $product_info['name'],
-				'minimum'       => $product_info['minimum'],
-				'price'        	=> (int)$product_info['price'],
+				'price'        	=> $this->currency->format($product_info['price'], $this->session->data['currency']),
 				'option'        => $option_data
 			);
 		}

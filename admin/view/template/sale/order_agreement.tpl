@@ -239,7 +239,7 @@
           </tr>
           <tr>
             <td style="width: 50%;"><?php echo $text_pihak_penyewa; ?></td>
-            <td><?php echo $store_owner; ?><br /><br /><br /><br /></td>
+            <td><?php echo $store_owner; ?><br /><br /><br /><br /><br /><br /></td>
           </tr>
           <tr>
             <td><u><?php echo '( ' . $customer . ' )'; ?></u></td>

@@ -82,9 +82,9 @@
 				          <td class="text-left"><?php echo $document['username']; ?></td>
                   <td class="text-right nowrap">
 				            <?php if ($document['printed']) { ?>
-				            <button type="button" value="<?php echo $document['code']; ?>" class="btn btn-sm btn-success btn-print" data-toggle="tooltip" title="<?php echo $document['text_printed']; ?>" <?php echo $document['modify']; ?> ><i class="fa fa-print"></i></button>
+				            <button type="button" value="<?php echo $document['code']; ?>" class="btn btn-sm btn-warning btn-print" data-toggle="tooltip" title="<?php echo $document['text_printed']; ?>" <?php echo $document['modify']; ?> ><i class="fa fa-print"></i></button>
                     <?php } else { ?>
-                    <button type="button" value="<?php echo $document['code']; ?>" class="btn btn-sm btn-warning btn-print" data-toggle="tooltip" title="<?php echo $document['text_not_printed']; ?>" <?php echo $document['modify']; ?> ><i class="fa fa-print"></i></button>
+                    <button type="button" value="<?php echo $document['code']; ?>" class="btn btn-sm btn-success btn-print" data-toggle="tooltip" title="<?php echo $document['text_not_printed']; ?>" <?php echo $document['modify']; ?> ><i class="fa fa-print"></i></button>
                     <?php } ?>
         				  </td>
                 </tr>

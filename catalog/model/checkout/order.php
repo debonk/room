@@ -415,7 +415,7 @@ class ModelCheckoutOrder extends Model {
 			}
 
 			// Update the DB with the new statuses
-//			$this->db->query("UPDATE `" . DB_PREFIX . "order` SET order_status_id = '" . (int)$order_status_id . "', date_modified = NOW() WHERE order_id = '" . (int)$order_id . "'");
+			$this->db->query("UPDATE `" . DB_PREFIX . "order` SET order_status_id = '" . (int)$order_status_id . "', date_modified = NOW() WHERE order_id = '" . (int)$order_id . "'");
 
 			// Add transaction if there is payment
 			if ($date && $amount) {

@@ -277,7 +277,7 @@ class ModelSaleOrder extends Model {
 	}
 
 	public function getOrderAttributes($order_id, $order_product_id) {
-		$sql = "SELECT oa.*, agd.name AS attribute_group, ad.name AS	attribute FROM " . DB_PREFIX . "order_attribute oa LEFT JOIN " . DB_PREFIX . "attribute_group_description agd ON (agd.attribute_group_id = oa.attribute_group_id) LEFT JOIN " . DB_PREFIX . "attribute_description ad ON (ad.attribute_id = oa.attribute_id) WHERE order_id = '" . (int)$order_id . "' AND order_product_id = '" . (int)$order_product_id . "' ORDER BY oa.order_attribute_id ASC";
+		$sql = "SELECT oa.*, agd.name AS attribute_group, ad.name AS attribute FROM " . DB_PREFIX . "order_attribute oa LEFT JOIN " . DB_PREFIX . "attribute_group_description agd ON (agd.attribute_group_id = oa.attribute_group_id) LEFT JOIN " . DB_PREFIX . "attribute_description ad ON (ad.attribute_id = oa.attribute_id) WHERE order_id = '" . (int)$order_id . "' AND order_product_id = '" . (int)$order_product_id . "' ORDER BY oa.order_attribute_id ASC";
 
 		$query = $this->db->query($sql);
 

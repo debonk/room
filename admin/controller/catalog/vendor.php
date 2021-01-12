@@ -624,7 +624,7 @@ class ControllerCatalogVendor extends Controller {
 
 		foreach ($results as $result) {
 			if (!empty($result['order_id'])) {
-				$invoice_no = '#' . $result['order_id'] . ($result['invoice_no'] ? ': ' . $result['invoice_prefix'] : '');
+				$invoice_no = '#' . $result['order_id'] . ($result['invoice_no'] ? ': ' . $result['invoice_prefix'] . str_pad($result['invoice_no'],4,0,STR_PAD_LEFT) : '');
 			} else {
 				$invoice_no = '';
 			}

@@ -205,31 +205,60 @@
           <tbody>
             <?php foreach ($products as $product) { ?>
             <tr>
-			  <td class="text-left"><em><?php echo $product['primary_type'] ? $text_primary_type : $text_secondary_type; ?></em><br />
-			    &nbsp;&nbsp;- <?php echo $product['category']; ?>
-			  </td>
-              <td class="text-left"><a href="<?php echo $product['href']; ?>"><?php echo $product['name']; ?></a>
+              <td class="text-left">
+                <?php if ($product['primary_type']) { ?>
+                <?= $text_primary_type; ?><br />
+                <strong>
+                  <?php echo $product['category']; ?>
+                </strong>
+                <?php } else { ?>
+                <?php echo $product['category']; ?>
+                <?php } ?>
+              </td>
+              <td class="text-left"><a href="<?php echo $product['href']; ?>">
+                  <?php echo $product['name']; ?>
+                </a>
                 <?php foreach ($product['option'] as $option) { ?>
                 <br />
                 <?php if ($option['type'] != 'file') { ?>
-                &nbsp;<small>&nbsp;-&nbsp;<?php echo $option['name']; ?>: <?php echo $option['value']; ?></small>
+                &nbsp;<small>&nbsp;-&nbsp;
+                  <?php echo $option['name']; ?>:
+                  <?php echo $option['value']; ?>
+                </small>
                 <?php } else { ?>
-                &nbsp;<small>&nbsp;-&nbsp;<?php echo $option['name']; ?>: <a href="<?php echo $option['href']; ?>"><?php echo $option['value']; ?></a></small>
+                &nbsp;<small>&nbsp;-&nbsp;
+                  <?php echo $option['name']; ?>: <a href="<?php echo $option['href']; ?>">
+                    <?php echo $option['value']; ?>
+                  </a>
+                </small>
                 <?php } ?>
                 <?php } ?>
                 <?php foreach ($product['attribute'] as $attribute_group => $attributes) { ?>
                 <br />
-				<small><?php echo $attribute_group; ?></small>
-                  <?php foreach ($attributes as $attribute) { ?>
-                  <br />
-                  &nbsp;<small>&nbsp;-&nbsp;<?php echo $attribute['name']; ?>: <?php echo $attribute['value']; ?></small>
-                  <?php } ?>
+                <small>
+                  <?php echo $attribute_group; ?>
+                </small>
+                <?php foreach ($attributes as $attribute) { ?>
+                <br />
+                &nbsp;<small>&nbsp;-&nbsp;
+                  <?php echo $attribute['name']; ?>:
+                  <?php echo $attribute['value']; ?>
+                </small>
                 <?php } ?>
-			  </td>
-              <td class="text-left"><?php echo $product['model']; ?></td>
-              <td class="text-right"><?php echo $product['quantity']; ?></td>
-              <td class="text-right"><?php echo $product['price']; ?></td>
-              <td class="text-right"><?php echo $product['total']; ?></td>
+                <?php } ?>
+              </td>
+              <td class="text-left">
+                <?php echo $product['model']; ?>
+              </td>
+              <td class="text-right">
+                <?php echo $product['quantity']; ?>
+              </td>
+              <td class="text-right">
+                <?php echo $product['price']; ?>
+              </td>
+              <td class="text-right">
+                <?php echo $product['total']; ?>
+              </td>
             </tr>
             <?php } ?>
             <?php foreach ($totals as $total) { ?>

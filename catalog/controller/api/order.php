@@ -534,21 +534,6 @@ class ControllerApiOrder extends Controller
 
 					$order_data = array();
 
-					// $inv_prefix = current($primary_products)['model'];
-					// $inv_prefix .= '-' . date('y/m', strtotime($this->session->data['event']['event_date'])) . '-';
-
-					// $this->load->model('localisation/ceremony');
-					// $ceremony_code = $this->model_localisation_ceremony->getCeremony($this->session->data['event']['ceremony_id'])['code'];
-
-					// $inv_prefix .= $ceremony_code . '-';
-
-					// if ($order_info['invoice_no']) {
-					// $inv_prefix .= str_pad($order_info['invoice_no'],4,0,STR_PAD_LEFT);
-					// }
-
-					// Store Details
-					// $order_data['invoice_prefix'] = $this->config->get('config_invoice_prefix');
-					// $order_data['invoice_prefix'] = $inv_prefix;
 					$order_data['invoice_prefix'] = str_ireplace('{YEAR}', date('Y', strtotime($this->session->data['event']['event_date'])), $this->config->get('config_invoice_prefix'));
 
 					if ($order_data['invoice_prefix'] == $order_info['invoice_prefix']) {
@@ -1091,7 +1076,7 @@ class ControllerApiOrder extends Controller
 				$order_id = 0;
 			}
 
-			$json = $this->model_checkout_order->getOrder($order_id);
+			$order_info = $this->model_checkout_order->getOrder($order_id);
 
 			if ($order_info) {
 				$json['order'] = $order_info;

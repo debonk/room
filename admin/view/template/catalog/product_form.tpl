@@ -414,6 +414,19 @@
                 </div>
               </div>
               <div class="form-group">
+                <label class="col-sm-2 control-label" for="input-included"><span data-toggle="tooltip" title="<?php echo $help_included; ?>"><?php echo $entry_included; ?></span></label>
+                <div class="col-sm-10">
+                  <input type="text" name="included" value="" placeholder="<?php echo $entry_included; ?>" id="input-included" class="form-control" />
+                  <div id="product-included" class="well well-sm" style="height: 150px; overflow: auto;">
+                    <?php foreach ($product_includeds as $product_included) { ?>
+                    <div id="product-included<?php echo $product_included['product_id']; ?>"><i class="fa fa-minus-circle"></i> <?php echo $product_included['name']; ?>
+                      <input type="hidden" name="product_included[]" value="<?php echo $product_included['product_id']; ?>" />
+                    </div>
+                    <?php } ?>
+                  </div>
+                </div>
+              </div>
+              <div class="form-group">
                 <label class="col-sm-2 control-label" for="input-download"><span data-toggle="tooltip" title="<?php echo $help_download; ?>"><?php echo $entry_download; ?></span></label>
                 <div class="col-sm-10">
                   <input type="text" name="download" value="" placeholder="<?php echo $entry_download; ?>" id="input-download" class="form-control" />
@@ -1062,6 +1075,35 @@ $('input[name=\'download\']').autocomplete({
 });
 
 $('#product-download').delegate('.fa-minus-circle', 'click', function() {
+	$(this).parent().remove();
+});
+
+// Included
+$('input[name=\'included\']').autocomplete({
+	'source': function(request, response) {
+		$.ajax({
+			url: 'index.php?route=catalog/product/autocomplete&token=<?php echo $token; ?>&filter_name=' +  encodeURIComponent(request) + '&filter_status=1',
+			dataType: 'json',
+			success: function(json) {
+				response($.map(json, function(item) {
+					return {
+						label: item['name'],
+						value: item['product_id']
+					}
+				}));
+			}
+		});
+	},
+	'select': function(item) {
+		$('input[name=\'included\']').val('');
+
+		$('#product-included' + item['value']).remove();
+
+		$('#product-included').append('<div id="product-included' + item['value'] + '"><i class="fa fa-minus-circle"></i> ' + item['label'] + '<input type="hidden" name="product_included[]" value="' + item['value'] + '" /></div>');
+	}
+});
+
+$('#product-included').delegate('.fa-minus-circle', 'click', function() {
 	$(this).parent().remove();
 });
 

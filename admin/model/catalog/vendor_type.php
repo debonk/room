@@ -2,8 +2,6 @@
 class ModelCatalogVendorType extends Model {
 	public function addVendorType($data) {
 		$this->db->query("INSERT INTO " . DB_PREFIX . "vendor_type SET name = '" . $this->db->escape($data['name']) . "', sort_order = '" . (int)$data['sort_order'] . "'");
-
-		return $vendor_type_id;
 	}
 
 	public function editVendorType($vendor_type_id, $data) {
@@ -31,7 +29,7 @@ class ModelCatalogVendorType extends Model {
 		if (isset($data['sort']) && in_array($data['sort'], $sort_data)) {
 			$sql .= " ORDER BY " . $data['sort'];
 		} else {
-			$sql .= " ORDER BY name";
+			$sql .= " ORDER BY sort_order";
 		}
 
 		if (isset($data['order']) && ($data['order'] == 'DESC')) {

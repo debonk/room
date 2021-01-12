@@ -77,7 +77,7 @@
           </tr>
           <tr>
             <td style="width: 50%;"><?php echo $text_hormat_kami; ?></td>
-            <td><?php echo $text_menyetujui; ?><br /><br /><br /><br /></td>
+            <td><?php echo $text_menyetujui; ?><br /><br /><br /><br /><br /><br /></td>
           </tr>
           <tr>
             <td><u><b><?php echo $manajemen; ?></b></u><br /><?php echo $text_manajemen; ?></td>

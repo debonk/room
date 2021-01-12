@@ -23,28 +23,16 @@ class ControllerApiCart extends Controller {
 
 				$json['success'] = $this->language->get('text_success');
 
-				unset($this->session->data['shipping_method']);
-				unset($this->session->data['shipping_methods']);
-				unset($this->session->data['payment_method']);
-				unset($this->session->data['payment_methods']);
+				// unset($this->session->data['shipping_method']);
+				// unset($this->session->data['shipping_methods']);
+				// unset($this->session->data['payment_method']);
+				// unset($this->session->data['payment_methods']);
 			} elseif (isset($this->request->post['product_id'])) {
 				$this->load->model('catalog/product');
 
 				$product_info = $this->model_catalog_product->getProduct($this->request->post['product_id']);
 
 				if ($product_info) {
-					if (isset($this->request->post['price']) && !empty($this->request->post['price'])) {
-						$price = $this->request->post['price'];
-					} else {
-						$price = $product_info['price'];
-					}
-
-					if (isset($this->request->post['quantity'])) {
-						$quantity = $this->request->post['quantity'];
-					} else {
-						$quantity = 1;
-					}
-
 					if (isset($this->request->post['option'])) {
 						$option = array_filter($this->request->post['option']);
 					} else {
@@ -61,16 +49,28 @@ class ControllerApiCart extends Controller {
 					
 					$this->load->model('catalog/category');
 					$category = $this->model_catalog_category->getCategory($this->request->post['category_id']);
-
+					
 					if (!isset($json['error']['option'])) {
-						$this->cart->add($this->request->post['product_id'], $quantity, $price, $option, 0, $this->request->post['primary_type'], $category['name']);
-
+						if ($product_info['primary_type']) {
+							$this->cart->clear();
+						}
+	
+						$this->cart->add($this->request->post['product_id'], $product_info['minimum'], $product_info['price'], $option, 0, $this->request->post['primary_type'], $category['name']);
+						
+						$products_included = $this->model_catalog_product->getProductsIncluded($this->request->post['product_id']);
+						
+						foreach ($products_included as $product_included) {
+							$product_included_category = $this->model_catalog_category->getCategory($this->model_catalog_product->getCategories($product_included['product_id'])[0]['category_id']);
+					
+							$this->cart->add($product_included['product_id'], $product_included['minimum'], $product_included['price'], array(), 0, $product_included['primary_type'], $product_included_category['name']);
+						}
+						
 						$json['success'] = $this->language->get('text_success');
 
-						unset($this->session->data['shipping_method']);
-						unset($this->session->data['shipping_methods']);
-						unset($this->session->data['payment_method']);
-						unset($this->session->data['payment_methods']);
+						// unset($this->session->data['shipping_method']);
+						// unset($this->session->data['shipping_methods']);
+						// unset($this->session->data['payment_method']);
+						// unset($this->session->data['payment_methods']);
 					}
 				} else {
 					$json['error']['store'] = $this->language->get('error_store');
@@ -135,10 +135,10 @@ class ControllerApiCart extends Controller {
 
 				$json['success'] = $this->language->get('text_success');
 
-				unset($this->session->data['shipping_method']);
-				unset($this->session->data['shipping_methods']);
-				unset($this->session->data['payment_method']);
-				unset($this->session->data['payment_methods']);
+				// unset($this->session->data['shipping_method']);
+				// unset($this->session->data['shipping_methods']);
+				// unset($this->session->data['payment_method']);
+				// unset($this->session->data['payment_methods']);
 				unset($this->session->data['reward']);
 			}
 		}
@@ -315,6 +315,12 @@ class ControllerApiCart extends Controller {
 					);
 				}
 				
+				$attribute_data = array();
+
+				foreach ($product['attribute'] as $attribute) {
+					$attribute_data[] = $attribute['attribute'] . ': ' . $attribute['text'];
+				}
+				
 				$json['products'][] = array(
 					'cart_id'    	=> $product['cart_id'],
 					'product_id' 	=> $product['product_id'],
@@ -323,6 +329,7 @@ class ControllerApiCart extends Controller {
 					'primary_type'	=> $product['primary_type'],
 					'category'		=> $product['category'],
 					'option'     	=> $option_data,
+					'attribute'     => $attribute_data,
 					'quantity'   	=> $product['quantity'],
 					'unit_class'   	=> $product['unit_class'],
 					'stock'      	=> $product['stock'] ? true : !(!$this->config->get('config_stock_checkout') || $this->config->get('config_stock_warning')),

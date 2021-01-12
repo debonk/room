@@ -37,7 +37,7 @@ class Cart {
 
 		foreach ($cart_query->rows as $cart) {
 			$stock = true;
-
+			
 			$product_query = $this->db->query("SELECT * FROM " . DB_PREFIX . "product_to_store p2s LEFT JOIN " . DB_PREFIX . "product p ON (p2s.product_id = p.product_id) LEFT JOIN " . DB_PREFIX . "product_description pd ON (p.product_id = pd.product_id) WHERE p2s.store_id = '" . (int)$this->config->get('config_store_id') . "' AND p2s.product_id = '" . (int)$cart['product_id'] . "' AND pd.language_id = '" . (int)$this->config->get('config_language_id') . "' AND p.date_available <= NOW() AND p.status = '1'");
 
 			if ($product_query->num_rows && ($cart['quantity'] > 0)) {
@@ -163,12 +163,6 @@ class Cart {
 					}
 				}
 
-				if ($cart['price']) {
-					$price = $cart['price'];
-				} else {
-					$price = $product_query->row['price'];
-				}
-
 				// Product Discounts
 				$discount_quantity = 0;
 
@@ -182,6 +176,8 @@ class Cart {
 
 				if ($product_discount_query->num_rows) {
 					$price = $product_discount_query->row['price'];
+				} else {
+					$price = $product_query->row['price'];
 				}
 
 				// Product Specials
@@ -239,6 +235,18 @@ class Cart {
 					$recurring = false;
 				}
 
+				// Product attributes
+				$attribute_data = array();
+
+				$attribute_query = $this->db->query("SELECT pa.text, ad.name FROM " . DB_PREFIX . "product_attribute pa LEFT JOIN " . DB_PREFIX . "attribute a ON (a.attribute_id = pa.attribute_id) LEFT JOIN " . DB_PREFIX . "attribute_description ad ON (ad.attribute_id = pa.attribute_id AND ad.language_id = pa.language_id) LEFT JOIN " . DB_PREFIX . "attribute_group ag ON (ag.attribute_group_id = a.attribute_group_id) WHERE product_id = '" . (int)$cart['product_id'] . "' AND pa.language_id = '" . (int)$this->config->get('config_language_id') . "' ORDER BY ag.sort_order, a.sort_order ASC");
+
+				foreach ($attribute_query->rows as $attribute) {
+					$attribute_data[] = [
+						'attribute'	=> $attribute['name'],
+						'text'	=> $attribute['text']
+					];
+				}
+
 				// Unit Class
 				$unit_class_query = $this->db->query("SELECT title FROM " . DB_PREFIX . "unit_class WHERE unit_class_id = '" . (int)$product_query->row['unit_class_id'] . "' AND language_id = '" . (int)$this->config->get('config_language_id') . "'");
 				
@@ -252,6 +260,7 @@ class Cart {
 					'shipping'        => $product_query->row['shipping'],
 					'image'           => $product_query->row['image'],
 					'option'          => $option_data,
+					'attribute'       => $attribute_data,
 					'download'        => $download_data,
 					'quantity'        => $cart['quantity'],
 					'unit_class'      => $unit_class_query->row['title'],
@@ -275,7 +284,6 @@ class Cart {
 				$this->remove($cart['cart_id']);
 			}
 		}
-
 		return $product_data;
 	}
 
@@ -289,7 +297,7 @@ class Cart {
 		}
 		
 		$query = $this->db->query("SELECT COUNT(*) AS total FROM " . DB_PREFIX . "cart WHERE customer_id = '" . (int)$this->customer->getId() . "' AND session_id = '" . $this->db->escape($this->session->getId()) . "' AND product_id = '" . (int)$product_id . "' AND recurring_id = '" . (int)$recurring_id . "' AND `option` = '" . $this->db->escape(json_encode($option)) . "'");
-
+		
 		if (!$query->row['total']) {
 			$this->db->query("INSERT " . DB_PREFIX . "cart SET customer_id = '" . (int)$this->customer->getId() . "', session_id = '" . $this->db->escape($this->session->getId()) . "', product_id = '" . (int)$product_id . "', recurring_id = '" . (int)$recurring_id . "', `option` = '" . $this->db->escape(json_encode($option)) . "', quantity = '" . (int)$quantity . "', price = '" . (float)$price . "', category = '" . $this->db->escape($category) . "', date_added = NOW()");
 		} else {

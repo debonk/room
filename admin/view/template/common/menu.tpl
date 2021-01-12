@@ -2,7 +2,7 @@
   <li id="dashboard"><a href="<?php echo $home; ?>"><i class="fa fa-dashboard fa-fw"></i> <span><?php echo $text_dashboard; ?></span></a></li>
   <?php foreach($menu_groups as $group_code => $menu_group) { ?>
     <?php if (isset($menu_group)) { ?>
-      <li id="<?php echo $menu_titles[$group_code]; ?>"><a class="parent"><i class="fa <?php echo $menu_titles[$group_code]['icon']; ?> fa-fw"></i> <span><?php echo $menu_titles[$group_code]['text']; ?></span></a>
+      <li id="<?php echo $menu_titles[$group_code]['text']; ?>"><a class="parent"><i class="fa <?php echo $menu_titles[$group_code]['icon']; ?> fa-fw"></i> <span><?php echo $menu_titles[$group_code]['text']; ?></span></a>
         <ul>
           <?php foreach($menu_group as $code => $menu_item) { ?>
             <?php if (isset($child_groups[$code])) { ?>

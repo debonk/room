@@ -32,7 +32,7 @@
       <div class="panel-body">
         <div class="well">
           <div class="row">
-            <div class="col-sm-4">
+            <div class="col-sm-3">
               <div class="form-group">
                 <label class="control-label" for="input-name"><?php echo $entry_name; ?></label>
                 <input type="text" name="filter_name" value="<?php echo $filter_name; ?>" placeholder="<?php echo $entry_name; ?>" id="input-name" class="form-control" />
@@ -42,7 +42,7 @@
                 <input type="text" name="filter_model" value="<?php echo $filter_model; ?>" placeholder="<?php echo $entry_model; ?>" id="input-model" class="form-control" />
               </div>
             </div>
-            <div class="col-sm-4">
+            <div class="col-sm-3">
               <div class="form-group">
                 <label class="control-label" for="input-price"><?php echo $entry_price; ?></label>
                 <input type="text" name="filter_price" value="<?php echo $filter_price; ?>" placeholder="<?php echo $entry_price; ?>" id="input-price" class="form-control" />
@@ -52,7 +52,51 @@
                 <input type="text" name="filter_quantity" value="<?php echo $filter_quantity; ?>" placeholder="<?php echo $entry_quantity; ?>" id="input-quantity" class="form-control" />
               </div>
             </div>
-            <div class="col-sm-4">
+            <div class="col-sm-3">
+              <div class="form-group">
+              <label class="control-label" for="input-manufacturer"><?php echo $entry_manufacturer; ?></label>
+              <select name="filter_manufacturer" id="input-manufacturer" class="form-control">
+                    <option value="*"><?php echo $text_all; ?></option>
+                    <?php foreach ($manufacturers as $manufacturer) { ?>
+                      <?php if ($manufacturer['manufacturer_id']==$filter_manufacturer) { ?>
+                        <option value="<?php echo $manufacturer['manufacturer_id']; ?>" selected="selected"><?php echo $manufacturer['name']; ?></option>
+                      <?php } else { ?>
+                        <option value="<?php echo $manufacturer['manufacturer_id']; ?>"><?php echo $manufacturer['name']; ?></option> 
+                      <?php } ?>
+                    <?php } ?>
+                    </select>
+              </div>
+              <div class="form-group">
+              <label class="control-label" for="input-category"><?php echo $entry_category; ?></label>
+              <select name="filter_category" id="input-category" class="form-control">
+                    <option value="*"><?php echo $text_all; ?></option>
+                    <?php foreach ($categories as $category) { ?>
+                      <?php if ($category['category_id']==$filter_category) { ?>
+                        <option value="<?php echo $category['category_id']; ?>" selected="selected"><?php echo $category['name']; ?></option>
+                      <?php } else { ?>
+                        <option value="<?php echo $category['category_id']; ?>"><?php echo $category['name']; ?></option> 
+                      <?php } ?>
+                    <?php } ?>
+                    </select>
+              </div>
+            </div>
+            <div class="col-sm-3">
+              <div class="form-group">
+                <label class="control-label" for="input-primary-type"><?php echo $entry_primary_type; ?></label>
+                <select name="filter_primary_type" id="input-primary-type" class="form-control">
+                  <option value="*"></option>
+                  <?php if ($filter_primary_type) { ?>
+                  <option value="1" selected="selected"><?php echo $text_yes; ?></option>
+                  <?php } else { ?>
+                  <option value="1"><?php echo $text_yes; ?></option>
+                  <?php } ?>
+                  <?php if (!$filter_primary_type && !is_null($filter_primary_type)) { ?>
+                  <option value="0" selected="selected"><?php echo $text_no; ?></option>
+                  <?php } else { ?>
+                  <option value="0"><?php echo $text_no; ?></option>
+                  <?php } ?>
+                </select>
+              </div>
               <div class="form-group">
                 <label class="control-label" for="input-status"><?php echo $entry_status; ?></label>
                 <select name="filter_status" id="input-status" class="form-control">
@@ -90,7 +134,21 @@
                     <?php } else { ?>
                     <a href="<?php echo $sort_model; ?>"><?php echo $column_model; ?></a>
                     <?php } ?></td>
-                  <td class="text-left"><?php echo $column_primary_type; ?></td>
+                  <td class="text-left"><?php if ($sort == 'p.primary_type') { ?>
+                    <a href="<?php echo $sort_primary_type; ?>" class="<?php echo strtolower($order); ?>"><?php echo $column_primary_type; ?></a>
+                    <?php } else { ?>
+                    <a href="<?php echo $sort_primary_type; ?>"><?php echo $column_primary_type; ?></a>
+                    <?php } ?></td>
+                  <td class="text-left"><?php if ($sort == 'manufacturer_name') { ?>
+                    <a href="<?php echo $sort_manufacturer; ?>" class="<?php echo strtolower($order); ?>"><?php echo $column_manufacturer; ?></a>
+                    <?php } else { ?>
+                    <a href="<?php echo $sort_manufacturer; ?>"><?php echo $column_manufacturer; ?></a>
+                    <?php } ?></td>
+                  <td class="text-left"><?php if ($sort == 'p2c.category_id') { ?>
+                    <a href="<?php echo $sort_category; ?>" class="<?php echo strtolower($order); ?>"><?php echo $column_category; ?></a>
+                    <?php } else { ?>
+                    <a href="<?php echo $sort_category; ?>"><?php echo $column_category; ?></a>
+                      <?php } ?></td>
                   <td class="text-right"><?php if ($sort == 'p.price') { ?>
                     <a href="<?php echo $sort_price; ?>" class="<?php echo strtolower($order); ?>"><?php echo $column_price; ?></a>
                     <?php } else { ?>
@@ -126,6 +184,13 @@
                   <td class="text-left"><?php echo $product['name']; ?></td>
                   <td class="text-left"><?php echo $product['model']; ?></td>
                   <td class="text-left"><?php echo $product['primary_type'] ? $text_yes : $text_no; ?></td>
+                  <td class="text-left"><?php echo $product['manufacturer'];?></td>
+                  <td class="text-left">
+                  <?php foreach ($categories as $category) { ?>
+                    <?php if (in_array($category['category_id'], $product['category'])) { ?>
+                    <?php echo $category['name'];?><br>
+                  <?php } ?> <?php } ?>
+                  </td>
                   <td class="text-right"><?php if ($product['special']) { ?>
                     <span style="text-decoration: line-through;"><?php echo $product['price']; ?></span><br/>
                     <div class="text-danger"><?php echo $product['special']; ?></div>
@@ -139,7 +204,7 @@
                 <?php } ?>
                 <?php } else { ?>
                 <tr>
-                  <td class="text-center" colspan="8"><?php echo $text_no_results; ?></td>
+                  <td class="text-center" colspan="11"><?php echo $text_no_results; ?></td>
                 </tr>
                 <?php } ?>
               </tbody>
@@ -169,6 +234,18 @@ $('#button-filter').on('click', function() {
 		url += '&filter_model=' + encodeURIComponent(filter_model);
 	}
 
+	var filter_manufacturer = $('select[name=\'filter_manufacturer\']').val();
+	
+	if (filter_manufacturer != '*') {
+		url += '&filter_manufacturer=' + encodeURIComponent(filter_manufacturer);
+	}
+
+	var filter_category = $('select[name=\'filter_category\']').val();
+	
+	if (filter_category != '*') {
+		url += '&filter_category=' + encodeURIComponent(filter_category);
+	}
+            
 	var filter_price = $('input[name=\'filter_price\']').val();
 
 	if (filter_price) {
@@ -181,6 +258,12 @@ $('#button-filter').on('click', function() {
 		url += '&filter_quantity=' + encodeURIComponent(filter_quantity);
 	}
 
+	var filter_primary_type = $('select[name=\'filter_primary_type\']').val();
+
+	if (filter_primary_type != '*') {
+		url += '&filter_primary_type=' + encodeURIComponent(filter_primary_type);
+	}
+
 	var filter_status = $('select[name=\'filter_status\']').val();
 
 	if (filter_status != '*') {
@@ -189,6 +272,13 @@ $('#button-filter').on('click', function() {
 
 	location = url;
 });
+
+$(document).keypress(function(e) {
+  if(e.which == 13) {
+    $("#button-filter").click();
+  }
+});
+
 //--></script>
   <script type="text/javascript"><!--
 $('input[name=\'filter_name\']').autocomplete({

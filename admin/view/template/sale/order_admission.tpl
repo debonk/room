@@ -95,7 +95,7 @@
         <tbody>
           <tr>
             <td style="width: 50%;"></td>
-            <td><?php echo $store_owner; ?><br /><br /><br /><br /></td>
+            <td><?php echo $store_owner; ?><br /><br /><br /><br /><br /><br /></td>
           </tr>
           <tr>
             <td></td>
