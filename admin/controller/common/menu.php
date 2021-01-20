@@ -12,7 +12,7 @@ class ControllerCommonMenu extends Controller
 		$data['child_groups'] = [];
 		$data['menu_title'] = [];
 
-		$fa_icon_class = ['fa-tags', 'fa-user', 'fa-share-alt', 'fa-shopping-cart', 'fa-book', 'fa-bar-chart-o', 'fa-puzzle-piece', 'fa-rocket', 'fa-television', 'fa-globe', 'fa-cog', '', ''];
+		$fa_icon_class = ['fa-tags', 'fa-user', 'fa-share-alt', 'fa-shopping-cart', 'fa-credit-card', 'fa-book', 'fa-bar-chart-o', 'fa-puzzle-piece', 'fa-rocket', 'fa-television', 'fa-globe', 'fa-cog', '', ''];
 
 		$menu_groups = [
 			'catalog'		=> [
@@ -37,6 +37,7 @@ class ControllerCommonMenu extends Controller
 				'voucher'		=> ['sale/voucher', 'sale/voucher_theme'],
 				'paypal'		=> ['payment/pp_express']
 			],
+			'purchase'		=> ['purchase/purchase', 'purchase/supplier'],
 			'accounting'	=> ['accounting/account', 'accounting/balance', 'accounting/expense', 'accounting/transaction'],
 			'reports'		=> [
 				'sale'			=> ['report/sale_order', 'report/sale_document', 'report/sale_tax', 'report/sale_coupon'],

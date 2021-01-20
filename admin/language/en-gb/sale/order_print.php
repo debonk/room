@@ -68,3 +68,6 @@ $_['text_vendor_setuju']	= 'Vendor juga setuju untuk mematuhi peraturan dan kete
 $_['text_lebih_lanjut']		= 'Untuk informasi lebih lanjut tentang fasilitas gedung, silahkan menghubungi kami.';
 $_['text_hormat_kami']		= 'Hormat kami,';
 $_['text_menyetujui']		= 'Menyetujui,';
+
+// Text Purchase
+// $_['title_purchase']		= 'PURCHASE ORDER';

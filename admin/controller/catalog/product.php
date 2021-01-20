@@ -709,6 +709,7 @@ class ControllerCatalogProduct extends Controller {
 		$data['entry_additional_image'] = $this->language->get('entry_additional_image');
 		$data['entry_store'] = $this->language->get('entry_store');
 		$data['entry_manufacturer'] = $this->language->get('entry_manufacturer');
+		$data['entry_supplier'] = $this->language->get('entry_supplier');
 		$data['entry_download'] = $this->language->get('entry_download');
 		$data['entry_category'] = $this->language->get('entry_category');
 		$data['entry_filter'] = $this->language->get('entry_filter');
@@ -739,6 +740,7 @@ class ControllerCatalogProduct extends Controller {
 		$data['help_mpn'] = $this->language->get('help_mpn');
 		$data['help_minimum'] = $this->language->get('help_minimum');
 		$data['help_manufacturer'] = $this->language->get('help_manufacturer');
+		$data['help_supplier'] = $this->language->get('help_supplier');
 		$data['help_stock_status'] = $this->language->get('help_stock_status');
 		$data['help_points'] = $this->language->get('help_points');
 		$data['help_category'] = $this->language->get('help_category');
@@ -1168,6 +1170,31 @@ class ControllerCatalogProduct extends Controller {
 			}
 		} else {
 			$data['manufacturer'] = '';
+		}
+
+		//Supplier
+		if (isset($this->request->post['supplier_id'])) {
+			$data['supplier_id'] = $this->request->post['supplier_id'];
+		} elseif (!empty($product_info)) {
+			$data['supplier_id'] = $product_info['supplier_id'];
+		} else {
+			$data['supplier_id'] = 0;
+		}
+
+		if (isset($this->request->post['supplier'])) {
+			$data['supplier'] = $this->request->post['supplier'];
+		} elseif (!empty($product_info)) {
+			$this->load->model('purchase/supplier');
+
+			$supplier_info = $this->model_purchase_supplier->getSupplier($product_info['supplier_id']);
+
+			if ($supplier_info) {
+				$data['supplier'] = $supplier_info['supplier_name'];
+			} else {
+				$data['supplier'] = '';
+			}
+		} else {
+			$data['supplier'] = '';
 		}
 
 		// Categories

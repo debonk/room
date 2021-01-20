@@ -357,6 +357,13 @@
                 </div>
               </div>
               <div class="form-group">
+                <label class="col-sm-2 control-label" for="input-supplier"><span data-toggle="tooltip" title="<?php echo $help_supplier; ?>"><?php echo $entry_supplier; ?></span></label>
+                <div class="col-sm-10">
+                  <input type="text" name="supplier" value="<?php echo $supplier ?>" placeholder="<?php echo $entry_supplier; ?>" id="input-supplier" class="form-control" />
+                  <input type="hidden" name="supplier_id" value="<?php echo $supplier_id; ?>" />
+                </div>
+              </div>
+              <div class="form-group">
                 <label class="col-sm-2 control-label" for="input-category"><span data-toggle="tooltip" title="<?php echo $help_category; ?>"><?php echo $entry_category; ?></span></label>
                 <div class="col-sm-10">
                   <input type="text" name="category" value="" placeholder="<?php echo $entry_category; ?>" id="input-category" class="form-control" />
@@ -988,6 +995,32 @@ $('input[name=\'manufacturer\']').autocomplete({
 	'select': function(item) {
 		$('input[name=\'manufacturer\']').val(item['label']);
 		$('input[name=\'manufacturer_id\']').val(item['value']);
+	}
+});
+
+$('input[name=\'supplier\']').autocomplete({
+	'source': function(request, response) {
+		$.ajax({
+			url: 'index.php?route=purchase/supplier/autocomplete&token=<?php echo $token; ?>&filter_name=' +  encodeURIComponent(request),
+			dataType: 'json',
+			success: function(json) {
+				json.unshift({
+					supplier_id: 0,
+					supplier_name: '<?php echo $text_none; ?>'
+				});
+
+				response($.map(json, function(item) {
+					return {
+						label: item['supplier_name'],
+						value: item['supplier_id']
+					}
+				}));
+			}
+		});
+	},
+	'select': function(item) {
+		$('input[name=\'supplier\']').val(item['label']);
+		$('input[name=\'supplier_id\']').val(item['value']);
 	}
 });
 

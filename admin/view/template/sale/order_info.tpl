@@ -70,7 +70,8 @@
 			  <?php foreach ($order_vendors as $order_vendor) { ?>
               <tr>
                 <td><?php echo $order_vendor['title']; ?></td>
-				<td class="text-right">
+				<td class="text-right nowrap">
+                  <button data-toggle="tooltip" title="<?php echo $button_vendor_purchase; ?>" class="btn btn-success btn-xs" id="vendor-purchase<?php echo $order_vendor['vendor_id']; ?>" value="<?php echo $order_vendor['vendor_id']; ?>"><i class="fa fa-shopping-cart fa-fw"></i></button>
                   <a href="<?php echo $order_vendor['agreement_href']; ?>" target="_blank" data-toggle="tooltip" title="<?php echo $button_vendor_agreement; ?>" class="<?php echo $order_vendor['agreement_printed']; ?>-agreement btn btn-success btn-xs" id="vendor-agreement<?php echo $order_vendor['vendor_id']; ?>" value="<?php echo $order_vendor['vendor_id']; ?>"><i class="fa fa-paperclip fa-fw"></i></a>
 				  <?php if ($order_vendor['admission_href']) { ?>
                   <a href="<?php echo $order_vendor['admission_href']; ?>" target="_blank" data-toggle="tooltip" title="<?php echo $button_admission; ?>" class="<?php echo $order_vendor['admission_printed']; ?>-admission btn btn-success btn-xs" id="vendor-admission<?php echo $order_vendor['vendor_id']; ?>" value="<?php echo $order_vendor['vendor_id']; ?>"><i class="fa fa-file-text-o fa-fw"></i></a>
@@ -459,7 +460,7 @@
       </div>
     </div>
   </div>
-  <script type="text/javascript"><!--
+  <script type="text/javascript">
 $('#order-products, #order-vendors, #vendor-transaction').on('click', 'td a[class^=\'print\']', function(e) {
 	e.preventDefault();
 
@@ -501,7 +502,8 @@ $('#order-vendors-add ul').on('click', 'a[id^=\'vendor-add\']', function(e) {
 			if (json['title']) {
                 html  = '<tr>';
                 html += '  <td>' + json['title'] + '</td>';
-                html += '  <td class="text-right">';
+                html += '  <td class="text-right nowrap">';
+                html += '  <button data-toggle="tooltip" title="<?php echo $button_vendor_purchase; ?>" class="btn btn-success btn-xs" id="vendor-purchase' + vendor_id + '" value="' + vendor_id + '"><i class="fa fa-shopping-cart fa-fw"></i></button>';
                 html += '  <a href="' + json['agreement_href'] + '" target="_blank" data-toggle="tooltip" title="<?php echo $button_vendor_agreement; ?>" class="print-agreement btn btn-success btn-xs" id="vendor-agreement' + vendor_id + '" value="' + vendor_id + '"><i class="fa fa-paperclip fa-fw"></i></a>';
                 html += '  <button data-toggle="tooltip" title="<?php echo $button_vendor_remove; ?>" class="btn btn-danger btn-xs" id="vendor-remove' + vendor_id + '" value="' + vendor_id + '"><i class="fa fa-minus-circle fa-fw"></i></button></td></tr>';
 
@@ -517,6 +519,34 @@ $('#order-vendors-add ul').on('click', 'a[id^=\'vendor-add\']', function(e) {
 			alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
 		}
 	});
+});
+
+$('#order-vendors tbody').on('click', 'button[id^=\'vendor-purchase\']', function() {
+		var node = this;
+		
+    vendor_id = encodeURIComponent($(node).attr('value'));
+		
+		$.ajax({
+			url: 'index.php?route=sale/order/purchaseOrder&token=<?php echo $token; ?>&order_id=<?php echo $order_id; ?>',
+			type: 'post',
+			data: 'vendor_id=' + vendor_id,
+			dataType: 'json',
+			success: function(json) {
+        $('.alert').remove();
+
+        if (json['error']) {
+					$('#content > .container-fluid').prepend('<div class="alert alert-danger"><i class="fa fa-exclamation-circle"></i> ' + json['error'] + ' <button type="button" class="close" data-dismiss="alert">&times;</button></div>');
+        }
+        
+				if (json['purchase_url']) {
+					open(json['purchase_url']);
+				}
+			},
+			
+			error: function(xhr, ajaxOptions, thrownError) {
+				alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+			}
+		});
 });
 
 $('#order-vendors tbody').on('click', 'button[id^=\'vendor-remove\']', function() {
@@ -886,10 +916,10 @@ $('#button-expired').on('click', function() {
 		}
 	});
 });
-//--></script> 
-  <script type="text/javascript"><!--
+</script> 
+  <script type="text/javascript">
 $('.date').datetimepicker({
 	pickTime: false
 });
-//--></script></div>
+</script></div>
 <?php echo $footer; ?> 

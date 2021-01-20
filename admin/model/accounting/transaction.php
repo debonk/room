@@ -457,12 +457,13 @@ class ModelAccountingTransaction extends Model {
 
 	public function getTransactionsByLabel($label, $label_id = 0, $start = 0, $limit = 10) {//Used by Vendor
 		$label_data = array(
+			'supplier',
 			'vendor',
 			'customer'
 		);
 		
 		if (!isset($label) || !in_array($label, $label_data)) {
-			$label = 'customer';
+			$label = '';
 		}
 
 		$sql = "SELECT t.*, o.invoice_no, o.invoice_prefix, u.username FROM " . DB_PREFIX . "transaction t LEFT JOIN " . DB_PREFIX . "order o ON (o.order_id = t.order_id) LEFT JOIN " . DB_PREFIX . "user u ON (u.user_id = t.user_id) WHERE t.label = '" . $this->db->escape($label) . "'";
@@ -488,12 +489,13 @@ class ModelAccountingTransaction extends Model {
 
 	public function getTransactionsCountByLabel($label, $label_id = 0) {//Used by Vendor
 		$label_data = array(
+			'supplier',
 			'vendor',
 			'customer'
 		);
 		
 		if (!isset($label) || !in_array($label, $label_data)) {
-			$label = 'customer';
+			$label = '';
 		}
 
 		$sql = "SELECT COUNT(*) AS total FROM " . DB_PREFIX . "transaction WHERE label = '" . $this->db->escape($label) . "'";
@@ -509,12 +511,13 @@ class ModelAccountingTransaction extends Model {
 
 	public function getTransactionsTotalByLabel($label, $label_id = 0) {//Used by Vendor
 		$label_data = array(
+			'supplier',
 			'vendor',
 			'customer'
 		);
 		
 		if (!isset($label) || !in_array($label, $label_data)) {
-			$label = 'customer';
+			$label = '';
 		}
 
 		$sql = "SELECT SUM(amount) AS total FROM " . DB_PREFIX . "transaction WHERE label = '" . $this->db->escape($label) . "'";
@@ -530,12 +533,13 @@ class ModelAccountingTransaction extends Model {
 
 	public function getTransactionsLabelSummaryByOrderId($order_id, $label) {
 		$label_data = array(
+			'supplier',
 			'vendor',
 			'customer'
 		);
 		
 		if (!isset($label) || !in_array($label, $label_data)) {
-			$label = 'customer';
+			$label = '';
 		}
 
 		$sql = "SELECT *, SUM(amount) AS total FROM " . DB_PREFIX . "transaction WHERE order_id = '" . (int)$order_id . "'";

@@ -109,6 +109,7 @@ class ControllerSettingSetting extends Controller {
 		$data['entry_receipt_vendor_prefix'] = $this->language->get('entry_receipt_vendor_prefix');
 		$data['entry_agreement_vendor_prefix'] = $this->language->get('entry_agreement_vendor_prefix');
 		$data['entry_admission_vendor_prefix'] = $this->language->get('entry_admission_vendor_prefix');
+		$data['entry_purchase_vendor_prefix'] = $this->language->get('entry_purchase_vendor_prefix');
 		$data['entry_reference_start'] = $this->language->get('entry_reference_start');
 		$data['entry_cart_weight'] = $this->language->get('entry_cart_weight');
 		$data['entry_checkout_guest'] = $this->language->get('entry_checkout_guest');
@@ -860,6 +861,14 @@ class ControllerSettingSetting extends Controller {
 			$data['config_admission_vendor_prefix'] = $this->config->get('config_admission_vendor_prefix');
 		} else {
 			$data['config_admission_vendor_prefix'] = '';
+		}
+
+		if (isset($this->request->post['config_purchase_vendor_prefix'])) {
+			$data['config_purchase_vendor_prefix'] = $this->request->post['config_purchase_vendor_prefix'];
+		} elseif ($this->config->get('config_purchase_vendor_prefix')) {
+			$data['config_purchase_vendor_prefix'] = $this->config->get('config_purchase_vendor_prefix');
+		} else {
+			$data['config_purchase_vendor_prefix'] = '';
 		}
 
 		if (isset($this->request->post['config_reference_start'])) {

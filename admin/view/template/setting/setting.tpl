@@ -828,6 +828,12 @@
                   </div>
                 </div>
                 <div class="form-group">
+                  <label class="col-sm-2 control-label" for="input-purchase-vendor-prefix"><?php echo $entry_purchase_vendor_prefix; ?></label>
+                  <div class="col-sm-10">
+                    <input type="text" name="config_purchase_vendor_prefix" value="<?php echo $config_purchase_vendor_prefix; ?>" placeholder="<?php echo $entry_purchase_vendor_prefix; ?>" id="input-purchase-vendor-prefix" class="form-control" />
+                  </div>
+                </div>
+                <div class="form-group">
                   <label class="col-sm-2 control-label" for="input-reference-start"><span data-toggle="tooltip" title="<?php echo $help_reference_start; ?>"><?php echo $entry_reference_start; ?></span></label>
                   <div class="col-sm-10">
                     <input type="text" name="config_reference_start" value="<?php echo $config_reference_start; ?>" placeholder="<?php echo $entry_reference_start; ?>" id="input-reference-start" class="form-control" />

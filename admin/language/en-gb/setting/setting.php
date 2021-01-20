@@ -123,6 +123,7 @@ $_['entry_password']                  = 'Allow Forgotten Password';
 $_['entry_prepaid_account']       	  = 'Prepaid Income Account';
 $_['entry_processing_status']         = 'Processing Order Status';
 $_['entry_product_count']             = 'Category Product Count';
+$_['entry_purchase_vendor_prefix']    = 'Purchase Order Vendor';
 $_['entry_receipt_customer_prefix']   = 'Kuitansi Customer';
 $_['entry_receipt_vendor_prefix']     = 'Kuitansi Vendor';
 $_['entry_reference_start']     	  = 'Nomor Urut Awal';

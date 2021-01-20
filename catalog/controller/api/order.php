@@ -244,6 +244,7 @@ class ControllerApiOrder extends Controller
 						'product_id'   => $product['product_id'],
 						'name'         => $product['name'],
 						'model'        => $product['model'],
+						'supplier_id'  => $product['supplier_id'],
 						'option'       => $option_data,
 						'download'     => $product['download'],
 						'quantity'     => $product['quantity'],
@@ -658,6 +659,7 @@ class ControllerApiOrder extends Controller
 							'product_id'   => $product['product_id'],
 							'name'         => $product['name'],
 							'model'        => $product['model'],
+							'supplier_id'  => $product['supplier_id'],
 							'option'       => $option_data,
 							'download'     => $product['download'],
 							'quantity'     => $product['quantity'],
@@ -818,8 +820,8 @@ class ControllerApiOrder extends Controller
 			} elseif ($transactions) {
 				$json['error'] = $this->language->get('error_transaction');
 			} else {
-				// $this->model_checkout_order->deleteOrder($order_id);
-
+				$this->model_checkout_order->deleteOrder($order_id);
+				
 				$json['success'] = $this->language->get('text_success');
 			}
 		}

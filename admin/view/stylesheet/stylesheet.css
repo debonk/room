@@ -649,6 +649,10 @@ td.nowrap {
 	white-space:nowrap;
 }
 
+.table-wide {
+	min-width: 800px;
+}
+
 /* calendar */
 td.calendar-day:hover {
 	background-color:#eceff5;

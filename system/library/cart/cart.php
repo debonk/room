@@ -259,6 +259,7 @@ class Cart {
 					'category'     	  => $cart['category'],
 					'shipping'        => $product_query->row['shipping'],
 					'image'           => $product_query->row['image'],
+					'supplier_id'     => $product_query->row['supplier_id'],
 					'option'          => $option_data,
 					'attribute'       => $attribute_data,
 					'download'        => $download_data,

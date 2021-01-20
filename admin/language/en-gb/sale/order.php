@@ -51,6 +51,7 @@ $_['text_print_confirm']       	 = 'Are you sure?\nPrint Dokumen hanya diperbole
 $_['text_product']               = 'Pilih Produk';
 $_['text_product_list']			 = 'Daftar Produk';
 $_['text_profession']            = 'Pekerjaan';
+$_['text_purchase_added']        = 'Success: Purchase Order added!';
 $_['text_receipt']               = 'Kuitansi';
 $_['text_reward']                = 'Reward Points';
 $_['text_reward_added']          = 'Success: Reward points added!';
@@ -174,6 +175,7 @@ $_['button_list']               = 'Tampilan List';
 $_['button_receipt']            = 'Kuitansi';
 $_['button_vendor_add']         = 'Tambah Vendor';
 $_['button_vendor_agreement']   = 'Surat Perjanjian Vendor';
+$_['button_vendor_purchase']    = 'Purchase Order';
 $_['button_vendor_remove']      = 'Hapus Vendor';
 $_['button_year_view']          = 'Yearly Overview';
 
@@ -184,6 +186,7 @@ $_['help_override']              = 'If the customers order is being blocked from
 
 // Error
 $_['error_action']     					= 'Warning: Could not complete this action!';
+$_['error_order']     					= 'Warning: Order tidak ditemukan!';
 $_['error_permission'] 					= 'Warning: You do not have permission to modify orders!';
 $_['error_vendor_name']					= 'Mohon isi Nama Vendor lebih lengkap!';
 $_['error_warning']    					= 'Warning: Please check the form carefully for errors!';
