@@ -2874,7 +2874,7 @@ class ControllerSaleOrder extends Controller
 					$invoice_no = $this->config->get('config_reference_start') + 1;
 				}
 
-				$purchase_products = $this->model_sale_order->getOrderProducts($order_id, $vendor_id);
+				$purchase_products = $this->model_sale_order->getOrderProductsBySupplierId($order_id, $vendor_id);
 
 				$purchase_data = array(
 					'supplier_id'		=> $vendor_id,

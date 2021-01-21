@@ -240,7 +240,7 @@
     $('input[name=\'supplier_name\']').autocomplete({
       'source': function (request, response) {
         $.ajax({
-          url: 'index.php?route=purchase/purchase/autocompleteSupplier&token=<?php echo $token; ?>&filter_name=' + encodeURIComponent(request),
+          url: 'index.php?route=purchase/purchase/supplierAutocomplete&token=<?php echo $token; ?>&filter_name=' + encodeURIComponent(request),
           dataType: 'json',
           success: function (json) {
             response($.map(json, function (item) {
@@ -268,7 +268,7 @@
       inline_total[i] = getNumber(inline_total_str[i]);
     };
 
-    $(document).ready(calculateTotal(inline_total));
+    calculateTotal(inline_total);
 
     let product_row = '<?php echo $purchase_product_idx ?>';
 

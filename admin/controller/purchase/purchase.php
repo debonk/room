@@ -154,6 +154,7 @@ class ControllerPurchasePurchase extends Controller
 			'column_description',
 			'column_invoice',
 			'column_supplier_name',
+			'column_telephone',
 			'column_total',
 			'column_username',
 			'column_action',
@@ -281,6 +282,7 @@ class ControllerPurchasePurchase extends Controller
 				'purchase_id' 	=> $result['purchase_id'],
 				'date'	 		=> date($this->language->get('date_format_short'), strtotime($result['date_added'])),
 				'supplier_name'	=> $result['supplier_name'],
+				'telephone'		=> $result['telephone'],
 				'invoice'  		=> $invoice,
 				'description'  	=> strlen($description) > 80 ? substr($description, 0, 78) . '..' : $description,
 				'total'      	=> $this->currency->format($result['total'], $this->config->get('config_currency')),
@@ -308,7 +310,7 @@ class ControllerPurchasePurchase extends Controller
 		$data['sort_supplier_name'] = $this->url->link('purchase/purchase', 'token=' . $this->session->data['token'] . '&sort=p.supplier_name' . $url, true);
 		$data['sort_invoice'] = $this->url->link('purchase/purchase', 'token=' . $this->session->data['token'] . '&sort=invoice' . $url, true);
 		$data['sort_telephone'] = $this->url->link('purchase/purchase', 'token=' . $this->session->data['token'] . '&sort=p.telephone' . $url, true);
-		$data['sort_order'] = $this->url->link('purchase/purchase', 'token=' . $this->session->data['token'] . '&sort=p.order_id' . $url, true);
+		$data['sort_total'] = $this->url->link('purchase/purchase', 'token=' . $this->session->data['token'] . '&sort=p.total' . $url, true);
 		$data['sort_username'] = $this->url->link('purchase/purchase', 'token=' . $this->session->data['token'] . '&sort=u.username' . $url, true);
 
 		$url = $this->urlFilter();
@@ -684,7 +686,7 @@ class ControllerPurchasePurchase extends Controller
 		return !$this->error;
 	}
 
-	public function autocompleteSupplier() {
+	public function supplierAutocomplete() {
 		$json = array();
 
 		if (isset($this->request->get['filter_name'])) {

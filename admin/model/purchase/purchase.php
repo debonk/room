@@ -28,22 +28,38 @@ class ModelPurchasePurchase extends Model {
 		$purchase_id = $this->db->getLastId();
 
 		if (isset($data['product'])) {
+			$product_total = 0;
+			
 			foreach ($data['product'] as $product) {
 				if (!isset($product['tax'])) {
 					$product['tax'] = 0;
 				}
 
-				if (!isset($product['product_id'])) {
+				if (isset($product['purchase_price'])) {
+					$product['price'] = $product['purchase_price'];
+				}
+
+				$product['quantity'] =  $this->getNumber($product['quantity']);
+				$product['price'] =  $this->getNumber($product['price']);
+				$product['total'] =  $product['quantity'] * $product['price'];
+				$product['tax'] =  $this->getNumber($product['tax']);
+
+				if ($product['product_id']) {
+					$this->load->model('catalog/product');
+					$product_info = $this->model_catalog_product->getProduct($product['product_id']);
+
+					$product['name'] = $product_info['name'];
+					$product['unit_class'] = $product_info['unit_class'];
+				} else {
 					$product['product_id'] = 0;
 				}
 
-				$product['quantity'] = $this->getNumber($product['quantity']);
-				$product['price'] = $this->getNumber($product['price']);
-				$product['total'] = $this->getNumber($product['total']);
-				$product['tax'] = $this->getNumber($product['tax']);
-
 				$this->db->query("INSERT INTO " . DB_PREFIX . "purchase_product SET purchase_id = '" . (int)$purchase_id . "', product_id = '" . (int)$product['product_id'] . "', name = '" . $this->db->escape($product['name']) . "', quantity = '" . (int)$product['quantity'] . "', price = '" . (float)$product['price'] . "', total = '" . (float)$product['total'] . "', tax = '" . (float)$product['tax'] . "', unit_class = '" . $this->db->escape($product['unit_class']) . "'");
+
+				$product_total += $product['total'];
 			}
+
+			$this->db->query("UPDATE " . DB_PREFIX . "purchase SET total = '" . (float)($product_total + $data['adjustment']) . "' WHERE purchase_id = '" . (int)$purchase_id . "'");
 		}
 
 		return $purchase_id;
@@ -83,7 +99,8 @@ class ModelPurchasePurchase extends Model {
 
 				$product['quantity'] =  $this->getNumber($product['quantity']);
 				$product['price'] =  $this->getNumber($product['price']);
-				$product['total'] =  $this->getNumber($product['total']);
+				$product['total'] =  $product['quantity'] * $product['price'];
+				// $product['total'] =  $this->getNumber($product['total']);
 				$product['tax'] =  $this->getNumber($product['tax']);
 
 				if ($product['product_id']) {
@@ -150,7 +167,7 @@ class ModelPurchasePurchase extends Model {
 			'p.supplier_name',
 			'invoice',
 			'p.telephone',
-			'p.order_id',
+			'p.total',
 			'u.username'
 		);
 
@@ -284,50 +301,6 @@ class ModelPurchasePurchase extends Model {
 	}
 
 // End
-
-	public function getTotalPurchases($data = array()) {
-		$sql = "SELECT COUNT(*) AS total FROM `" . DB_PREFIX . "purchase`";
-
-		if (isset($data['filter_purchase_status'])) {
-			$implode = array();
-
-			$purchase_statuses = explode(',', $data['filter_purchase_status']);
-
-			foreach ($purchase_statuses as $purchase_status_id) {
-				$implode[] = "purchase_status_id = '" . (int)$purchase_status_id . "'";
-			}
-
-			if ($implode) {
-				$sql .= " WHERE (" . implode(" OR ", $implode) . ")";
-			}
-		} else {
-			$sql .= " WHERE purchase_status_id > '0'";
-		}
-
-		if (!empty($data['filter_purchase_id'])) {
-			$sql .= " AND purchase_id = '" . (int)$data['filter_purchase_id'] . "'";
-		}
-
-		if (!empty($data['filter_customer'])) {
-			$sql .= " AND CONCAT(firstname, ' ', lastname) LIKE '%" . $this->db->escape($data['filter_customer']) . "%'";
-		}
-
-		if (!empty($data['filter_date_added'])) {
-			$sql .= " AND DATE(date_added) = DATE('" . $this->db->escape($data['filter_date_added']) . "')";
-		}
-
-		if (!empty($data['filter_event_date'])) {
-			$sql .= " AND DATE(event_date) = DATE('" . $this->db->escape($data['filter_event_date']) . "')";
-		}
-
-		if (!empty($data['filter_total'])) {
-			$sql .= " AND total = '" . (float)$data['filter_total'] . "'";
-		}
-
-		$query = $this->db->query($sql);
-
-		return $query->row['total'];
-	}
 
 	public function getTotalPurchasesByCompleteStatus() {
 		$implode = array();

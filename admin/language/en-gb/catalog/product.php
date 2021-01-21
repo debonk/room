@@ -66,6 +66,7 @@ $_['entry_points']           = 'Points';
 $_['entry_price']            = 'Price';
 $_['entry_primary_type']     = 'Produk Utama';
 $_['entry_priority']         = 'Priority';
+$_['entry_purchase_price']   = 'Harga Pokok';
 $_['entry_quantity']         = 'Quantity';
 $_['entry_recurring']        = 'Recurring Profile';
 $_['entry_related']          = 'Related Products';
@@ -114,3 +115,6 @@ $_['error_name']             = 'Product Name must be greater than 3 and less tha
 $_['error_meta_title']       = 'Meta Title must be greater than 3 and less than 255 characters!';
 $_['error_model']            = 'Product Model must be greater than 1 and less than 64 characters!';
 $_['error_keyword']          = 'SEO URL already in use!';
+
+// Button
+$_['button_supplier_add']   = 'Add Supplier';

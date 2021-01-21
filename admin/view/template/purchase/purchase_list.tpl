@@ -119,11 +119,11 @@
                       onclick="$('input[name*=\'selected\']').prop('checked', this.checked);" /></td>
                   <td class="text-left">
                     <?php if ($sort == 'p.date_added') { ?>
-                    <a href="<?php echo $sort_date; ?>" class="<?php echo strtolower($order); ?>">
+                    <a href="<?php echo $sort_date_added; ?>" class="<?php echo strtolower($order); ?>">
                       <?php echo $column_date_added; ?>
                     </a>
                     <?php } else { ?>
-                    <a href="<?php echo $sort_date; ?>">
+                    <a href="<?php echo $sort_date_added; ?>">
                       <?php echo $column_date_added; ?>
                     </a>
                     <?php } ?>
@@ -136,6 +136,17 @@
                     <?php } else { ?>
                     <a href="<?php echo $sort_supplier_name; ?>">
                       <?php echo $column_supplier_name; ?>
+                    </a>
+                    <?php } ?>
+                  </td>
+                  <td class="text-left">
+                    <?php if ($sort == 'p.telephone') { ?>
+                    <a href="<?php echo $sort_telephone; ?>" class="<?php echo strtolower($order); ?>">
+                      <?php echo $column_telephone; ?>
+                    </a>
+                    <?php } else { ?>
+                    <a href="<?php echo $sort_telephone; ?>">
+                      <?php echo $column_telephone; ?>
                     </a>
                     <?php } ?>
                   </td>
@@ -198,6 +209,9 @@
                   <td class="text-left">
                     <?php echo $purchase['supplier_name']; ?>
                   </td>
+                  <td class="text-left">
+                    <?php echo $purchase['telephone']; ?>
+                  </td>
                   <?php if ($purchase['order_url']) { ?>
                   <td class="text-left"><a href="<?php echo $purchase['order_url']; ?>" target="_blank">
                       <?php echo $purchase['invoice']; ?>
@@ -233,7 +247,7 @@
               </tbody>
               <tfoot>
                 <tr>
-                  <td class="text-right" colspan="5">
+                  <td class="text-right" colspan="6">
                     <?php echo $text_total; ?>
                   </td>
                   <td class="text-right">

@@ -710,6 +710,7 @@ class ControllerCatalogProduct extends Controller {
 		$data['entry_store'] = $this->language->get('entry_store');
 		$data['entry_manufacturer'] = $this->language->get('entry_manufacturer');
 		$data['entry_supplier'] = $this->language->get('entry_supplier');
+		$data['entry_purchase_price'] = $this->language->get('entry_purchase_price');
 		$data['entry_download'] = $this->language->get('entry_download');
 		$data['entry_category'] = $this->language->get('entry_category');
 		$data['entry_filter'] = $this->language->get('entry_filter');
@@ -740,7 +741,6 @@ class ControllerCatalogProduct extends Controller {
 		$data['help_mpn'] = $this->language->get('help_mpn');
 		$data['help_minimum'] = $this->language->get('help_minimum');
 		$data['help_manufacturer'] = $this->language->get('help_manufacturer');
-		$data['help_supplier'] = $this->language->get('help_supplier');
 		$data['help_stock_status'] = $this->language->get('help_stock_status');
 		$data['help_points'] = $this->language->get('help_points');
 		$data['help_category'] = $this->language->get('help_category');
@@ -760,6 +760,7 @@ class ControllerCatalogProduct extends Controller {
 		$data['button_image_add'] = $this->language->get('button_image_add');
 		$data['button_remove'] = $this->language->get('button_remove');
 		$data['button_recurring_add'] = $this->language->get('button_recurring_add');
+		$data['button_supplier_add'] = $this->language->get('button_supplier_add');
 
 		$data['tab_general'] = $this->language->get('tab_general');
 		$data['tab_data'] = $this->language->get('tab_data');
@@ -768,6 +769,7 @@ class ControllerCatalogProduct extends Controller {
 		$data['tab_recurring'] = $this->language->get('tab_recurring');
 		$data['tab_discount'] = $this->language->get('tab_discount');
 		$data['tab_special'] = $this->language->get('tab_special');
+		$data['tab_supplier'] = $this->language->get('tab_supplier');
 		$data['tab_image'] = $this->language->get('tab_image');
 		$data['tab_links'] = $this->language->get('tab_links');
 		$data['tab_reward'] = $this->language->get('tab_reward');
@@ -1008,6 +1010,16 @@ class ControllerCatalogProduct extends Controller {
 			$data['product_recurrings'] = array();
 		}
 
+		if (isset($this->request->post['product_suppliers'])) {
+			$data['product_suppliers'] = $this->request->post['product_suppliers'];
+		} elseif (!empty($product_info)) {
+			$data['product_suppliers'] = $this->model_catalog_product->getProductSuppliers($product_info['product_id']);
+		} else {
+			$data['product_suppliers'] = array();
+		}
+
+		$data['product_suppliers_idx'] = ($data['product_suppliers'] ? max(array_keys($data['product_suppliers'])) + 1 : 0);
+
 		$this->load->model('localisation/tax_class');
 
 		$data['tax_classes'] = $this->model_localisation_tax_class->getTaxClasses();
@@ -1170,31 +1182,6 @@ class ControllerCatalogProduct extends Controller {
 			}
 		} else {
 			$data['manufacturer'] = '';
-		}
-
-		//Supplier
-		if (isset($this->request->post['supplier_id'])) {
-			$data['supplier_id'] = $this->request->post['supplier_id'];
-		} elseif (!empty($product_info)) {
-			$data['supplier_id'] = $product_info['supplier_id'];
-		} else {
-			$data['supplier_id'] = 0;
-		}
-
-		if (isset($this->request->post['supplier'])) {
-			$data['supplier'] = $this->request->post['supplier'];
-		} elseif (!empty($product_info)) {
-			$this->load->model('purchase/supplier');
-
-			$supplier_info = $this->model_purchase_supplier->getSupplier($product_info['supplier_id']);
-
-			if ($supplier_info) {
-				$data['supplier'] = $supplier_info['supplier_name'];
-			} else {
-				$data['supplier'] = '';
-			}
-		} else {
-			$data['supplier'] = '';
 		}
 
 		// Categories
@@ -1661,6 +1648,40 @@ class ControllerCatalogProduct extends Controller {
 				);
 			}
 		}
+
+		$this->response->addHeader('Content-Type: application/json');
+		$this->response->setOutput(json_encode($json));
+	}
+
+	public function supplierAutocomplete() {
+		$json = array();
+
+		if (isset($this->request->get['filter_name'])) {
+			$this->load->model('purchase/supplier');
+
+			$filter_data = array(
+				'filter_supplier_name' 	=> $this->request->get['filter_name'],
+				'start'       			=> 0,
+				'limit'       			=> 0
+			);
+
+			$results = $this->model_purchase_supplier->getSuppliers($filter_data);
+
+			foreach ($results as $result) {
+				$json[] = array(
+					'supplier_id' 	=> $result['supplier_id'],
+					'supplier_name' => strip_tags(html_entity_decode($result['supplier_name'], ENT_QUOTES, 'UTF-8'))
+				);
+			}
+		}
+
+		$sort_order = array();
+
+		foreach ($json as $key => $value) {
+			$sort_order[$key] = $value['supplier_name'];
+		}
+
+		array_multisort($sort_order, SORT_ASC, $json);
 
 		$this->response->addHeader('Content-Type: application/json');
 		$this->response->setOutput(json_encode($json));

@@ -264,14 +264,16 @@ class ModelSaleOrder extends Model {
 		return $query->row;
 	}
 
-	public function getOrderProducts($order_id, $supplier_id = 0) {
-		$sql = "SELECT * FROM " . DB_PREFIX . "order_product WHERE order_id = '" . (int)$order_id . "'";
+	public function getOrderProducts($order_id) {
+		$sql = "SELECT * FROM " . DB_PREFIX . "order_product WHERE order_id = '" . (int)$order_id . "' ORDER BY primary_type DESC";
 
-		if ($supplier_id) {
-			$sql .= " AND supplier_id = '" . (int)$supplier_id . "'";
-		}
+		$query = $this->db->query($sql);
 
-		$sql .= " ORDER BY primary_type DESC";
+		return $query->rows;
+	}
+
+	public function getOrderProductsBySupplierId($order_id, $supplier_id) {
+		$sql = "SELECT op.*, ps.supplier_id, ps.price AS purchase_price FROM " . DB_PREFIX . "order_product op LEFT JOIN " . DB_PREFIX . "product_supplier ps ON (ps.product_id = op.product_id) WHERE order_id = '" . (int)$order_id . "' AND ps.supplier_id = '" . (int)$supplier_id . "'";
 
 		$query = $this->db->query($sql);
 

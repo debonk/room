@@ -125,6 +125,7 @@ $_['tab_payment']                   = 'Payment Details';
 $_['tab_product']                   = 'Products';
 $_['tab_reward']                    = 'Reward Points';
 $_['tab_shipping']                  = 'Shipping Details';
+$_['tab_supplier']                  = 'Supplier';
 $_['tab_total']                     = 'Totals';
 $_['tab_transaction']               = 'Transactions';
 $_['tab_voucher']                   = 'Vouchers';
