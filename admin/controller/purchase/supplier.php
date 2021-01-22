@@ -212,7 +212,7 @@ class ControllerPurchaseSupplier extends Controller {
 			$data['suppliers'][] = array(
 				'supplier_id'   => $result['supplier_id'],
 				'supplier_name' => $result['supplier_name'],
-				'vendor_type'   => $result['vendor_type'],
+				'vendor_type'   => $result['vendor_type_id'] ? $result['vendor_type'] : '-',
 				'telephone'     => $result['telephone'],
 				'email'         => $result['email'],
 				'balance'       => $this->currency->format($balance, $this->config->get('config_currency')),
@@ -230,6 +230,7 @@ class ControllerPurchaseSupplier extends Controller {
 			'text_disabled',
 			'text_no_results',
 			'text_confirm',
+			'text_not_vendor',
 			'entry_supplier_name',
 			'entry_vendor_type',
 			'entry_status',
@@ -344,6 +345,8 @@ class ControllerPurchaseSupplier extends Controller {
 
 		$this->load->model('catalog/vendor_type');
 		$data['vendor_types'] = $this->model_catalog_vendor_type->getVendorTypes();
+
+		array_unshift($data['vendor_types'], ['vendor_type_id' => 0, 'name' => $this->language->get('text_not_vendor')]);
 
 		$data['header'] = $this->load->controller('common/header');
 		$data['column_left'] = $this->load->controller('common/column_left');

@@ -471,7 +471,7 @@ class ControllerCatalogOption extends Controller {
 			$filter_data = array(
 				'filter_name' => $this->request->get['filter_name'],
 				'start'       => 0,
-				'limit'       => 5
+				'limit'       => 0
 			);
 
 			$options = $this->model_catalog_option->getOptions($filter_data);
@@ -492,14 +492,15 @@ class ControllerCatalogOption extends Controller {
 						$option_value_data[] = array(
 							'option_value_id' => $option_value['option_value_id'],
 							'name'            => strip_tags(html_entity_decode($option_value['name'], ENT_QUOTES, 'UTF-8')),
-							'image'           => $image
+							'image'           => $image,
+							'sort_order'	  => $option_value['sort_order']
 						);
 					}
 
 					$sort_order = array();
 
 					foreach ($option_value_data as $key => $value) {
-						$sort_order[$key] = $value['name'];
+						$sort_order[$key] = $value['sort_order'] . $value['name'];
 					}
 
 					array_multisort($sort_order, SORT_ASC, $option_value_data);

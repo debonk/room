@@ -110,8 +110,6 @@ class ControllerApiOrder extends Controller
 			}
 
 			if (!$json) {
-				$json['success'] = $this->language->get('text_success');
-
 				$order_data = array();
 
 				// $inv_prefix = current($primary_products)['model'];
@@ -144,6 +142,7 @@ class ControllerApiOrder extends Controller
 				$order_data['custom_field'] = $this->session->data['customer']['custom_field'];
 
 				// Event Details
+				$order_data['title'] = $this->session->data['event']['title'];
 				$order_data['event_date'] = $this->session->data['event']['event_date'];
 				$order_data['slot_id'] = $this->session->data['event']['slot_id'];
 				$order_data['ceremony_id'] = $this->session->data['event']['ceremony_id'];
@@ -244,7 +243,6 @@ class ControllerApiOrder extends Controller
 						'product_id'   => $product['product_id'],
 						'name'         => $product['name'],
 						'model'        => $product['model'],
-						'supplier_id'  => $product['supplier_id'],
 						'option'       => $option_data,
 						'download'     => $product['download'],
 						'quantity'     => $product['quantity'],
@@ -398,6 +396,8 @@ class ControllerApiOrder extends Controller
 				unset($this->session->data['event']);
 				unset($this->session->data['customer']);
 				unset($this->session->data['payment_address']);
+
+				$json['success'] = $this->language->get('text_success');
 			}
 		}
 
@@ -531,8 +531,6 @@ class ControllerApiOrder extends Controller
 				}
 
 				if (!$json) {
-					$json['success'] = $this->language->get('text_success');
-
 					$order_data = array();
 
 					$order_data['invoice_prefix'] = str_ireplace('{YEAR}', date('Y', strtotime($this->session->data['event']['event_date'])), $this->config->get('config_invoice_prefix'));
@@ -559,6 +557,7 @@ class ControllerApiOrder extends Controller
 					$order_data['custom_field'] = $this->session->data['customer']['custom_field'];
 
 					// Event Details
+					$order_data['title'] = $this->session->data['event']['title'];
 					$order_data['event_date'] = $this->session->data['event']['event_date'];
 					$order_data['slot_id'] = $this->session->data['event']['slot_id'];
 					$order_data['ceremony_id'] = $this->session->data['event']['ceremony_id'];
@@ -659,7 +658,6 @@ class ControllerApiOrder extends Controller
 							'product_id'   => $product['product_id'],
 							'name'         => $product['name'],
 							'model'        => $product['model'],
-							'supplier_id'  => $product['supplier_id'],
 							'option'       => $option_data,
 							'download'     => $product['download'],
 							'quantity'     => $product['quantity'],
@@ -777,6 +775,10 @@ class ControllerApiOrder extends Controller
 					unset($this->session->data['event']);
 					unset($this->session->data['customer']);
 					unset($this->session->data['payment_address']);
+
+					$json['success'] = $this->language->get('text_success');
+
+					$json['order_id'] = $order_id;
 				}
 			} else {
 				$json['error'] = $this->language->get('error_not_found');

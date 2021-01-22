@@ -41,17 +41,21 @@
           <table class="table">
             <tbody>
               <tr>
+                <td style="width: 1%;"><button data-toggle="tooltip" title="<?php echo $text_title; ?>" class="btn btn-info btn-xs"><i class="fa fa-birthday-cake fa-fw"></i></button></td>
+                <td><?php echo $title; ?></td>
+              </tr>
+              <tr>
                 <td style="width: 1%;"><button data-toggle="tooltip" title="<?php echo $text_event_date; ?>" class="btn btn-info btn-xs"><i class="fa fa-calendar fa-fw"></i></button></td>
                 <td><?php echo $event_date; ?></td>
               </tr>
               <tr>
                 <td><button data-toggle="tooltip" title="<?php echo $text_slot; ?>" class="btn btn-info btn-xs"><i class="fa fa-clock-o fa-fw"></i></button></td>
-                <td><?php echo $slot; ?></td>
+                <td><?php echo $session_slot; ?></td>
               </tr>
-              <tr>
+              <!-- <tr>
                 <td><button data-toggle="tooltip" title="<?php echo $text_ceremony; ?>" class="btn btn-info btn-xs"><i class="fa fa-birthday-cake fa-fw"></i></button></td>
                 <td><?php echo $ceremony; ?></td>
-              </tr>
+              </tr> -->
               <tr>
                 <td><button data-toggle="tooltip" title="<?php echo $text_date_added; ?>" class="btn btn-info btn-xs"><i class="fa fa-calendar-plus-o fa-fw"></i></button></td>
                 <td><?php echo $date_added; ?></td>

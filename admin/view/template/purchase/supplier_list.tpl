@@ -43,7 +43,7 @@
                 <select name="filter_vendor_type_id" id="input-supplier-type" class="form-control">
                   <option value="*"><?php echo $text_all; ?></option>
                   <?php foreach ($vendor_types as $vendor_type) { ?>
-                  <?php if ($vendor_type['vendor_type_id'] == $filter_vendor_type_id) { ?>
+                  <?php if ($vendor_type['vendor_type_id'] == $filter_vendor_type_id && !is_null($filter_vendor_type_id)) { ?>
                   <option value="<?php echo $vendor_type['vendor_type_id']; ?>" selected="selected"><?php echo $vendor_type['name']; ?></option>
                   <?php } else { ?>
                   <option value="<?php echo $vendor_type['vendor_type_id']; ?>"><?php echo $vendor_type['name']; ?></option>

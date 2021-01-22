@@ -29,8 +29,10 @@ class ModelPurchaseSupplier extends Model {
 			$implode[] = "s.supplier_name LIKE '%" . $this->db->escape($data['filter_supplier_name']) . "%'";
 		}
 
-		if (!empty($data['filter_vendor_type_id'])) {
+		if (isset($data['filter_vendor_type_id'])) {
 			$implode[] = "s.vendor_type_id = '" . (int)$data['filter_vendor_type_id'] . "'";
+		} elseif (isset($data['filter_vendor'])) {//Supplier yg sekaligus vendor.
+			$implode[] = "s.vendor_type_id > 0";
 		}
 
 		if (isset($data['filter_status']) && !is_null($data['filter_status'])) {

@@ -87,7 +87,7 @@
       </div>
     </div>
   </div>
-  <script type="text/javascript"><!--
+  <script type="text/javascript">
 $(document).ready(function(){
 	$.ajax({
 		url: 'index.php?route=sale/order/viewData&token=<?php echo $token; ?>&filter_month=<?php echo $filter_month; ?>',
@@ -95,15 +95,12 @@ $(document).ready(function(){
 		success: function(json) {
 			$('.alert').remove();
 
-			if (json['error']) {
-				$('#content > .container-fluid').prepend('<div class="alert alert-danger"><i class="fa fa-exclamation-circle"></i> ' + json['error'] + ' <button type="button" class="close" data-dismiss="alert">&times;</button></div>');
-			}
-
 			if (json['orders'].length) {
 				for (i = 0; i < json['orders'].length; i++) {
-					var order = json['orders'][i];
-					var date_slot_idx = order['event_date'] + order['slot_idx'];
+					let order = json['orders'][i];
+					let date_slot_idx = order['event_date'] + order['slot_idx'];
 					
+					console.log(order);
 					for	 (j in order['slot_remove']) {
 						$('#slot-' + order['event_date'] + order['slot_remove'][j]).replaceWith('<a id="slot-' + order['event_date'] + order['slot_remove'][j] + '"></a>');
 					}
@@ -117,7 +114,7 @@ $(document).ready(function(){
 					}
 					
 					html += '</a>';
-					
+
 					$('#slot-' + date_slot_idx).replaceWith(html);
 				}
 			}
@@ -140,8 +137,8 @@ $('#button-filter').on('click', function() {
 
 	location = url;
 });
-//--></script> 
-  <script type="text/javascript"><!--
+</script> 
+  <script type="text/javascript">
 $(document).delegate('#button-ip-add', 'click', function() {
 	$.ajax({
 		url: 'index.php?route=user/api/addip&token=<?php echo $token; ?>&api_id=<?php echo $api_id; ?>',
@@ -202,13 +199,13 @@ $.ajax({
 		alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
 	}
 });
-//--></script> 
+</script> 
   <script src="view/javascript/jquery/datetimepicker/bootstrap-datetimepicker.min.js" type="text/javascript"></script>
   <link href="view/javascript/jquery/datetimepicker/bootstrap-datetimepicker.min.css" type="text/css" rel="stylesheet" media="screen" />
-  <script type="text/javascript"><!--
+  <script type="text/javascript">
 $('.month').datetimepicker({
 	minViewMode: 'months',
 	pickTime: false
 });
-//--></script></div>
+</script></div>
 <?php echo $footer; ?> 

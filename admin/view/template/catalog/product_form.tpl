@@ -1224,10 +1224,10 @@ $('#suppliers tbody tr').each(function(index, element) {
 	supplierAutocomplete(index);
 });
 
-var attribute_row = <?php echo $attribute_row; ?>;
+var attribute_row = '<?php echo $attribute_row; ?>';
 
 function addAttribute() {
-    html  = '<tr id="attribute-row' + attribute_row + '">';
+  html  = '<tr id="attribute-row' + attribute_row + '">';
 	html += '  <td class="text-left" style="width: 20%;"><input type="text" name="product_attribute[' + attribute_row + '][name]" value="" placeholder="<?php echo $entry_attribute; ?>" class="form-control" /><input type="hidden" name="product_attribute[' + attribute_row + '][attribute_id]" value="" /></td>';
 	html += '  <td class="text-left">';
 	<?php foreach ($languages as $language) { ?>

@@ -167,6 +167,7 @@ class ControllerApiCart extends Controller {
 		} else {
 			// Add keys for missing post vars
 			$keys = array(
+				'title',
 				'event_date',
 				'slot_id',
 				'ceremony_id'
@@ -177,7 +178,11 @@ class ControllerApiCart extends Controller {
 				}
 			}
 
-			//Validate event date, bisa ditambah jika tanggal event harus 1 bulan sebelumnya, dst
+			if (empty($this->request->post['title'])) {
+				$json['error']['title'] = $this->language->get('error_title');
+			}
+
+			//Validate event date, bisa ditambah validasi: tanggal event plg lambat 1 bulan sebelumnya, dst
 			if (empty($this->request->post['event_date']) || trim($this->request->post['event_date']) == '0000-00-00') {
 				$json['error']['event_date'] = $this->language->get('error_event_date');
 			}
@@ -229,6 +234,7 @@ class ControllerApiCart extends Controller {
 			
 			if (!$json) {
 				$this->session->data['event'] = array(
+					'title'   	   => $this->request->post['title'],
 					'event_date'   => $this->request->post['event_date'],
 					'slot_id'      => $this->request->post['slot_id'],
 					'ceremony_id'  => $this->request->post['ceremony_id']
@@ -271,6 +277,7 @@ class ControllerApiCart extends Controller {
 				$this->load->model('localisation/local_date');
 				
 				$json['event'] = array(
+					'title'			=> $this->session->data['event']['title'],
 					'event_date'	=> $this->model_localisation_local_date->getInFormatDate($this->session->data['event']['event_date'])['long_date'],
 					'slot_id'		=> $this->session->data['event']['slot_id'],
 					'slot'			=> $this->model_localisation_slot->getSlot($this->session->data['event']['slot_id'])['name'],

@@ -1661,6 +1661,7 @@ class ControllerCatalogProduct extends Controller {
 
 			$filter_data = array(
 				'filter_supplier_name' 	=> $this->request->get['filter_name'],
+				'filter_vendor'		 	=> true,
 				'start'       			=> 0,
 				'limit'       			=> 0
 			);

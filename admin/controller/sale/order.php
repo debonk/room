@@ -620,6 +620,7 @@ class ControllerSaleOrder extends Controller
 			'entry_slot',
 			'entry_store',
 			'entry_telephone',
+			'entry_title',
 			'entry_zone',
 			'entry_zone_code',
 			'column_action',
@@ -736,6 +737,7 @@ class ControllerSaleOrder extends Controller
 
 			$data['addresses'] = $this->model_customer_customer->getAddresses($order_info['customer_id']);
 
+			$data['title'] = $order_info['title'];
 			$data['event_date'] = date('Y-m-d', strtotime($order_info['event_date']));
 			$data['slot_id'] = $order_info['slot_id'];
 			$data['ceremony_id'] = $order_info['ceremony_id'];
@@ -833,6 +835,8 @@ class ControllerSaleOrder extends Controller
 			$data['customer_custom_field'] = array();
 
 			$data['addresses'] = array();
+
+			$data['title'] = '';
 
 			if (isset($this->request->get['event_date'])) {
 				$data['event_date'] = $this->request->get['event_date'];
@@ -1010,6 +1014,7 @@ class ControllerSaleOrder extends Controller
 			$language_items = array(
 				'heading_title',
 				'text_order_detail',
+				'text_title',
 				'text_event_date',
 				'text_slot',
 				'text_ceremony',
@@ -1165,6 +1170,8 @@ class ControllerSaleOrder extends Controller
 			$event_date = $this->model_localisation_local_date->getInFormatDate($order_info['event_date']);
 			$data['event_date'] = $event_date['day'] . ', ' . $event_date['long_date'];
 
+			$data['title'] = $order_info['title'];
+			$data['session_slot'] = explode(': ', $order_info['session_slot'])[1];
 			$data['slot'] = $order_info['slot'];
 			$data['ceremony'] = $order_info['ceremony'];
 			$data['date_added'] = $this->model_localisation_local_date->getInFormatDate($order_info['date_added'])['long_date'];
@@ -1667,65 +1674,66 @@ class ControllerSaleOrder extends Controller
 
 		$json = array();
 
-		if (!$this->user->hasPermission('modify', 'sale/order')) {
-			$json['error'] = $this->language->get('error_permission');
+		if (isset($this->request->get['filter_month'])) {
+			$filter_month = $this->request->get['filter_month'];
 		} else {
-			if (isset($this->request->get['filter_month'])) {
-				$filter_month = $this->request->get['filter_month'];
-			} else {
-				$filter_month = date('M Y', strtotime('today'));
-			}
+			$filter_month = date('M Y', strtotime('today'));
+		}
 
-			$url = '';
-			$url .= '&filter_month=' . $filter_month;
+		$url = '';
+		$url .= '&filter_month=' . $filter_month;
 
-			$this->load->model('sale/order');
+		$this->load->model('sale/order');
 
-			$filter_data = array(
-				'filter_month'         => $filter_month
-			);
+		$filter_data = array(
+			'filter_month'         => $filter_month
+		);
 
-			$results = $this->model_sale_order->getOrders($filter_data);
+		$results = $this->model_sale_order->getOrders($filter_data);
 
-			// $processing_statuses = $this->config->get('config_processing_status');
-			$processing_statuses = array_merge($this->config->get('config_processing_status'), $this->config->get('config_complete_status'));
+		// $processing_statuses = $this->config->get('config_processing_status');
+		$processing_statuses = array_merge($this->config->get('config_processing_status'), $this->config->get('config_complete_status'));
 
-			foreach ($results as $result) {
-				$slot_idx = strtolower(substr($result['model'], -2, 2) . $result['slot_code']);
+		foreach ($results as $result) {
+			// $slot_idx = strtolower(substr($result['model'], -2, 2) . $result['slot_code']);
+			$session_slot = explode(': ', $result['session_slot']);
+			$slot_idx = strtolower($session_slot[0]);
 
-				if (in_array($result['order_status_id'], $processing_statuses)) {
-					$slot_remove = $this->model_sale_order->getSlotUsed($slot_idx);
+			if (in_array($result['order_status_id'], $processing_statuses)) {
+				$slot_remove = $this->model_sale_order->getSlotUsed($slot_idx);
 
-					$order_summary = sprintf($this->language->get('text_order_summary'), $result['customer'], $result['primary_product'], $result['ceremony'], $result['order_status']);
+				$order_summary = sprintf($this->language->get('text_order_summary'), $result['title'], $result['primary_product'], $result['customer'], $result['order_status']);
 
 					// Check payment status
-					$payment_phases = $this->model_sale_order->getPaymentPhases($result['order_id']);
+				$payment_phases = $this->model_sale_order->getPaymentPhases($result['order_id']);
 
-					$auto_expired = false;
-					$payment_status = '';
+				$auto_expired = false;
+				$payment_status = '';
 
-					foreach ($payment_phases as $payment_phase) {
-						$payment_status = $payment_phase['limit_status'];
+				foreach ($payment_phases as $payment_phase) {
+					$payment_status = $payment_phase['limit_status'];
 
-						if ($payment_phase['limit_status'] == 'expired' && !$auto_expired) {
-							$auto_expired = $payment_phase['auto_expired'];
-						}
+					if ($payment_phase['limit_status'] == 'expired' && !$auto_expired) {
+						$auto_expired = $payment_phase['auto_expired'];
 					}
-
-					$json['orders'][] = array(
-						'slot_idx'        		=> $slot_idx,
-						'slot_name'        		=> $result['model'] . $result['slot_code'],
-						'event_date'      		=> $result['event_date'],
-						'slot_remove'     		=> $slot_remove,
-						'order_summary'   		=> $order_summary,
-						'order_status_class'	=> $result['order_status_class'],
-						'url'			  		=> $this->url->link('sale/order/info', 'token=' . $this->session->data['token'] . '&order_id=' . $result['order_id'] . $url, true),
-						'payment_status'   		=> $payment_status,
-						'auto_expired'   		=> $auto_expired
-					);
 				}
+
+				$json['orders'][] = array(
+					'slot_idx'        		=> $slot_idx,
+					'slot_name'        		=> $result['model'],
+					'event_date'      		=> $result['event_date'],
+					'slot_remove'     		=> $slot_remove,
+					'order_summary'   		=> $order_summary,
+					'order_status_class'	=> $result['order_status_class'],
+					'url'			  		=> $this->url->link('sale/order/info', 'token=' . $this->session->data['token'] . '&order_id=' . $result['order_id'] . $url, true),
+					'payment_status'   		=> $payment_status,
+					'auto_expired'   		=> $auto_expired
+				);
 			}
 		}
+		// print_r($json['orders']);
+		// print_r($slot_remove);
+		// die('---breakpoint---');
 
 		$this->response->addHeader('Content-Type: application/json');
 		$this->response->setOutput(json_encode($json));
@@ -2367,7 +2375,7 @@ class ControllerSaleOrder extends Controller
 				'text_telephone',
 				'text_day_date',
 				'text_slot',
-				'text_ceremony',
+				// 'text_ceremony',
 				'text_category',
 				'text_product_name',
 				'text_quantity',
@@ -2427,7 +2435,7 @@ class ControllerSaleOrder extends Controller
 
 			$date_added_in = $this->model_localisation_local_date->getInFormatDate($order_info['date_added']);
 
-			$data['text_pada_hari'] = sprintf($this->language->get('text_pada_hari'), $date_added_in['day'], $date_added_in['long_date']);
+			$data['text_pada_hari'] = sprintf($this->language->get('text_pada_hari'),$order_info['title'] , $date_added_in['day'], $date_added_in['long_date']);
 
 			$address_format = array(
 				$order_info['payment_address_1'] . ($order_info['payment_address_2'] ? ', ' . $order_info['payment_address_2'] : ''),
@@ -2482,10 +2490,11 @@ class ControllerSaleOrder extends Controller
 
 			// Event Data
 			$event_date_in = $this->model_localisation_local_date->getInFormatDate($order_info['event_date']);
-
+			
+			// $data['title'] = $order_info['title'];
 			$data['event_date'] = $event_date_in['day'] . '/' . $event_date_in['long_date'];
-			$data['slot'] = $order_info['slot'];
-			$data['ceremony'] = $order_info['ceremony'];
+			// $data['slot'] = $order_info['slot'];
+			// $data['ceremony'] = $order_info['ceremony'];
 
 			// Product Data
 			$data['products'] = array();
@@ -2536,6 +2545,10 @@ class ControllerSaleOrder extends Controller
 					'total'		=> $this->currency->format($product['total'] + ($this->config->get('config_tax') ? ($product['tax'] * $product['quantity']) : 0), $order_info['currency_code'], $order_info['currency_value'])
 				);
 			}
+
+			$data['slot'] = explode(': ', $data['products'][1][0]['option'][0]['value'])[1];
+
+			var_dump($data['products']);//die('---breakpoint---');
 
 			// Vendors
 			$data['order_vendors'] = array();
