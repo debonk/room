@@ -5,7 +5,7 @@
       <div class="pull-right">
 	    <a href="<?php echo $document; ?>" target="_blank" class="btn btn-primary"><i class="fa fa-file-text-o"></i> <?php echo $button_document; ?></a>
 		<div class="btn-group">
-		  <button type="button" data-toggle="dropdown" class="btn btn-primary dropdown-toggle" id="button-agreement"><i class="fa fa-file-o"></i> <?php echo $button_agreement; ?></button>
+		  <button type="button" data-toggle="dropdown" class="btn btn-primary dropdown-toggle" id="button-agreement" <?php echo $initial_payment ? '' : 'disabled'; ?> ><i class="fa fa-file-o"></i> <?php echo $button_agreement; ?></button>
 		  <ul class="dropdown-menu dropdown-menu-left">
 			<li><a href="<?php echo $agreement_preview; ?>" target="_blank"><?php echo $text_preview; ?></a></li>
 			<?php if (!$printed) { ?>

@@ -1,15 +1,16 @@
 <?php
 //Text
-$_['text_category'] 	= 'Tipe Pesanan';
-$_['text_product_name'] = 'Nama Pesanan';
+$_['text_category'] 	= 'Tipe Paket';
+$_['text_product_name'] = 'Nama Paket';
 $_['text_quantity'] 	= 'Jumlah';
 $_['text_amount'] 		= 'Harga';
 
 // Text Agreement
 $_['title_agreement']		= 'SURAT KESEPAKATAN PERSEWAAN';
+$_['text_atas_nama']    	= '"Atas Nama %s"';
 $_['text_pada_hari']    	= 'Dalam rangka pelaksanaan acara "%s", maka pada hari %s, tanggal %s, saya yang bertanda tangan di bawah ini:';
 $_['text_sewa_tempat']    	= 'menyatakan akan menyewa tempat di %s dengan rincian:';
-$_['text_termasuk']         = 'Termasuk dalam Paket';
+$_['text_termasuk']         = 'Termasuk dalam Paket "%s":';
 $_['text_kelengkapan']      = 'Kelengkapan Paket Lainnya';
 $_['text_info_tambahan']    = 'dengan informasi tambahan:';
 $_['text_order_vendor']     = 'bekerja sama dengan vendor berikut:';

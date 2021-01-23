@@ -1374,7 +1374,7 @@ class ControllerSaleOrder extends Controller
 
 				$data['order_vendors'][] = array(
 					'vendor_id' 		=> $order_vendor['vendor_id'],
-					'title' 			=> $order_vendor['supplier_name'] . ' - ' . $order_vendor['vendor_type'],
+					'title' 			=> $order_vendor['vendor_name'] . ' - ' . $order_vendor['vendor_type'],
 					'agreement_href'	=> $this->url->link('sale/order/vendorAgreement', 'token=' . $this->session->data['token'] . '&order_id=' . $order_id . '&vendor_id=' . $order_vendor['vendor_id'], true),
 					'admission_href'	=> $admission_href,
 					'agreement_printed'	=> $order_vendor['agreement_printed'] ? 'preview' : 'print',
@@ -1382,24 +1382,23 @@ class ControllerSaleOrder extends Controller
 				);
 			}
 
-			$this->load->model('purchase/supplier');
+			$this->load->model('catalog/vendor');
 
 			$data['vendors'] = array();
 
 			$filter_data = array(
-				'filter_vendor'	=> true,
 				'filter_status'	=> 1,
-				'sort'			=> 'vt.sort_order ASC, s.supplier_name',
+				'sort'			=> 'vt.sort_order ASC, v.vendor_name',
 				'order'         => 'ASC'
 			);
 				
-			$vendors = $this->model_purchase_supplier->getSuppliers($filter_data);
+			$vendors = $this->model_catalog_vendor->getVendors($filter_data);
 
 			foreach ($vendors as $vendor) {
-				if (!in_array($vendor['supplier_id'], array_column($data['order_vendors'], 'vendor_id'))) {
+				if (!in_array($vendor['vendor_id'], array_column($data['order_vendors'], 'vendor_id'))) {
 					$data['vendors'][] = array(
-						'vendor_id' => $vendor['supplier_id'],
-						'title' 	=> $vendor['supplier_name'] . ' - ' . $vendor['vendor_type']
+						'vendor_id' => $vendor['vendor_id'],
+						'title' 	=> $vendor['vendor_name'] . ' - ' . $vendor['vendor_type']
 					);
 				}
 			}
@@ -1436,6 +1435,8 @@ class ControllerSaleOrder extends Controller
 					'status'		=> $payment_phase['paid_status']
 				);
 			}
+
+			$data['initial_payment'] = $payment_phases['initial_payment']['paid_status'];
 
 			$data['comment'] = nl2br($order_info['comment']);
 
@@ -2341,15 +2342,11 @@ class ControllerSaleOrder extends Controller
 			$order_id = 0;
 		}
 
-		if (isset($this->request->get['print']) && $this->request->get['print'] == 1) {
-			$print = 1;
-		} else {
-			$print = 0;
-		}
-
 		$order_info = $this->model_sale_order->getOrder($order_id);
 
-		if ($order_info) {
+		$payment_phases = $this->model_sale_order->getPaymentPhases($order_id);
+	
+		if ($order_info && $payment_phases['initial_payment']['paid_status']) {
 			$this->load->model('setting/setting');
 			$this->load->model('localisation/local_date');
 
@@ -2384,7 +2381,6 @@ class ControllerSaleOrder extends Controller
 				'text_product_name',
 				'text_quantity',
 				'text_amount',
-				'text_termasuk',
 				'text_kelengkapan',
 				'text_info_tambahan',
 				'text_layanan_tambahan',
@@ -2441,7 +2437,11 @@ class ControllerSaleOrder extends Controller
 
 			$date_added_in = $this->model_localisation_local_date->getInFormatDate($order_info['date_added']);
 
-			$data['text_pada_hari'] = sprintf($this->language->get('text_pada_hari'),$order_info['title'] , $date_added_in['day'], $date_added_in['long_date']);
+			if (!$order_info['title']) {
+				$order_info['title'] = sprintf($this->language->get('text_atas_nama'), $order_info['firstname'] . ' ' . $order_info['lastname']);
+			}
+
+			$data['text_pada_hari'] = sprintf($this->language->get('text_pada_hari'), $order_info['title'], $date_added_in['day'], $date_added_in['long_date']);
 
 			$address_format = array(
 				$order_info['payment_address_1'] . ($order_info['payment_address_2'] ? ', ' . $order_info['payment_address_2'] : ''),
@@ -2560,9 +2560,9 @@ class ControllerSaleOrder extends Controller
 				);
 			}
 
-			$data['slot'] = explode(': ', $data['products']['primary'][0]['option'][0]['value'])[1];
+			$data['text_termasuk'] = sprintf($this->language->get('text_termasuk'), $data['products']['primary'][0]['name']);
 
-			// var_dump($data['products']['primary'][0]['attribute']);//die('---breakpoint---');
+			$data['slot'] = explode(': ', $data['products']['primary'][0]['option'][0]['value'])[1];
 
 			// Vendors
 			$data['order_vendors'] = array();
@@ -2644,7 +2644,13 @@ class ControllerSaleOrder extends Controller
 
 			$data['comment'] = nl2br($order_info['comment']);
 
-			if ($order_info['printed'] || !$print || !$this->user->hasPermission('modify', 'sale/order')) {
+			if (!$order_info['printed'] && isset($this->request->get['print']) && $this->request->get['print'] == 1) {
+				$print = 1;
+			} else {
+				$print = 0;
+			}
+	
+			if (!$print || !$this->user->hasPermission('modify', 'sale/order')) {
 				$data['preview'] = 1;
 				$data['letter_content'] = 'letter-content';
 			} else {
@@ -2737,14 +2743,6 @@ class ControllerSaleOrder extends Controller
 
 				$data['text_subject'] = $this->language->get('text_to');
 			}
-
-			// SISTEM PENOMORAN DARI INVOICE
-			// if ($order_info['invoice_no']) {
-			// $data['invoice_no'] = $order_info['invoice_prefix'];
-			// } else {
-			// $data['invoice_no'] = $this->model_sale_order->createInvoiceNo($order_id);
-			// }
-			// $data['invoice_no'] .= '-R' . str_pad($transaction_id,4,0,STR_PAD_LEFT);
 
 			$data['invoice_no'] = $transaction_info['reference_no'] . str_pad($transaction_info['transaction_no'], 4, 0, STR_PAD_LEFT);
 

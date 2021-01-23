@@ -94,56 +94,60 @@
           <tr>
             <td></td><td><?php echo $text_amount; ?></td><td>:</td><td><?php echo $product_primary['total']; ?></td>
           </tr>
-
-          <?php if (isset($products['included'])) { ?>
-            <tr><td></td>
+          <?php if ($order_vendors) { ?>
+            <tr>
               <td colspan="4">
-                <b><?php echo $text_termasuk; ?></b>
+                <b><?php echo $text_order_vendor; ?></b>
               </td>
             </tr>
-          <?php foreach ($products['included'] as $product) { ?>
+          <?php foreach ($order_vendors as $order_vendor) { ?>
             <tr>
-              <td></td><td>&nbsp;&nbsp;<?php echo $product['name']; ?></td><td>:</td><td><?php echo $product['quantity']; ?></td>
-            </tr>
-          <?php foreach ($product['attribute'] as $attribute_group => $attributes) { ?>
-          <?php foreach ($attributes as $attribute) { ?>
-            <tr class="text-italic">
-              <td></td><td>&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;<?php echo $attribute['name']; ?></td><td>:</td><td><?php echo $attribute['value']; ?></td>
+              <td></td><td><?php echo $order_vendor['type']; ?></td><td>:</td><td><?php echo $order_vendor['name']; ?></td>
             </tr>
           <?php } ?>
           <?php } ?>
-          <?php foreach ($product['option'] as $option) { ?>
-            <tr>
-              <td></td><td><?php echo $option['name']; ?></td><td>:</td><td><?php echo $option['value']; ?></td>
-            </tr>
-          <?php } ?>
-          <?php } ?>
-          <?php } ?>
-
-	  	  <?php foreach ($product_primary['attribute'] as $attribute_group => $attributes) { ?>
-          <tr>
-            <td></td><td>&nbsp;&nbsp;<?php echo $text_kelengkapan; ?></td>
-          </tr>
-	  	  <?php foreach ($attributes as $attribute) { ?>
-          <tr class="text-italic">
-            <td></td><td>&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;<?php echo $attribute['name']; ?></td><td>:</td><td><?php echo $attribute['value']; ?></td>
-          </tr>
-	  	  <?php } ?>
-	  	  <?php } ?>
-	  	  <!-- <?php if ($product['option']) { ?>
+        </tbody>
+      </table>
+      <table class="table table-application page-content">
+        <tbody>
+        <?php if (isset($products['included']) || $product_primary['attribute']) { ?>
           <tr>
             <td colspan="4">
-              <b><?php echo $text_info_tambahan; ?></b>
+              <b><?php echo $text_termasuk; ?></b>
             </td>
           </tr>
-	  	  <?php foreach ($product['option'] as $option) { ?>
+        <?php foreach ($products['included'] as $product) { ?>
+          <tr>
+            <td style="width: 1%;"></td>
+            <td style="width: 40%;"><?php echo $product['name']; ?></td>
+            <td style="width: 1%;">:</td>
+            <td style="width: 58%;"><?php echo $product['quantity']; ?></td>
+          </tr>
+        <?php foreach ($product['attribute'] as $attribute_group => $attributes) { ?>
+        <?php foreach ($attributes as $attribute) { ?>
+          <tr class="text-italic">
+            <td></td><td>&nbsp;&nbsp;-&nbsp;<?php echo $attribute['name']; ?></td><td>:</td><td><?php echo $attribute['value']; ?></td>
+          </tr>
+        <?php } ?>
+        <?php } ?>
+        <?php foreach ($product['option'] as $option) { ?>
           <tr>
             <td></td><td><?php echo $option['name']; ?></td><td>:</td><td><?php echo $option['value']; ?></td>
           </tr>
+        <?php } ?>
+        <?php } ?>
+        <?php } ?>
+	  	  <?php foreach ($product_primary['attribute'] as $attribute_group => $attributes) { ?>
+          <tr>
+            <td></td><td><?php echo $attribute_group; ?></td>
+          </tr>
+	  	  <?php foreach ($attributes as $attribute) { ?>
+          <tr class="text-italic">
+            <td></td><td>&nbsp;&nbsp;-&nbsp;<?php echo $attribute['name']; ?></td><td>:</td><td><?php echo $attribute['value']; ?></td>
+          </tr>
 	  	  <?php } ?>
-	  	  <?php } ?> -->
 	  	  <?php } ?>
-
+	  	  <?php } ?>
 	  	  <?php if (isset($products['additional'])) { ?>
           <tr>
             <td colspan="4">
@@ -168,39 +172,23 @@
 	  	  <?php } ?>
 	  	  <?php } ?>
 	  	  <?php } ?>
-	  	  <?php if ($order_vendors) { ?>
-          <tr>
-            <td colspan="4">
-              <b><?php echo $text_order_vendor; ?></b>
-            </td>
-          </tr>
-	  	  <?php foreach ($order_vendors as $order_vendor) { ?>
-          <tr>
-            <td></td><td><?php echo $order_vendor['type']; ?></td><td>:</td><td><?php echo $order_vendor['name']; ?></td>
-          </tr>
-	  	  <?php } ?>
-	  	  <?php } ?>
-        </tbody>
-      </table>
-      <table class="table table-application page-content">
-        <tbody>
-          <tr>
-            <td colspan="4">
-              <b><?php echo $text_total; ?></b><br />
-            </td>
-          </tr>
-	  	  <?php foreach ($totals as $total) { ?>
+      </tbody>
+    </table>
+    <table class="table table-application page-content">
+      <tbody>
+        <tr>
+          <td colspan="4">
+            <b><?php echo $text_total; ?></b><br />
+          </td>
+        </tr>
+        <?php foreach ($totals as $total) { ?>
           <tr>
             <td style="width: 1%;"></td>
             <td style="width: 40%;"><?php echo $total['title']; ?></td>
             <td style="width: 1%;">:</td>
             <td style="width: 58%;"><?php echo $total['text'] ?></td>
           </tr>
-	  	  <?php } ?>
-        </tbody>
-      </table>
-      <table class="table table-application page-content">
-        <tbody>
+        <?php } ?>
 	  	  <?php if ($transactions) { ?>
           <tr>
             <td colspan="4">
@@ -209,83 +197,82 @@
           </tr>
 	  	  <?php foreach ($transactions as $transaction) { ?>
           <tr>
-            <td style="width: 1%;"></td>
-            <td style="width: 40%;"><?php echo $transaction['title']; ?></td>
-            <td style="width: 1%;">:</td>
-            <td style="width: 58%;"><?php echo $transaction['text'] ?></td>
+            <td></td><td><?php echo $transaction['title']; ?></td><td>:</td><td><?php echo $transaction['text'] ?></td>
           </tr>
 	  	  <?php } ?>
 	  	  <?php } ?>
         </tbody>
       </table>
-      <table class="table table-application page-content">
-        <tbody>
-          <tr>
-            <td>
-              <b><?php echo $text_snk; ?></b><br />
-            </td>
-          </tr>
-          <tr>
-            <td>
-	  	    <ol>
-	  		  <?php foreach ($text_transactions as $text_transaction) { ?>
-              <li><?php echo $text_transaction; ?></li>
-	  		  <?php } ?>
-	  		  <?php if ($text_transactions) { ?>
-              <li><?php echo $text_transfer_ke; ?><div style="margin-left: 10px;"><b><?php echo $no_rekening; ?></b></div></li>
-	  		  <?php } ?>
-			  <?php if (!$preview) { ?>
-              <li><?php echo $text_belum_ppn; ?></li>
-              <li><?php echo $text_tukar_bukti; ?></li>
-              <li><?php echo $text_ubah_tanggal; ?></li>
-              <li><?php echo $text_pembatalan_acara; ?>
-	  		  <div style="margin-left: 10px;"><b>
-	  		    <?php echo $text_pembatalan_1; ?><br />
-	  		    <?php echo $text_pembatalan_2; ?><br />
-	  		    <?php echo $text_pembatalan_3; ?>
-	  		  </b></div>
-	  		  </li>
-			  <?php } else { ?>
-			  <li><?php echo $text_dst ?></li>
-			  <?php } ?>
-	  		</ol>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-	  <?php if (!$preview) { ?>
-      <table class="table table-application text-center page-content">
-        <tbody>
-          <tr>
-            <td colspan="2" class="text-justify">
-              <b><?php echo $text_demikian; ?></b><br /><br />
-            </td>
-          </tr>
-          <tr>
-            <td style="width: 50%;"><?php echo $text_pihak_penyewa; ?></td>
-            <td><?php echo $store_owner; ?><br /><br /><br /><br /><br /><br /></td>
-          </tr>
-          <tr>
-            <td><u><?php echo '( ' . $customer . ' )'; ?></u></td>
-            <td><u><?php echo $manajemen; ?></u><br /><?php echo $text_manajemen; ?></td>
-          </tr>
-        </tbody>
-      </table>
-      <?php if ($comment) { ?>
-      <table class="table table-application">
-        <thead>
-          <tr>
-            <td><b><?php echo $text_comment; ?></b></td>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td><?php echo $comment; ?></td>
-          </tr>
-        </tbody>
-      </table>
-      <?php } ?>
-      <?php } ?>
+      <div class="page-content">
+        <table class="table table-application page-content">
+          <tbody>
+            <tr>
+              <td>
+                <b><?php echo $text_snk; ?></b><br />
+              </td>
+            </tr>
+            <tr>
+              <td>
+            <ol>
+            <?php foreach ($text_transactions as $text_transaction) { ?>
+                <li><?php echo $text_transaction; ?></li>
+            <?php } ?>
+            <?php if ($text_transactions) { ?>
+                <li><?php echo $text_transfer_ke; ?><div style="margin-left: 10px;"><b><?php echo $no_rekening; ?></b></div></li>
+            <?php } ?>
+          <?php if (!$preview) { ?>
+                <li><?php echo $text_belum_ppn; ?></li>
+                <li><?php echo $text_tukar_bukti; ?></li>
+                <li><?php echo $text_ubah_tanggal; ?></li>
+                <li><?php echo $text_pembatalan_acara; ?>
+            <div style="margin-left: 10px;"><b>
+              <?php echo $text_pembatalan_1; ?><br />
+              <?php echo $text_pembatalan_2; ?><br />
+              <?php echo $text_pembatalan_3; ?>
+            </b></div>
+            </li>
+          <?php } else { ?>
+          <li><?php echo $text_dst ?></li>
+          <?php } ?>
+          </ol>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <?php if (!$preview) { ?>
+        <table class="table table-application text-center page-content">
+          <tbody>
+            <tr>
+              <td colspan="2" class="text-justify">
+                <b><?php echo $text_demikian; ?></b><br /><br />
+              </td>
+            </tr>
+            <tr>
+              <td style="width: 50%;"><?php echo $text_pihak_penyewa; ?></td>
+              <td><?php echo $store_owner; ?><br /><br /><br /><br /><br /><br /></td>
+            </tr>
+            <tr>
+              <td><u><?php echo '( ' . $customer . ' )'; ?></u></td>
+              <td><u><?php echo $manajemen; ?></u><br /><?php echo $text_manajemen; ?></td>
+            </tr>
+          </tbody>
+        </table>
+        <?php if ($comment) { ?>
+        <table class="table table-application">
+          <thead>
+            <tr>
+              <td><b><?php echo $text_comment; ?></b></td>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><?php echo $comment; ?></td>
+            </tr>
+          </tbody>
+        </table>
+        <?php } ?>
+        <?php } ?>
+      </div>
     </div>
   </div>
 </div>

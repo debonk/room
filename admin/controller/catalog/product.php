@@ -1676,14 +1676,6 @@ class ControllerCatalogProduct extends Controller {
 			}
 		}
 
-		// $sort_order = array();
-
-		// foreach ($json as $key => $value) {
-		// 	$sort_order[$key] = $value['title'];
-		// }
-
-		// array_multisort($sort_order, SORT_ASC, $json);
-
 		$this->response->addHeader('Content-Type: application/json');
 		$this->response->setOutput(json_encode($json));
 	}
