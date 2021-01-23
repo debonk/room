@@ -328,7 +328,7 @@ class ModelSaleOrder extends Model {
 	}
 
 	public function getOrderVendor($order_id, $vendor_id) {
-		$query = $this->db->query("SELECT DISTINCT ov.*, v.*, vt.name AS vendor_type, (SELECT SUM(t.amount) FROM " . DB_PREFIX . "transaction t WHERE t.order_id = ov.order_id AND t.label = 'vendor' AND t.label_id = v.vendor_id) AS total FROM " . DB_PREFIX . "order_vendor ov LEFT JOIN " . DB_PREFIX . "vendor v ON (v.vendor_id = ov.vendor_id) LEFT JOIN " . DB_PREFIX . "vendor_type vt ON (vt.vendor_type_id = v.vendor_type_id) WHERE ov.order_id = '" . (int)$order_id . "' AND ov.vendor_id = '" . (int)$vendor_id . "'");
+		$query = $this->db->query("SELECT DISTINCT ov.*, s.*, vt.name AS vendor_type, vt.deposit, (SELECT SUM(t.amount) FROM " . DB_PREFIX . "transaction t WHERE t.order_id = ov.order_id AND t.label = 'vendor' AND t.label_id = s.supplier_id) AS total FROM " . DB_PREFIX . "order_vendor ov LEFT JOIN " . DB_PREFIX . "supplier s ON (s.supplier_id = ov.vendor_id) LEFT JOIN " . DB_PREFIX . "vendor_type vt ON (vt.vendor_type_id = s.vendor_type_id) WHERE ov.order_id = '" . (int)$order_id . "' AND ov.vendor_id = '" . (int)$vendor_id . "'");
 
 		return $query->row;
 	}
@@ -340,7 +340,7 @@ class ModelSaleOrder extends Model {
 	}
 
 	public function getOrderVendors($order_id) {
-		$query = $this->db->query("SELECT ov.agreement_printed, ov.admission_printed, v.*, vt.name AS vendor_type, (SELECT SUM(t.amount) FROM " . DB_PREFIX . "transaction t WHERE t.order_id = ov.order_id AND t.label = 'vendor' AND t.label_id = v.vendor_id) AS total FROM " . DB_PREFIX . "order_vendor ov LEFT JOIN " . DB_PREFIX . "vendor v ON (v.vendor_id = ov.vendor_id) LEFT JOIN " . DB_PREFIX . "vendor_type vt ON (vt.vendor_type_id = v.vendor_type_id) WHERE ov.order_id = '" . (int)$order_id . "'");
+		$query = $this->db->query("SELECT ov.*, s.*, vt.name AS vendor_type, vt.deposit, (SELECT SUM(t.amount) FROM " . DB_PREFIX . "transaction t WHERE t.order_id = ov.order_id AND t.label = 'vendor' AND t.label_id = ov.vendor_id) AS total FROM " . DB_PREFIX . "order_vendor ov LEFT JOIN " . DB_PREFIX . "supplier s ON (s.supplier_id = ov.vendor_id) LEFT JOIN " . DB_PREFIX . "vendor_type vt ON (vt.vendor_type_id = s.vendor_type_id) WHERE ov.order_id = '" . (int)$order_id . "' ORDER BY s.supplier_name ASC");
 
 		return $query->rows;
 	}

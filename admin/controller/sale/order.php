@@ -1359,8 +1359,6 @@ class ControllerSaleOrder extends Controller
 
 			$order_vendors = $this->model_sale_order->getOrderVendors($order_id);
 
-			$min_deposit = $this->config->get('config_deposit');
-
 			if ($this->config->get('config_complete_status_required') && !in_array($order_info['order_status_id'], $this->config->get('config_complete_status'))) {
 				$paid_off_status = false;
 			} else {
@@ -1368,7 +1366,7 @@ class ControllerSaleOrder extends Controller
 			}
 
 			foreach ($order_vendors as $order_vendor) {
-				if ($paid_off_status && $order_vendor['total'] >= $min_deposit) {
+				if ($paid_off_status && $order_vendor['total'] >= $order_vendor['deposit']) {
 					$admission_href = $this->url->link('sale/order/admission', 'token=' . $this->session->data['token'] . '&order_id=' . $order_id . '&vendor_id=' . $order_vendor['vendor_id'], true);
 				} else {
 					$admission_href = '';
@@ -1376,8 +1374,7 @@ class ControllerSaleOrder extends Controller
 
 				$data['order_vendors'][] = array(
 					'vendor_id' 		=> $order_vendor['vendor_id'],
-					'title' 			=> $order_vendor['vendor_name'] . ' - ' . $order_vendor['vendor_type'],
-					// 'purchase_href'		=> $this->url->link('sale/order/purchaseOrder', 'token=' . $this->session->data['token'] . '&order_id=' . $order_id . '&vendor_id=' . $order_vendor['vendor_id'], true),
+					'title' 			=> $order_vendor['supplier_name'] . ' - ' . $order_vendor['vendor_type'],
 					'agreement_href'	=> $this->url->link('sale/order/vendorAgreement', 'token=' . $this->session->data['token'] . '&order_id=' . $order_id . '&vendor_id=' . $order_vendor['vendor_id'], true),
 					'admission_href'	=> $admission_href,
 					'agreement_printed'	=> $order_vendor['agreement_printed'] ? 'preview' : 'print',
@@ -1385,17 +1382,24 @@ class ControllerSaleOrder extends Controller
 				);
 			}
 
-			$this->load->model('catalog/vendor');
+			$this->load->model('purchase/supplier');
 
 			$data['vendors'] = array();
 
-			$vendors = $this->model_catalog_vendor->getVendorsByStatus(1);
+			$filter_data = array(
+				'filter_vendor'	=> true,
+				'filter_status'	=> 1,
+				'sort'			=> 'vt.sort_order ASC, s.supplier_name',
+				'order'         => 'ASC'
+			);
+				
+			$vendors = $this->model_purchase_supplier->getSuppliers($filter_data);
 
 			foreach ($vendors as $vendor) {
-				if (!in_array($vendor['vendor_id'], array_column($data['order_vendors'], 'vendor_id'))) {
+				if (!in_array($vendor['supplier_id'], array_column($data['order_vendors'], 'vendor_id'))) {
 					$data['vendors'][] = array(
-						'vendor_id' => $vendor['vendor_id'],
-						'title' 	=> $vendor['vendor_name'] . ' - ' . $vendor['vendor_type']
+						'vendor_id' => $vendor['supplier_id'],
+						'title' 	=> $vendor['supplier_name'] . ' - ' . $vendor['vendor_type']
 					);
 				}
 			}
@@ -1406,7 +1410,7 @@ class ControllerSaleOrder extends Controller
 			$data['payment_phases'] = array();
 			$data['information'] = '';
 			$data['auto_expired'] = false;
-			$expired = false;
+			// $expired = false;
 
 			$payment_phases = $this->model_sale_order->getPaymentPhases($order_id);
 
@@ -2380,6 +2384,8 @@ class ControllerSaleOrder extends Controller
 				'text_product_name',
 				'text_quantity',
 				'text_amount',
+				'text_termasuk',
+				'text_kelengkapan',
 				'text_info_tambahan',
 				'text_layanan_tambahan',
 				'text_order_vendor',
@@ -2536,7 +2542,15 @@ class ControllerSaleOrder extends Controller
 					);
 				}
 
-				$data['products'][$product['primary_type']][] = array(
+				if ($product['primary_type']) {
+					$key = 'primary';
+				} elseif ($product['category'] == 'Included in Package') {
+					$key = 'included';
+				} else {
+					$key = 'additional';
+				}
+
+				$data['products'][$key][] = array(
 					'category'	=> $product['category'],
 					'name'    	=> $product['name'],
 					'quantity'	=> $product['quantity'] . '&nbsp;' . $product['unit_class'],
@@ -2546,9 +2560,9 @@ class ControllerSaleOrder extends Controller
 				);
 			}
 
-			$data['slot'] = explode(': ', $data['products'][1][0]['option'][0]['value'])[1];
+			$data['slot'] = explode(': ', $data['products']['primary'][0]['option'][0]['value'])[1];
 
-			var_dump($data['products']);//die('---breakpoint---');
+			// var_dump($data['products']['primary'][0]['attribute']);//die('---breakpoint---');
 
 			// Vendors
 			$data['order_vendors'] = array();

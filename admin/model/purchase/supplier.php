@@ -49,7 +49,9 @@ class ModelPurchaseSupplier extends Model {
 			's.telephone',
 			's.email',
 			's.status',
-			's.date_added'
+			's.date_added',
+			'vt.sort_order',
+			'vt.sort_order ASC, s.supplier_name'
 		);
 
 		if (isset($data['sort']) && in_array($data['sort'], $sort_data)) {
@@ -112,6 +114,8 @@ class ModelPurchaseSupplier extends Model {
 
 		return $query->row['total'];
 	}
+
+	//End
 
 	public function getSuppliersCountByVendorTypeId($vendor_type_id) {
 		$query = $this->db->query("SELECT COUNT(*) AS total FROM " . DB_PREFIX . "supplier WHERE vendor_type_id = '" . (int)$vendor_type_id . "'");

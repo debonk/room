@@ -81,38 +81,86 @@
           <tr>
             <td></td><td><?php echo $text_slot; ?></td><td>:</td><td><?php echo $slot; ?></td>
           </tr>
+	  	  <?php foreach ($products['primary'] as $product_primary) { ?>
           <tr>
-            <td></td><td><?php echo $text_ceremony; ?></td><td>:</td><td><?php echo $ceremony; ?></td>
-          </tr>
-	  	  <?php foreach ($products[1] as $product) { ?>
-          <tr>
-            <td></td><td><?php echo $text_category; ?></td><td>:</td><td><?php echo $product['category']; ?></td>
+            <td></td><td><?php echo $text_category; ?></td><td>:</td><td><?php echo $product_primary['category']; ?></td>
           </tr>
           <tr>
-            <td></td><td><?php echo $text_product_name; ?></td><td>:</td><td><?php echo $product['name']; ?></td>
+            <td></td><td><?php echo $text_product_name; ?></td><td>:</td><td><?php echo $product_primary['name']; ?></td>
           </tr>
+          <!-- <tr>
+            <td></td><td><?php echo $text_quantity; ?></td><td>:</td><td><?php echo $product_primary['quantity']; ?></td>
+          </tr> -->
           <tr>
-            <td></td><td><?php echo $text_quantity; ?></td><td>:</td><td><?php echo $product['quantity']; ?></td>
+            <td></td><td><?php echo $text_amount; ?></td><td>:</td><td><?php echo $product_primary['total']; ?></td>
           </tr>
+
+          <?php if (isset($products['included'])) { ?>
+            <tr><td></td>
+              <td colspan="4">
+                <b><?php echo $text_termasuk; ?></b>
+              </td>
+            </tr>
+          <?php foreach ($products['included'] as $product) { ?>
+            <tr>
+              <td></td><td>&nbsp;&nbsp;<?php echo $product['name']; ?></td><td>:</td><td><?php echo $product['quantity']; ?></td>
+            </tr>
+          <?php foreach ($product['attribute'] as $attribute_group => $attributes) { ?>
+          <?php foreach ($attributes as $attribute) { ?>
+            <tr class="text-italic">
+              <td></td><td>&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;<?php echo $attribute['name']; ?></td><td>:</td><td><?php echo $attribute['value']; ?></td>
+            </tr>
+          <?php } ?>
+          <?php } ?>
+          <?php foreach ($product['option'] as $option) { ?>
+            <tr>
+              <td></td><td><?php echo $option['name']; ?></td><td>:</td><td><?php echo $option['value']; ?></td>
+            </tr>
+          <?php } ?>
+          <?php } ?>
+          <?php } ?>
+
+	  	  <?php foreach ($product_primary['attribute'] as $attribute_group => $attributes) { ?>
           <tr>
-            <td></td><td><?php echo $text_amount; ?></td><td>:</td><td><?php echo $product['total']; ?></td>
-          </tr>
-	  	  <?php foreach ($product['attribute'] as $attribute_group => $attributes) { ?>
-          <tr>
-            <td></td><td><b><?php echo $attribute_group; ?></b></td>
+            <td></td><td>&nbsp;&nbsp;<?php echo $text_kelengkapan; ?></td>
           </tr>
 	  	  <?php foreach ($attributes as $attribute) { ?>
-          <tr>
-            <td></td><td>&nbsp;&nbsp;-&nbsp;<?php echo $attribute['name']; ?></td><td>:</td><td><?php echo $attribute['value']; ?></td>
+          <tr class="text-italic">
+            <td></td><td>&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;<?php echo $attribute['name']; ?></td><td>:</td><td><?php echo $attribute['value']; ?></td>
           </tr>
 	  	  <?php } ?>
 	  	  <?php } ?>
-	  	  <?php if ($product['option']) { ?>
+	  	  <!-- <?php if ($product['option']) { ?>
           <tr>
             <td colspan="4">
               <b><?php echo $text_info_tambahan; ?></b>
             </td>
           </tr>
+	  	  <?php foreach ($product['option'] as $option) { ?>
+          <tr>
+            <td></td><td><?php echo $option['name']; ?></td><td>:</td><td><?php echo $option['value']; ?></td>
+          </tr>
+	  	  <?php } ?>
+	  	  <?php } ?> -->
+	  	  <?php } ?>
+
+	  	  <?php if (isset($products['additional'])) { ?>
+          <tr>
+            <td colspan="4">
+              <b><?php echo $text_layanan_tambahan; ?></b>
+            </td>
+          </tr>
+	  	  <?php foreach ($products['additional'] as $product) { ?>
+          <tr>
+            <td></td><td><?php echo $product['name'] . ' (' . $product['quantity'] . ')'; ?></td><td>:</td><td><?php echo $product['total']; ?></td>
+          </tr>
+	  	  <?php foreach ($product['attribute'] as $attribute_group => $attributes) { ?>
+	  	  <?php foreach ($attributes as $attribute) { ?>
+          <tr class="text-italic">
+            <td></td><td>&nbsp;&nbsp;-&nbsp;<?php echo $attribute['name']; ?></td><td>:</td><td><?php echo $attribute['value']; ?></td>
+          </tr>
+	  	  <?php } ?>
+	  	  <?php } ?>
 	  	  <?php foreach ($product['option'] as $option) { ?>
           <tr>
             <td></td><td><?php echo $option['name']; ?></td><td>:</td><td><?php echo $option['value']; ?></td>
@@ -130,30 +178,6 @@
           <tr>
             <td></td><td><?php echo $order_vendor['type']; ?></td><td>:</td><td><?php echo $order_vendor['name']; ?></td>
           </tr>
-	  	  <?php } ?>
-	  	  <?php } ?>
-	  	  <?php if (isset($products[0])) { ?>
-          <tr>
-            <td colspan="4">
-              <b><?php echo $text_layanan_tambahan; ?></b>
-            </td>
-          </tr>
-	  	  <?php foreach ($products[0] as $product) { ?>
-          <tr>
-            <td></td><td><?php echo $product['name'] . ' (' . $product['quantity'] . ')'; ?></td><td>:</td><td><?php echo $product['total']; ?></td>
-          </tr>
-	  	  <?php foreach ($product['attribute'] as $attribute_group => $attributes) { ?>
-	  	  <?php foreach ($attributes as $attribute) { ?>
-          <tr class="text-italic">
-            <td></td><td>&nbsp;&nbsp;-&nbsp;<?php echo $attribute['name']; ?></td><td>:</td><td><?php echo $attribute['value']; ?></td>
-          </tr>
-	  	  <?php } ?>
-	  	  <?php } ?>
-	  	  <?php foreach ($product['option'] as $option) { ?>
-          <tr>
-            <td></td><td><?php echo $option['name']; ?></td><td>:</td><td><?php echo $option['value']; ?></td>
-          </tr>
-	  	  <?php } ?>
 	  	  <?php } ?>
 	  	  <?php } ?>
         </tbody>
