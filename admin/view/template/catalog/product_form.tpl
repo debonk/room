@@ -29,7 +29,7 @@
             <li class="active"><a href="#tab-general" data-toggle="tab"><?php echo $tab_general; ?></a></li>
             <li><a href="#tab-data" data-toggle="tab"><?php echo $tab_data; ?></a></li>
             <li><a href="#tab-links" data-toggle="tab"><?php echo $tab_links; ?></a></li>
-            <li><a href="#tab-supplier" data-toggle="tab"><?php echo $tab_supplier; ?></a></li>
+            <li><a href="#tab-vendor" data-toggle="tab"><?php echo $tab_vendor; ?></a></li>
             <li><a href="#tab-attribute" data-toggle="tab"><?php echo $tab_attribute; ?></a></li>
             <li><a href="#tab-option" data-toggle="tab"><?php echo $tab_option; ?></a></li>
             <li><a href="#tab-recurring" data-toggle="tab"><?php echo $tab_recurring; ?></a></li>
@@ -454,34 +454,34 @@
                 </div>
               </div>
             </div>
-            <div class="tab-pane" id="tab-supplier">
+            <div class="tab-pane" id="tab-vendor">
               <div class="table-responsive">
-                <table id="suppliers" class="table table-striped table-bordered table-hover">
+                <table id="vendors" class="table table-striped table-bordered table-hover">
                   <thead>
                     <tr>
-                      <td class="text-left"><?php echo $entry_supplier; ?></td>
+                      <td class="text-left"><?php echo $entry_vendor; ?></td>
                       <td class="text-left"><?php echo $entry_purchase_price; ?></td>
                       <td class="text-right"></td>
                     </tr>
                   </thead>
                   <tbody>
-                    <?php if ($product_suppliers) { ?>
-                    <?php foreach ($product_suppliers as $key => $product_supplier) { ?>
-                    <tr id="supplier-row<?php echo $key; ?>" value="<?php echo $key; ?>">
+                    <?php if ($product_vendors) { ?>
+                    <?php foreach ($product_vendors as $key => $product_vendor) { ?>
+                    <tr id="vendor-row<?php echo $key; ?>" value="<?php echo $key; ?>">
                       <td class="text-left">
-                        <input type="text" name="product_supplier[<?php echo $key; ?>][name]"
-                          value="<?php echo $product_supplier['supplier_name']; ?>" placeholder="<?php echo $entry_supplier?>"
+                        <input type="text" name="product_vendor[<?php echo $key; ?>][name]"
+                          value="<?php echo $product_vendor['vendor_name']; ?>" placeholder="<?php echo $entry_vendor?>"
                           class="form-control" />
-                        <input type="hidden" name="product_supplier[<?php echo $key; ?>][supplier_id]"
-                          value="<?php echo $product_supplier['supplier_id']; ?>" />
+                        <input type="hidden" name="product_vendor[<?php echo $key; ?>][vendor_id]"
+                          value="<?php echo $product_vendor['vendor_id']; ?>" />
                       </td>
                       <td class="text-right">
-                        <input type="text" name="product_supplier[<?php echo $key; ?>][price]"
-                          value="<?php echo $product_supplier['price']; ?>" placeholder="<?php echo $entry_purchase_price; ?>"
+                        <input type="text" name="product_vendor[<?php echo $key; ?>][purchase_price]"
+                          value="<?php echo $product_vendor['purchase_price']; ?>" placeholder="<?php echo $entry_purchase_price; ?>"
                           class="form-control" />
                       </td>
                       <td class="text-right">
-                        <button type="button" onclick="$('#supplier-row<?php echo $key; ?>').remove()" data-toggle="tooltip" title="<?php echo $button_remove; ?>" class="btn btn-danger"><i class="fa fa-minus-circle"></i></button>
+                        <button type="button" onclick="$('#vendor-row<?php echo $key; ?>').remove()" data-toggle="tooltip" title="<?php echo $button_remove; ?>" class="btn btn-danger"><i class="fa fa-minus-circle"></i></button>
                       </td>
                     </tr>
                     <?php } ?>
@@ -490,7 +490,7 @@
                   <tfoot>
                     <tr>
                       <td colspan="2"></td>
-                      <td class="text-right"><button type="button" onclick="addSupplier()" data-toggle="tooltip" title="<?php echo $button_supplier_add; ?>" class="btn btn-primary"><i class="fa fa-plus-circle"></i></button></td>
+                      <td class="text-right"><button type="button" onclick="addVendor()" data-toggle="tooltip" title="<?php echo $button_vendor_add; ?>" class="btn btn-primary"><i class="fa fa-plus-circle"></i></button></td>
                     </tr>
                   </tfoot>
                 </table>
@@ -1180,48 +1180,48 @@ $('#product-related').delegate('.fa-minus-circle', 'click', function() {
 });
 </script>
   <script type="text/javascript">
-let supplier_row = '<?php echo $product_suppliers_idx ?>';
+let vendor_row = '<?php echo $product_vendors_idx ?>';
 
-function addSupplier() {
-  html  = '<tr id="supplier-row' + supplier_row + '" value="' + supplier_row + '">';
-  html += '  <td><input type="text" name="product_supplier[' + supplier_row + '][name]" value="" placeholder="<?php echo $entry_supplier; ?>" class="form-control" />';
-  html += '  <input type="hidden" name="product_supplier[' + supplier_row + '][supplier_id]" value="0" /></td>';
-  html += '  <td><input type="text" name="product_supplier[' + supplier_row + '][price]" value="" class="form-control" placeholder="<?php echo $entry_purchase_price; ?>" /></td>';
-  html += '  <td class="text-right"><button type="button" onclick="$(\'#supplier-row' + supplier_row + '\').remove();" data-toggle="tooltip" title="<?php echo $button_remove; ?>" class="btn btn-danger btn-remove"><i class="fa fa-minus-circle"></i></button></td>';
+function addVendor() {
+  html  = '<tr id="vendor-row' + vendor_row + '" value="' + vendor_row + '">';
+  html += '  <td><input type="text" name="product_vendor[' + vendor_row + '][name]" value="" placeholder="<?php echo $entry_vendor; ?>" class="form-control" />';
+  html += '  <input type="hidden" name="product_vendor[' + vendor_row + '][vendor_id]" value="0" /></td>';
+  html += '  <td><input type="text" name="product_vendor[' + vendor_row + '][price]" value="" class="form-control" placeholder="<?php echo $entry_purchase_price; ?>" /></td>';
+  html += '  <td class="text-right"><button type="button" onclick="$(\'#vendor-row' + vendor_row + '\').remove();" data-toggle="tooltip" title="<?php echo $button_remove; ?>" class="btn btn-danger btn-remove"><i class="fa fa-minus-circle"></i></button></td>';
   html += '</tr>';
 
-  $('#suppliers tbody').append(html);
+  $('#vendors tbody').append(html);
 
-  supplierAutocomplete(supplier_row);
+  vendorAutocomplete(vendor_row);
 
-  supplier_row++;
+  vendor_row++;
 };
 
-function supplierAutocomplete(supplier_row) {
-	$('input[name=\'product_supplier[' + supplier_row + '][name]\']').autocomplete({
+function vendorAutocomplete(vendor_row) {
+	$('input[name=\'product_vendor[' + vendor_row + '][name]\']').autocomplete({
 		'source': function(request, response) {
 			$.ajax({
-				url: 'index.php?route=catalog/product/supplierAutocomplete&token=<?php echo $token; ?>&filter_name=' +  encodeURIComponent(request),
+				url: 'index.php?route=catalog/product/vendorAutocomplete&token=<?php echo $token; ?>&filter_name=' +  encodeURIComponent(request),
 				dataType: 'json',
 				success: function(json) {
 					response($.map(json, function(item) {
 						return {
-              label: item['supplier_name'],
-              value: item['supplier_id']
+              label: item['title'],
+              value: item['vendor_id']
 						}
 					}));
 				}
 			});
 		},
 		'select': function(item) {
-			$('input[name=\'product_supplier[' + supplier_row + '][name]\']').val(item['label']);
-			$('input[name=\'product_supplier[' + supplier_row + '][supplier_id]\']').val(item['value']);
+			$('input[name=\'product_vendor[' + vendor_row + '][name]\']').val(item['label']);
+			$('input[name=\'product_vendor[' + vendor_row + '][vendor_id]\']').val(item['value']);
 		}
 	});
 }
 
-$('#suppliers tbody tr').each(function(index, element) {
-	supplierAutocomplete(index);
+$('#vendors tbody tr').each(function(index, element) {
+	vendorAutocomplete(index);
 });
 
 var attribute_row = '<?php echo $attribute_row; ?>';

@@ -53,7 +53,9 @@ class ModelCatalogVendor extends Model {
 			'v.telephone',
 			'v.email',
 			'v.status',
-			'v.date_added'
+			'v.date_added',
+			'vt.sort_order',
+			'vt.sort_order ASC, v.vendor_name'
 		);
 
 		if (isset($data['sort']) && in_array($data['sort'], $sort_data)) {

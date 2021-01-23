@@ -709,7 +709,7 @@ class ControllerCatalogProduct extends Controller {
 		$data['entry_additional_image'] = $this->language->get('entry_additional_image');
 		$data['entry_store'] = $this->language->get('entry_store');
 		$data['entry_manufacturer'] = $this->language->get('entry_manufacturer');
-		$data['entry_supplier'] = $this->language->get('entry_supplier');
+		$data['entry_vendor'] = $this->language->get('entry_vendor');
 		$data['entry_purchase_price'] = $this->language->get('entry_purchase_price');
 		$data['entry_download'] = $this->language->get('entry_download');
 		$data['entry_category'] = $this->language->get('entry_category');
@@ -760,7 +760,7 @@ class ControllerCatalogProduct extends Controller {
 		$data['button_image_add'] = $this->language->get('button_image_add');
 		$data['button_remove'] = $this->language->get('button_remove');
 		$data['button_recurring_add'] = $this->language->get('button_recurring_add');
-		$data['button_supplier_add'] = $this->language->get('button_supplier_add');
+		$data['button_vendor_add'] = $this->language->get('button_vendor_add');
 
 		$data['tab_general'] = $this->language->get('tab_general');
 		$data['tab_data'] = $this->language->get('tab_data');
@@ -769,7 +769,7 @@ class ControllerCatalogProduct extends Controller {
 		$data['tab_recurring'] = $this->language->get('tab_recurring');
 		$data['tab_discount'] = $this->language->get('tab_discount');
 		$data['tab_special'] = $this->language->get('tab_special');
-		$data['tab_supplier'] = $this->language->get('tab_supplier');
+		$data['tab_vendor'] = $this->language->get('tab_vendor');
 		$data['tab_image'] = $this->language->get('tab_image');
 		$data['tab_links'] = $this->language->get('tab_links');
 		$data['tab_reward'] = $this->language->get('tab_reward');
@@ -1010,15 +1010,15 @@ class ControllerCatalogProduct extends Controller {
 			$data['product_recurrings'] = array();
 		}
 
-		if (isset($this->request->post['product_suppliers'])) {
-			$data['product_suppliers'] = $this->request->post['product_suppliers'];
+		if (isset($this->request->post['product_vendors'])) {
+			$data['product_vendors'] = $this->request->post['product_vendors'];
 		} elseif (!empty($product_info)) {
-			$data['product_suppliers'] = $this->model_catalog_product->getProductSuppliers($product_info['product_id']);
+			$data['product_vendors'] = $this->model_catalog_product->getProductVendors($product_info['product_id']);
 		} else {
-			$data['product_suppliers'] = array();
+			$data['product_vendors'] = array();
 		}
 
-		$data['product_suppliers_idx'] = ($data['product_suppliers'] ? max(array_keys($data['product_suppliers'])) + 1 : 0);
+		$data['product_vendors_idx'] = ($data['product_vendors'] ? max(array_keys($data['product_vendors'])) + 1 : 0);
 
 		$this->load->model('localisation/tax_class');
 
@@ -1653,36 +1653,36 @@ class ControllerCatalogProduct extends Controller {
 		$this->response->setOutput(json_encode($json));
 	}
 
-	public function supplierAutocomplete() {
+	public function vendorAutocomplete() {
 		$json = array();
 
 		if (isset($this->request->get['filter_name'])) {
-			$this->load->model('purchase/supplier');
+			$this->load->model('catalog/vendor');
 
 			$filter_data = array(
-				'filter_supplier_name' 	=> $this->request->get['filter_name'],
-				'filter_vendor'		 	=> true,
-				'start'       			=> 0,
-				'limit'       			=> 0
+				'filter_vendor_name' 	=> $this->request->get['filter_name'],
+				'filter_status'			=> 1,
+				'sort'					=> 'vt.sort_order ASC, v.vendor_name',
+				'order'         		=> 'ASC'
 			);
 
-			$results = $this->model_purchase_supplier->getSuppliers($filter_data);
+			$results = $this->model_catalog_vendor->getVendors($filter_data);
 
 			foreach ($results as $result) {
 				$json[] = array(
-					'supplier_id' 	=> $result['supplier_id'],
-					'supplier_name' => strip_tags(html_entity_decode($result['supplier_name'], ENT_QUOTES, 'UTF-8'))
+					'vendor_id' => $result['vendor_id'],
+					'title' 	=> strip_tags(html_entity_decode($result['vendor_name'], ENT_QUOTES, 'UTF-8')) . ' - ' . $result['vendor_type']
 				);
 			}
 		}
 
-		$sort_order = array();
+		// $sort_order = array();
 
-		foreach ($json as $key => $value) {
-			$sort_order[$key] = $value['supplier_name'];
-		}
+		// foreach ($json as $key => $value) {
+		// 	$sort_order[$key] = $value['title'];
+		// }
 
-		array_multisort($sort_order, SORT_ASC, $json);
+		// array_multisort($sort_order, SORT_ASC, $json);
 
 		$this->response->addHeader('Content-Type: application/json');
 		$this->response->setOutput(json_encode($json));

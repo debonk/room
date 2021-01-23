@@ -79,7 +79,7 @@ $_['entry_status']           = 'Status';
 $_['entry_stock_status']     = 'Out Of Stock Status';
 $_['entry_store']            = 'Stores';
 $_['entry_subtract']         = 'Subtract Stock';
-$_['entry_supplier']         = 'Supplier';
+$_['entry_vendor']           = 'Vendor';
 $_['entry_tag']          	 = 'Product Tags';
 $_['entry_tax_class']        = 'Tax Class';
 $_['entry_text']             = 'Text';
@@ -117,4 +117,4 @@ $_['error_model']            = 'Product Model must be greater than 1 and less th
 $_['error_keyword']          = 'SEO URL already in use!';
 
 // Button
-$_['button_supplier_add']   = 'Add Supplier';
+$_['button_vendor_add']   = 'Add Vendor';

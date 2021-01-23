@@ -64,12 +64,12 @@ class ModelCatalogProduct extends Model {
 			}
 		}
 
-		if (isset($data['product_supplier'])) {
-			foreach ($data['product_supplier'] as $product_supplier) {
-				if ($product_supplier['supplier_id']) {
+		if (isset($data['product_vendor'])) {
+			foreach ($data['product_vendor'] as $product_vendor) {
+				if ($product_vendor['vendor_id']) {
 					// Removes duplicates
-					$this->db->query("DELETE FROM " . DB_PREFIX . "product_supplier WHERE product_id = '" . (int)$product_id . "' AND supplier_id = '" . (int)$product_supplier['supplier_id'] . "'");
-					$this->db->query("INSERT INTO " . DB_PREFIX . "product_supplier SET product_id = '" . (int)$product_id . "', supplier_id = '" . (int)$product_supplier['supplier_id'] . "', price = '" . (float)$product_supplier['price'] . "'");
+					$this->db->query("DELETE FROM " . DB_PREFIX . "product_vendor WHERE product_id = '" . (int)$product_id . "' AND vendor_id = '" . (int)$product_vendor['vendor_id'] . "'");
+					$this->db->query("INSERT INTO " . DB_PREFIX . "product_vendor SET product_id = '" . (int)$product_id . "', vendor_id = '" . (int)$product_vendor['vendor_id'] . "', purchase_price = '" . (float)$product_vendor['purchase_price'] . "'");
 				}
 			}
 		}
@@ -216,14 +216,14 @@ class ModelCatalogProduct extends Model {
 			}
 		}
 
-		$this->db->query("DELETE FROM " . DB_PREFIX . "product_supplier WHERE product_id = '" . (int)$product_id . "'");
+		$this->db->query("DELETE FROM " . DB_PREFIX . "product_vendor WHERE product_id = '" . (int)$product_id . "'");
 
-		if (!empty($data['product_supplier'])) {
-			foreach ($data['product_supplier'] as $product_supplier) {
-				if ($product_supplier['supplier_id']) {
+		if (!empty($data['product_vendor'])) {
+			foreach ($data['product_vendor'] as $product_vendor) {
+				if ($product_vendor['vendor_id']) {
 					// Removes duplicates
-					$this->db->query("DELETE FROM " . DB_PREFIX . "product_supplier WHERE product_id = '" . (int)$product_id . "' AND supplier_id = '" . (int)$product_supplier['supplier_id'] . "'");
-					$this->db->query("INSERT INTO " . DB_PREFIX . "product_supplier SET product_id = '" . (int)$product_id . "', supplier_id = '" . (int)$product_supplier['supplier_id'] . "', price = '" . (float)$product_supplier['price'] . "'");
+					$this->db->query("DELETE FROM " . DB_PREFIX . "product_vendor WHERE product_id = '" . (int)$product_id . "' AND vendor_id = '" . (int)$product_vendor['vendor_id'] . "'");
+					$this->db->query("INSERT INTO " . DB_PREFIX . "product_vendor SET product_id = '" . (int)$product_id . "', vendor_id = '" . (int)$product_vendor['vendor_id'] . "', purchase_price = '" . (float)$product_vendor['purchase_price'] . "'");
 				}
 			}
 		}
@@ -341,6 +341,7 @@ class ModelCatalogProduct extends Model {
 			$data['product_category'] = $this->getProductCategories($product_id);
 			$data['product_download'] = $this->getProductDownloads($product_id);
 			$data['product_layout'] = $this->getProductLayouts($product_id);
+			$data['product_vendor'] = $this->getProductVendors($product_id);
 			$data['product_store'] = $this->getProductStores($product_id);
 			$data['product_recurrings'] = $this->getRecurrings($product_id);
 
@@ -362,6 +363,7 @@ class ModelCatalogProduct extends Model {
 		$this->db->query("DELETE FROM " . DB_PREFIX . "product_related WHERE related_id = '" . (int)$product_id . "'");
 		$this->db->query("DELETE FROM " . DB_PREFIX . "product_reward WHERE product_id = '" . (int)$product_id . "'");
 		$this->db->query("DELETE FROM " . DB_PREFIX . "product_special WHERE product_id = '" . (int)$product_id . "'");
+		$this->db->query("DELETE FROM " . DB_PREFIX . "product_vendor WHERE product_id = '" . (int)$product_id . "'");
 		$this->db->query("DELETE FROM " . DB_PREFIX . "product_to_category WHERE product_id = '" . (int)$product_id . "'");
 		$this->db->query("DELETE FROM " . DB_PREFIX . "product_to_download WHERE product_id = '" . (int)$product_id . "'");
 		$this->db->query("DELETE FROM " . DB_PREFIX . "product_to_layout WHERE product_id = '" . (int)$product_id . "'");
@@ -691,8 +693,8 @@ class ModelCatalogProduct extends Model {
 		return $product_related_data;
 	}
 
-	public function getProductSuppliers($product_id) {
-		$query = $this->db->query("SELECT ps.*, s.supplier_name FROM `" . DB_PREFIX . "product_supplier` ps LEFT JOIN `" . DB_PREFIX . "supplier` s on (s.supplier_id = ps.supplier_id) WHERE product_id = '" . (int)$product_id . "'");
+	public function getProductVendors($product_id) {
+		$query = $this->db->query("SELECT pv.*, v.vendor_name FROM `" . DB_PREFIX . "product_vendor` pv LEFT JOIN `" . DB_PREFIX . "vendor` v on (v.vendor_id = pv.vendor_id) WHERE product_id = '" . (int)$product_id . "'");
 
 		return $query->rows;
 	}
