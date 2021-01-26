@@ -58,10 +58,14 @@
               <br /><?php echo $text_ketentuan; ?>
               <br /><br /><?php echo $text_mohon_surat; ?>
               <br /><br /><?php echo $text_apabila_anda; ?>
+              <?php if ($pay_deposit) { ?>
               <br /><br /><?php echo $text_uang_jaminan; ?>
-              <br /><br /><?php echo $text_uang_dikembalikan; ?>
+              <br /><br /><?php echo $text_uang_dikembalikan . ' ' . $text_kerusakan; ?>
               <br /><br /><?php echo $text_silahkan_transfer; ?>
               <p class="text-center"><b><?php echo $no_rekening; ?></b></p>
+              <?php } else { ?>
+              <br /><br /><?php echo $text_kerusakan; ?><br />
+              <?php } ?>
               <br />
             </td>
           </tr>
@@ -71,7 +75,7 @@
         <tbody>
           <tr>
             <td colspan="2" class="text-justify">
-			  <?php echo $text_vendor_setuju; ?><br /><br />
+			        <?php echo $text_vendor_setuju; ?><br /><br />
               <?php echo $text_lebih_lanjut; ?><br /><br />
             </td>
           </tr>

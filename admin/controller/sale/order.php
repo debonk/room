@@ -1170,8 +1170,18 @@ class ControllerSaleOrder extends Controller
 			$event_date = $this->model_localisation_local_date->getInFormatDate($order_info['event_date']);
 			$data['event_date'] = $event_date['day'] . ', ' . $event_date['long_date'];
 
+			if (!$order_info['title']) {
+				$order_info['title'] = sprintf($this->language->get('text_atas_nama'), $order_info['firstname'] . ' ' . $order_info['lastname']);
+			}
+
 			$data['title'] = $order_info['title'];
-			$data['session_slot'] = explode(': ', $order_info['session_slot'])[1];
+
+			if ($order_info['session_slot']) {
+				$data['session_slot'] = explode(': ', $order_info['session_slot'])[1];
+			} else {
+				$data['session_slot'] = '-';
+			}
+
 			$data['slot'] = $order_info['slot'];
 			$data['ceremony'] = $order_info['ceremony'];
 			$data['date_added'] = $this->model_localisation_local_date->getInFormatDate($order_info['date_added'])['long_date'];
@@ -2497,7 +2507,6 @@ class ControllerSaleOrder extends Controller
 			// Event Data
 			$event_date_in = $this->model_localisation_local_date->getInFormatDate($order_info['event_date']);
 			
-			// $data['title'] = $order_info['title'];
 			$data['event_date'] = $event_date_in['day'] . '/' . $event_date_in['long_date'];
 			// $data['slot'] = $order_info['slot'];
 			// $data['ceremony'] = $order_info['ceremony'];
@@ -2747,6 +2756,10 @@ class ControllerSaleOrder extends Controller
 			$data['invoice_no'] = $transaction_info['reference_no'] . str_pad($transaction_info['transaction_no'], 4, 0, STR_PAD_LEFT);
 
 			// Event Data
+			if (!$order_info['title']) {
+				$order_info['title'] = sprintf($this->language->get('text_atas_nama'), $order_info['firstname'] . ' ' . $order_info['lastname']);
+			}
+
 			$event_date_in = $this->model_localisation_local_date->getInFormatDate($order_info['event_date']);
 
 			// Product Data
@@ -2766,7 +2779,7 @@ class ControllerSaleOrder extends Controller
 
 					$address_format = sprintf($this->language->get('text_address_format'), $order_info['payment_address_1'] . ($order_info['payment_address_2'] ? ', ' . $order_info['payment_address_2'] : ''), $order_info['payment_city'], $order_info['payment_postcode'], $order_info['payment_zone'], $order_info['payment_country']);
 
-					$data['text_hal'] = sprintf($this->language->get('text_atas_persewaan'), $transaction_title, $primary_product['name'], $data['store_name'], $order_info['ceremony'], $event_date_in['long_date']);
+					$data['text_hal'] = sprintf($this->language->get('text_atas_persewaan'), $transaction_title, $primary_product['name'], $data['store_name'], $order_info['title'], $event_date_in['long_date']);
 					$data['text_pihak'] = $this->language->get('text_pihak_penyewa');
 					$data['tanda_tangan'] = '( ' . $order_info['firstname'] . ' ' . $order_info['lastname'] . ' )';
 					$data['company'] = $order_info['payment_company'] ? $order_info['payment_company'] : '';
@@ -2782,7 +2795,7 @@ class ControllerSaleOrder extends Controller
 
 					$address_format = $vendor_info['address'];
 
-					$data['text_hal'] = sprintf($this->language->get('text_atas_pelaksanaan'), $transaction_title, $order_info['ceremony'], $order_info['firstname'] . ' ' . $order_info['lastname'], $primary_product['name'], $data['store_name'], $event_date_in['long_date']);
+					$data['text_hal'] = sprintf($this->language->get('text_atas_pelaksanaan'), $transaction_title, $order_info['title'], $data['store_name'], $event_date_in['long_date']);
 					$data['text_pihak'] = $this->language->get('text_pihak_vendor');
 					$data['tanda_tangan'] = $this->language->get('text_tanda_tangan');
 					$data['company'] = $vendor_info['vendor_name'];
@@ -3339,7 +3352,6 @@ class ControllerSaleOrder extends Controller
 				'text_contact_person',
 				'text_persiapan',
 				'text_time',
-				// 'text_pembongkaran',
 				'text_catatan',
 				'text_lampirkan',
 				'text_demikian_2',
@@ -3373,34 +3385,34 @@ class ControllerSaleOrder extends Controller
 
 			$data['store_url'] = ltrim(rtrim($order_info['store_url'], '/'), 'http://');
 
-			// if ($order_info['invoice_no']) {
-			// $invoice_no = $order_info['invoice_prefix'];
-			// } else {
-			// $invoice_no = $this->model_sale_order->createInvoiceNo($order_id);
-			// }
-
-			// $data['invoice_no'] = $invoice_no . '-A' . str_pad($order_vendor_info['order_vendor_id'],3,0,STR_PAD_LEFT);
-
 			$data['letter_head'] = HTTP_CATALOG . 'image/catalog/letter_head.png';
 
 			$data['invoice_no'] = $order_vendor_info['admission_prefix'] . str_pad($order_vendor_info['reference_no'], 4, 0, STR_PAD_LEFT);
 
-			$data['text_sehubungan'] = sprintf($this->language->get('text_sehubungan'), $data['store_name']);
+			if (!$order_info['title']) {
+				$order_info['title'] = sprintf($this->language->get('text_atas_nama'), $order_info['firstname'] . ' ' . $order_info['lastname']);
+			}
+
+			$data['text_sehubungan'] = sprintf($this->language->get('text_sehubungan'), $order_info['title'], $data['store_name']);
 
 			// Event Data
 			$event_date_in = $this->model_localisation_local_date->getInFormatDate($order_info['event_date']);
 
 			$data['event_date'] = $event_date_in['day'] . '/' . $event_date_in['long_date'];
-			$data['slot'] = $order_info['slot'];
-			$data['ceremony'] = $order_info['ceremony'];
+
+			// $data['ceremony'] = $order_info['ceremony'];
 
 			// Product Data
-			$data['product_name'] = $this->model_sale_order->getOrderPrimaryProduct($order_id)['name'];
+			$primary_product = $this->model_sale_order->getOrderPrimaryProduct($order_id);
 
-			// $admission_to = $order_vendor_info['vendor_type'] . ': ' . $order_vendor_info['vendor_name'];
+			$data['product_name'] = $primary_product['name'];
+			$option = $this->model_sale_order->getOrderOptions($order_id, $primary_product['order_product_id']);
 
-			// $data['text_dengan_ini'] = sprintf($this->language->get('text_dengan_ini'), $admission_to);
-			// $data['text_dengan_ini'] = sprintf($this->language->get('text_dengan_ini'), $order_vendor_info['vendor_type']);
+			if ($option) {
+				$data['slot'] = explode(': ', $option[0]['value'])[1];
+			} else {
+				$data['slot'] = '-';
+			}
 
 			$data['vendor_name'] = $order_vendor_info['vendor_name'];
 			$data['vendor_type'] = $order_vendor_info['vendor_type'];
@@ -3412,14 +3424,6 @@ class ControllerSaleOrder extends Controller
 			$data['preparation_date'] = $preparation_date_in['day'] . '/' . $preparation_date_in['long_date'];
 
 			$data['preparation_time'] = $order_info['slot'];
-
-			// $dismantling_date_in = $this->model_localisation_local_date->getInFormatDate($order_info['event_date']);
-			// $data['dismantling_date'] = $dismantling_date_in['day'] . '/' . $dismantling_date_in['long_date'];
-
-			// $dismantling_time = 'Sehabis acara - 24.00 WIB';
-			// $data['dismantling_time'] = $dismantling_time;
-
-			// $data['text_tanggung_jawab'] = sprintf($this->language->get('text_tanggung_jawab'), $data['store_name']);
 
 			// User Info
 			$this->load->model('user/user');
@@ -3491,6 +3495,7 @@ class ControllerSaleOrder extends Controller
 				'text_garis',
 				'text_mohon_surat',
 				'text_uang_dikembalikan',
+				'text_kerusakan',
 				'text_lebih_lanjut',
 				'text_hormat_kami',
 				'text_menyetujui',
@@ -3545,14 +3550,22 @@ class ControllerSaleOrder extends Controller
 			$data['text_ketentuan'] = sprintf($this->language->get('text_ketentuan'), $data['store_name']);
 			$data['text_apabila_anda'] = sprintf($this->language->get('text_apabila_anda'), $data['store_telephone'], $data['store_email']);
 
-			$deposit = $this->currency->format($this->config->get('config_deposit'), $order_info['currency_code'], $order_info['currency_value']);
-			$deposit_in_word = $this->model_localisation_local_date->getInWord($this->config->get('config_deposit'));
-			$data['text_uang_jaminan'] = sprintf($this->language->get('text_uang_jaminan'), $deposit, $deposit_in_word);
+			if ($order_vendor_info['deposit']) {
+				$deposit = $this->currency->format($order_vendor_info['deposit'], $order_info['currency_code'], $order_info['currency_value']);
+				$deposit_in_word = $this->model_localisation_local_date->getInWord($order_vendor_info['deposit']);
 
-			$no_rekening = $this->config->get($order_info['payment_code'] . '_bank' . $order_info['language_id']);
-			$data['no_rekening'] = str_replace(array("\r\n", "\r", "\n"), '<br />', preg_replace(array("/\s\s+/", "/\r\r+/", "/\n\n+/"), '<br />', trim($no_rekening)));
+				$data['text_uang_jaminan'] = sprintf($this->language->get('text_uang_jaminan'), $deposit, $deposit_in_word);
+	
+				$no_rekening = $this->config->get($order_info['payment_code'] . '_bank' . $order_info['language_id']);
+				$data['no_rekening'] = str_replace(array("\r\n", "\r", "\n"), '<br />', preg_replace(array("/\s\s+/", "/\r\r+/", "/\n\n+/"), '<br />', trim($no_rekening)));
+	
+				$data['text_silahkan_transfer'] = sprintf($this->language->get('text_silahkan_transfer'), $data['store_name']);
 
-			$data['text_silahkan_transfer'] = sprintf($this->language->get('text_silahkan_transfer'), $data['store_name']);
+				$data['pay_deposit'] = 1;
+			} else {
+				$data['pay_deposit'] = 0;
+			}
+
 			$data['text_vendor_setuju'] = sprintf($this->language->get('text_vendor_setuju'), $data['store_name']);
 
 			// User Info

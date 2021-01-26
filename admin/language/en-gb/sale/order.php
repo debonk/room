@@ -9,6 +9,7 @@ $_['text_account_custom_field']  = 'Account Custom Fields';
 $_['text_add']                   = 'Add Order';
 $_['text_address']            	 = 'Alamat';
 $_['text_affiliate']             = 'Affiliate';
+$_['text_atas_nama']    	     = 'Atas Nama %s';
 $_['text_balance']               = 'Sisa Tagihan';
 $_['text_browser']               = 'Browser';
 $_['text_ceremony']              = 'Jenis Acara';

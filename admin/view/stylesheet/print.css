@@ -88,7 +88,7 @@
 }
 
 .page-content {
-	page-break-inside: avoid;
-	page-break-after: auto;
+	break-inside: avoid;
+	break-after: auto;
 }
 }

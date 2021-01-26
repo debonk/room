@@ -7,8 +7,7 @@ $_['text_amount'] 		= 'Harga';
 
 // Text Agreement
 $_['title_agreement']		= 'SURAT KESEPAKATAN PERSEWAAN';
-$_['text_atas_nama']    	= '"Atas Nama %s"';
-$_['text_pada_hari']    	= 'Dalam rangka pelaksanaan acara "%s", maka pada hari %s, tanggal %s, saya yang bertanda tangan di bawah ini:';
+$_['text_pada_hari']    	= 'Dalam rangka penyelenggaraan acara "%s", maka pada hari %s, tanggal %s, saya yang bertanda tangan di bawah ini:';
 $_['text_sewa_tempat']    	= 'menyatakan akan menyewa tempat di %s dengan rincian:';
 $_['text_termasuk']         = 'Termasuk dalam Paket "%s":';
 $_['text_kelengkapan']      = 'Kelengkapan Paket Lainnya';
@@ -40,8 +39,8 @@ $_['text_attn']   			= 'Hal';
 $_['text_to']   			= 'Kepada';
 $_['text_from']   			= 'Dari';
 $_['text_address_format']   = '%s<br />%s %s<br />%s, %s';
-$_['text_atas_persewaan']   = '<b>%s</b> atas Pemesanan %s - %s Untuk Acara %s Pada Tanggal %s';
-$_['text_atas_pelaksanaan'] = '<b>%s</b> dalam Pelaksanaan Acara %s atas nama %s yang bertempat di %s - %s Pada Tanggal %s';
+$_['text_atas_persewaan']   = '<b>%s</b> atas Pemesanan %s - %s Untuk Acara <b>"%s"</b> Pada Tanggal %s';
+$_['text_atas_pelaksanaan'] = '<b>%s</b> dalam Pelaksanaan Acara <b>"%s"</b> yang bertempat di %s Pada Tanggal %s';
 $_['text_sejumlah']   		= 'TOTAL SEJUMLAH';
 $_['text_terbilang']   		= 'Terbilang: # %s rupiah #';
 $_['text_diterima']   		= '- Pembayaran dikonfirmasi oleh %s - %s';
@@ -49,11 +48,11 @@ $_['text_disimpan']   		= '- Kuitansi ini disimpan oleh %s';
 
 // Text Admission
 $_['title_admission']		= 'SURAT IJIN MASUK';
-$_['text_sehubungan']		= 'Sehubungan dengan acara yang akan berlangsung di %s pada:';
+$_['text_sehubungan']		= 'Sehubungan dengan penyelenggaraan acara <b>"%s"</b> yang akan berlangsung di %s pada:';
 $_['text_dengan_ini']		= 'dengan ini manajemen memberikan ijin masuk kepada vendor berikut:';
 $_['text_contact_person']	= 'Nama Kontak:';
 $_['text_persiapan']		= 'untuk memasukkan dan memasang peralatan dan dekorasi untuk keperluan acara tersebut serta membongkar dan mengosongkannya seusai acara. Keseluruhan kegiatan ini dilaksanakan dalam waktu yang telah ditentukan yaitu:';
-$_['text_demikian_2']		= 'Demikian Surat Ijin Masuk ini dibuat untuk membantu terlaksananya acara tersebut di atas. Atas kerjasama yang baik, kami ucapkan terima kasih.';
+$_['text_demikian_2']		= 'Demikian Surat Ijin Masuk ini dibuat untuk membantu terselenggaranya acara tersebut di atas. Atas kerjasama yang baik, kami ucapkan terima kasih.';
 $_['text_catatan']			= 'Catatan:';
 $_['text_lampirkan']		= 'Harap menunjukkan Surat Tanda Masuk ini kepada Security Gedung dengan melampirkan daftar pekerja/pegawai vendor untuk mendapatkan Kartu Tanda Ijin Masuk.';
 
@@ -65,7 +64,8 @@ $_['text_ketentuan']		= 'Terlampir Peraturan & Ketetapan yang harus dipatuhi ole
 $_['text_mohon_surat']		= 'Mohon surat ini ditandatangani dan dikembalikan kepada kami sebagai tanda persetujuan atas ketentuan yang dimaksud di atas.';
 $_['text_apabila_anda']		= 'Apabila anda membutuhkan informasi lebih lanjut, silahkan menghubungi kami di nomor telepon %s, email: %s.';
 $_['text_uang_jaminan']		= 'Vendor yang bersangkutan diharuskan memberikan <b>uang jaminan sebesar %s (%s rupiah)</b> pada saat setelah Technical Meeting.';
-$_['text_uang_dikembalikan']= 'Uang tersebut akan dikembalikan ke vendor maksimum 5 hari setelah acara apabila tidak ada laporan kerusakan dari supervisor gedung dan semua sampah telah dibersihkan dengan benar. Apabila terjadi kerusakan, maka pihak Manajemen Graha Kartini akan melakukan perbaikan dimana invoice akan ditagihkan kepada vendor yang menyebabkan kerusakan.';
+$_['text_uang_dikembalikan']= 'Uang tersebut akan dikembalikan ke vendor maksimum 5 hari setelah acara apabila tidak ada laporan kerusakan dari supervisor gedung dan semua sampah telah dibersihkan dengan benar.';
+$_['text_kerusakan']        = 'Apabila terjadi kerusakan, maka pihak Manajemen Graha Kartini akan melakukan perbaikan dimana invoice akan ditagihkan kepada vendor yang menyebabkan kerusakan.';
 $_['text_silahkan_transfer']= 'Di bawah ini adalah rekening %s,';
 $_['text_vendor_setuju']	= 'Vendor juga setuju untuk mematuhi peraturan dan ketetapan Manajemen %s yang telah ditandatangani dalam surat perjanjian.';
 $_['text_lebih_lanjut']		= 'Untuk informasi lebih lanjut tentang fasilitas gedung, silahkan menghubungi kami.';

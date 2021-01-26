@@ -47,9 +47,9 @@
           <tr>
             <td></td><td><?php echo $text_slot; ?></td><td>:</td><td><?php echo $slot; ?></td>
           </tr>
-          <tr>
+          <!-- <tr>
             <td></td><td><?php echo $text_ceremony; ?></td><td>:</td><td><?php echo $ceremony; ?></td>
-          </tr>
+          </tr> -->
           <tr>
             <td></td><td><?php echo $text_product_name; ?></td><td>:</td><td><?php echo $product_name; ?></td>
           </tr>
