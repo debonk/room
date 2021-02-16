@@ -315,6 +315,33 @@
             </div>
             <div class="tab-pane" id="tab-option">
               <fieldset>
+                <legend><?php echo $text_customer; ?></legend>
+                <div class="form-group">
+                  <label class="col-sm-2 control-label" for="input-customer-deposit"><?php echo $entry_customer_deposit; ?></label>
+                  <div class="col-sm-10">
+                    <input type="text" name="config_customer_deposit" value="<?php echo $config_customer_deposit; ?>" placeholder="<?php echo $entry_customer_deposit; ?>" id="input-customer-deposit" class="form-control" />
+                    <?php if ($error_customer_deposit) { ?>
+                    <div class="text-danger"><?php echo $error_customer_deposit; ?></div>
+                    <?php } ?>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="col-sm-2 control-label" for="input-customer-deposit-label"><?php echo $entry_customer_deposit_label; ?></label>
+                  <div class="col-sm-10">
+                    <select name="config_customer_deposit_label" id="input-customer-deposit-label" class="form-control">
+                      <option value=""><?php echo $text_none; ?></option>
+                      <?php foreach ($transaction_type_labels as $transaction_type_label) { ?>
+                      <?php if ($transaction_type_label == $config_customer_deposit_label) { ?>
+                      <option value="<?php echo $transaction_type_label; ?>" selected="selected"><?php echo $transaction_type_label; ?></option>
+                      <?php } else { ?>
+                      <option value="<?php echo $transaction_type_label; ?>"><?php echo $transaction_type_label; ?></option>
+                      <?php } ?>
+                      <?php } ?>
+                    </select>
+                  </div>
+                </div>
+              </fieldset>
+              <fieldset>
                 <legend><?php echo $text_product; ?></legend>
                 <div class="form-group">
                   <label class="col-sm-2 control-label"><span data-toggle="tooltip" title="<?php echo $help_product_count; ?>"><?php echo $entry_product_count; ?></span></label>
@@ -762,15 +789,6 @@
               </fieldset>
               <fieldset>
                 <legend><?php echo $text_admission; ?></legend>
-                <div class="form-group">
-                  <label class="col-sm-2 control-label" for="input-deposit"><span data-toggle="tooltip" title="<?php echo $help_deposit; ?>"><?php echo $entry_deposit; ?></span></label>
-                  <div class="col-sm-10">
-                    <input type="text" name="config_deposit" value="<?php echo $config_deposit; ?>" placeholder="<?php echo $entry_deposit; ?>" id="input-deposit" class="form-control" />
-                    <?php if ($error_deposit) { ?>
-                    <div class="text-danger"><?php echo $error_deposit; ?></div>
-                    <?php } ?>
-                  </div>
-                </div>
                 <div class="form-group">
                   <label class="col-sm-2 control-label"><span data-toggle="tooltip" title="<?php echo $help_complete_status_required; ?>"><?php echo $entry_complete_status_required; ?></span></label>
                   <div class="col-sm-10">

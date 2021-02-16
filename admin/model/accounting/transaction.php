@@ -28,13 +28,49 @@ class ModelAccountingTransaction extends Model {
 			$data['label'] = $account_to_info['component'];
         }
       
-        if (!isset($data['reference_no'])) {
-			$data['reference_no'] = array_search($account_to_info['component'], $label_data) . date('ym');
-			$data['transaction_no'] = $this->getTransactionNoMax($data['reference_no']) + 1;
+        if (!isset($data['reference_prefix'])) {
+			$data['reference_prefix'] = array_search($account_to_info['component'], $label_data) . date('ym');
+			$data['reference_no'] = $this->getLastReferenceNo($data['reference_prefix']) + 1;
         }
       
-		$this->db->query("INSERT INTO " . DB_PREFIX . "transaction SET account_from_id = '" . (int)$data['account_from_id'] . "', account_to_id = '" . (int)$data['account_to_id'] . "', label = '" . $this->db->escape($data['label']) . "', label_id = '" . (int)$data['label_id'] . "', order_id = '" . (int)$data['order_id'] . "', date = DATE('" . $this->db->escape($data['date']) . "'), payment_method = '" . $this->db->escape($data['payment_method']) . "', description = '" . $this->db->escape($data['description']) . "', amount = '" . (float)$data['amount'] . "', customer_name = '" . $this->db->escape($data['customer_name']) . "', reference_no = '" . $this->db->escape($data['reference_no']) . "', transaction_no = '" . (int)$data['transaction_no'] . "', edit_permission = '0', date_added = NOW(), user_id = '" . $this->user->getId() . "'");
+		$this->db->query("INSERT INTO " . DB_PREFIX . "transaction SET account_from_id = '" . (int)$data['account_from_id'] . "', account_to_id = '" . (int)$data['account_to_id'] . "', label = '" . $this->db->escape($data['label']) . "', label_id = '" . (int)$data['label_id'] . "', order_id = '" . (int)$data['order_id'] . "', transaction_type_id = '" . (int)$data['transaction_type_id'] . "', date = DATE('" . $this->db->escape($data['date']) . "'), payment_method = '" . $this->db->escape($data['payment_method']) . "', description = '" . $this->db->escape($data['description']) . "', amount = '" . (float)$data['amount'] . "', customer_name = '" . $this->db->escape($data['customer_name']) . "', reference_prefix = '" . $this->db->escape($data['reference_prefix']) . "', reference_no = '" . (int)$data['reference_no'] . "', edit_permission = '0', date_added = NOW(), user_id = '" . $this->user->getId() . "'");
 	}
+
+/* 	public function addTransaction($data) {
+		if (!isset($data['label_id'])) {
+			$data['label_id'] = 0;
+		}
+		
+		if (!isset($data['order_id'])) {
+			$data['order_id'] = 0;
+		}
+		
+		if (!isset($data['payment_method'])) {
+			$data['payment_method'] = '';
+		}
+
+		$this->load->model('accounting/account');
+		$account_to_info = $this->model_accounting_account->getAccount($data['account_to_id']);
+
+		$label_data = array(
+			'B'	=> 'asset',
+			'L'	=> 'liability',
+			'Q'	=> 'equity',
+			'R'	=> 'revenue',
+			'E'	=> 'expense'
+		);
+		
+        if (!isset($data['label'])) {
+			$data['label'] = $account_to_info['component'];
+        }
+      
+        if (!isset($data['reference_prefix'])) {
+			$data['reference_prefix'] = array_search($account_to_info['component'], $label_data) . date('ym');
+			$data['reference_no'] = $this->getTransactionNoMax($data['reference_prefix']) + 1;
+        }
+      
+		$this->db->query("INSERT INTO " . DB_PREFIX . "transaction SET account_from_id = '" . (int)$data['account_from_id'] . "', account_to_id = '" . (int)$data['account_to_id'] . "', label = '" . $this->db->escape($data['label']) . "', label_id = '" . (int)$data['label_id'] . "', order_id = '" . (int)$data['order_id'] . "', date = DATE('" . $this->db->escape($data['date']) . "'), payment_method = '" . $this->db->escape($data['payment_method']) . "', description = '" . $this->db->escape($data['description']) . "', amount = '" . (float)$data['amount'] . "', customer_name = '" . $this->db->escape($data['customer_name']) . "', reference_prefix = '" . $this->db->escape($data['reference_prefix']) . "', reference_no = '" . (int)$data['reference_no'] . "', edit_permission = '0', date_added = NOW(), user_id = '" . $this->user->getId() . "'");
+	} */
 
 	public function editTransaction($transaction_id, $data) {
 		$sql = "UPDATE " . DB_PREFIX . "transaction SET account_from_id = '" . (int)$data['account_from_id'] . "', account_to_id = '" . (int)$data['account_to_id'] . "', edit_permission = 0, date_added = NOW(), user_id = '" . $this->user->getId() . "'";
@@ -71,18 +107,22 @@ class ModelAccountingTransaction extends Model {
 	}
 
 	public function getTransaction($transaction_id) {
-		$query = $this->db->query("SELECT DISTINCT *, CONCAT(reference_no, LPAD(transaction_no, 4, '0')) AS reference FROM " . DB_PREFIX . "transaction WHERE transaction_id = '" . (int)$transaction_id . "'");
+		$query = $this->db->query("SELECT DISTINCT t.*, CONCAT(t.reference_prefix, LPAD(t.reference_no, 4, '0')) AS reference, tt.name AS transaction_type FROM " . DB_PREFIX . "transaction t LEFT JOIN " . DB_PREFIX . "transaction_type tt ON (tt.transaction_type_id = t.transaction_type_id) WHERE t.transaction_id = '" . (int)$transaction_id . "'");
 
 		return $query->row;
 	}
 
 	public function getTransactions($data = array()) {
-		$sql = "SELECT t.*, CONCAT(t.reference_no, LPAD(t.transaction_no, 4, '0')) AS reference, a1.name AS account_from, a2.name AS account_to, o.invoice_no, o.invoice_prefix, o.firstname, o.lastname, u.username FROM " . DB_PREFIX . "transaction t LEFT JOIN " . DB_PREFIX . "account a1 ON (a1.account_id = t.account_from_id) LEFT JOIN " . DB_PREFIX . "account a2 ON (a2.account_id = t.account_to_id) LEFT JOIN " . DB_PREFIX . "order o ON (o.order_id = t.order_id) LEFT JOIN " . DB_PREFIX . "user u ON (u.user_id = t.user_id)";
+		$sql = "SELECT t.*, CONCAT(t.reference_prefix, LPAD(t.reference_no, 4, '0')) AS reference, a1.name AS account_from, a2.name AS account_to, o.invoice_no, o.invoice_prefix, o.firstname, o.lastname, tt.name AS transaction_type, u.username FROM " . DB_PREFIX . "transaction t LEFT JOIN " . DB_PREFIX . "account a1 ON (a1.account_id = t.account_from_id) LEFT JOIN " . DB_PREFIX . "account a2 ON (a2.account_id = t.account_to_id) LEFT JOIN " . DB_PREFIX . "order o ON (o.order_id = t.order_id) LEFT JOIN " . DB_PREFIX . "transaction_type tt ON (tt.transaction_type_id = t.transaction_type_id) LEFT JOIN " . DB_PREFIX . "user u ON (u.user_id = t.user_id)";
 
 		$implode = array();
 
 		if (!empty($data['filter_label'])) {
 			$implode[] = "t.label = '" . $this->db->escape($data['filter_label']) . "'";
+
+			if (!empty($data['filter_label_id'])) {
+				$implode[] = "t.label_id = '" . $this->db->escape($data['filter_label_id']) . "'";
+			}
 		}
 
 		if (!empty($data['filter_date_start'])) {
@@ -93,11 +133,12 @@ class ModelAccountingTransaction extends Model {
 			$implode[] = "DATE(t.date) <= '" . $this->db->escape($data['filter_date_end']) . "'";
 		}
 
-		if (!empty($data['filter_account_from_id']) || $data['filter_account_from_id'] == '0') {
+		if (isset($data['filter_account_from_id']) && !is_null($data['filter_account_from_id'])) {
 			$implode[] = "t.account_from_id = '" . (int)$data['filter_account_from_id'] . "'";
 		}
 
-		if (!empty($data['filter_account_to_id']) || $data['filter_account_to_id'] == '0') {
+		// if (!empty($data['filter_account_to_id']) && $data['filter_account_to_id'] == '0') {
+		if (isset($data['filter_account_to_id']) && !is_null($data['filter_account_to_id'])) {
 			$implode[] = "t.account_to_id = '" . (int)$data['filter_account_to_id'] . "'";
 		}
 
@@ -105,8 +146,8 @@ class ModelAccountingTransaction extends Model {
 			$implode[] = "t.description LIKE '%" . $this->db->escape($data['filter_description']) . "%'";
 		}
 
-		if (!empty($data['filter_reference_no'])) {
-			$implode[] = "CONCAT(t.reference_no, LPAD(t.transaction_no, 4, '0')) LIKE '%" . $this->db->escape($data['filter_reference_no']) . "%'";
+		if (!empty($data['filter_reference'])) {
+			$implode[] = "CONCAT(t.reference_prefix, LPAD(t.reference_no, 4, '0')) LIKE '%" . $this->db->escape($data['filter_reference']) . "%'";
 		}
 
 		if (!empty($data['filter_order_id'])) {
@@ -178,6 +219,10 @@ class ModelAccountingTransaction extends Model {
 
 		if (!empty($data['filter_label'])) {
 			$implode[] = "t.label = '" . $this->db->escape($data['filter_label']) . "'";
+
+			if (!empty($data['filter_label_id'])) {
+				$implode[] = "t.label_id = '" . $this->db->escape($data['filter_label_id']) . "'";
+			}
 		}
 
 		if (!empty($data['filter_date_start'])) {
@@ -188,11 +233,11 @@ class ModelAccountingTransaction extends Model {
 			$implode[] = "DATE(t.date) <= '" . $this->db->escape($data['filter_date_end']) . "'";
 		}
 
-		if (!empty($data['filter_account_from_id']) || $data['filter_account_from_id'] == '0') {
+		if (isset($data['filter_account_from_id']) && !is_null($data['filter_account_from_id'])) {
 			$implode[] = "t.account_from_id = '" . (int)$data['filter_account_from_id'] . "'";
 		}
 
-		if (!empty($data['filter_account_to_id']) || $data['filter_account_to_id'] == '0') {
+		if (isset($data['filter_account_to_id']) && !is_null($data['filter_account_to_id'])) {
 			$implode[] = "t.account_to_id = '" . (int)$data['filter_account_to_id'] . "'";
 		}
 
@@ -200,8 +245,8 @@ class ModelAccountingTransaction extends Model {
 			$implode[] = "t.description LIKE '%" . $this->db->escape($data['filter_description']) . "%'";
 		}
 
-		if (!empty($data['filter_reference_no'])) {
-			$implode[] = "CONCAT(t.reference_no, LPAD(t.transaction_no, 4, '0')) LIKE '%" . $this->db->escape($data['filter_reference_no']) . "%'";
+		if (!empty($data['filter_reference'])) {
+			$implode[] = "CONCAT(t.reference_prefix, LPAD(t.reference_no, 4, '0')) LIKE '%" . $this->db->escape($data['filter_reference']) . "%'";
 		}
 
 		if (!empty($data['filter_order_id'])) {
@@ -238,6 +283,10 @@ class ModelAccountingTransaction extends Model {
 
 		if (!empty($data['filter_label'])) {
 			$implode[] = "t.label = '" . $this->db->escape($data['filter_label']) . "'";
+
+			if (!empty($data['filter_label_id'])) {
+				$implode[] = "t.label_id = '" . $this->db->escape($data['filter_label_id']) . "'";
+			}
 		}
 
 		if (!empty($data['filter_date_start'])) {
@@ -248,11 +297,11 @@ class ModelAccountingTransaction extends Model {
 			$implode[] = "DATE(t.date) <= '" . $this->db->escape($data['filter_date_end']) . "'";
 		}
 
-		if (!empty($data['filter_account_from_id']) || $data['filter_account_from_id'] == '0') {
+		if (isset($data['filter_account_from_id']) && !is_null($data['filter_account_from_id'])) {
 			$implode[] = "t.account_from_id = '" . (int)$data['filter_account_from_id'] . "'";
 		}
 
-		if (!empty($data['filter_account_to_id']) || $data['filter_account_to_id'] == '0') {
+		if (isset($data['filter_account_to_id']) && !is_null($data['filter_account_to_id'])) {
 			$implode[] = "t.account_to_id = '" . (int)$data['filter_account_to_id'] . "'";
 		}
 
@@ -260,8 +309,8 @@ class ModelAccountingTransaction extends Model {
 			$implode[] = "t.description LIKE '%" . $this->db->escape($data['filter_description']) . "%'";
 		}
 
-		if (!empty($data['filter_reference_no'])) {
-			$implode[] = "CONCAT(t.reference_no, LPAD(t.transaction_no, 4, '0')) LIKE '%" . $this->db->escape($data['filter_reference_no']) . "%'";
+		if (!empty($data['filter_reference'])) {
+			$implode[] = "CONCAT(t.reference_prefix, LPAD(t.reference_no, 4, '0')) LIKE '%" . $this->db->escape($data['filter_reference']) . "%'";
 		}
 
 		if (!empty($data['filter_order_id'])) {
@@ -353,16 +402,26 @@ class ModelAccountingTransaction extends Model {
 		return $total;
 	}
 	
-	public function getTransactionNoMax($reference_no) {
-		$sql = "SELECT MAX(transaction_no) AS total FROM `" . DB_PREFIX . "transaction` WHERE reference_no = '" . $this->db->escape($reference_no) . "'";
+	public function getLastReferenceNo($reference_prefix) {
+		$sql = "SELECT MAX(reference_no) AS total FROM `" . DB_PREFIX . "transaction` WHERE reference_prefix = '" . $this->db->escape($reference_prefix) . "'";
 
 		$query = $this->db->query($sql);
 
 		return $query->row['total'];
 	}
 
+//Delete
+	public function getTransactionNoMax($reference_prefix) {
+		$sql = "SELECT MAX(reference_no) AS total FROM `" . DB_PREFIX . "transaction` WHERE reference_prefix = '" . $this->db->escape($reference_prefix) . "'";
+
+		$query = $this->db->query($sql);
+
+		return $query->row['total'];
+	}
+
+//Cek apakah masih digunakan
 	public function getTransactionsByOrderId($order_id, $data = array()) {
-		$sql = "SELECT t.*, u.username FROM " . DB_PREFIX . "transaction t LEFT JOIN " . DB_PREFIX . "user u ON (u.user_id = t.user_id) WHERE order_id = '" . (int)$order_id . "'";
+		$sql = "SELECT t.*, CONCAT(t.reference_prefix, LPAD(t.reference_no, 4, '0')) AS reference, tt.name AS transaction_type, u.username FROM " . DB_PREFIX . "transaction t LEFT JOIN " . DB_PREFIX . "transaction_type tt ON (tt.transaction_type_id = t.transaction_type_id) LEFT JOIN " . DB_PREFIX . "user u ON (u.user_id = t.user_id) WHERE order_id = '" . (int)$order_id . "'";
 
 		if (!empty($data['label'])) {
 			$sql .= " AND t.label = '" . $this->db->escape($data['label']) . "'";
@@ -375,19 +434,20 @@ class ModelAccountingTransaction extends Model {
 //Cek cara sort yg dibutuhkan pada account > balance
 		$sort_data = array(
 			't.order_id',
-			't.date'
+			't.date',
+			't.date DESC, t.transaction_id'
 		);
 
 		if (isset($data['sort']) && in_array($data['sort'], $sort_data)) {
 			$sql .= " ORDER BY " . $data['sort'];
 		} else {
-			$sql .= " ORDER BY t.date";
+			$sql .= " ORDER BY t.date DESC, t.transaction_id";
 		}
 
-		if (isset($data['order']) && ($data['order'] == 'DESC')) {
-			$sql .= " DESC";
-		} else {
+		if (isset($data['order']) && ($data['order'] == 'ASC')) {
 			$sql .= " ASC";
+		} else {
+			$sql .= " DESC";
 		}
 
 		if (isset($data['start']) || isset($data['limit'])) {
@@ -433,6 +493,14 @@ class ModelAccountingTransaction extends Model {
 				$sql .= " AND label_id = '" . (int)$data['label_id'] . "'";
 			}
 		}
+
+		$query = $this->db->query($sql);
+
+		return $query->row['total'];
+	}
+
+	public function getTransactionsCountByTransactionTypeId($transaction_type_id) {//Used by Transaction Type
+		$sql = "SELECT COUNT(*) AS total FROM " . DB_PREFIX . "transaction WHERE transaction_type_id = '" . (int)$transaction_type_id . "'";
 
 		$query = $this->db->query($sql);
 
@@ -531,6 +599,73 @@ class ModelAccountingTransaction extends Model {
 		return $query->row['total'];
 	}
 
+	public function getTransactionsSummary($data = []) {
+		$sql = "SELECT t.*, tt.*, SUM(t.amount) AS total FROM " . DB_PREFIX . "transaction t LEFT JOIN " . DB_PREFIX . "transaction_type tt ON (tt.transaction_type_id = t.transaction_type_id)";
+
+		$implode = array();
+
+		if (isset($data['order_id'])) {
+			$implode[] = "t.order_id = '" . (int)$data['order_id'] . "'";
+		}
+
+		$label_data = array(
+			'supplier',
+			'vendor',
+			'customer'
+		);
+		
+		if (isset($data['label']) && in_array($data['label'], $label_data)) {
+			$implode[] = "t.label = '" . $this->db->escape($data['label']) . "'";
+
+			if (isset($data['label_id'])) {
+				$implode[] = "t.label_id = '" . $this->db->escape($data['label_id']) . "'";
+			}
+		}
+
+		if (isset($data['transaction_type_id'])) {
+			$implode[] = "transaction_type_id = '" . (int)$data['transaction_type_id'] . "'";
+		}
+
+		if ($implode) {
+			$sql .= " WHERE " . implode(" AND ", $implode);
+		}
+
+		$group_data = array(
+			't.label',
+			't.label_id',
+			'tt.client_label',
+			'tt.category_label',
+			'tt.category_label, tt.account_type',
+			't.label_id, tt.category_label',
+			't.transaction_type_id'
+		);
+		
+		if (isset($data['group']) && in_array($data['group'], $group_data)) {
+			$sql .= " GROUP BY " . $data['group'];
+		} else {
+			$sql .= " GROUP BY label";
+		}
+
+		$sort_data = array(
+			't.label',
+			't.label_id',
+			't.transaction_type_id'
+		);
+
+		if (isset($data['sort']) && in_array($data['sort'], $sort_data)) {
+			$sql .= " ORDER BY " . $data['sort'];
+		} else {
+			$sql .= " ORDER BY " . $data['group'];
+		}
+
+		$sql .= " ASC";
+
+		$query = $this->db->query($sql);
+
+		return $query->rows;
+	}
+
+//Akan diganti ke getTransactionsSummary($order_id, $label)
 	public function getTransactionsLabelSummaryByOrderId($order_id, $label) {
 		$label_data = array(
 			'supplier',

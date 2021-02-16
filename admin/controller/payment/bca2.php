@@ -123,7 +123,7 @@ class ControllerPaymentBca2 extends Controller {
 
 		$this->load->model('accounting/account');
 
-		$data['asset_accounts'] = $this->model_accounting_account->getAccountsMenuByComponent($component = 'asset');
+		$data['asset_accounts'] = $this->model_accounting_account->getAccountsMenuByComponent(['asset']);
 
 		if (isset($this->request->post['bca2_status'])) {
 			$data['bca2_status'] = $this->request->post['bca2_status'];

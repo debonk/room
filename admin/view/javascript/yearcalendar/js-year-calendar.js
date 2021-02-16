@@ -2002,7 +2002,7 @@
       days: ["Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"],
       daysShort: ["Ming", "Sen", "Sel", "Rab", "kam", "Jum", "Sab"],
       daysMin: ["Mg", "Sn", "Sl", "Rb", "Km", "Jm", "Sb"],
-      months: ["Januari", "Februari", "Maret", "April", "Mai", "Juni", "Juli", "Agustus", "September", "Oktober", "Nopember", "Desember" ],
+      months: ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "Nopember", "Desember" ],
       monthsShort: ["Jan", "Feb", "Mar", "Apr", "Mai", "Jun", "Jul", "Agt", "Sep", "Okt", "Nop", "Des"],
       weekShort: 'W',
       weekStart: 0

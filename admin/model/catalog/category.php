@@ -206,7 +206,7 @@ class ModelCatalogCategory extends Model {
 		$sql = "SELECT cp.category_id AS category_id, GROUP_CONCAT(cd1.name ORDER BY cp.level SEPARATOR '&nbsp;&nbsp;&gt;&nbsp;&nbsp;') AS name, c1.parent_id, c1.sort_order FROM " . DB_PREFIX . "category_path cp LEFT JOIN " . DB_PREFIX . "category c1 ON (cp.category_id = c1.category_id) LEFT JOIN " . DB_PREFIX . "category c2 ON (cp.path_id = c2.category_id) LEFT JOIN " . DB_PREFIX . "category_description cd1 ON (cp.path_id = cd1.category_id) LEFT JOIN " . DB_PREFIX . "category_description cd2 ON (cp.category_id = cd2.category_id) WHERE cd1.language_id = '" . (int)$this->config->get('config_language_id') . "' AND cd2.language_id = '" . (int)$this->config->get('config_language_id') . "'";
 
 		if (!empty($data['filter_name'])) {
-			$sql .= " AND cd2.name LIKE '" . $this->db->escape($data['filter_name']) . "%'";
+			$sql .= " AND cd2.name LIKE '%" . $this->db->escape($data['filter_name']) . "%'";
 		}
 
 		$sql .= " GROUP BY cp.category_id";
@@ -244,6 +244,30 @@ class ModelCatalogCategory extends Model {
 
 		return $query->rows;
 	}
+
+	public function getCategoriesByParentId($parent_id = 0) {
+		$query = $this->db->query("SELECT * FROM " . DB_PREFIX . "category c LEFT JOIN " . DB_PREFIX . "category_description cd ON (c.category_id = cd.category_id) LEFT JOIN " . DB_PREFIX . "category_to_store c2s ON (c.category_id = c2s.category_id) WHERE c.parent_id = '" . (int)$parent_id . "' AND cd.language_id = '" . (int)$this->config->get('config_language_id') . "' AND c2s.store_id = '" . (int)$this->config->get('config_store_id') . "' AND c.status = '1' ORDER BY c.sort_order, LCASE(cd.name)");
+
+		return $query->rows;
+	}
+
+	// public function getTopCategories($data = array()) {
+	// 	$sql = "SELECT cp.category_id AS category_id, GROUP_CONCAT(cd1.name ORDER BY cp.level SEPARATOR '&nbsp;&nbsp;&gt;&nbsp;&nbsp;') AS name, c1.parent_id, c1.top, c1.sort_order FROM " . DB_PREFIX . "category_path cp LEFT JOIN " . DB_PREFIX . "category c1 ON (cp.category_id = c1.category_id) LEFT JOIN " . DB_PREFIX . "category c2 ON (cp.path_id = c2.category_id) LEFT JOIN " . DB_PREFIX . "category_description cd1 ON (cp.path_id = cd1.category_id) LEFT JOIN " . DB_PREFIX . "category_description cd2 ON (cp.category_id = cd2.category_id) WHERE cd1.language_id = '" . (int)$this->config->get('config_language_id') . "' AND cd2.language_id = '" . (int)$this->config->get('config_language_id') . "' AND c1.status = 1";
+
+	// 	$query = $this->db->query("SELECT * FROM " . DB_PREFIX . "category_description WHERE category_id = '" . (int)$category_id . "'");
+
+	// 	foreach ($query->rows as $result) {
+	// 		$category_description_data[$result['language_id']] = array(
+	// 			'name'             => $result['name'],
+	// 			'meta_title'       => $result['meta_title'],
+	// 			'meta_description' => $result['meta_description'],
+	// 			'meta_keyword'     => $result['meta_keyword'],
+	// 			'description'      => $result['description']
+	// 		);
+	// 	}
+
+	// 	return $category_description_data;
+	// }
 
 	public function getCategoryDescriptions($category_id) {
 		$category_description_data = array();

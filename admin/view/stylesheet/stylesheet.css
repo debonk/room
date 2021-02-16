@@ -639,6 +639,9 @@ input[type="checkbox"]:checked::after, .checkbox input[type="checkbox"]:checked:
 /* Menu Fix For System -> Layout -> Banner */
 
 /* User */
+.blank-page {
+	min-height: 400px;
+}
 
 /* Fix form control bug */
 .form-control {
@@ -722,4 +725,25 @@ a.slot-prf, a.slot-cdf, a.slot-krf, a.slot-pof {
 }
 table.month td.day .day-content:hover {
 	background: none!important;
+}
+
+/* Margin Class */
+.mt-1 {
+	margin-top: 20px;
+}
+.mt-2 {
+	margin-top: 40px;
+}
+.mt-3 {
+	margin-top: 60px;
+}
+.mt-4 {
+	margin-top: 80px;
+}
+
+.ml-1 {
+	margin-left: 8.33333333%;
+}
+.ml-2 {
+	margin-left: 16.66666666%;
 }

@@ -145,7 +145,7 @@ class ControllerApiOrder extends Controller
 				$order_data['title'] = $this->session->data['event']['title'];
 				$order_data['event_date'] = $this->session->data['event']['event_date'];
 				$order_data['slot_id'] = $this->session->data['event']['slot_id'];
-				$order_data['ceremony_id'] = $this->session->data['event']['ceremony_id'];
+				// $order_data['ceremony_id'] = $this->session->data['event']['ceremony_id'];
 
 				// Payment Details
 				$order_data['payment_firstname'] = $this->session->data['payment_address']['firstname'];
@@ -247,6 +247,7 @@ class ControllerApiOrder extends Controller
 						'download'     => $product['download'],
 						'quantity'     => $product['quantity'],
 						'unit_class'   => $product['unit_class'],
+						'category_id'  => $product['category_id'],
 						'category'     => $product['category'],
 						'subtract'     => $product['subtract'],
 						'price'        => $product['price'],
@@ -560,7 +561,7 @@ class ControllerApiOrder extends Controller
 					$order_data['title'] = $this->session->data['event']['title'];
 					$order_data['event_date'] = $this->session->data['event']['event_date'];
 					$order_data['slot_id'] = $this->session->data['event']['slot_id'];
-					$order_data['ceremony_id'] = $this->session->data['event']['ceremony_id'];
+					// $order_data['ceremony_id'] = $this->session->data['event']['ceremony_id'];
 
 					// Payment Details
 					$order_data['payment_firstname'] = $this->session->data['payment_address']['firstname'];
@@ -662,6 +663,7 @@ class ControllerApiOrder extends Controller
 							'download'     => $product['download'],
 							'quantity'     => $product['quantity'],
 							'unit_class'   => $product['unit_class'],
+							'category_id'  => $product['category_id'],
 							'category'     => $product['category'],
 							'subtract'     => $product['subtract'],
 							'price'        => $product['price'],

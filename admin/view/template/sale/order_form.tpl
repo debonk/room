@@ -375,8 +375,7 @@
                   <?php echo $entry_title; ?>
                 </label>
                 <div class="col-sm-10">
-                  <input type="text" name="title" value="<?php echo $title; ?>" id="input-title"
-                    class="form-control" />
+                  <input type="text" name="title" value="<?php echo $title; ?>" id="input-title" class="form-control" />
                 </div>
               </div>
               <div class="form-group required">
@@ -395,14 +394,10 @@
                 </div>
               </div>
               <div class="form-group required">
-                <label class="col-sm-2 control-label" for="input-slot">
-                  <?php echo $entry_slot; ?>
-                </label>
+                <label class="col-sm-2 control-label" for="input-slot"><?php echo $entry_slot; ?></label>
                 <div class="col-sm-10">
                   <select name="slot_id" id="input-slot" class="form-control">
-                    <option value="">
-                      <?php echo $text_select; ?>
-                    </option>
+                    <option value=""><?php echo $text_select; ?></option>
                     <?php foreach ($slots as $slot) { ?>
                     <?php if ($slot['slot_id'] == $slot_id) { ?>
                     <option value="<?php echo $slot['slot_id']; ?>" selected="selected">
@@ -411,29 +406,6 @@
                     <?php } else { ?>
                     <option value="<?php echo $slot['slot_id']; ?>">
                       <?php echo $slot['name']; ?>
-                    </option>
-                    <?php } ?>
-                    <?php } ?>
-                  </select>
-                </div>
-              </div>
-              <div class="form-group required">
-                <label class="col-sm-2 control-label" for="input-ceremony">
-                  <?php echo $entry_ceremony; ?>
-                </label>
-                <div class="col-sm-10">
-                  <select name="ceremony_id" id="input-ceremony" class="form-control">
-                    <option value="">
-                      <?php echo $text_select; ?>
-                    </option>
-                    <?php foreach ($ceremonies as $ceremony) { ?>
-                    <?php if ($ceremony['ceremony_id'] == $ceremony_id) { ?>
-                    <option value="<?php echo $ceremony['ceremony_id']; ?>" selected="selected">
-                      <?php echo $ceremony['name']; ?>
-                    </option>
-                    <?php } else { ?>
-                    <option value="<?php echo $ceremony['ceremony_id']; ?>">
-                      <?php echo $ceremony['name']; ?>
                     </option>
                     <?php } ?>
                     <?php } ?>
@@ -449,7 +421,7 @@
                     <thead>
                       <tr>
                         <td class="text-left">
-                          <?php echo $column_product_type; ?>
+                          <?php echo $column_category; ?>
                         </td>
                         <td class="text-left">
                           <?php echo $column_product; ?>
@@ -481,8 +453,8 @@
                       <tr>
                         <td class="text-left">
                           <?php echo $order_product['category']; ?>
-                          <input type="hidden" name="product[<?php echo $product_row; ?>][category]"
-                            value="<?php echo $order_product['category']; ?>" />
+                          <input type="hidden" name="product[<?php echo $product_row; ?>][category_id]"
+                            value="<?php echo $order_product['category_id']; ?>" />
                         </td>
                         <td class="text-left">
                           <?php echo $order_product['name']; ?><br />
@@ -544,23 +516,22 @@
                   <?php echo $text_product; ?>
                 </legend>
                 <div class="form-group">
-                  <label class="col-sm-2 control-label" for="input-primary-type">
-                    <?php echo $entry_primary_type; ?>
+                  <label class="col-sm-2 control-label" for="input-main-category">
+                    <?php echo $entry_category; ?>
                   </label>
                   <div class="col-sm-10">
-                    <select name="primary_type" id="input-primary-type" class="form-control">
-                      <option value="1">
-                        <?php echo $text_primary_type; ?>
+                    <select name="main_category_id" id="input-main-category" class="form-control">
+                      <?php foreach ($main_categories as $main_category) { ?>
+                      <option value="<?php echo $main_category['category_id']; ?>">
+                        <?php echo $main_category['name']; ?>
                       </option>
-                      <option value="0">
-                        <?php echo $text_secondary_type; ?>
-                      </option>
+                      <?php } ?>
                     </select>
                   </div>
                 </div>
                 <div class="form-group">
                   <label class="col-sm-2 control-label" for="input-category">
-                    <?php echo $entry_category; ?>
+                    <?php echo $entry_sub_category; ?>
                   </label>
                   <div class="col-sm-10">
                     <select name="category_id" id="input-category" class="form-control">
@@ -980,20 +951,12 @@
                   <p class="form-control-static">-</p>
                 </div>
               </div>
-              <div class="form-group">
-                <label class="col-sm-3 control-label" for="input-ceremony">
-                  <?php echo $entry_ceremony; ?>
-                </label>
-                <div class="col-sm-9" id="static-ceremony">
-                  <p class="form-control-static">-</p>
-                </div>
-              </div>
               <div class="table-responsive">
                 <table class="table table-bordered">
                   <thead>
                     <tr>
                       <td class="text-left">
-                        <?php echo $column_product_type; ?>
+                        <?php echo $column_category; ?>
                       </td>
                       <td class="text-left">
                         <?php echo $column_product; ?>
@@ -1173,16 +1136,16 @@
       return false;
     });
 
-    var products = [];
+    let products = [];
 
-    $('select[name=\'primary_type\']').on('change', function () {
-      var primary_type = $('select[name=\'primary_type\']').val();
+    $('select[name=\'main_category_id\']').on('change', function () {
+      let main_category_id = $('select[name=\'main_category_id\']').val();
 
       $.ajax({
-        url: 'index.php?route=sale/order/productSelect&token=<?php echo $token; ?>&primary_type=' + primary_type,
+        url: 'index.php?route=sale/order/productSelect&token=<?php echo $token; ?>&main_category_id=' + main_category_id,
         dataType: 'json',
         beforeSend: function () {
-          $('select[name=\'primary_type\']').after(' <i class="fa fa-circle-o-notch fa-spin"></i>');
+          $('select[name=\'main_category_id\']').after(' <i class="fa fa-circle-o-notch fa-spin"></i>');
         },
         complete: function () {
           $('.fa-spin').remove();
@@ -1190,9 +1153,11 @@
         success: function (json) {
           html = '<option value=""><?php echo $text_select; ?></option>';
 
-          if (json['categories'] && json['categories'] != '') {
-            for (i = 0; i < json['categories'].length; i++) {
-              html += '<option value="' + json['categories'][i]['category_id'] + '">' + json['categories'][i]['name'] + '</option>';
+          if (json.length) {
+            for (let i = 0; i < json.length; i++) {
+              html += '<option value="' + json[i]['category_id'] + '">' + json[i]['name'] + '</option>';
+
+              products[json[i]['category_id']] = json[i]['product'];
             }
           } else {
             html += '<option value="0"><?php echo $text_none; ?></option>';
@@ -1200,10 +1165,6 @@
 
           $('select[name=\'category_id\']').html(html);
           $('select[name=\'category_id\']').trigger('change');
-          $('#price').html('-');
-          $('#option').html('');
-
-          products = json['products'];
         },
 
         error: function (xhr, ajaxOptions, thrownError) {
@@ -1212,15 +1173,15 @@
       });
     });
 
-    $('select[name=\'primary_type\']').trigger('change');
+    $('select[name=\'main_category_id\']').trigger('change');
 
     $('select[name=\'category_id\']').on('change', function () {
-      var category_id = $('select[name=\'category_id\']').val();
+      let category_id = $('select[name=\'category_id\']').val();
 
       html = '<option value=""><?php echo $text_select; ?></option>';
 
       if (products[category_id] && products[category_id] != '') {
-        for (i = 0; i < products[category_id].length; i++) {
+        for (let i = 0; i < products[category_id].length; i++) {
           html += '<option value="' + products[category_id][i]['product_id'] + '">' + products[category_id][i]['name'] + '</option>';
         }
       } else {
@@ -1235,7 +1196,7 @@
     $('select[name=\'category_id\']').trigger('change');
 
     $('select[name=\'product_id\']').on('change', function () {
-      var product_id = $('select[name=\'product_id\']').val();
+      let product_id = $('select[name=\'product_id\']').val();
 
       $.ajax({
         url: 'index.php?route=sale/order/product&token=<?php echo $token; ?>&product_id=' + product_id,
@@ -1249,6 +1210,16 @@
         success: function (json) {
           if (json && json != '') {
             $('#price').html(json['price']);
+
+            // if (json['slot'] != '') {
+            //   html = '       <option value=""><?php echo $text_select; ?></option>';
+
+            //   for (let i = 0; i < json['slot'].length; i++) {
+            //     html += '       <option value="' + json['slot'][i]['slot_id'] + '">' + json['slot'][i]['name'] + '</option>';
+            //   }
+
+            //   $('#input-slot').html(html);
+            // }
 
             if (json['option'] != '') {
               html = '<fieldset>';
@@ -1562,16 +1533,15 @@
               product = json['products'][i];
 
               html += '<tr>';
+              html += '  <td class="text-left">';
 
               if (product['primary_type'] == 1) {
-                html += '  <td class="text-left"><?php echo $text_primary_type; ?><br />';
                 html += '  <strong>' + product['category'] + '</strong><br />';
               } else {
-                html += '  <td class="text-left">';
                 html += product['category'] + '<br />';
               }
 
-              html += '  <input type="hidden" name="product[' + i + '][category]" value="' + product['category'] + '" /></td>';
+              html += '  <input type="hidden" name="product[' + i + '][category_id]" value="' + product['category_id'] + '" /></td>';
 
               html += '  <td class="text-left">' + product['name'] + ' ' + (!product['stock'] ? '<span class="text-danger">***</span>' : '') + '<br />';
               html += '  <input type="hidden" name="product[' + i + '][product_id]" value="' + product['product_id'] + '" />';
@@ -1634,7 +1604,6 @@
             $('#static-title > p').html(json['event']['title']);
             $('#static-event-date > p').html(json['event']['event_date']);
             $('#static-slot > p').html(json['event']['slot']);
-            $('#static-ceremony > p').html(json['event']['ceremony']);
           }
 
           html = '';
@@ -1644,12 +1613,11 @@
               product = json['products'][i];
 
               html += '<tr>';
+              html += '  <td class="text-left">';
 
               if (product['primary_type'] == 1) {
-                html += '  <td class="text-left"><?php echo $text_primary_type; ?><br />';
                 html += '  <strong>' + product['category'] + '</strong><br />';
               } else {
-                html += '  <td class="text-left"><br />';
                 html += product['category'] + '<br />';
               }
 
@@ -1902,7 +1870,7 @@
       $.ajax({
         url: '<?php echo $store_url; ?>index.php?route=api/cart/add&token=' + token + '&store_id=' + $('select[name=\'store_id\'] option:selected').val(),
         type: 'post',
-        data: $('#field-product select[name=\'primary_type\'], #field-product select[name=\'category_id\'], #field-product select[name=\'product_id\'], #field-product input[name^=\'option\'][type=\'text\'], #field-product input[name^=\'option\'][type=\'hidden\'], #field-product input[name^=\'option\'][type=\'radio\']:checked, #field-product input[name^=\'option\'][type=\'checkbox\']:checked, #field-product select[name^=\'option\'], #field-product textarea[name^=\'option\']'),
+        data: $('#field-product select[name=\'category_id\'], #field-product select[name=\'product_id\'], #tab-cart select[name=\'slot_id\'], #field-product input[name^=\'option\'][type=\'text\'], #field-product input[name^=\'option\'][type=\'hidden\'], #field-product input[name^=\'option\'][type=\'radio\']:checked, #field-product input[name^=\'option\'][type=\'checkbox\']:checked, #field-product select[name^=\'option\'], #field-product textarea[name^=\'option\']'),
         dataType: 'json',
         crossDomain: true,
         beforeSend: function () {
@@ -1918,6 +1886,10 @@
           if (json['error']) {
             if (json['error']['warning']) {
               $('#content > .container-fluid').prepend('<div class="alert alert-danger"><i class="fa fa-exclamation-circle"></i> ' + json['error']['warning'] + ' <button type="button" class="close" data-dismiss="alert">&times;</button></div>');
+            }
+
+            if (json['error']['slot']) {
+              $('#tab-cart select[name=\'slot_id\']').after('<div class="text-danger">' + json['error']['slot'] + '</div>');
             }
 
             if (json['error']['option']) {
@@ -1941,6 +1913,16 @@
           } else {
             if (json['success']) {
               $('#content > .container-fluid').prepend('<div class="alert alert-success"><i class="fa fa-check-circle"></i> ' + json['success'] + ' <button type="button" class="close" data-dismiss="alert">&times;</button></div></div>');
+            }
+
+            if (json['slot'] != '') {
+              html = '       <option value=""><?php echo $text_select; ?></option>';
+
+              for (let i = 0; i < json['slot'].length; i++) {
+                html += '       <option value="' + json['slot'][i]['slot_id'] + '">' + json['slot'][i]['name'] + '</option>';
+              }
+
+              $('#input-slot').html(html);
             }
 
             $('select[name=\'category_id\']').trigger('change');

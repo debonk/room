@@ -1,9 +1,11 @@
 <?php
 //Text
-$_['text_category'] 	= 'Tipe Paket';
-$_['text_product_name'] = 'Nama Paket';
-$_['text_quantity'] 	= 'Jumlah';
-$_['text_amount'] 		= 'Harga';
+$_['text_package']      	= 'Nama Paket';
+$_['text_quantity'] 		= 'Jumlah';
+$_['text_price'] 			= 'Harga';
+$_['text_mark']         	= 'Preview Only!';
+$_['text_reference']		= 'No. :';
+$_['text_atas_nama']    	= 'Atas Nama %s';
 
 // Text Agreement
 $_['title_agreement']		= 'SURAT KESEPAKATAN PERSEWAAN';
@@ -39,7 +41,7 @@ $_['text_attn']   			= 'Hal';
 $_['text_to']   			= 'Kepada';
 $_['text_from']   			= 'Dari';
 $_['text_address_format']   = '%s<br />%s %s<br />%s, %s';
-$_['text_atas_persewaan']   = '<b>%s</b> atas Pemesanan %s - %s Untuk Acara <b>"%s"</b> Pada Tanggal %s';
+$_['text_atas_persewaan']   = '<b>%s</b> atas Pemesanan Paket %s - %s Untuk Acara <b>"%s"</b> Pada Tanggal %s';
 $_['text_atas_pelaksanaan'] = '<b>%s</b> dalam Pelaksanaan Acara <b>"%s"</b> yang bertempat di %s Pada Tanggal %s';
 $_['text_sejumlah']   		= 'TOTAL SEJUMLAH';
 $_['text_terbilang']   		= 'Terbilang: # %s rupiah #';
@@ -48,6 +50,11 @@ $_['text_disimpan']   		= '- Kuitansi ini disimpan oleh %s';
 
 // Text Admission
 $_['title_admission']		= 'SURAT IJIN MASUK';
+$_['text_day_date']         = 'Hari/Tanggal';
+$_['text_slot']           	= 'Sesi';
+$_['text_venue']            = 'Venue';
+$_['text_vendor_type']      = 'Type Vendor';
+$_['text_time']             = 'Jam';
 $_['text_sehubungan']		= 'Sehubungan dengan penyelenggaraan acara <b>"%s"</b> yang akan berlangsung di %s pada:';
 $_['text_dengan_ini']		= 'dengan ini manajemen memberikan ijin masuk kepada vendor berikut:';
 $_['text_contact_person']	= 'Nama Kontak:';
@@ -58,6 +65,10 @@ $_['text_lampirkan']		= 'Harap menunjukkan Surat Tanda Masuk ini kepada Security
 
 // Text Vendor Agreement
 $_['title_vendor_agreement']= 'SURAT PERJANJIAN VENDOR';
+$_['text_address']			= 'Alamat';
+$_['text_customer']			= 'Nama';
+$_['text_telephone']		= 'Telepon/HP';
+$_['text_vendor_name']		= 'Nama Vendor';
 $_['text_place_date']		= 'Gresik, %s,';
 $_['text_garis']   			= '______________________________________________';
 $_['text_ketentuan']		= 'Terlampir Peraturan & Ketetapan yang harus dipatuhi oleh para Vendor dan berlaku efektif mulai ditandatanganinya surat ini. Untuk menjadi perhatian bersama bahwa   semua vendor bertanggung jawab terhadap keutuhan gedung %s. Semua kelalaian atas penggunaan gedung yang mengakibatkan kerusakan, kehilangan dan tagihan dari semua kerusakan apapun atau pada luka pribadi atau sampai meninggalnya seseorang yang timbul karena kelalaian dari vendor atau pekerja sub vendor anda.';

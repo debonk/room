@@ -38,7 +38,7 @@ class ControllerCommonMenu extends Controller
 				'paypal'		=> ['payment/pp_express']
 			],
 			'purchase'		=> ['purchase/purchase', 'purchase/supplier'],
-			'accounting'	=> ['accounting/account', 'accounting/balance', 'accounting/expense', 'accounting/transaction'],
+			'accounting'	=> ['accounting/account', 'accounting/balance', 'accounting/expense', 'accounting/transaction', 'accounting/transaction_type'],
 			'reports'		=> [
 				'sale'			=> ['report/sale_order', 'report/sale_document', 'report/sale_tax', 'report/sale_coupon'],
 				'product'		=> ['report/product_viewed', 'report/product_purchased'],

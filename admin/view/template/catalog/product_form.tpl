@@ -30,6 +30,7 @@
             <li><a href="#tab-data" data-toggle="tab"><?php echo $tab_data; ?></a></li>
             <li><a href="#tab-links" data-toggle="tab"><?php echo $tab_links; ?></a></li>
             <li><a href="#tab-vendor" data-toggle="tab"><?php echo $tab_vendor; ?></a></li>
+            <li><a href="#tab-slot" data-toggle="tab"><?php echo $tab_slot; ?></a></li>
             <li><a href="#tab-attribute" data-toggle="tab"><?php echo $tab_attribute; ?></a></li>
             <li><a href="#tab-option" data-toggle="tab"><?php echo $tab_option; ?></a></li>
             <li><a href="#tab-recurring" data-toggle="tab"><?php echo $tab_recurring; ?></a></li>
@@ -493,6 +494,32 @@
                       <td class="text-right"><button type="button" onclick="addVendor()" data-toggle="tooltip" title="<?php echo $button_vendor_add; ?>" class="btn btn-primary"><i class="fa fa-plus-circle"></i></button></td>
                     </tr>
                   </tfoot>
+                </table>
+              </div>
+            </div>
+            <div class="tab-pane" id="tab-slot">
+              <div class="form-group">
+                <label class="col-sm-2 control-label" for="input-slot-prefix"><?php echo $entry_slot_prefix; ?></label>
+                <div class="col-sm-10">
+                  <input type="text" name="slot_prefix" value="<?php echo $slot_prefix; ?>" placeholder="<?php echo $entry_slot_prefix; ?>" id="input-slot-prefix" class="form-control" />
+                </div>
+              </div>
+              <div class="table-responsive">
+                <table class="table table-bordered table-hover">
+                  <thead>
+                    <tr>
+                      <td class="text-left"><?php echo $entry_slot; ?></td>
+                      <td class="text-right"><?php echo $entry_price_change; ?></td>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <?php foreach ($slots as $slot) { ?>
+                    <tr>
+                      <td class="text-left"><?php echo $slot['name']; ?></td>
+                      <td class="text-right"><input type="text" name="product_slot[<?php echo $slot['slot_id']; ?>][price]" value="<?php echo isset($product_slot[$slot['slot_id']]) ? $product_slot[$slot['slot_id']]['price'] : ''; ?>" class="form-control" /></td>
+                    </tr>
+                    <?php } ?>
+                  </tbody>
                 </table>
               </div>
             </div>

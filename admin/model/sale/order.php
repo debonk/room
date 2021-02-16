@@ -1,7 +1,8 @@
 <?php
 class ModelSaleOrder extends Model {
 	public function getOrder($order_id) {
-		$order_query = $this->db->query("SELECT *, oo.value AS session_slot, s.name AS slot, cr.name AS ceremony, (SELECT CONCAT(c.firstname, ' ', c.lastname) FROM " . DB_PREFIX . "customer c WHERE c.customer_id = o.customer_id) AS customer, (SELECT os.name FROM " . DB_PREFIX . "order_status os WHERE os.order_status_id = o.order_status_id AND os.language_id = '" . (int)$this->config->get('config_language_id') . "') AS order_status, (SELECT u.username FROM " . DB_PREFIX . "user u WHERE o.user_id = u.user_id) AS username FROM `" . DB_PREFIX . "order` o LEFT JOIN `" . DB_PREFIX . "order_option` oo ON (oo.order_id = o.order_id) LEFT JOIN `" . DB_PREFIX . "slot` s ON (s.slot_id = o.slot_id) LEFT JOIN `" . DB_PREFIX . "ceremony` cr ON (cr.ceremony_id = o.ceremony_id) WHERE o.order_id = '" . (int)$order_id . "'");
+		$order_query = $this->db->query("SELECT *, s.name AS slot, (SELECT CONCAT(c.firstname, ' ', c.lastname) FROM " . DB_PREFIX . "customer c WHERE c.customer_id = o.customer_id) AS customer, (SELECT os.name FROM " . DB_PREFIX . "order_status os WHERE os.order_status_id = o.order_status_id AND os.language_id = '" . (int)$this->config->get('config_language_id') . "') AS order_status, (SELECT u.username FROM " . DB_PREFIX . "user u WHERE o.user_id = u.user_id) AS username FROM `" . DB_PREFIX . "order` o LEFT JOIN `" . DB_PREFIX . "slot` s ON (s.slot_id = o.slot_id) WHERE o.order_id = '" . (int)$order_id . "'");
+		// $order_query = $this->db->query("SELECT *, oo.value AS session_slot, s.name AS slot, cr.name AS ceremony, (SELECT CONCAT(c.firstname, ' ', c.lastname) FROM " . DB_PREFIX . "customer c WHERE c.customer_id = o.customer_id) AS customer, (SELECT os.name FROM " . DB_PREFIX . "order_status os WHERE os.order_status_id = o.order_status_id AND os.language_id = '" . (int)$this->config->get('config_language_id') . "') AS order_status, (SELECT u.username FROM " . DB_PREFIX . "user u WHERE o.user_id = u.user_id) AS username FROM `" . DB_PREFIX . "order` o LEFT JOIN `" . DB_PREFIX . "order_option` oo ON (oo.order_id = o.order_id AND name = 'Session Slot') LEFT JOIN `" . DB_PREFIX . "slot` s ON (s.slot_id = o.slot_id) LEFT JOIN `" . DB_PREFIX . "ceremony` cr ON (cr.ceremony_id = o.ceremony_id) WHERE o.order_id = '" . (int)$order_id . "'");
 
 		if ($order_query->num_rows) {
 			$customer_group_query = $this->db->query("SELECT name FROM " . DB_PREFIX . "customer_group_description WHERE customer_group_id = '" . (int)$order_query->row['customer_group_id'] . "' AND language_id = '" . (int)$this->config->get('config_language_id') . "'");
@@ -104,12 +105,11 @@ class ModelSaleOrder extends Model {
 				'fax'                     => $order_query->row['fax'],
 				'custom_field'            => json_decode($order_query->row['custom_field'], true),
 				'title'              	  => $order_query->row['title'],
-				'session_slot'            => $order_query->row['session_slot'],
 				'event_date'              => $order_query->row['event_date'],
 				'slot_id'             	  => $order_query->row['slot_id'],
 				'slot'             	  	  => $order_query->row['slot'],
-				'ceremony_id'             => $order_query->row['ceremony_id'],
-				'ceremony'                => $order_query->row['ceremony'],
+				// 'ceremony_id'             => $order_query->row['ceremony_id'],
+				// 'ceremony'                => $order_query->row['ceremony'],
 				'payment_firstname'       => $order_query->row['payment_firstname'],
 				'payment_lastname'        => $order_query->row['payment_lastname'],
 				'payment_company'         => $order_query->row['payment_company'],
@@ -176,7 +176,8 @@ class ModelSaleOrder extends Model {
 	}
 
 	public function getOrders($data = array()) {
-		$sql = "SELECT o.order_id, o.title, o.event_date, oo.value AS session_slot, s.code AS slot_code, s.name AS slot, cr.name AS ceremony, CONCAT(o.firstname, ' ', o.lastname) AS customer, o.order_status_id, os.name AS order_status, os.class AS order_status_class, o.invoice_no, o.invoice_prefix, o.shipping_code, o.total, o.currency_code, o.currency_value, o.date_added, o.date_modified, op.name AS primary_product, op.model, u.username, (SELECT SUM(t.amount) FROM `" . DB_PREFIX . "transaction` t WHERE t.order_id = o.order_id AND t.label IN('customer', 'vendor')) AS total_paid FROM `" . DB_PREFIX . "order` o LEFT JOIN `" . DB_PREFIX . "slot` s ON (s.slot_id = o.slot_id) LEFT JOIN `" . DB_PREFIX . "ceremony` cr ON (cr.ceremony_id = o.ceremony_id) LEFT JOIN `" . DB_PREFIX . "order_product` op ON (op.order_id = o.order_id AND op.primary_type = 1) LEFT JOIN `" . DB_PREFIX . "order_option` oo ON (oo.order_id = o.order_id) LEFT JOIN `" . DB_PREFIX . "order_status` os ON (os.order_status_id = o.order_status_id AND os.language_id = '" . (int)$this->config->get('config_language_id') . "') LEFT JOIN `" . DB_PREFIX . "user` u ON (u.user_id = o.user_id)";
+		// $sql = "SELECT o.order_id, o.title, o.event_date, oo.value AS session_slot, s.code AS slot_code, s.name AS slot, cr.name AS ceremony, CONCAT(o.firstname, ' ', o.lastname) AS customer, o.order_status_id, os.name AS order_status, os.class AS order_status_class, o.invoice_no, o.invoice_prefix, o.shipping_code, o.total, o.currency_code, o.currency_value, o.date_added, o.date_modified, op.name AS primary_product, op.model, u.username, (SELECT SUM(t.amount) FROM `" . DB_PREFIX . "transaction` t WHERE t.order_id = o.order_id AND t.label IN('customer', 'vendor')) AS total_paid FROM `" . DB_PREFIX . "order` o LEFT JOIN `" . DB_PREFIX . "slot` s ON (s.slot_id = o.slot_id) LEFT JOIN `" . DB_PREFIX . "ceremony` cr ON (cr.ceremony_id = o.ceremony_id) LEFT JOIN `" . DB_PREFIX . "order_product` op ON (op.order_id = o.order_id AND op.primary_type = 1) LEFT JOIN `" . DB_PREFIX . "order_option` oo ON (oo.order_id = o.order_id) LEFT JOIN `" . DB_PREFIX . "order_status` os ON (os.order_status_id = o.order_status_id AND os.language_id = '" . (int)$this->config->get('config_language_id') . "') LEFT JOIN `" . DB_PREFIX . "user` u ON (u.user_id = o.user_id)";
+		$sql = "SELECT o.order_id, o.title, o.event_date, oo.value AS session_slot, s.code AS slot_code, s.name AS slot, CONCAT(o.firstname, ' ', o.lastname) AS customer, o.order_status_id, os.name AS order_status, os.class AS order_status_class, o.invoice_no, o.invoice_prefix, o.shipping_code, o.total, o.currency_code, o.currency_value, o.date_added, o.date_modified, op.name AS primary_product, op.model, u.username, (SELECT SUM(t.amount) FROM `" . DB_PREFIX . "transaction` t WHERE t.order_id = o.order_id AND t.label IN('customer', 'vendor')) AS total_paid FROM `" . DB_PREFIX . "order` o LEFT JOIN `" . DB_PREFIX . "slot` s ON (s.slot_id = o.slot_id) LEFT JOIN `" . DB_PREFIX . "order_product` op ON (op.order_id = o.order_id AND op.primary_type = 1) LEFT JOIN `" . DB_PREFIX . "order_option` oo ON (oo.order_id = o.order_id) LEFT JOIN `" . DB_PREFIX . "order_status` os ON (os.order_status_id = o.order_status_id AND os.language_id = '" . (int)$this->config->get('config_language_id') . "') LEFT JOIN `" . DB_PREFIX . "user` u ON (u.user_id = o.user_id)";
 
 		if (isset($data['filter_order_status'])) {
 			$implode = array();
@@ -274,14 +275,6 @@ class ModelSaleOrder extends Model {
 		return $query->rows;
 	}
 
-	public function getOrderProductsByVendorId($order_id, $vendor_id) {
-		$sql = "SELECT op.*, pv.vendor_id, ps.price AS purchase_price FROM " . DB_PREFIX . "order_product op LEFT JOIN " . DB_PREFIX . "product_vendor pv ON (pv.product_id = op.product_id) WHERE order_id = '" . (int)$order_id . "' AND pv.vendor_id = '" . (int)$vendor_id . "'";
-
-		$query = $this->db->query($sql);
-
-		return $query->rows;
-	}
-
 	public function getOrderPrimaryProduct($order_id) {
 		$query = $this->db->query("SELECT DISTINCT * FROM " . DB_PREFIX . "order_product WHERE order_id = '" . (int)$order_id . "' AND primary_type = '1'");
 
@@ -304,19 +297,22 @@ class ModelSaleOrder extends Model {
 		return $query->rows;
 	}
 
-	public function addOrderVendor($order_id, $vendor_id) {
-		$agreement_prefix = str_ireplace('{YEAR}',date('Y'),$this->config->get('config_agreement_vendor_prefix'));
-		$admission_prefix = str_ireplace('{YEAR}',date('Y'),$this->config->get('config_admission_vendor_prefix'));
+	public function addOrderVendor($order_id, $data) {
+		// $agreement_prefix = str_ireplace('{YEAR}',date('Y'),$this->config->get('config_agreement_vendor_prefix'));
+		// $admission_prefix = str_ireplace('{YEAR}',date('Y'),$this->config->get('config_admission_vendor_prefix'));
+		// $purchase_prefix = str_ireplace('{YEAR}',date('Y'),$this->config->get('config_purchase_vendor_prefix'));
 		
-		$query = $this->db->query("SELECT MAX(reference_no) AS reference_no FROM `" . DB_PREFIX . "order_vendor` WHERE agreement_prefix = '" . $this->db->escape($agreement_prefix) . "'");
+		// $query = $this->db->query("SELECT MAX(reference_no) AS reference_no FROM `" . DB_PREFIX . "order_vendor` WHERE agreement_prefix = '" . $this->db->escape($agreement_prefix) . "'");
 
-		if ($query->row['reference_no']) {
-			$reference_no = $query->row['reference_no'] + 1;
-		} else {
-			$reference_no = $this->config->get('config_reference_start') + 1;
-		}
+		// if ($query->row['reference_no']) {
+		// 	$reference_no = $query->row['reference_no'] + 1;
+		// } else {
+		// 	$reference_no = $this->config->get('config_reference_start') + 1;
+		// }
+		// print_r("INSERT INTO " . DB_PREFIX . "order_vendor SET order_id = '" . (int)$order_id . "', vendor_id = '" . (int)$data['vendor_id'] . "', vendor_name = '" . $this->db->escape($data['vendor_name']) . "', vendor_type = '" . $this->db->escape($data['vendor_type']) . "', date_added = NOW(), user_id = '" . (int)$this->user->getId() . "'");die('---breakpoint---');
 		
-		$this->db->query("INSERT INTO " . DB_PREFIX . "order_vendor SET order_id = '" . (int)$order_id . "', vendor_id = '" . (int)$vendor_id . "', agreement_prefix = '" . $this->db->escape($agreement_prefix) . "', admission_prefix = '" . $this->db->escape($admission_prefix) . "', reference_no = '" . (int)$reference_no . "', date_added = NOW(), user_id = '" . (int)$this->user->getId() . "'");
+		// $this->db->query("INSERT INTO " . DB_PREFIX . "order_vendor SET order_id = '" . (int)$order_id . "', vendor_id = '" . (int)$vendor_id . "', agreement_prefix = '" . $this->db->escape($agreement_prefix) . "', admission_prefix = '" . $this->db->escape($admission_prefix) . "', purchase_prefix = '" . $this->db->escape($purchase_prefix) . "', reference_no = '" . (int)$reference_no . "', date_added = NOW(), user_id = '" . (int)$this->user->getId() . "'");
+		$this->db->query("INSERT INTO " . DB_PREFIX . "order_vendor SET order_id = '" . (int)$order_id . "', vendor_id = '" . (int)$data['vendor_id'] . "', vendor_name = '" . $this->db->escape($data['vendor_name']) . "', vendor_type = '" . $this->db->escape($data['vendor_type']) . "', date_added = NOW(), user_id = '" . (int)$this->user->getId() . "'");
 
 		$order_vendor_id = $this->db->getLastId();
 		
@@ -340,7 +336,8 @@ class ModelSaleOrder extends Model {
 	}
 
 	public function getOrderVendors($order_id) {
-		$query = $this->db->query("SELECT ov.*, v.*, vt.name AS vendor_type, vt.deposit, (SELECT SUM(t.amount) FROM " . DB_PREFIX . "transaction t WHERE t.order_id = ov.order_id AND t.label = 'vendor' AND t.label_id = ov.vendor_id) AS total FROM " . DB_PREFIX . "order_vendor ov LEFT JOIN " . DB_PREFIX . "vendor v ON (v.vendor_id = ov.vendor_id) LEFT JOIN " . DB_PREFIX . "vendor_type vt ON (vt.vendor_type_id = v.vendor_type_id) WHERE ov.order_id = '" . (int)$order_id . "' ORDER BY v.vendor_name ASC");
+		$query = $this->db->query("SELECT * FROM " . DB_PREFIX . "order_vendor WHERE order_id = '" . (int)$order_id . "' ORDER BY vendor_name ASC");
+		// $query = $this->db->query("SELECT ov.*, v.*, vt.name AS vendor_type, vt.deposit, (SELECT SUM(t.amount) FROM " . DB_PREFIX . "transaction t WHERE t.order_id = ov.order_id AND t.label = 'vendor' AND t.label_id = ov.vendor_id) AS total FROM " . DB_PREFIX . "order_vendor ov LEFT JOIN " . DB_PREFIX . "vendor v ON (v.vendor_id = ov.vendor_id) LEFT JOIN " . DB_PREFIX . "vendor_type vt ON (vt.vendor_type_id = v.vendor_type_id) WHERE ov.order_id = '" . (int)$order_id . "' ORDER BY v.vendor_name ASC");
 
 		return $query->rows;
 	}
@@ -534,18 +531,21 @@ class ModelSaleOrder extends Model {
 	}
 
 	public function setOrderVendorPrintStatus($order_vendor_id, $type, $printed_status) {
-		if ($this->db->escape($type) == 'agreement') {
-			$this->db->query("UPDATE `" . DB_PREFIX . "order_vendor` SET agreement_printed = '" . (int)$printed_status . "' WHERE order_vendor_id = '" . (int)$order_vendor_id . "'");
-		} elseif ($this->db->escape($type) == 'admission') {
-			$this->db->query("UPDATE `" . DB_PREFIX . "order_vendor` SET admission_printed = '" . (int)$printed_status . "' WHERE order_vendor_id = '" . (int)$order_vendor_id . "'");
-		}
-	}
-
-	public function setOrderVendorPrinted($order_vendor_id, $type) {
-		if ($this->db->escape($type) == 'agreement') {
-			$this->db->query("UPDATE `" . DB_PREFIX . "order_vendor` SET agreement_printed = '1' WHERE order_vendor_id = '" . (int)$order_vendor_id . "'");
-		} elseif ($this->db->escape($type) == 'admission') {
-			$this->db->query("UPDATE `" . DB_PREFIX . "order_vendor` SET admission_printed = '1' WHERE order_vendor_id = '" . (int)$order_vendor_id . "'");
+		switch ($type) {
+			case 'agreement':
+				$this->db->query("UPDATE `" . DB_PREFIX . "order_vendor` SET agreement_printed = '" . (int)$printed_status . "' WHERE order_vendor_id = '" . (int)$order_vendor_id . "'");
+				break;
+			
+			case 'admission':
+				$this->db->query("UPDATE `" . DB_PREFIX . "order_vendor` SET admission_printed = '" . (int)$printed_status . "' WHERE order_vendor_id = '" . (int)$order_vendor_id . "'");
+				break;
+			
+			case 'purchase':
+				$this->db->query("UPDATE `" . DB_PREFIX . "order_vendor` SET purchase_printed = '" . (int)$printed_status . "' WHERE order_vendor_id = '" . (int)$order_vendor_id . "'");
+				break;
+			
+			default:
+				break;
 		}
 	}
 

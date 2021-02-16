@@ -211,10 +211,10 @@ class ModelAccountingAccount extends Model {
 		$childs_data = array();
 
 		$filter_data = array(
-			'component' 	=> $component,
-			'filter_type' 	=> $type,
-			'filter_status'	=> 1,
-			'sort' 			=> 'account_id'
+			'component' 		=> $component,
+			'filter_type' 		=> $type,
+			'filter_status'		=> 1,
+			'sort' 				=> 'account_id'
 		);
 		
 		$accounts = $this->getAccounts($filter_data);

@@ -6,11 +6,11 @@ class ModelLocalisationSlot extends Model {
 		return $query->row;
 	}
 
-	// public function getSlots() {
-		// $sql = "SELECT * FROM " . DB_PREFIX . "slot ORDER BY sort_order ASC";
+	public function getSlots() {
+		$sql = "SELECT * FROM " . DB_PREFIX . "slot ORDER BY sort_order ASC";
 
-		// $query = $this->db->query($sql);
+		$query = $this->db->query($sql);
 
-		// return $query->rows;
-	// }
+		return $query->rows;
+	}
 }

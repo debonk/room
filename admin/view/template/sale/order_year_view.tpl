@@ -26,7 +26,7 @@
       </div>
     </div>
   </div>
-  <script type="text/javascript"><!--
+  <script type="text/javascript">
 const calendar = new Calendar('#calendar', {
 	style: 'background',
 	language: 'id',
@@ -69,5 +69,5 @@ function updateCalendar(year)	{
 document.querySelector('#calendar').addEventListener('clickDay', function(e) {
 	open('index.php?route=sale/order&token=<?php echo $token; ?>&filter_month=' + e.date.toLocaleDateString(), '_self');
 });
-//--></script> 
+</script> 
 <?php echo $footer; ?> 

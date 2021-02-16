@@ -427,7 +427,7 @@ class ControllerSaleOrder extends Controller
 				'event_date'      => date($this->language->get('date_format_short'), strtotime($result['event_date'])),
 				'slot'      	  => $result['slot'],
 				'primary_product' => $result['primary_product'],
-				'ceremony'        => $result['ceremony'],
+				// 'ceremony'        => $result['ceremony'],
 				'customer'        => $result['customer'],
 				'order_status'    => $result['order_status'],
 				'payment_status'  => $payment_status,
@@ -580,17 +580,14 @@ class ControllerSaleOrder extends Controller
 			'text_no_results',
 			'text_none',
 			'text_order_detail',
-			'text_primary_type',
 			'text_product',
 			'text_product_list',
-			'text_secondary_type',
 			'text_select',
 			'entry_address',
 			'entry_address_1',
 			'entry_address_2',
 			'entry_affiliate',
 			'entry_category',
-			'entry_ceremony',
 			'entry_city',
 			'entry_comment',
 			'entry_company',
@@ -611,7 +608,6 @@ class ControllerSaleOrder extends Controller
 			'entry_payment_method',
 			'entry_postcode',
 			'entry_price',
-			'entry_primary_type',
 			'entry_product',
 			'entry_profession',
 			'entry_position',
@@ -619,15 +615,16 @@ class ControllerSaleOrder extends Controller
 			'entry_reward',
 			'entry_slot',
 			'entry_store',
+			'entry_sub_category',
 			'entry_telephone',
 			'entry_title',
 			'entry_zone',
 			'entry_zone_code',
 			'column_action',
+			'column_category',
 			'column_model',
 			'column_price',
 			'column_product',
-			'column_product_type',
 			'column_quantity',
 			'column_total',
 			'column_unit_class',
@@ -740,7 +737,7 @@ class ControllerSaleOrder extends Controller
 			$data['title'] = $order_info['title'];
 			$data['event_date'] = date('Y-m-d', strtotime($order_info['event_date']));
 			$data['slot_id'] = $order_info['slot_id'];
-			$data['ceremony_id'] = $order_info['ceremony_id'];
+			// $data['ceremony_id'] = $order_info['ceremony_id'];
 			// $data['primary_type'] = $order_info['primary_type'];
 
 			$data['payment_firstname'] = $order_info['payment_firstname'];
@@ -776,7 +773,13 @@ class ControllerSaleOrder extends Controller
 
 			$products = $this->model_sale_order->getOrderProducts($this->request->get['order_id']);
 
+			$this->load->model('catalog/product');
+
 			foreach ($products as $product) {
+				if ($product['primary_type']) {
+					$product_slots = $this->model_catalog_product->getProductSlots($product['product_id']);
+				}
+
 				$data['order_products'][] = array(
 					'product_id'   => $product['product_id'],
 					'name'         => $product['name'],
@@ -787,7 +790,8 @@ class ControllerSaleOrder extends Controller
 					'total'        => $product['total'],
 					'reward'       => $product['reward'],
 					'primary_type' => $product['primary_type'],
-					'category'     => $product['category'],
+					'category_id'  => $product['category_id'],
+					'category'     => $product['category']
 				);
 			}
 
@@ -845,7 +849,7 @@ class ControllerSaleOrder extends Controller
 			}
 
 			$data['slot_id'] = '';
-			$data['ceremony_id'] = '';
+			// $data['ceremony_id'] = '';
 			// $data['primary_type'] = '';
 
 			$data['payment_firstname'] = '';
@@ -918,15 +922,46 @@ class ControllerSaleOrder extends Controller
 
 		$data['customer_groups'] = $this->model_customer_customer_group->getCustomerGroups();
 
+		// Categories
+		$this->load->model('catalog/category');
+		$data['main_categories'] = [];
+
+		$main_categories = $this->model_catalog_category->getCategoriesByParentId();
+
+		foreach ($main_categories as $category) {
+			if ($category['top']) {
+				$data['main_categories'][] = [
+					'category_id'	=> $category['category_id'],
+					'name'			=> $category['name'],
+				];
+			}
+		}
+
 		// Slots
+		$data['slots'] = array();
+
 		$this->load->model('localisation/slot');
 
-		$data['slots'] = $this->model_localisation_slot->getSlots();
+		$slots = $this->model_localisation_slot->getSlots();
+
+		foreach ($slots as $slot) {
+			if (isset($product_slots[$slot['slot_id']])) {
+				$prefix = $product_slots[$slot['slot_id']]['price'] < 0 ? '-' : '+';
+				$text_price = ' (' . $prefix . ' ' . $this->currency->format($product_slots[$slot['slot_id']]['price'], $this->session->data['currency']) . ')';
+			} else {
+				$text_price = '';
+			}
+
+			$data['slots'][] = array(
+				'slot_id'		=> $slot['slot_id'],
+				'name'			=> $slot['name'] . $text_price
+			);
+		}
 
 		// Ceremonies
-		$this->load->model('localisation/ceremony');
+		// $this->load->model('localisation/ceremony');
 
-		$data['ceremonies'] = $this->model_localisation_ceremony->getCeremonies();
+		// $data['ceremonies'] = $this->model_localisation_ceremony->getCeremonies();
 
 		// Custom Fields
 		$this->load->model('customer/custom_field');
@@ -1013,41 +1048,41 @@ class ControllerSaleOrder extends Controller
 
 			$language_items = array(
 				'heading_title',
-				'text_order_detail',
-				'text_title',
-				'text_event_date',
-				'text_slot',
-				'text_ceremony',
-				'text_date_added',
-				'text_payment_method',
+				'text_accept_language',
+				'text_account_custom_field',
+				'text_affiliate',
+				'text_browser',
+				'text_comment',
+				'text_confirm',
 				'text_customer_detail',
 				'text_customer',
+				'text_date_added',
 				'text_email',
-				'text_telephone',
-				'text_option',
-				'text_invoice',
-				'text_reward',
-				'text_affiliate',
-				'text_username',
-				'text_payment_address',
-				'text_primary_type',
-				'text_secondary_type',
-				'text_comment',
-				'text_account_custom_field',
-				'text_payment_custom_field',
-				'text_browser',
-				'text_ip',
+				'text_event_date',
 				'text_forwarded_ip',
-				'text_user_agent',
-				'text_accept_language',
-				'text_history',
 				'text_history_add',
+				'text_history',
+				'text_invoice',
+				'text_ip',
 				'text_loading',
-				'text_vendor',
-				'text_confirm',
-				'text_print_confirm',
+				'text_option',
+				'text_order_detail',
+				'text_package',
+				'text_payment_address',
+				'text_payment_custom_field',
+				'text_payment_method',
 				'text_preview',
+				'text_print_confirm',
 				'text_print',
+				'text_reward',
+				'text_sales',
+				'text_secondary_type',
+				'text_slot',
+				'text_telephone',
+				'text_title',
+				'text_user_agent',
+				'text_vendor',
+				'text_venue',
 				'entry_vendor',
 				'entry_order_status',
 				'entry_date',
@@ -1055,10 +1090,10 @@ class ControllerSaleOrder extends Controller
 				'entry_notify',
 				'entry_override',
 				'entry_comment',
+				'column_category',
 				'column_model',
 				'column_price',
 				'column_product',
-				'column_product_type',
 				'column_quantity',
 				'column_total',
 				'column_phase_title',
@@ -1069,10 +1104,12 @@ class ControllerSaleOrder extends Controller
 				'help_override',
 				'tab_additional',
 				'tab_history',
+				'tab_order',
+				'tab_customer',
+				'tab_purchase',
 				'tab_vendor',
 				'button_agreement',
 				'button_receipt',
-				'button_admission',
 				'button_cancel',
 				'button_document',
 				'button_edit',
@@ -1083,8 +1120,6 @@ class ControllerSaleOrder extends Controller
 				'button_commission_add',
 				'button_commission_remove',
 				'button_vendor_add',
-				'button_vendor_agreement',
-				'button_vendor_purchase',
 				'button_vendor_remove',
 				'button_history_add',
 				'button_ip_add'
@@ -1175,15 +1210,8 @@ class ControllerSaleOrder extends Controller
 			}
 
 			$data['title'] = $order_info['title'];
-
-			if ($order_info['session_slot']) {
-				$data['session_slot'] = explode(': ', $order_info['session_slot'])[1];
-			} else {
-				$data['session_slot'] = '-';
-			}
-
 			$data['slot'] = $order_info['slot'];
-			$data['ceremony'] = $order_info['ceremony'];
+
 			$data['date_added'] = $this->model_localisation_local_date->getInFormatDate($order_info['date_added'])['long_date'];
 
 			$data['store_url'] = $this->request->server['HTTPS'] ? str_replace("http", "https", $order_info['store_url']) : $order_info['store_url'];
@@ -1194,7 +1222,10 @@ class ControllerSaleOrder extends Controller
 				$data['invoice_no'] = '';
 			}
 
-			$data['username'] = $order_info['username'];
+			$this->load->model('user/user');
+			$sales_info = $this->model_user_user->getUserByUsername($order_info['username']);
+
+			$data['sales'] = $sales_info['firstname'] . ' ' . $sales_info['lastname'];
 
 			$data['firstname'] = $order_info['firstname'];
 			$data['lastname'] = $order_info['lastname'];
@@ -1259,6 +1290,9 @@ class ControllerSaleOrder extends Controller
 
 			$data['payment_address'] = str_replace(array("\r\n", "\r", "\n"), '<br />', preg_replace(array("/\s\s+/", "/\r\r+/", "/\n\n+/"), '<br />', trim(str_replace($find, $replace, $format))));
 
+			$data['package'] = '';
+			$data['venue'] = '';
+
 			// Uploaded files
 			$this->load->model('tool/upload');
 
@@ -1267,6 +1301,10 @@ class ControllerSaleOrder extends Controller
 			$products = $this->model_sale_order->getOrderProducts($this->request->get['order_id']);
 
 			foreach ($products as $product) {
+				if ($product['primary_type']) {
+					$data['package'] = $product['name'];
+				}
+
 				$option_data = array();
 
 				$options = $this->model_sale_order->getOrderOptions($this->request->get['order_id'], $product['order_product_id']);
@@ -1297,11 +1335,18 @@ class ControllerSaleOrder extends Controller
 				$attributes = $this->model_sale_order->getOrderAttributes($this->request->get['order_id'], $product['order_product_id']);
 
 				foreach ($attributes as $attribute) {
+					if ($product['primary_type']) {
+						if ($attribute['attribute_group'] == 'Kelengkapan Paket' && $attribute['attribute'] == 'Venue') {
+							$data['venue'] = $attribute['text'];
+						}
+					}
+
 					$attribute_data[$attribute['attribute_group']][] = array(
 						'name'	=> $attribute['attribute'],
 						'value'	=> $attribute['text']
 					);
 				}
+
 
 				$data['products'][] = array(
 					'order_product_id' => $product['order_product_id'],
@@ -1369,29 +1414,73 @@ class ControllerSaleOrder extends Controller
 
 			$order_vendors = $this->model_sale_order->getOrderVendors($order_id);
 
-			if ($this->config->get('config_complete_status_required') && !in_array($order_info['order_status_id'], $this->config->get('config_complete_status'))) {
-				$paid_off_status = false;
-			} else {
-				$paid_off_status = true;
-			}
+			// if ($this->config->get('config_complete_status_required') && !in_array($order_info['order_status_id'], $this->config->get('config_complete_status'))) {
+			// 	$paid_off_status = false;
+			// } else {
+			// 	$paid_off_status = true;
+			// }
+			// var_dump($order_vendors);die('---breakpoint---');
+
+			$this->load->model('sale/document');
 
 			foreach ($order_vendors as $order_vendor) {
-				if ($paid_off_status && $order_vendor['total'] >= $order_vendor['deposit']) {
-					$admission_href = $this->url->link('sale/order/admission', 'token=' . $this->session->data['token'] . '&order_id=' . $order_id . '&vendor_id=' . $order_vendor['vendor_id'], true);
-				} else {
-					$admission_href = '';
+				$filter_data = [
+					'filter_order_id'		=> $order_id,
+					'filter_client_type'	=> 'vendor',
+					'filter_client_id'		=> $order_vendor['order_vendor_id'],
+					'sort'					=> 't.date',
+					'order'					=> 'ASC'
+				];
+	
+				$document_data = [];
+
+				$order_documents = $this->model_sale_document->getOrderDocuments($filter_data);
+
+				foreach ($order_documents as $order_document) {
+					if ($order_document['document_type'] == 'agreement') {
+						$href = $this->url->link('sale/order/vendorAgreement', 'token=' . $this->session->data['token'] . '&order_id=' . $order_id . '&vendor_id=' . $order_vendor['vendor_id'], true);
+					} elseif ($order_document['document_type'] == 'admission') {
+						$href = $this->url->link('sale/order/admission', 'token=' . $this->session->data['token'] . '&order_id=' . $order_id . '&vendor_id=' . $order_vendor['vendor_id'], true);
+					} else {
+						$href = '';
+					}
+
+					$document_data[] = [
+						'href'		=> $href,
+						'printed'	=> $order_document['printed']
+					];
 				}
+
+
+				// if (isset($order_documents['vendor_agreement'])) {
+				// 	$agreement_href = $this->url->link('sale/order/vendorAgreement', 'token=' . $this->session->data['token'] . '&order_id=' . $order_id . '&vendor_id=' . $order_vendor['vendor_id'], true);
+				// 	$agreement_printed = $order_documents['vendor_agreement']['printed'] ? 'preview' : 'print';
+				// } else {
+				// 	$agreement_href = '';
+				// 	$agreement_printed = '';
+				// }
+
+				// if (isset($order_documents['vendor-admission'])) {
+				// 	$admission_href = $this->url->link('sale/order/admission', 'token=' . $this->session->data['token'] . '&order_id=' . $order_id . '&vendor_id=' . $order_vendor['vendor_id'], true);
+				// 	$admission_printed = $order_documents['vendor_admission']['printed'] ? 'preview' : 'print';
+				// } else {
+				// 	$admission_href = '';
+				// 	$admission_printed = '';
+				// }
 
 				$data['order_vendors'][] = array(
 					'vendor_id' 		=> $order_vendor['vendor_id'],
 					'title' 			=> $order_vendor['vendor_name'] . ' - ' . $order_vendor['vendor_type'],
-					'agreement_href'	=> $this->url->link('sale/order/vendorAgreement', 'token=' . $this->session->data['token'] . '&order_id=' . $order_id . '&vendor_id=' . $order_vendor['vendor_id'], true),
-					'admission_href'	=> $admission_href,
-					'agreement_printed'	=> $order_vendor['agreement_printed'] ? 'preview' : 'print',
-					'admission_printed'	=> $order_vendor['admission_printed'] ? 'preview' : 'print'
+					'document'			=> $document_data
+					// 'agreement_href'	=> $agreement_href,
+					// 'admission_href'	=> $admission_href,
+					// 'agreement_printed'	=> $agreement_printed,
+					// 'admission_printed'	=> $admission_printed
 				);
 			}
+			// var_dump($data['order_vendors']);die('---breakpoint---');
 
+			# Vendor List
 			$this->load->model('catalog/vendor');
 
 			$data['vendors'] = array();
@@ -1401,7 +1490,7 @@ class ControllerSaleOrder extends Controller
 				'sort'			=> 'vt.sort_order ASC, v.vendor_name',
 				'order'         => 'ASC'
 			);
-				
+
 			$vendors = $this->model_catalog_vendor->getVendors($filter_data);
 
 			foreach ($vendors as $vendor) {
@@ -1412,6 +1501,8 @@ class ControllerSaleOrder extends Controller
 					);
 				}
 			}
+			// var_dump($data['order_vendors']);
+			// die('---breakpoint---');
 
 			//Payment Phase
 			$this->load->model('localisation/order_status');
@@ -1719,7 +1810,7 @@ class ControllerSaleOrder extends Controller
 
 				$order_summary = sprintf($this->language->get('text_order_summary'), $result['title'], $result['primary_product'], $result['customer'], $result['order_status']);
 
-					// Check payment status
+				// Check payment status
 				$payment_phases = $this->model_sale_order->getPaymentPhases($result['order_id']);
 
 				$auto_expired = false;
@@ -1746,9 +1837,6 @@ class ControllerSaleOrder extends Controller
 				);
 			}
 		}
-		// print_r($json['orders']);
-		// print_r($slot_remove);
-		// die('---breakpoint---');
 
 		$this->response->addHeader('Content-Type: application/json');
 		$this->response->setOutput(json_encode($json));
@@ -1790,40 +1878,49 @@ class ControllerSaleOrder extends Controller
 
 		$json = array();
 
-		// if (!$this->user->hasPermission('modify', 'sale/order')) { //Sementara dobel ijin sebelum membuat mini order oleh marketing
-		if (!$this->user->hasPermission('modify', 'sale/order') || !$this->user->hasPermission('modify', 'catalog/vendor')) {
+		if (!$this->user->hasPermission('modify', 'sale/order') || !$this->user->hasPermission('modify', 'sale/vendor')) {
 			$json['error'] = $this->language->get('error_permission');
 		}
 
 		if (!$json) {
-			if (isset($this->request->get['order_id'])) {
-				$order_id = $this->request->get['order_id'];
-			} else {
-				$order_id = 0;
-			}
+			$order_id = isset($this->request->get['order_id']) ? $this->request->get['order_id'] : 0;
 
 			$this->load->model('sale/order');
 
 			$order_info = $this->model_sale_order->getOrder($order_id);
-			$order_vendors = $this->model_sale_order->getOrderVendors($order_id);
 
 			if ($order_info) {
-				if (!$order_info['invoice_no']) {
-					$this->model_sale_order->createInvoiceNo($order_id);
-				}
+				$this->load->model('catalog/vendor');
+				$vendor_info = $this->model_catalog_vendor->getVendor($this->request->post['vendor_id']);
 
-				if (!in_array($this->request->post['vendor_id'], array_column($order_vendors, 'vendor_id'))) {
-					$this->model_sale_order->addOrderVendor($order_id, $this->request->post['vendor_id']);
-
-					$this->load->model('catalog/vendor');
-
-					$vendor_info = $this->model_catalog_vendor->getVendor($this->request->post['vendor_id']);
-
-					$json['title'] = $vendor_info['vendor_name'] . ' - ' . $vendor_info['vendor_type'];
-					$json['agreement_href'] = $this->url->link('sale/order/vendorAgreement', 'token=' . $this->session->data['token'] . '&order_id=' . $order_id . '&vendor_id=' . $vendor_info['vendor_id'], true);
+				if (!$vendor_info) {
+					$json['error'] = $this->language->get('error_vendor');
 				}
 			} else {
 				$json['error'] = $this->language->get('error_order');
+			}
+		}
+
+		if (!$json) {
+			if (!$order_info['invoice_no']) {
+				$this->model_sale_order->createInvoiceNo($order_id);
+			}
+
+			$order_vendors = $this->model_sale_order->getOrderVendors($order_id);
+
+			if (!in_array($this->request->post['vendor_id'], array_column($order_vendors, 'vendor_id'))) {
+
+				$vendor_data = [
+					'vendor_id'		=> $vendor_info['vendor_id'],
+					'vendor_name'	=> $vendor_info['vendor_name'],
+					'vendor_type'	=> $vendor_info['vendor_type']
+				];
+
+				$this->model_sale_order->addOrderVendor($order_id, $vendor_data);
+
+				$json['title'] = $vendor_info['vendor_name'] . ' - ' . $vendor_info['vendor_type'];
+
+				$json['success'] = $this->language->get('text_vendor_added');
 			}
 		}
 
@@ -1837,8 +1934,7 @@ class ControllerSaleOrder extends Controller
 
 		$json = array();
 
-		// if (!$this->user->hasPermission('modify', 'sale/order')) { //Sementara dobel ijin sebelum membuat mini order oleh marketing
-		if (!$this->user->hasPermission('modify', 'sale/order') || !$this->user->hasPermission('modify', 'catalog/vendor')) {
+		if (!$this->user->hasPermission('modify', 'sale/order') || !$this->user->hasPermission('modify', 'sale/vendor')) {
 			$json['error'] = $this->language->get('error_permission');
 		}
 
@@ -1849,6 +1945,15 @@ class ControllerSaleOrder extends Controller
 				$order_id = 0;
 			}
 
+			$this->load->model('sale/purchase');
+			$order_purchase_info = $this->model_sale_purchase->getOrderPurchase($order_id, $this->request->post['vendor_id']);
+
+			if ($order_purchase_info) {
+				$json['error'] = $this->language->get('error_order_purchase');
+			}
+		}
+
+		if (!$json) {
 			$this->load->model('sale/order');
 			$order_info = $this->model_sale_order->getOrder($order_id);
 
@@ -1869,6 +1974,8 @@ class ControllerSaleOrder extends Controller
 				$vendor_info = $this->model_catalog_vendor->getVendor($this->request->post['vendor_id']);
 
 				$json['title'] 	= $vendor_info['vendor_name'] . ' - ' . $vendor_info['vendor_type'];
+
+				$json['success'] = $this->language->get('text_vendor_removed');
 			} else {
 				$json['error'] = sprintf($this->language->get('error_vendor_transaction'), $this->currency->format($transaction_total, $order_info['currency_code'], $order_info['currency_value']));
 			}
@@ -2068,280 +2175,6 @@ class ControllerSaleOrder extends Controller
 		$this->response->setOutput($this->load->view('sale/order_history', $data));
 	}
 
-	public function vendorTransaction()
-	{
-		$this->load->language('sale/order');
-
-		$language_items = array(
-			'text_no_results',
-			'text_vendor',
-			'text_vendor_transaction',
-			'text_vendor_transaction_add',
-			'text_loading',
-			'text_select',
-			'column_telephone',
-			'column_email',
-			'column_vendor_total',
-			'column_date',
-			'column_date_added',
-			'column_vendor',
-			'column_payment_method',
-			'column_description',
-			'column_amount',
-			'column_username',
-			'entry_vendor',
-			'entry_date',
-			'entry_payment_method',
-			'entry_description',
-			'entry_amount',
-			'help_amount',
-			'button_receipt',
-			'button_transaction_add',
-			'button_vendor_remove',
-			'button_admission'
-		);
-		foreach ($language_items as $language_item) {
-			$data[$language_item] = $this->language->get($language_item);
-		}
-
-		if (isset($this->request->get['order_id'])) {
-			$order_id = $this->request->get['order_id'];
-		} else {
-			$order_id = 0;
-		}
-
-		if (isset($this->request->get['page'])) {
-			$page = $this->request->get['page'];
-		} else {
-			$page = 1;
-		}
-
-		$limit = 10;
-
-		$this->load->model('sale/order');
-		$this->load->model('accounting/transaction');
-		$this->load->model('catalog/vendor');
-
-		$order_info = $this->model_sale_order->getOrder($order_id);
-
-		$data['order_vendors_summary'] = array();
-
-		$vendors_summary = $this->model_accounting_transaction->getTransactionsLabelSummaryByOrderId($order_id, 'vendor');
-
-		foreach ($vendors_summary as $vendor_summary) {
-			$vendor_info = $this->model_catalog_vendor->getVendor($vendor_summary['label_id']);
-
-			$data['order_vendors_summary'][] = array(
-				'title' 	=> $vendor_info['vendor_name'] . ' - ' . $vendor_info['vendor_type'],
-				'telephone'	=> $vendor_info['telephone'],
-				'email'		=> $vendor_info['email'],
-				'href'		=> $this->url->link('catalog/vendor/edit', 'token=' . $this->session->data['token'] . '&vendor_id=' . $vendor_info['vendor_id'], true),
-				'total'		=> $this->currency->format($vendor_summary['total'], $order_info['currency_code'], $order_info['currency_value'])
-			);
-		}
-
-		$data['vendor_transactions'] = array();
-
-		$filter_data = array(
-			'label'		=> 'vendor',
-			'sort'		=> 't.date',
-			'order'		=> 'DESC',
-			'start'		=> ($page - 1) * $limit,
-			'limit'		=> $limit
-		);
-
-		$results = $this->model_accounting_transaction->getTransactionsByOrderId($order_id, $filter_data);
-
-		foreach ($results as $result) {
-			$data['vendor_transactions'][] = array(
-				'date'				=> date($this->language->get('date_format_short'), strtotime($result['date'])),
-				'customer_name'		=> $result['customer_name'],
-				'payment_method'	=> $result['payment_method'],
-				'description'		=> $result['description'],
-				'amount'			=> $this->currency->format($result['amount'], $order_info['currency_code'], $order_info['currency_value']),
-				'date_added'		=> date($this->language->get('date_format_short'), strtotime($result['date_added'])),
-				'username'			=> $result['username'],
-				'receipt'	 		=> $this->url->link('sale/order/receipt', 'token=' . $this->session->data['token'] . '&transaction_id=' . (int)$result['transaction_id'], true),
-				'print'				=> $result['printed'] ? 'preview' : 'print'
-			);
-		}
-
-		$vendor_transaction_count = $this->model_accounting_transaction->getTransactionsCountByOrderId($order_id, $filter_data);
-
-		$pagination = new Pagination();
-		$pagination->total = $vendor_transaction_count;
-		$pagination->page = $page;
-		$pagination->limit = $limit;
-		$pagination->url = $this->url->link('sale/order/vendorTransaction', 'token=' . $this->session->data['token'] . '&order_id=' . $this->request->get['order_id'] . '&page={page}', true);
-
-		$data['pagination'] = $pagination->render();
-
-		$data['results'] = sprintf($this->language->get('text_pagination'), ($vendor_transaction_count) ? (($page - 1) * $limit) + 1 : 0, ((($page - 1) * $limit) > ($vendor_transaction_count - $limit)) ? $vendor_transaction_count : ((($page - 1) * $limit) + $limit), $vendor_transaction_count, ceil($vendor_transaction_count / $limit));
-
-		// Vendors
-		$data['order_vendors'] = array();
-		$data['payment_accounts'] = array();
-
-		$order_vendors = $this->model_sale_order->getOrderVendors($order_id);
-
-		if ($order_vendors) {
-			foreach ($order_vendors as $order_vendor) {
-				$data['order_vendors'][] = array(
-					'vendor_id' => $order_vendor['vendor_id'],
-					'title' 	=> $order_vendor['vendor_name'] . ' - ' . $order_vendor['vendor_type']
-				);
-			}
-
-			// Payment Methods
-			$this->load->model('extension/extension');
-
-			$payment_accounts = $this->model_extension_extension->getInstalled('payment');
-
-			foreach ($payment_accounts as $payment_account) {
-				if ($this->config->get($payment_account . '_status')) {
-					$this->load->language('payment/' . $payment_account);
-
-					$data['payment_accounts'][$payment_account] = $this->language->get('heading_title');
-				}
-			}
-		}
-
-		$data['token'] = $this->session->data['token'];
-		$data['order_id'] = $order_id;
-
-		$this->response->setOutput($this->load->view('sale/order_vendor_transaction', $data));
-	}
-
-	public function transaction()
-	{
-		$this->load->language('sale/order');
-
-		$json = array();
-
-		// if (!$this->user->hasPermission('modify', 'sale/order')) { //Sementara dobel ijin sebelum membuat mini order oleh marketing
-		if (!$this->user->hasPermission('modify', 'sale/order') || !$this->user->hasPermission('modify', 'catalog/vendor')) {
-			$json['error'] = $this->language->get('error_permission');
-		} else {
-			if (empty($this->request->post['transaction_vendor_id'])) {
-				$json['error_transaction_vendor'] = $this->language->get('error_transaction_vendor');
-			}
-
-			if (empty($this->request->post['transaction_payment_code'])) {
-				$json['error_transaction_payment_code'] = $this->language->get('error_transaction_payment_code');
-			}
-
-			if (empty($this->request->post['transaction_date'])) {
-				$json['error_transaction_date'] = $this->language->get('error_transaction_date');
-			}
-
-			if ((utf8_strlen($this->request->post['transaction_description']) < 5) || (utf8_strlen($this->request->post['transaction_description']) > 256)) {
-				$json['error_transaction_description'] = $this->language->get('error_transaction_description');
-			}
-
-			if (empty((float)$this->request->post['transaction_amount'])) {
-				$json['error_transaction_amount'] = $this->language->get('error_transaction_amount');
-			}
-
-			if ($json) {
-				$json['error'] = $this->language->get('error_warning');
-			}
-		}
-
-		if (!$json) {
-			if (isset($this->request->get['order_id'])) {
-				$order_id = $this->request->get['order_id'];
-			} else {
-				$order_id = 0;
-			}
-
-			$this->load->model('sale/order');
-
-			$order_info = $this->model_sale_order->getOrder($order_id);
-			$order_vendors = $this->model_sale_order->getOrderVendors($order_id);
-
-			if ($order_info) {
-				if (!in_array($this->request->post['transaction_vendor_id'], array_column($order_vendors, 'vendor_id'))) {
-					$json['error_transaction_vendor'] = $this->language->get('error_vendor_not_found');
-				}
-
-				$this->load->model('accounting/account');
-
-				$asset_id = $this->config->get($this->request->post['transaction_payment_code'] . '_asset_id');
-
-				$asset_info = $this->model_accounting_account->getAccount($asset_id);
-
-				if (empty($asset_info)) {
-					$asset_id = $this->config->get('config_asset_account_id');
-
-					$asset_replacement_info = $this->model_accounting_account->getAccount($asset_id);
-
-					if (empty($asset_replacement_info)) {
-						$json['error'] = $this->language->get('error_asset_not_found');
-					}
-				}
-			} else {
-				$json['error'] = $this->language->get('error_order');
-			}
-		}
-
-		if (!$json) {
-			$this->load->model('catalog/vendor');
-			$this->load->model('accounting/transaction');
-
-			$vendor_info = $this->model_catalog_vendor->getVendor($this->request->post['transaction_vendor_id']);
-
-			$reference_no = str_ireplace('{YEAR}', date('Y', strtotime($this->request->post['transaction_date'])), $this->config->get('config_receipt_vendor_prefix'));
-
-			$transaction_no_max = $this->model_accounting_transaction->getTransactionNoMax($reference_no);
-
-			if ($transaction_no_max) {
-				$transaction_no = $transaction_no_max + 1;
-			} else {
-				$transaction_no = $this->config->get('config_reference_start') + 1;
-			}
-
-			$this->load->language('payment/' . $this->request->post['transaction_payment_code']);
-
-			$payment_method = $this->language->get('heading_title');
-
-			$transaction_data = array(
-				'order_id'			=> $order_id,
-				'account_from_id'	=> $this->config->get('config_vendor_deposit_account_id'),
-				'account_to_id'		=> $asset_id,
-				'label'				=> 'vendor',
-				'label_id'			=> $this->request->post['transaction_vendor_id'],
-				'date' 				=> $this->request->post['transaction_date'],
-				'payment_method'	=> $payment_method,
-				'description' 		=> $this->request->post['transaction_description'],
-				'amount' 			=> $this->request->post['transaction_amount'],
-				'customer_name' 	=> $vendor_info['vendor_name'],
-				'reference_no'		=> $reference_no,
-				'transaction_no' 	=> $transaction_no
-			);
-
-			$this->model_accounting_transaction->addTransaction($transaction_data);
-
-			$transaction_total = $this->model_accounting_transaction->getTransactionsTotalByOrderId($order_id, $transaction_data);
-
-			$json['success'] = $this->language->get('text_transaction_added');
-
-			if ($this->config->get('config_complete_status_required') && !in_array($order_info['order_status_id'], $this->config->get('config_complete_status'))) {
-				$paid_off_status = false;
-			} else {
-				$paid_off_status = true;
-			}
-
-			if ($paid_off_status && $transaction_total >= $this->config->get('config_deposit')) {
-				$json['admission_href'] = $this->url->link('sale/order/admission', 'token=' . $this->session->data['token'] . '&order_id=' . $order_id . '&vendor_id=' . $this->request->post['transaction_vendor_id'], true);
-			} else {
-				$json['admission_href'] = '';
-			}
-		}
-
-		$this->response->addHeader('Content-Type: application/json');
-		$this->response->setOutput(json_encode($json));
-	}
-
 	public function agreement()
 	{
 		$this->load->model('sale/order');
@@ -2355,13 +2188,13 @@ class ControllerSaleOrder extends Controller
 		$order_info = $this->model_sale_order->getOrder($order_id);
 
 		$payment_phases = $this->model_sale_order->getPaymentPhases($order_id);
-	
+
 		if ($order_info && $payment_phases['initial_payment']['paid_status']) {
 			$this->load->model('setting/setting');
 			$this->load->model('localisation/local_date');
 
 			$this->load->language('sale/order');
-			$this->load->language('sale/order_print');
+			$this->load->language('sale/document');
 
 			if ($this->request->server['HTTPS']) {
 				$data['base'] = HTTPS_SERVER;
@@ -2374,40 +2207,39 @@ class ControllerSaleOrder extends Controller
 
 			$language_items = array(
 				'title_agreement',
-				'text_mark',
-				'text_invoice_no',
-				'text_customer',
-				'text_id_no',
-				'text_customer_group',
-				'text_company',
 				'text_address',
-				'text_profession',
-				'text_position',
-				'text_telephone',
-				'text_day_date',
-				'text_slot',
-				// 'text_ceremony',
-				'text_category',
-				'text_product_name',
-				'text_quantity',
-				'text_amount',
-				'text_kelengkapan',
-				'text_info_tambahan',
-				'text_layanan_tambahan',
-				'text_order_vendor',
-				'text_total',
-				'text_telah_bayar',
-				'text_snk',
-				'text_transfer_ke',
 				'text_belum_ppn',
-				'text_ubah_tanggal',
-				'text_pembatalan_acara',
+				'text_comment',
+				'text_company',
+				'text_customer_group',
+				'text_customer',
+				'text_day_date',
+				'text_dst',
+				'text_id_no',
+				'text_info_tambahan',
+				'text_invoice_no',
+				'text_kelengkapan',
+				'text_layanan_tambahan',
+				'text_mark',
+				'text_order_vendor',
+				'text_package',
 				'text_pembatalan_1',
 				'text_pembatalan_2',
 				'text_pembatalan_3',
+				'text_pembatalan_acara',
 				'text_pihak_penyewa',
-				'text_dst',
-				'text_comment'
+				'text_position',
+				'text_price',
+				'text_profession',
+				'text_quantity',
+				'text_slot',
+				'text_snk',
+				'text_telah_bayar',
+				'text_telephone',
+				'text_total',
+				'text_transfer_ke',
+				'text_ubah_tanggal',
+				'text_venue',
 			);
 			foreach ($language_items as $language_item) {
 				$data[$language_item] = $this->language->get($language_item);
@@ -2506,9 +2338,9 @@ class ControllerSaleOrder extends Controller
 
 			// Event Data
 			$event_date_in = $this->model_localisation_local_date->getInFormatDate($order_info['event_date']);
-			
+
 			$data['event_date'] = $event_date_in['day'] . '/' . $event_date_in['long_date'];
-			// $data['slot'] = $order_info['slot'];
+			$data['slot'] = $order_info['slot'];
 			// $data['ceremony'] = $order_info['ceremony'];
 
 			// Product Data
@@ -2545,10 +2377,14 @@ class ControllerSaleOrder extends Controller
 				$attributes = $this->model_sale_order->getOrderAttributes($order_id, $product['order_product_id']);
 
 				foreach ($attributes as $attribute) {
-					$attribute_data[$attribute['attribute_group']][] = array(
-						'name'	=> $attribute['attribute'],
-						'value'	=> $attribute['text']
-					);
+					if ($product['primary_type'] && $attribute['attribute'] == 'Venue') {
+						$data['venue'] = $attribute['text'];
+					} else {
+						$attribute_data[$attribute['attribute_group']][] = array(
+							'name'	=> $attribute['attribute'],
+							'value'	=> $attribute['text']
+						);
+					}
 				}
 
 				if ($product['primary_type']) {
@@ -2569,9 +2405,12 @@ class ControllerSaleOrder extends Controller
 				);
 			}
 
-			$data['text_termasuk'] = sprintf($this->language->get('text_termasuk'), $data['products']['primary'][0]['name']);
+			$data['product_primary'] = $data['products']['primary'][0];
 
-			$data['slot'] = explode(': ', $data['products']['primary'][0]['option'][0]['value'])[1];
+			$data['package'] = $data['products']['primary'][0]['name'];
+			$data['price'] = $data['products']['primary'][0]['total'];
+
+			$data['text_termasuk'] = sprintf($this->language->get('text_termasuk'), $data['products']['primary'][0]['name']);
 
 			// Vendors
 			$data['order_vendors'] = array();
@@ -2653,13 +2492,11 @@ class ControllerSaleOrder extends Controller
 
 			$data['comment'] = nl2br($order_info['comment']);
 
-			if (!$order_info['printed'] && isset($this->request->get['print']) && $this->request->get['print'] == 1) {
-				$print = 1;
-			} else {
-				$print = 0;
-			}
-	
-			if (!$print || !$this->user->hasPermission('modify', 'sale/order')) {
+			$print = isset($this->request->get['print']) && $this->request->get['print'] == 1;
+			$preview = $order_info['printed'] || !$print || !$this->user->hasPermission('modify', 'sale/order');
+			// $preview = 0;// Development Purpose
+
+			if ($preview) {
 				$data['preview'] = 1;
 				$data['letter_content'] = 'letter-content';
 			} else {
@@ -2696,7 +2533,7 @@ class ControllerSaleOrder extends Controller
 			$this->load->model('localisation/local_date');
 
 			$this->load->language('sale/order');
-			$this->load->language('sale/order_print');
+			$this->load->language('sale/document');
 
 			if ($this->request->server['HTTPS']) {
 				$data['base'] = HTTPS_SERVER;
@@ -2753,7 +2590,7 @@ class ControllerSaleOrder extends Controller
 				$data['text_subject'] = $this->language->get('text_to');
 			}
 
-			$data['invoice_no'] = $transaction_info['reference_no'] . str_pad($transaction_info['transaction_no'], 4, 0, STR_PAD_LEFT);
+			$data['invoice_no'] = $transaction_info['reference'];
 
 			// Event Data
 			if (!$order_info['title']) {
@@ -2767,7 +2604,8 @@ class ControllerSaleOrder extends Controller
 
 			// Transaction Info
 			$transaction_date_in = $this->model_localisation_local_date->getInFormatDate($transaction_info['date']);
-			$transaction_title	= $transaction_info['description'];
+			$transaction_title	= $transaction_info['transaction_type'];
+			// $transaction_title	= $transaction_info['description'];
 
 			$data['date']	= $transaction_date_in['long_date'];
 			$data['amount']	= $this->currency->format(abs($transaction_info['amount']), $order_info['currency_code'], $order_info['currency_value']);
@@ -2838,7 +2676,11 @@ class ControllerSaleOrder extends Controller
 			$data['manajemen'] = '( ' . $user_info['firstname'] . ' ' . $user_info['lastname'] . ' )';
 			$data['text_manajemen'] = $user_info['user_group'];
 
-			if ($transaction_info['printed'] || !$this->user->hasPermission('modify', 'sale/order')) {
+			$print = isset($this->request->get['print']) && $this->request->get['print'] == 1;
+			$preview = $transaction_info['printed'] || !$print || !$this->user->hasPermission('modify', 'sale/order');
+			// $preview = 0;// Development Purpose
+
+			if ($preview) {
 				$data['preview'] = 1;
 				$data['letter_content'] = 'letter-content';
 			} else {
@@ -2852,426 +2694,6 @@ class ControllerSaleOrder extends Controller
 		}
 
 		$this->response->setOutput($this->load->view('sale/order_receipt', $data));
-	}
-
-	public function purchaseOrder()
-	{
-		$this->load->language('sale/order');
-
-		$json = array();
-
-		// if (!$this->user->hasPermission('modify', 'sale/order')) { //Sementara dobel ijin sebelum membuat mini order oleh marketing
-		if (!$this->user->hasPermission('modify', 'sale/order') || !$this->user->hasPermission('modify', 'catalog/vendor') || !$this->user->hasPermission('modify', 'purchase/purchase')) {
-			$json['error'] = $this->language->get('error_permission');
-		} else {
-			if (isset($this->request->get['order_id'])) {
-				$order_id = $this->request->get['order_id'];
-			} else {
-				$order_id = 0;
-			}
-
-			if (isset($this->request->post['vendor_id'])) {
-				$vendor_id = $this->request->post['vendor_id'];
-			} else {
-				$vendor_id = 0;
-			}
-
-			$this->load->model('sale/order');
-
-			$order_info = $this->model_sale_order->getOrder($order_id);
-			$order_vendors = $this->model_sale_order->getOrderVendors($order_id);
-
-			if ($order_info) {
-				if (!in_array($vendor_id, array_column($order_vendors, 'vendor_id'))) {
-					$json['error'] = $this->language->get('error_vendor_not_found');
-				}
-			} else {
-				$json['error'] = $this->language->get('error_order');
-			}
-		}
-
-		// if (!$json) {
-		// 	# Cek validasi pembayaran
-		// }
-
-		if (!$json) {
-			$this->load->model('catalog/vendor');
-			$this->load->model('purchase/purchase');
-
-			$vendor_info = $this->model_catalog_vendor->getVendor($vendor_id);
-			$purchase_info = $this->model_purchase_purchase->getPurchaseBySupplierOrder($vendor_id, $order_id);
-
-			if (empty($purchase_info)) {
-				$invoice_prefix = str_ireplace('{YEAR}', date('Y'), $this->config->get('config_purchase_vendor_prefix'));
-				
-				$invoice_no_max = $this->model_purchase_purchase->getInvoiceNoMax($invoice_prefix);
-				
-				if ($invoice_no_max) {
-					$invoice_no = $invoice_no_max + 1;
-				} else {
-					$invoice_no = $this->config->get('config_reference_start') + 1;
-				}
-
-				$purchase_products = $this->model_sale_order->getOrderProductsBySupplierId($order_id, $vendor_id);
-
-				$purchase_data = array(
-					'supplier_id'		=> $vendor_id,
-					'supplier_name'		=> $vendor_info['vendor_name'],
-					'telephone'			=> $vendor_info['telephone'],
-					'contact_person'	=> $vendor_info['contact_person'],
-					'order_id'			=> $order_id,
-					'adjustment' 		=> 0,
-					'total' 			=> 0,
-					'invoice_prefix'	=> $invoice_prefix,
-					'invoice_no' 		=> $invoice_no,
-					'product'			=> $purchase_products
-				);
-
-				$purchase_id = $this->model_purchase_purchase->addPurchase($purchase_data);
-			} else {
-				$purchase_id = $purchase_info['purchase_id'];
-			}
-
-			$json['purchase_url'] = 'index.php?route=purchase/purchase/edit&token=' . $this->session->data['token'] . '&purchase_id=' . $purchase_id;
-			
-			// $transaction_total = $this->model_accounting_transaction->getTransactionsTotalByOrderId($order_id, $transaction_data);
-
-			// if ($this->config->get('config_complete_status_required') && !in_array($order_info['order_status_id'], $this->config->get('config_complete_status'))) {
-			// 	$paid_off_status = false;
-			// } else {
-			// 	$paid_off_status = true;
-			// }
-
-			// if ($paid_off_status && $transaction_total >= $this->config->get('config_deposit')) {
-			// 	$json['admission_href'] = $this->url->link('sale/order/admission', 'token=' . $this->session->data['token'] . '&order_id=' . $order_id . '&vendor_id=' . $this->request->post['transaction_vendor_id'], true);
-			// } else {
-			// 	$json['admission_href'] = '';
-			// }
-		}
-
-		$this->response->addHeader('Content-Type: application/json');
-		$this->response->setOutput(json_encode($json));
-	}
-
-	public function purchaseOrderDel()
-	{
-		$this->load->model('sale/order');
-
-		if (isset($this->request->get['order_id'])) {
-			$order_id = $this->request->get['order_id'];
-		} else {
-			$order_id = 0;
-		}
-
-		if (isset($this->request->get['vendor_id'])) {
-			$vendor_id = $this->request->get['vendor_id'];
-		} else {
-			$vendor_id = 0;
-		}
-
-		if (isset($this->request->get['print']) && $this->request->get['print'] == 1) {
-			$print = 1;
-		} else {
-			// $print = 0;
-			$print = 1;
-		}
-
-		$order_info = $this->model_sale_order->getOrder($order_id);
-
-		if ($order_info) {
-			$this->load->model('setting/setting');
-			// $this->load->model('localisation/local_date');
-
-			$this->load->language('sale/order');
-			// $this->load->language('sale/order_print');
-
-			if ($this->request->server['HTTPS']) {
-				$data['base'] = HTTPS_SERVER;
-			} else {
-				$data['base'] = HTTP_SERVER;
-			}
-
-			$data['direction'] = $this->language->get('direction');
-			$data['lang'] = $this->language->get('code');
-
-			$language_items = array(
-				'title_purchase',
-				'text_mark',
-				'text_invoice_no',
-				// 'text_customer',
-				// 'text_id_no',
-				// 'text_customer_group',
-				// 'text_company',
-				// 'text_address',
-				// 'text_profession',
-				// 'text_position',
-				// 'text_telephone',
-				// 'text_day_date',
-				// 'text_slot',
-				// 'text_ceremony',
-				// 'text_category',
-				// 'text_product_name',
-				// 'text_quantity',
-				// 'text_amount',
-				// 'text_info_tambahan',
-				// 'text_layanan_tambahan',
-				// 'text_order_vendor',
-				// 'text_total',
-				// 'text_telah_bayar',
-				// 'text_snk',
-				// 'text_transfer_ke',
-				// 'text_belum_ppn',
-				// 'text_ubah_tanggal',
-				// 'text_pembatalan_acara',
-				// 'text_pembatalan_1',
-				// 'text_pembatalan_2',
-				// 'text_pembatalan_3',
-				// 'text_pihak_penyewa',
-				// 'text_dst',
-				'text_comment'
-			);
-			foreach ($language_items as $language_item) {
-				$data[$language_item] = $this->language->get($language_item);
-			}
-
-			$data['letter_head'] = HTTP_CATALOG . 'image/catalog/letter_head.png';
-
-			if ($order_info['invoice_no']) {
-				$data['invoice_no'] = $order_info['invoice_prefix'] . str_pad($order_info['invoice_no'], 4, 0, STR_PAD_LEFT);
-			} else {
-				$data['invoice_no'] = $this->model_sale_order->createInvoiceNo($order_id);
-			}
-
-			$store_info = $this->model_setting_setting->getSetting('config', $order_info['store_id']);
-
-			if ($store_info) {
-				$data['store_logo'] = HTTP_CATALOG . 'image/' . $store_info['config_logo'];
-				$data['store_name'] = $store_info['config_name'];
-				$data['store_slogan'] = htmlspecialchars_decode($store_info['config_slogan'], ENT_NOQUOTES);
-				$data['store_address'] = strtoupper($store_info['config_address']);
-				$data['store_email'] = $store_info['config_email'];
-				$data['store_telephone'] = $store_info['config_telephone'];
-				$data['store_fax'] = $store_info['config_fax'];
-				$data['store_owner'] = $store_info['config_owner'];
-			} else {
-				$data['store_logo'] = HTTP_CATALOG . 'image/' . $this->config->get('config_logo');
-				$data['store_name'] = $this->config->get('config_name');
-				$data['store_slogan'] = htmlspecialchars_decode($this->config->get('config_slogan'), ENT_NOQUOTES);
-				$data['store_address'] = strtoupper($this->config->get('config_address'));
-				$data['store_email'] = $this->config->get('config_email');
-				$data['store_telephone'] = $this->config->get('config_telephone');
-				$data['store_fax'] = $this->config->get('config_fax');
-				$data['store_owner'] = $this->config->get('config_owner');
-			}
-
-			$data['store_url'] = ltrim(rtrim($order_info['store_url'], '/'), 'http://');
-
-			$date_added_in = $this->model_localisation_local_date->getInFormatDate($order_info['date_added']);
-
-			$data['text_pada_hari'] = sprintf($this->language->get('text_pada_hari'), $date_added_in['day'], $date_added_in['long_date']);
-
-			$address_format = array(
-				$order_info['payment_address_1'] . ($order_info['payment_address_2'] ? ', ' . $order_info['payment_address_2'] : ''),
-				$order_info['payment_city'],
-				$order_info['payment_zone'],
-				$order_info['payment_country'],
-				$order_info['payment_postcode']
-			);
-
-			$address_format = implode(', ', $address_format);
-
-			// Custom Fields
-			$custom_fields = array();
-
-			$this->load->model('customer/custom_field');
-
-			foreach ($order_info['custom_field'] as $custom_field_id => $custom_field_value) {
-				$custom_field_info = $this->model_customer_custom_field->getCustomField($custom_field_id);
-
-				if ($custom_field_info) {
-					$custom_fields[] = array(
-						'name'			=> $custom_field_info['name'],
-						'value'			=> $custom_field_value
-					);
-				}
-			}
-
-			foreach ($order_info['payment_custom_field'] as $custom_field_id => $custom_field_value) {
-				$custom_field_info = $this->model_customer_custom_field->getCustomField($custom_field_id);
-
-				if ($custom_field_info) {
-					$custom_fields[] = array(
-						'name'			=> $custom_field_info['name'],
-						'value'			=> $custom_field_value
-					);
-				}
-			}
-			// END Custom Fields
-
-			// Customer Data
-			$data['customer'] = $order_info['firstname'] . ' ' . $order_info['lastname'];
-			$data['id_no'] = $order_info['id_no'];
-			$data['customer_group'] = $order_info['customer_group'];
-			$data['company'] = $order_info['payment_company'];
-			$data['address'] = str_replace(array("\r\n", "\r", "\n"), '<br />', preg_replace(array("/\s\s+/", "/\r\r+/", "/\n\n+/"), '<br />', trim($address_format)));
-			$data['profession'] = $order_info['payment_profession'];
-			$data['position'] = $order_info['payment_position'];
-			$data['telephone'] = $order_info['telephone'];
-			$data['custom_fields'] = $custom_fields;
-
-			$data['text_sewa_tempat'] = sprintf($this->language->get('text_sewa_tempat'), $data['store_name']);
-
-			// Event Data
-			$event_date_in = $this->model_localisation_local_date->getInFormatDate($order_info['event_date']);
-
-			$data['event_date'] = $event_date_in['day'] . '/' . $event_date_in['long_date'];
-			$data['slot'] = $order_info['slot'];
-			$data['ceremony'] = $order_info['ceremony'];
-
-			// Product Data
-			$data['products'] = array();
-
-			$products = $this->model_sale_order->getOrderProducts($order_id);
-
-			foreach ($products as $product) {
-				$option_data = array();
-
-				$options = $this->model_sale_order->getOrderOptions($order_id, $product['order_product_id']);
-
-				foreach ($options as $option) {
-					if ($option['type'] != 'file') {
-						$value = $option['value'];
-					} else {
-						$upload_info = $this->model_tool_upload->getUploadByCode($option['value']);
-
-						if ($upload_info) {
-							$value = $upload_info['name'];
-						} else {
-							$value = '';
-						}
-					}
-
-					$option_data[] = array(
-						'name'  => $option['name'],
-						'value' => $value
-					);
-				}
-
-				$attribute_data = array();
-
-				$attributes = $this->model_sale_order->getOrderAttributes($order_id, $product['order_product_id']);
-
-				foreach ($attributes as $attribute) {
-					$attribute_data[$attribute['attribute_group']][] = array(
-						'name'	=> $attribute['attribute'],
-						'value'	=> $attribute['text']
-					);
-				}
-
-				$data['products'][$product['primary_type']][] = array(
-					'category'	=> $product['category'],
-					'name'    	=> $product['name'],
-					'quantity'	=> $product['quantity'] . '&nbsp;' . $product['unit_class'],
-					'option'  	=> $option_data,
-					'attribute'	=> $attribute_data,
-					'total'		=> $this->currency->format($product['total'] + ($this->config->get('config_tax') ? ($product['tax'] * $product['quantity']) : 0), $order_info['currency_code'], $order_info['currency_value'])
-				);
-			}
-
-			// Vendors
-			$data['order_vendors'] = array();
-
-			$order_vendors = $this->model_sale_order->getOrderVendors($order_id);
-
-			foreach ($order_vendors as $order_vendor) {
-				$data['order_vendors'][] = array(
-					'type' => $order_vendor['vendor_type'],
-					'name' => $order_vendor['vendor_name']
-				);
-			}
-
-			// Total
-			$data['totals'] = array();
-
-			$totals = $this->model_sale_order->getOrderTotals($order_id);
-
-			foreach ($totals as $total) {
-				$data['totals'][$total['code']] = array(
-					'title' => $total['title'],
-					'value' => $total['value'],
-					'text'  => $this->currency->format($total['value'], $order_info['currency_code'], $order_info['currency_value'])
-				);
-			}
-
-			if (isset($data['totals']['sub_total']['value']) && isset($data['totals']['total']['value']) && $data['totals']['sub_total']['value'] == $data['totals']['total']['value']) {
-				unset($data['totals']['sub_total']);
-			}
-
-			// Transaction
-			$this->load->model('accounting/transaction');
-
-			$data['transactions'] = array();
-
-			$filter_data = array(
-				'label'		=> 'customer'
-			);
-
-			$transactions = $this->model_accounting_transaction->getTransactionsDescriptionSummaryByOrderId($order_id, $filter_data);
-
-			$transactions_total = 0;
-
-			foreach ($transactions as $transaction) {
-				$date_in = $this->model_localisation_local_date->getInFormatDate($transaction['date']);
-
-				$transactions_total += $transaction['amount'];
-
-				$data['transactions'][] = array(
-					'title'	=> $transaction['description'],
-					'text'	=> $this->currency->format($transaction['amount'], $order_info['currency_code'], $order_info['currency_value']) . ' (' . $date_in['long_date'] . ')'
-				);
-			}
-
-			$data['text_transactions'] = array();
-
-			$down_payment = round($order_info['total'] * $this->config->get('config_down_payment_amount') / 100000, 0) * 1000;
-
-			if ($down_payment > $transactions_total) {
-				$data['text_transactions']['text_uang_muka'] = sprintf($this->language->get('text_uang_muka'), $this->currency->format($down_payment - $transactions_total, $order_info['currency_code'], $order_info['currency_value']));
-				$data['text_transactions']['text_pelunasan'] = sprintf($this->language->get('text_pelunasan'), $this->currency->format($order_info['total'] - $down_payment, $order_info['currency_code'], $order_info['currency_value']));
-			} elseif ($order_info['total'] > $transactions_total) {
-				$data['text_transactions']['text_pelunasan'] = sprintf($this->language->get('text_pelunasan'), $this->currency->format($order_info['total'] - $transactions_total, $order_info['currency_code'], $order_info['currency_value']));
-			}
-
-			$no_rekening = $this->config->get($order_info['payment_code'] . '_bank' . $order_info['language_id']);
-			$data['no_rekening'] = str_replace(array("\r\n", "\r", "\n"), '<br />', preg_replace(array("/\s\s+/", "/\r\r+/", "/\n\n+/"), '<br />', trim($no_rekening)));
-
-			$data['text_tukar_bukti'] = sprintf($this->language->get('text_tukar_bukti'), $data['store_owner']);
-			$data['text_demikian'] = sprintf($this->language->get('text_demikian'), $data['store_owner']);
-
-			// User Info
-			$this->load->model('user/user');
-
-			$user_info = $this->model_user_user->getUser($this->user->getId());
-
-			$data['text_manajemen'] = $user_info['user_group'];
-			$data['manajemen'] = '( ' . $user_info['firstname'] . ' ' . $user_info['lastname'] . ' )';
-
-			$data['comment'] = nl2br($order_info['comment']);
-
-			if ($order_info['printed'] || !$print || !$this->user->hasPermission('modify', 'sale/order')) {
-				$data['preview'] = 1;
-				$data['letter_content'] = 'letter-content';
-			} else {
-				$data['preview'] = 0;
-				$data['letter_content'] = '';
-
-				$this->model_sale_order->editOrderPrintStatus($order_id, 1);
-			}
-		} else {
-			return false;
-		}
-
-		$this->response->setOutput($this->load->view('sale/order_purchase', $data));
 	}
 
 	public function document()
@@ -3301,324 +2723,39 @@ class ControllerSaleOrder extends Controller
 		}
 	}
 
-	public function admission()
-	{
-		$this->load->model('sale/order');
-
-		if (isset($this->request->get['order_id'])) {
-			$order_id = $this->request->get['order_id'];
-		} else {
-			$order_id = 0;
-		}
-
-		if (isset($this->request->get['vendor_id'])) {
-			$vendor_id = $this->request->get['vendor_id'];
-		} else {
-			$vendor_id = 0;
-		}
-
-		$order_info = $this->model_sale_order->getOrder($order_id);
-		$order_vendor_info = $this->model_sale_order->getOrderVendor($order_id, $vendor_id);
-
-		if ($order_vendor_info) {
-			$this->load->model('setting/setting');
-			$this->load->model('localisation/local_date');
-
-			$this->load->language('sale/order');
-			$this->load->language('sale/order_print');
-
-			if ($this->request->server['HTTPS']) {
-				$data['base'] = HTTPS_SERVER;
-			} else {
-				$data['base'] = HTTP_SERVER;
-			}
-
-			$data['direction'] = $this->language->get('direction');
-			$data['lang'] = $this->language->get('code');
-
-			$language_items = array(
-				'title_admission',
-				'text_mark',
-				'text_invoice_no',
-				'text_day_date',
-				'text_slot',
-				'text_ceremony',
-				'text_product_name',
-				'text_dengan_ini',
-				'text_vendor_name',
-				'text_vendor_type',
-				'text_address',
-				'text_telephone',
-				'text_contact_person',
-				'text_persiapan',
-				'text_time',
-				'text_catatan',
-				'text_lampirkan',
-				'text_demikian_2',
-				'text_manajemen'
-			);
-			foreach ($language_items as $language_item) {
-				$data[$language_item] = $this->language->get($language_item);
-			}
-
-			$store_info = $this->model_setting_setting->getSetting('config', $order_info['store_id']);
-
-			if ($store_info) {
-				$data['store_logo'] = HTTP_CATALOG . 'image/' . $store_info['config_logo'];
-				$data['store_name'] = $store_info['config_name'];
-				$data['store_slogan'] = htmlspecialchars_decode($store_info['config_slogan'], ENT_NOQUOTES);
-				$data['store_address'] = strtoupper($store_info['config_address']);
-				$data['store_email'] = $store_info['config_email'];
-				$data['store_telephone'] = $store_info['config_telephone'];
-				$data['store_fax'] = $store_info['config_fax'];
-				$data['store_owner'] = $store_info['config_owner'];
-			} else {
-				$data['store_logo'] = HTTP_CATALOG . 'image/' . $this->config->get('config_logo');
-				$data['store_name'] = $this->config->get('config_name');
-				$data['store_slogan'] = htmlspecialchars_decode($this->config->get('config_slogan'), ENT_NOQUOTES);
-				$data['store_address'] = strtoupper($this->config->get('config_address'));
-				$data['store_email'] = $this->config->get('config_email');
-				$data['store_telephone'] = $this->config->get('config_telephone');
-				$data['store_fax'] = $this->config->get('config_fax');
-				$data['store_owner'] = $this->config->get('config_owner');
-			}
-
-			$data['store_url'] = ltrim(rtrim($order_info['store_url'], '/'), 'http://');
-
-			$data['letter_head'] = HTTP_CATALOG . 'image/catalog/letter_head.png';
-
-			$data['invoice_no'] = $order_vendor_info['admission_prefix'] . str_pad($order_vendor_info['reference_no'], 4, 0, STR_PAD_LEFT);
-
-			if (!$order_info['title']) {
-				$order_info['title'] = sprintf($this->language->get('text_atas_nama'), $order_info['firstname'] . ' ' . $order_info['lastname']);
-			}
-
-			$data['text_sehubungan'] = sprintf($this->language->get('text_sehubungan'), $order_info['title'], $data['store_name']);
-
-			// Event Data
-			$event_date_in = $this->model_localisation_local_date->getInFormatDate($order_info['event_date']);
-
-			$data['event_date'] = $event_date_in['day'] . '/' . $event_date_in['long_date'];
-
-			// $data['ceremony'] = $order_info['ceremony'];
-
-			// Product Data
-			$primary_product = $this->model_sale_order->getOrderPrimaryProduct($order_id);
-
-			$data['product_name'] = $primary_product['name'];
-			$option = $this->model_sale_order->getOrderOptions($order_id, $primary_product['order_product_id']);
-
-			if ($option) {
-				$data['slot'] = explode(': ', $option[0]['value'])[1];
-			} else {
-				$data['slot'] = '-';
-			}
-
-			$data['vendor_name'] = $order_vendor_info['vendor_name'];
-			$data['vendor_type'] = $order_vendor_info['vendor_type'];
-			$data['address'] = str_replace(array("\r\n", "\r", "\n"), '<br />', preg_replace(array("/\s\s+/", "/\r\r+/", "/\n\n+/"), '<br />', trim($order_vendor_info['address'])));
-			$data['telephone'] = $order_vendor_info['telephone'];
-			$data['contact_person'] = $order_vendor_info['contact_person'];
-
-			$preparation_date_in = $this->model_localisation_local_date->getInFormatDate($order_info['event_date']);
-			$data['preparation_date'] = $preparation_date_in['day'] . '/' . $preparation_date_in['long_date'];
-
-			$data['preparation_time'] = $order_info['slot'];
-
-			// User Info
-			$this->load->model('user/user');
-
-			$user_info = $this->model_user_user->getUser($this->user->getId());
-
-			$data['text_manajemen'] = $user_info['user_group'];
-			$data['manajemen'] = '( ' . $user_info['firstname'] . ' ' . $user_info['lastname'] . ' )';
-
-			if ($order_vendor_info['admission_printed'] || !$this->user->hasPermission('modify', 'sale/order') || !$this->user->hasPermission('modify', 'catalog/vendor')) {
-				$data['preview'] = 1;
-				$data['letter_content'] = 'letter-content';
-			} else {
-				$data['preview'] = 0;
-				$data['letter_content'] = '';
-
-				$this->model_sale_order->setOrderVendorPrintStatus($order_vendor_info['order_vendor_id'], 'admission', 1);
-			}
-		} else {
-			return false;
-		}
-
-		$this->response->setOutput($this->load->view('sale/order_admission', $data));
-	}
-
-	public function vendorAgreement()
-	{
-		$this->load->model('sale/order');
-
-		if (isset($this->request->get['order_id'])) {
-			$order_id = $this->request->get['order_id'];
-		} else {
-			$order_id = 0;
-		}
-
-		if (isset($this->request->get['vendor_id'])) {
-			$vendor_id = $this->request->get['vendor_id'];
-		} else {
-			$vendor_id = 0;
-		}
-
-		$order_info = $this->model_sale_order->getOrder($order_id);
-		$order_vendor_info = $this->model_sale_order->getOrderVendor($order_id, $vendor_id);
-
-		if ($order_vendor_info) {
-			$this->load->model('setting/setting');
-			$this->load->model('localisation/local_date');
-
-			$this->load->language('sale/order');
-			$this->load->language('sale/order_print');
-
-			if ($this->request->server['HTTPS']) {
-				$data['base'] = HTTPS_SERVER;
-			} else {
-				$data['base'] = HTTP_SERVER;
-			}
-
-			$data['direction'] = $this->language->get('direction');
-			$data['lang'] = $this->language->get('code');
-
-			$language_items = array(
-				'title_vendor_agreement',
-				'text_mark',
-				'text_invoice_no',
-				'text_customer',
-				'text_vendor_name',
-				'text_address',
-				'text_telephone',
-				'text_garis',
-				'text_mohon_surat',
-				'text_uang_dikembalikan',
-				'text_kerusakan',
-				'text_lebih_lanjut',
-				'text_hormat_kami',
-				'text_menyetujui',
-				'text_tanda_tangan'
-			);
-			foreach ($language_items as $language_item) {
-				$data[$language_item] = $this->language->get($language_item);
-			}
-
-			$store_info = $this->model_setting_setting->getSetting('config', $order_info['store_id']);
-
-			if ($store_info) {
-				$data['store_logo'] = HTTP_CATALOG . 'image/' . $store_info['config_logo'];
-				$data['store_name'] = $store_info['config_name'];
-				$data['store_slogan'] = htmlspecialchars_decode($store_info['config_slogan'], ENT_NOQUOTES);
-				$data['store_address'] = strtoupper($store_info['config_address']);
-				$data['store_email'] = $store_info['config_email'];
-				$data['store_telephone'] = $store_info['config_telephone'];
-				$data['store_fax'] = $store_info['config_fax'];
-				$data['store_owner'] = $store_info['config_owner'];
-			} else {
-				$data['store_logo'] = HTTP_CATALOG . 'image/' . $this->config->get('config_logo');
-				$data['store_name'] = $this->config->get('config_name');
-				$data['store_slogan'] = htmlspecialchars_decode($this->config->get('config_slogan'), ENT_NOQUOTES);
-				$data['store_address'] = strtoupper($this->config->get('config_address'));
-				$data['store_email'] = $this->config->get('config_email');
-				$data['store_telephone'] = $this->config->get('config_telephone');
-				$data['store_fax'] = $this->config->get('config_fax');
-				$data['store_owner'] = $this->config->get('config_owner');
-			}
-
-			$data['store_url'] = ltrim(rtrim($order_info['store_url'], '/'), 'http://');
-
-			// if ($order_info['invoice_no']) {
-			// $invoice_no = $order_info['invoice_prefix'];
-			// } else {
-			// $invoice_no = $this->model_sale_order->createInvoiceNo($order_id);
-			// }
-
-			$data['letter_head'] = HTTP_CATALOG . 'image/catalog/letter_head.png';
-
-			$data['invoice_no'] = $order_vendor_info['agreement_prefix'] . str_pad($order_vendor_info['reference_no'], 4, 0, STR_PAD_LEFT);
-			// $data['invoice_no'] = $invoice_no . '-V' . str_pad($order_vendor_info['order_vendor_id'],3,0,STR_PAD_LEFT);
-
-			$current_date_in = $this->model_localisation_local_date->getInFormatDate();
-			$data['text_place_date'] = sprintf($this->language->get('text_place_date'), $current_date_in['long_date']);
-
-			$data['vendor_name'] = $order_vendor_info['vendor_name'];
-			$data['address'] = str_replace(array("\r\n", "\r", "\n"), '<br />', preg_replace(array("/\s\s+/", "/\r\r+/", "/\n\n+/"), '<br />', trim($order_vendor_info['address'])));
-			$data['telephone'] = $order_vendor_info['telephone'];
-
-			$data['text_ketentuan'] = sprintf($this->language->get('text_ketentuan'), $data['store_name']);
-			$data['text_apabila_anda'] = sprintf($this->language->get('text_apabila_anda'), $data['store_telephone'], $data['store_email']);
-
-			if ($order_vendor_info['deposit']) {
-				$deposit = $this->currency->format($order_vendor_info['deposit'], $order_info['currency_code'], $order_info['currency_value']);
-				$deposit_in_word = $this->model_localisation_local_date->getInWord($order_vendor_info['deposit']);
-
-				$data['text_uang_jaminan'] = sprintf($this->language->get('text_uang_jaminan'), $deposit, $deposit_in_word);
-	
-				$no_rekening = $this->config->get($order_info['payment_code'] . '_bank' . $order_info['language_id']);
-				$data['no_rekening'] = str_replace(array("\r\n", "\r", "\n"), '<br />', preg_replace(array("/\s\s+/", "/\r\r+/", "/\n\n+/"), '<br />', trim($no_rekening)));
-	
-				$data['text_silahkan_transfer'] = sprintf($this->language->get('text_silahkan_transfer'), $data['store_name']);
-
-				$data['pay_deposit'] = 1;
-			} else {
-				$data['pay_deposit'] = 0;
-			}
-
-			$data['text_vendor_setuju'] = sprintf($this->language->get('text_vendor_setuju'), $data['store_name']);
-
-			// User Info
-			$this->load->model('user/user');
-
-			$user_info = $this->model_user_user->getUser($order_vendor_info['user_id']);
-
-			$data['text_manajemen'] = $user_info['user_group'];
-			$data['manajemen'] = '( ' . $user_info['firstname'] . ' ' . $user_info['lastname'] . ' )';
-
-			if ($order_vendor_info['agreement_printed'] || !$this->user->hasPermission('modify', 'sale/order') || !$this->user->hasPermission('modify', 'catalog/vendor')) {
-				$data['preview'] = 1;
-				$data['letter_content'] = 'letter-content';
-			} else {
-				$data['preview'] = 0;
-				$data['letter_content'] = '';
-
-				$this->model_sale_order->setOrderVendorPrintStatus($order_vendor_info['order_vendor_id'], 'agreement', 1);
-			}
-		} else {
-			return false;
-		}
-
-		$this->response->setOutput($this->load->view('sale/order_vendor_agreement', $data));
-	}
-
 	public function productSelect()
 	{
-		$json = array();
-		$categories = array();
+		$json = [];
 
 		$this->load->model('catalog/product');
 		$this->load->model('catalog/category');
 
-		$products = $this->model_catalog_product->getProductsByPrimaryType($this->request->get['primary_type']);
+		$categories = $this->model_catalog_category->getCategoriesByParentId($this->request->get['main_category_id']);
 
-		foreach ($products as $product) {
-			$product_categories = $this->model_catalog_product->getProductCategories($product['product_id']);
+		foreach ($categories as $category) {
+			$product_data = [];
 
-			foreach ($product_categories as $category_id) {
-				$json['products'][$category_id][] = $product;
+			$filter_data = [
+				'filter_category'	=> $category['category_id'],
+				'filter_status'	 	=> 1
+			];
+
+			$products = $this->model_catalog_product->getProducts($filter_data);
+
+			foreach ($products as $product) {
+				// $product_data[$category['category_id']][] = [
+				$product_data[] = [
+					'product_id'	=> $product['product_id'],
+					'name'			=> $product['name'],
+				];
 			}
 
-			$categories = array_merge($categories, $product_categories);
+			$json[] = [
+				'category_id'	=> $category['category_id'],
+				'name'			=> $category['name'],
+				'product'		=> $product_data
+			];
 		}
-
-		$categories = array_unique($categories);
-
-		foreach ($categories as $category_id) {
-			$json['categories'][] = $this->model_catalog_category->getCategory($category_id);
-		}
-
-		array_multisort(array_column($json['categories'], 'sort_order'), SORT_ASC, $json['categories']);
 
 		$this->response->addHeader('Content-Type: application/json');
 		$this->response->setOutput(json_encode($json));
@@ -3676,6 +2813,7 @@ class ControllerSaleOrder extends Controller
 				'name'          => $product_info['name'],
 				'price'        	=> $this->currency->format($product_info['price'], $this->session->data['currency']),
 				'option'        => $option_data
+				// 'slot'        	=> $slot_data
 			);
 		}
 

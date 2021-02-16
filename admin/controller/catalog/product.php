@@ -731,6 +731,9 @@ class ControllerCatalogProduct extends Controller {
 		$data['entry_reward'] = $this->language->get('entry_reward');
 		$data['entry_layout'] = $this->language->get('entry_layout');
 		$data['entry_recurring'] = $this->language->get('entry_recurring');
+		$data['entry_slot_prefix'] = $this->language->get('entry_slot_prefix');
+		$data['entry_slot'] = $this->language->get('entry_slot');
+		$data['entry_price_change'] = $this->language->get('entry_price_change');
 
 		$data['help_keyword'] = $this->language->get('help_keyword');
 		$data['help_sku'] = $this->language->get('help_sku');
@@ -764,6 +767,7 @@ class ControllerCatalogProduct extends Controller {
 
 		$data['tab_general'] = $this->language->get('tab_general');
 		$data['tab_data'] = $this->language->get('tab_data');
+		$data['tab_slot'] = $this->language->get('tab_slot');
 		$data['tab_attribute'] = $this->language->get('tab_attribute');
 		$data['tab_option'] = $this->language->get('tab_option');
 		$data['tab_recurring'] = $this->language->get('tab_recurring');
@@ -1468,6 +1472,25 @@ class ControllerCatalogProduct extends Controller {
 					'name'       => $related_info['name']
 				);
 			}
+		}
+
+		if (isset($this->request->post['slot_prefix'])) {
+			$data['slot_prefix'] = $this->request->post['slot_prefix'];
+		} elseif (!empty($product_info)) {
+			$data['slot_prefix'] = $product_info['slot_prefix'];
+		} else {
+			$data['slot_prefix'] = '';
+		}
+
+		$this->load->model('localisation/slot');
+		$data['slots'] = $this->model_localisation_slot->getSlots();
+
+		if (isset($this->request->post['product_slot'])) {
+			$data['product_slot'] = $this->request->post['product_slot'];
+		} elseif (isset($this->request->get['product_id'])) {
+			$data['product_slot'] = $this->model_catalog_product->getProductSlots($this->request->get['product_id']);
+		} else {
+			$data['product_slot'] = array();
 		}
 
 		if (isset($this->request->post['points'])) {

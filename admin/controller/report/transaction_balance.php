@@ -190,7 +190,7 @@ class ControllerReportTransactionBalance extends Controller {
 		
 		foreach ($results as $result) {
 			if (!empty($result['order_id'])) {
-				$reference_no = '#' . $result['order_id'] . ($result['transaction_no'] ? ': ' . $result['reference'] : '');
+				$reference_no = '#' . $result['order_id'] . ($result['reference_no'] ? ': ' . $result['reference'] : '');
 			} else {
 				$reference_no = $result['reference'];
 			}

@@ -427,7 +427,7 @@ class ControllerAccountingTransaction extends Controller {
 			'filter_account_from_id' => $filter_account_from_id,
 			'filter_account_to_id'	 => $filter_account_to_id,
 			'filter_description'	 => $filter_description,
-			'filter_reference_no'	 => $filter_reference_no,
+			'filter_reference'	 	 => $filter_reference_no,
 			'filter_order_id'	 	 => $filter_order_id,
 			'filter_customer_name'	 => $filter_customer_name,
 			'filter_username'	 	 => $filter_username,
@@ -444,7 +444,7 @@ class ControllerAccountingTransaction extends Controller {
 		
 		foreach ($results as $result) {
 			if (!empty($result['order_id'])) {
-				$reference_no = '#' . $result['order_id'] . ($result['transaction_no'] ? ': ' . $result['reference'] : '');
+				$reference_no = '#' . $result['order_id'] . ($result['reference_no'] ? ': ' . $result['reference'] : '');
 				$order_url = $this->url->link('sale/order/info', 'token=' . $this->session->data['token'] . '&order_id=' . $result['order_id'], true);
 			} else {
 				$reference_no = $result['reference'];
