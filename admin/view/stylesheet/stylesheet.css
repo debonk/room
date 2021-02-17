@@ -639,7 +639,7 @@ input[type="checkbox"]:checked::after, .checkbox input[type="checkbox"]:checked:
 /* Menu Fix For System -> Layout -> Banner */
 
 /* User */
-.blank-page {
+.tab-pane {
 	min-height: 400px;
 }
 

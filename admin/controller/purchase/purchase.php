@@ -1070,7 +1070,7 @@ class ControllerPurchasePurchase extends Controller
 
 			$reference_prefix = str_ireplace('{YEAR}', date('Y', strtotime($this->request->post['transaction_date'])), $this->config->get('config_receipt_vendor_prefix'));
 
-			$transaction_no_max = $this->model_accounting_transaction->getTransactionNoMax($reference_prefix);
+			$transaction_no_max = $this->model_accounting_transaction->getLastReferenceNo($reference_prefix);
 
 			if ($transaction_no_max) {
 				$reference_no = $transaction_no_max + 1;

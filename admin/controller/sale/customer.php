@@ -61,40 +61,47 @@ class ControllerSaleCustomer extends Controller
 		$data['customers_transaction_summary'] = [];
 
 		$summary_data = [
-			'order_id'	=> $order_id,
 			'label'		=> 'customer',
-			'group'		=> 'tt.category_label',
-			'sort'		=> 'tt.category_label'
+			'group'		=> 'tt.category_label'
 		];
 
-		$customer_transaction_summary = $this->model_accounting_transaction->getTransactionsSummary($summary_data);
+		$customer_transaction_summary = $this->model_accounting_transaction->getTransactionsSummary($order_id, $summary_data);
+		foreach ($customer_transaction_summary as $key => $transaction_summary) {
+			$customer_transaction_summary[$transaction_summary['category_label']][$transaction_summary['account_type']] = $transaction_summary;
+			unset($customer_transaction_summary[$key]);
+		}
 
-		foreach ($customer_transaction_summary as $transaction_summary) {
-			if ($transaction_summary['client_label'] . '-' . $transaction_summary['category_label'] == $this->config->get('config_customer_deposit_label')) {
+		foreach ($customer_transaction_summary as $key => $transaction_summary) {
+			if ('customer-' . $key == $this->config->get('config_customer_deposit_label')) {
 				$amount = $this->config->get('config_customer_deposit');
-			} elseif (empty($transaction_summary['category_label']) || $transaction_summary['category_label'] == 'order') {
+			} elseif (!isset($customer_transaction_summary['order']) || $key == 'order') {
 				$amount = $order_info['total'];
 			}
 
+			$debit = isset($transaction_summary['D']) ? $transaction_summary['D']['total'] : 0;
+			$credit = isset($transaction_summary['C']) ? $transaction_summary['C']['total'] : 0;
+			$total = $debit - $credit;
+
 			$data['customers_transaction_summary'][] = [
-				'transaction_type' 	=> $this->language->get('text_category_' . $transaction_summary['category_label']),
+				'transaction_type' 	=> $this->language->get('text_category_' . $key),
 				'amount'			=> $this->currency->format($amount, $order_info['currency_code'], $order_info['currency_value']),
-				'total'				=> $this->currency->format($transaction_summary['total'], $order_info['currency_code'], $order_info['currency_value']),
-				'balance'			=> $this->currency->format($amount - $transaction_summary['total'], $order_info['currency_code'], $order_info['currency_value'])
+				'total'				=> $this->currency->format($total, $order_info['currency_code'], $order_info['currency_value']),
+				'balance'			=> $this->currency->format($amount - $total, $order_info['currency_code'], $order_info['currency_value'])
 			];
 		}
 
 		$data['customer_transactions'] = [];
 
 		$filter_data = [
-			'label'		=> 'customer',
-			'sort'		=> 't.date DESC, t.transaction_id',
-			'order'		=> 'DESC',
-			'start'		=> ($page - 1) * $limit,
-			'limit'		=> $limit
+			'filter_order_id'	=> $order_id,
+			'filter_label'		=> 'customer',
+			'sort'				=> 't.date DESC, t.transaction_id',
+			'order'				=> 'DESC',
+			'start'				=> ($page - 1) * $limit,
+			'limit'				=> $limit
 		];
 
-		$results = $this->model_accounting_transaction->getTransactionsByOrderId($order_id, $filter_data);
+		$results = $this->model_accounting_transaction->getTransactions($filter_data);
 
 		foreach ($results as $result) {
 			$data['customer_transactions'][] = array(
@@ -105,7 +112,7 @@ class ControllerSaleCustomer extends Controller
 				'asset'				=> $result['payment_method'],
 				'reference'			=> $result['reference'],
 				'description'		=> $result['description'],
-				'amount'			=> $this->currency->format($result['amount'], $order_info['currency_code'], $order_info['currency_value']),
+				'amount'			=> $this->currency->format(($result['account_type'] == 'C' ? -1 : 1) * $result['amount'], $order_info['currency_code'], $order_info['currency_value']),
 				'date_added'		=> date($this->language->get('date_format_short'), strtotime($result['date_added'])),
 				'username'			=> $result['username'],
 				'receipt'	 		=> $this->url->link('sale/order/receipt', 'token=' . $this->session->data['token'] . '&transaction_id=' . (int)$result['transaction_id'], true),
@@ -113,7 +120,7 @@ class ControllerSaleCustomer extends Controller
 			);
 		}
 
-		$customer_transaction_count = $this->model_accounting_transaction->getTransactionsCountByOrderId($order_id, $filter_data);
+		$customer_transaction_count = $this->model_accounting_transaction->getTransactionsCount($filter_data);
 
 		$pagination = new Pagination();
 		$pagination->total = $customer_transaction_count;
@@ -183,7 +190,9 @@ class ControllerSaleCustomer extends Controller
 			$order_info = $this->model_sale_order->getOrder($order_id);
 
 			if (!$order_info) {
-				$json['error'] = $this->language->get('error_order');
+				$json['error']['warning'] = $this->language->get('error_order');
+			} elseif (!in_array($order_info['order_status_id'], $this->config->get('config_status_with_payment'))) {
+				$json['error']['warning'] = $this->language->get('error_order_status');
 			}
 		}
 
@@ -227,6 +236,17 @@ class ControllerSaleCustomer extends Controller
 
 			$this->model_accounting_transaction->addTransaction($transaction_data);
 
+			$payment_phases = $this->model_sale_order->getPaymentPhases($order_id);
+			foreach ($payment_phases as $payment_phase) {
+				if ($payment_phase['paid_status']) {
+					$order_status_id = $payment_phase['order_status_id'];
+				}
+			}
+
+			if ($order_info['order_status_id'] != $order_status_id) {
+				$this->model_sale_order->addOrderHistory($order_id, $order_status_id);
+			}
+			
 			$json['success'] = $this->language->get('text_customer_transaction_added');
 		}
 

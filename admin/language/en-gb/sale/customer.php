@@ -10,7 +10,7 @@ $_['text_print_confirm']       	 		= 'Are you sure?\nPrint Dokumen hanya diperbo
 
 // Column
 $_['column_action']				= 'Action';
-$_['column_amount']				= 'Jumlah';
+$_['column_amount']				= 'Ketentuan';
 $_['column_balance']			= 'Saldo';
 $_['column_date']				= 'Tanggal';
 $_['column_date_added']			= 'Tanggal Entry';
@@ -30,6 +30,7 @@ $_['entry_transaction_type']	= 'Jenis Transaksi';
 
 // Error
 $_['error_order']     					= 'Warning: Order tidak ditemukan!';
+$_['error_order_status']     			= 'Warning: Order Status tidak sesuai!';
 $_['error_transaction_amount']			= 'Jumlah harus diisi dan hrs lebih besar dari 0!';
 $_['error_transaction_date']			= 'Tentukan Tanggal Transaksi!';
 $_['error_transaction_description']		= 'Keterangan tidak boleh melebihi 256 karakter!';

@@ -418,15 +418,7 @@
 									<?php foreach ($totals as $total) { ?>
 									<tr>
 										<td colspan="5" class="text-right">
-											<?php if ($total['receipt']) { ?>
-											<a href="<?php echo $total['receipt']; ?>" data-toggle="tooltip"
-												title="<?php echo $button_receipt; ?>" target="_blank"
-												class="<?php echo $total['print']; ?>-receipt">
-												<?php echo $total['title']; ?> <i class="fa fa-external-link"></i>
-											</a>
-											<?php } else { ?>
 											<?php echo $total['title']; ?>
-											<?php } ?>
 										</td>
 										<td class="text-right">
 											<?php echo $total['text']; ?>
@@ -538,29 +530,6 @@
 															<?php } ?>
 															<?php } ?>
 														</select>
-													</div>
-												</div>
-												<div class="form-group transaction">
-													<label class="col-sm-2 control-label" for="input-date">
-														<?php echo $entry_date; ?>
-													</label>
-													<div class="col-sm-10">
-														<div class="input-group date">
-															<input type="text" name="date" value="" placeholder="<?php echo $entry_date; ?>"
-																data-date-format="YYYY-MM-DD" id="input-date" class="form-control" />
-															<span class="input-group-btn">
-																<button type="button" class="btn btn-default"><i class="fa fa-calendar"></i></button>
-															</span>
-														</div>
-													</div>
-												</div>
-												<div class="form-group transaction">
-													<label class="col-sm-2 control-label" for="input-amount">
-														<?php echo $entry_amount; ?>
-													</label>
-													<div class="col-sm-10">
-														<input type="text" name="amount" value="" placeholder="<?php echo $entry_amount; ?>"
-															class="form-control" id="input-amount" />
 													</div>
 												</div>
 												<div class="form-group">
@@ -700,10 +669,10 @@
 						</div>
 					</div>
 					<div class="tab-pane" id="tab-customer">
-						<div id="order-customer" class="blank-page"></div>
+						<div id="order-customer"></div>
 					</div>
 					<div class="tab-pane" id="tab-purchase">
-						<div id="order-purchase" class="blank-page"></div>
+						<div id="order-purchase"></div>
 					</div>
 					<div class="tab-pane" id="tab-vendor">
 						<div id="order-vendor"></div>
@@ -1045,42 +1014,12 @@
 			$('#order-vendor').load(this.href);
 		});
 
-		$('select[name=\'order_status_id\']').on('change', function () {
-			var order_status_id = $('select[name=\'order_status_id\']').val();
-
-			$.ajax({
-				url: 'index.php?route=sale/order/orderStatus&token=<?php echo $token; ?>&order_status_id=' + order_status_id + '&order_id=<?php echo $order_id; ?>',
-				dataType: 'json',
-				beforeSend: function () {
-					$('select[name=\'primary_type\']').after(' <i class="fa fa-circle-o-notch fa-spin"></i>');
-				},
-				complete: function () {
-					$('.fa-spin').remove();
-				},
-				success: function (json) {
-					if (json['transaction']) {
-						$('.transaction').slideDown();
-					} else {
-						$('.transaction').slideUp();
-					}
-
-					$('input[name=\'amount\']').val(json['amount']);
-				},
-
-				error: function (xhr, ajaxOptions, thrownError) {
-					alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
-				}
-			});
-		});
-
-		$('select[name=\'order_status_id\']').trigger('change');
-
 		$('#button-history').on('click', function () {
 			$.ajax({
 				url: '<?php echo $store_url; ?>index.php?route=api/order/history&token=' + token + '&order_id=<?php echo $order_id; ?>',
 				type: 'post',
 				dataType: 'json',
-				data: 'order_status_id=' + encodeURIComponent($('select[name=\'order_status_id\']').val()) + '&date=' + encodeURIComponent($('input[name=\'date\']').val()) + '&amount=' + Number($('input[name=\'amount\']').val()) + '&notify=' + ($('input[name=\'notify\']').prop('checked') ? 1 : 0) + '&override=' + ($('input[name=\'override\']').prop('checked') ? 1 : 0) + '&comment=' + encodeURIComponent($('textarea[name=\'comment\']').val()) + '&user_id=<?php echo $user_id; ?>',
+				data: 'order_status_id=' + encodeURIComponent($('select[name=\'order_status_id\']').val()) + '&notify=' + ($('input[name=\'notify\']').prop('checked') ? 1 : 0) + '&override=' + ($('input[name=\'override\']').prop('checked') ? 1 : 0) + '&comment=' + encodeURIComponent($('textarea[name=\'comment\']').val()) + '&user_id=<?php echo $user_id; ?>',
 				beforeSend: function () {
 					$('#button-history').button('loading');
 				},

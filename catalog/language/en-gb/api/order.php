@@ -5,11 +5,11 @@ $_['text_success']           = 'Success: You have modified orders!';
 // Error
 $_['error_adjustment']          = 'Warning: Transaksi penyesuaian sudah ada sebelumnya. Hubungi Audit untuk pengecekan!';
 $_['error_adjustment_amount']   = 'Warning: Order Total tidak sesuai dengan transaksi pembayaran. Hubungi Audit untuk pengecekan!';
-$_['error_amount']     		    = 'Jumlah pembayaran harus diisi.';
+// $_['error_amount']     		    = 'Jumlah pembayaran harus diisi.';
 $_['error_action']              = 'Warning: Could not complete this action!';
 $_['error_asset_not_found']     = 'Warning: Akun Aset tidak ditemukan. Silahkan set Akun Aset di modul Payment atau Setting!';
 $_['error_customer']            = 'Warning: Customer details needs to be set!';
-$_['error_date']  		 	    = 'Tanggal pembayaran harus diisi.';
+// $_['error_date']  		 	    = 'Tanggal pembayaran harus diisi.';
 $_['error_event']         	    = 'Warning: Rincian Event harus diisi!';
 $_['error_liability_not_found'] = 'Warning: Akun Pendapatan Diterima Dimuka tidak ditemukan. Atur Akun ini pada Setting!';
 $_['error_minimum']             = 'Warning: Minimum order amount for %s is %s!';

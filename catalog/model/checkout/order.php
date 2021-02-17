@@ -345,7 +345,7 @@ class ModelCheckoutOrder extends Model {
 		return $payment_phase_data;
 	}
 
-	public function addOrderHistory($order_id, $order_status_id, $comment = '', $notify = false, $override = false, $date = '', $amount = 0, $user_id = 0) {
+	public function addOrderHistory($order_id, $order_status_id, $comment = '', $notify = false, $override = false, $user_id = 0) {
 		$order_info = $this->getOrder($order_id);
 		
 		if ($order_info) {
@@ -423,49 +423,6 @@ class ModelCheckoutOrder extends Model {
 			// Update the DB with the new statuses
 			$this->db->query("UPDATE `" . DB_PREFIX . "order` SET order_status_id = '" . (int)$order_status_id . "', date_modified = NOW() WHERE order_id = '" . (int)$order_id . "'");
 
-			// Add transaction if there is payment
-			if ($date && $amount) {
-				$asset_id = $this->config->get($order_info['payment_code'] . '_asset_id');
-			
-				$this->load->model('accounting/account');
-				
-				$asset_info = $this->model_accounting_account->getAccount($asset_id);
-				
-				if (empty($asset_info)) {
-					$asset_id = $this->config->get('config_asset_account_id');
-				}
-
-				$order_status_info = $this->model_localisation_order_status->getOrderStatus($order_status_id);
-		
-				$reference_prefix = str_ireplace('{YEAR}',date('Y', strtotime($date)),$this->config->get('config_receipt_customer_prefix'));
-
-				$query = $this->db->query("SELECT MAX(reference_no) AS reference_no FROM `" . DB_PREFIX . "transaction` WHERE reference_prefix = '" . $this->db->escape($reference_prefix) . "'");
-
-				if ($query->row['reference_no']) {
-					$reference_no = $query->row['reference_no'] + 1;
-				} else {
-					$reference_no = $this->config->get('config_reference_start') + 1;
-				}
-				
-				$transaction_data = array(
-					'order_id'			=> $order_id,
-					'account_from_id'	=> $this->config->get('config_prepaid_account_id'),
-					'account_to_id'		=> $asset_id,
-					'label'				=> 'customer',
-					'label_id'			=> $order_info['customer_id'],
-					'reference_prefix'	=> $reference_prefix,
-					'reference_no'		=> $reference_no,
-					'date' 				=> $date,
-					'payment_method'	=> $order_info['payment_method'],
-					'description' 		=> $order_status_info['name'],
-					'amount' 			=> $amount,
-					'customer_name' 	=> $order_info['firstname'] . ' ' . $order_info['lastname'],
-					'user_id' 			=> $user_id
-				);
-
-				$this->addTransaction($transaction_data);
-			}
-				
 			// If current order status is not complete but new status is complete then commence adjustment transaction
 			if (!in_array($order_info['order_status_id'], $this->config->get('config_complete_status')) && in_array($order_status_id, $this->config->get('config_complete_status'))) {
 				$this->load->model('accounting/transaction');
@@ -543,7 +500,7 @@ class ModelCheckoutOrder extends Model {
 			$this->cache->delete('product');
 			
 			// If order status is 0 then becomes greater than 0 send main html email
-			if (!$order_info['order_status_id'] && $order_status_id) {
+/* 			if (!$order_info['order_status_id'] && $order_status_id) {
 				// Check for any downloadable products
 				$download_status = false;
 	
@@ -682,7 +639,7 @@ class ModelCheckoutOrder extends Model {
 				$data['payment_address'] = str_replace(array("\r\n", "\r", "\n"), '<br />', preg_replace(array("/\s\s+/", "/\r\r+/", "/\n\n+/"), '<br />', trim(str_replace($find, $replace, $format))));
 
 				//Shipping Unused
-/* 				if ($order_info['shipping_address_format']) {
+				if ($order_info['shipping_address_format']) {
 					$format = $order_info['shipping_address_format'];
 				} else {
 					$format = '{firstname} {lastname}' . "\n" . '{company}' . "\n" . '{address_1}' . "\n" . '{address_2}' . "\n" . '{city} {postcode}' . "\n" . '{zone}' . "\n" . '{country}';
@@ -715,7 +672,7 @@ class ModelCheckoutOrder extends Model {
 				);
 	
 				$data['shipping_address'] = str_replace(array("\r\n", "\r", "\n"), '<br />', preg_replace(array("/\s\s+/", "/\r\r+/", "/\n\n+/"), '<br />', trim(str_replace($find, $replace, $format))));
- */	
+	
 				$this->load->model('tool/upload');
 	
 				// Products
@@ -872,7 +829,7 @@ class ModelCheckoutOrder extends Model {
 				$text .= $language->get('text_new_footer') . "\n\n";
 
 				//Customer Alert Mail
-/* 				$mail = new Mail();
+				$mail = new Mail();
 				$mail->protocol = $this->config->get('config_mail_protocol');
 				$mail->parameter = $this->config->get('config_mail_parameter');
 				$mail->smtp_hostname = $this->config->get('config_mail_smtp_hostname');
@@ -888,7 +845,7 @@ class ModelCheckoutOrder extends Model {
 				$mail->setHtml($this->load->view('mail/order', $data));
 				$mail->setText($text);
 				$mail->send();
- */	
+	
 				// Admin Alert Mail
 				if ($this->config->get('config_order_mail')) {
 					$subject = sprintf($language->get('text_new_subject'), html_entity_decode($this->config->get('config_name'), ENT_QUOTES, 'UTF-8'), $order_id);
@@ -997,7 +954,7 @@ class ModelCheckoutOrder extends Model {
 					}
 				}
 			}
-	
+ */	
 			// If order status is not 0 then send update text email
 /* 			if ($order_info['order_status_id'] && $order_status_id && $notify) {
 				$language = new Language($order_info['language_code']);
@@ -1044,7 +1001,8 @@ class ModelCheckoutOrder extends Model {
 				$mail->setText($message);
 				$mail->send();
 			}
- */		}
+ */
+		}
 	}
 
 	public function addTransaction($data) {

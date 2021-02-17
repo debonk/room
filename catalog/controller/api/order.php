@@ -867,8 +867,6 @@ class ControllerApiOrder extends Controller
 			// Add keys for missing post vars
 			$keys = array(
 				'order_status_id',
-				'date',
-				'amount',
 				'notify',
 				'override',
 				'comment',
@@ -882,16 +880,6 @@ class ControllerApiOrder extends Controller
 			}
 
 			$this->load->model('checkout/order');
-
-			if (!empty($this->config->get('config_status_with_payment')) && in_array((int)$this->request->post['order_status_id'], $this->config->get('config_status_with_payment'))) {
-				if (empty($this->request->post['date'])) {
-					$json['error_date'] = $this->language->get('error_date');
-				}
-
-				if (empty($this->request->post['amount'])) {
-					$json['error_amount'] = $this->language->get('error_amount');
-				}
-			}
 
 			if (isset($this->request->get['order_id'])) {
 				$order_id = $this->request->get['order_id'];
@@ -927,6 +915,7 @@ class ControllerApiOrder extends Controller
 				if (empty($prepaid_account_info)) {
 					$json['error'] = $this->language->get('error_liability_not_found');
 				}
+////////////
 
 				// If current order status is not complete but new status is complete then check for adjustment transaction
 				if (!in_array($order_info['order_status_id'], $this->config->get('config_complete_status')) && in_array($this->request->post['order_status_id'], $this->config->get('config_complete_status'))) {
@@ -958,7 +947,7 @@ class ControllerApiOrder extends Controller
 		}
 
 		if (!$json) {
-			$this->model_checkout_order->addOrderHistory($order_id, $this->request->post['order_status_id'], $this->request->post['comment'], $this->request->post['notify'], $this->request->post['override'], $this->request->post['date'], $this->request->post['amount'], $this->request->post['user_id']);
+			$this->model_checkout_order->addOrderHistory($order_id, $this->request->post['order_status_id'], $this->request->post['comment'], $this->request->post['notify'], $this->request->post['override'], $this->request->post['user_id']);
 
 			$json['success'] = $this->language->get('text_success');
 		}

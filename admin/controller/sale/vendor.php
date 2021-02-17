@@ -76,33 +76,27 @@ class ControllerSaleVendor extends Controller
 
 		foreach ($order_vendors as $order_vendor) {
 			$summary_data = [
-				'order_id'	=> $order_id,
 				'label'		=> 'vendor',
 				'label_id'	=> $order_vendor['vendor_id'],
-				'group'		=> 'tt.category_label, tt.account_type',
-				'sort'		=> 't.label_id'
+				'group'		=> 'tt.category_label'
 			];
 
 			$transaction_summary_data = [];
 
-			$transactions_summary = $this->model_accounting_transaction->getTransactionsSummary($summary_data);
+			$transactions_summary = $this->model_accounting_transaction->getTransactionsSummary($order_id, $summary_data);
+			foreach ($transactions_summary as $key => $transaction_summary) {
+				$transactions_summary[$transaction_summary['category_label']][$transaction_summary['account_type']] = $transaction_summary;
+				unset($transactions_summary[$key]);
+			}
 
-			$debit = 0;
-			$credit = 0;
 			$admission_status = $order_admission_status;
 
-			foreach ($transactions_summary as $transaction_summary) {
+			foreach ($transactions_summary as $key => $transaction_summary) {
+				$debit = isset($transaction_summary['D']) ? $transaction_summary['D']['total'] : 0;
+				$credit = isset($transaction_summary['C']) ? $transaction_summary['C']['total'] : 0;
 
-				if ($transaction_summary['account_type'] == 'D') {
-					$debit = $transaction_summary['total'];
-				}
-
-				if ($transaction_summary['account_type'] == 'C') {
-					$credit = $transaction_summary['total'];
-				}
-
-				$transaction_summary_data[$transaction_summary['category_label']] = [
-					'transaction_type' 	=> $transaction_summary['category_label'] ? $this->language->get('text_category_' . $transaction_summary['category_label']) : '',
+				$transaction_summary_data[$key] = [
+					'transaction_type' 	=> $key ? $this->language->get('text_category_' . $key) : '',
 					'debit'				=> $this->currency->format($debit, $order_info['currency_code'], $order_info['currency_value']),
 					'credit'			=> $this->currency->format($credit, $order_info['currency_code'], $order_info['currency_value']),
 					'balance'			=> $this->currency->format($debit - $credit, $order_info['currency_code'], $order_info['currency_value']),
@@ -201,7 +195,7 @@ class ControllerSaleVendor extends Controller
 				'vendor_name'		=> $result['customer_name'],
 				'asset'				=> $result['payment_method'],
 				'description'		=> $result['description'],
-				'amount'			=> $this->currency->format($result['amount'], $order_info['currency_code'], $order_info['currency_value']),
+				'amount'			=> $this->currency->format(($result['account_type'] == 'C' ? -1 : 1) * $result['amount'], $order_info['currency_code'], $order_info['currency_value']),
 				'date_added'		=> date($this->language->get('date_format_short'), strtotime($result['date_added'])),
 				'username'			=> $result['username'],
 				'receipt'	 		=> $href,
@@ -531,31 +525,20 @@ class ControllerSaleVendor extends Controller
 		}
 
 		if ($order_vendor_info && $order_vendor_info['deposit']) {
-			$deposit_balance = 0;
-
 			$summary_data = [
-				'order_id'	=> $order_id,
-				'label'		=> 'vendor',
-				'label_id'	=> $order_vendor_info['vendor_id'],
-				'group'		=> 'tt.category_label, tt.account_type'
+				'label'				=> 'vendor',
+				'label_id'			=> $order_vendor_info['vendor_id'],
+				'category_label'	=> 'deposit',
+				'group'				=> 'tt.category_label'
 			];
 
-			$transactions_summary = $this->model_accounting_transaction->getTransactionsSummary($summary_data);
+			$transaction_total = $this->model_accounting_transaction->getTransactionsTotalSummary($order_id, $summary_data);
 
-			foreach ($transactions_summary as $transaction_summary) {
-				if ($transaction_summary['category_label'] == 'deposit') {
-					if ($transaction_summary['account_type'] == 'D') {
-						$deposit_balance += $transaction_summary['amount'];
-					} else {
-						$deposit_balance -= $transaction_summary['amount'];
-					}
-				}
-			}
-
-			if ($order_vendor_info['deposit'] < $deposit_balance) {
+			if ($order_vendor_info['deposit'] > $transaction_total) {
 				$admission_status = false;
 			}
 		}
+		// $admission_status = 1;//Develompent Purpose
 
 		if ($admission_status) {
 			$this->load->model('setting/setting');

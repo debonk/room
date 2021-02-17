@@ -1085,8 +1085,6 @@ class ControllerSaleOrder extends Controller
 				'text_venue',
 				'entry_vendor',
 				'entry_order_status',
-				'entry_date',
-				'entry_amount',
 				'entry_notify',
 				'entry_override',
 				'entry_comment',
@@ -1372,40 +1370,30 @@ class ControllerSaleOrder extends Controller
 
 			$totals = $this->model_sale_order->getOrderTotals($this->request->get['order_id']);
 
-			$filter_data = array(
-				'label'		=> 'customer',
-				'sort'		=> 't.date',
-				'order'		=> 'ASC'
-			);
-
-			$transactions = $this->model_accounting_transaction->getTransactionsByOrderId($order_id, $filter_data);
+			$summary_data = [
+				'label'				=> 'customer',
+				'label_id'			=> $order_info['customer_id'],
+				'category_label'	=> 'order',
+			];
+	
+			$transaction_total = $this->model_accounting_transaction->getTransactionsTotalSummary($order_id, $summary_data);
 
 			foreach ($totals as $total) {
 				$data['totals'][] = array(
 					'title' 	=> $total['title'],
-					'text'  	=> $this->currency->format($total['value'], $order_info['currency_code'], $order_info['currency_value']),
-					'receipt'	=> ''
+					'text'  	=> $this->currency->format($total['value'], $order_info['currency_code'], $order_info['currency_value'])
 				);
 			}
 
-			$balance = $order_info['total'];
-
-			foreach ($transactions as $transaction) {
+			if ($transaction_total) {
 				$data['totals'][] = array(
-					'title' 	=> $transaction['description'] . ' (' . date($this->language->get('date_format_short'), strtotime($transaction['date'])) . ')',
-					'text'  	=> $this->currency->format(-$transaction['amount'], $order_info['currency_code'], $order_info['currency_value']),
-					'receipt'	=> $this->url->link('sale/order/receipt', 'token=' . $this->session->data['token'] . '&transaction_id=' . (int)$transaction['transaction_id'], true),
-					'print'		=> $transaction['printed'] ? 'preview' : 'print'
+					'title' => $this->language->get('text_total'),
+					'text'  => $this->currency->format(-$transaction_total, $order_info['currency_code'], $order_info['currency_value'])
 				);
 
-				$balance -= $transaction['amount'];
-			}
-
-			if ($transactions) {
 				$data['totals'][] = array(
 					'title' => $this->language->get('text_balance'),
-					'text'  => $this->currency->format($balance, $order_info['currency_code'], $order_info['currency_value']),
-					'receipt'	=> ''
+					'text'  => $this->currency->format($order_info['total'] - $transaction_total, $order_info['currency_code'], $order_info['currency_value'])
 				);
 			}
 
@@ -1413,13 +1401,6 @@ class ControllerSaleOrder extends Controller
 			$data['order_vendors'] = array();
 
 			$order_vendors = $this->model_sale_order->getOrderVendors($order_id);
-
-			// if ($this->config->get('config_complete_status_required') && !in_array($order_info['order_status_id'], $this->config->get('config_complete_status'))) {
-			// 	$paid_off_status = false;
-			// } else {
-			// 	$paid_off_status = true;
-			// }
-			// var_dump($order_vendors);die('---breakpoint---');
 
 			$this->load->model('sale/document');
 
@@ -1451,34 +1432,12 @@ class ControllerSaleOrder extends Controller
 					];
 				}
 
-
-				// if (isset($order_documents['vendor_agreement'])) {
-				// 	$agreement_href = $this->url->link('sale/order/vendorAgreement', 'token=' . $this->session->data['token'] . '&order_id=' . $order_id . '&vendor_id=' . $order_vendor['vendor_id'], true);
-				// 	$agreement_printed = $order_documents['vendor_agreement']['printed'] ? 'preview' : 'print';
-				// } else {
-				// 	$agreement_href = '';
-				// 	$agreement_printed = '';
-				// }
-
-				// if (isset($order_documents['vendor-admission'])) {
-				// 	$admission_href = $this->url->link('sale/order/admission', 'token=' . $this->session->data['token'] . '&order_id=' . $order_id . '&vendor_id=' . $order_vendor['vendor_id'], true);
-				// 	$admission_printed = $order_documents['vendor_admission']['printed'] ? 'preview' : 'print';
-				// } else {
-				// 	$admission_href = '';
-				// 	$admission_printed = '';
-				// }
-
 				$data['order_vendors'][] = array(
 					'vendor_id' 		=> $order_vendor['vendor_id'],
 					'title' 			=> $order_vendor['vendor_name'] . ' - ' . $order_vendor['vendor_type'],
 					'document'			=> $document_data
-					// 'agreement_href'	=> $agreement_href,
-					// 'admission_href'	=> $admission_href,
-					// 'agreement_printed'	=> $agreement_printed,
-					// 'admission_printed'	=> $admission_printed
 				);
 			}
-			// var_dump($data['order_vendors']);die('---breakpoint---');
 
 			# Vendor List
 			$this->load->model('catalog/vendor');
@@ -1501,10 +1460,8 @@ class ControllerSaleOrder extends Controller
 					);
 				}
 			}
-			// var_dump($data['order_vendors']);
-			// die('---breakpoint---');
 
-			//Payment Phase
+			# Payment Phase
 			$this->load->model('localisation/order_status');
 
 			$data['payment_phases'] = array();
@@ -1964,7 +1921,7 @@ class ControllerSaleOrder extends Controller
 				'label_id'	=> $this->request->post['vendor_id']
 			);
 
-			$transaction_total = $this->model_accounting_transaction->getTransactionsTotalByOrderId($order_id, $filter_data);
+			$transaction_total = $this->model_accounting_transaction->getTransactionsTotalSummary($order_id, $filter_data);
 
 			if ($order_info && ($transaction_total == 0)) {
 				$this->model_sale_order->deleteOrderVendor($order_id, $this->request->post['vendor_id']);
@@ -2815,54 +2772,6 @@ class ControllerSaleOrder extends Controller
 				'option'        => $option_data
 				// 'slot'        	=> $slot_data
 			);
-		}
-
-		$this->response->addHeader('Content-Type: application/json');
-		$this->response->setOutput(json_encode($json));
-	}
-
-	public function orderStatus()
-	{
-		$json = array();
-
-		$order_id = $this->request->get['order_id'];
-		$order_status_id = $this->request->get['order_status_id'];
-
-		$this->load->model('sale/order');
-		$this->load->model('accounting/transaction');
-
-		$order_info = $this->model_sale_order->getOrder($order_id);
-
-		$filter_data = array(
-			'label'		=> 'customer'
-		);
-
-		$transaction_total = $this->model_accounting_transaction->getTransactionsTotalByOrderId($order_id, $filter_data);
-
-		if (in_array($order_status_id, $this->config->get('config_status_with_payment'))) {
-			$json['transaction'] = true;
-
-			switch ($order_status_id) {
-				case $this->config->get('config_initial_payment_status_id'):
-					$amount = $this->config->get('config_initial_payment_amount'); //Fixed value
-
-					break;
-
-				case $this->config->get('config_down_payment_status_id'):
-					$amount = round($order_info['total'] * $this->config->get('config_down_payment_amount') / 100000, 0) * 1000;
-
-					break;
-
-				case $this->config->get('config_full_payment_status_id'):
-					$amount = $order_info['total'];
-
-					break;
-
-				default:
-					$amount = 0;
-			}
-
-			$json['amount'] = max($amount - $transaction_total, 0);
 		}
 
 		$this->response->addHeader('Content-Type: application/json');

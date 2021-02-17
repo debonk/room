@@ -113,7 +113,7 @@ class ModelAccountingTransaction extends Model {
 	}
 
 	public function getTransactions($data = array()) {
-		$sql = "SELECT t.*, CONCAT(t.reference_prefix, LPAD(t.reference_no, 4, '0')) AS reference, a1.name AS account_from, a2.name AS account_to, o.invoice_no, o.invoice_prefix, o.firstname, o.lastname, tt.name AS transaction_type, u.username FROM " . DB_PREFIX . "transaction t LEFT JOIN " . DB_PREFIX . "account a1 ON (a1.account_id = t.account_from_id) LEFT JOIN " . DB_PREFIX . "account a2 ON (a2.account_id = t.account_to_id) LEFT JOIN " . DB_PREFIX . "order o ON (o.order_id = t.order_id) LEFT JOIN " . DB_PREFIX . "transaction_type tt ON (tt.transaction_type_id = t.transaction_type_id) LEFT JOIN " . DB_PREFIX . "user u ON (u.user_id = t.user_id)";
+		$sql = "SELECT t.*, CONCAT(t.reference_prefix, LPAD(t.reference_no, 4, '0')) AS reference, a1.name AS account_from, a2.name AS account_to, o.invoice_no, o.invoice_prefix, o.firstname, o.lastname, tt.account_type, tt.name AS transaction_type, u.username FROM " . DB_PREFIX . "transaction t LEFT JOIN " . DB_PREFIX . "account a1 ON (a1.account_id = t.account_from_id) LEFT JOIN " . DB_PREFIX . "account a2 ON (a2.account_id = t.account_to_id) LEFT JOIN " . DB_PREFIX . "order o ON (o.order_id = t.order_id) LEFT JOIN " . DB_PREFIX . "transaction_type tt ON (tt.transaction_type_id = t.transaction_type_id) LEFT JOIN " . DB_PREFIX . "user u ON (u.user_id = t.user_id)";
 
 		$implode = array();
 
@@ -410,15 +410,6 @@ class ModelAccountingTransaction extends Model {
 		return $query->row['total'];
 	}
 
-//Delete
-	public function getTransactionNoMax($reference_prefix) {
-		$sql = "SELECT MAX(reference_no) AS total FROM `" . DB_PREFIX . "transaction` WHERE reference_prefix = '" . $this->db->escape($reference_prefix) . "'";
-
-		$query = $this->db->query($sql);
-
-		return $query->row['total'];
-	}
-
 //Cek apakah masih digunakan
 	public function getTransactionsByOrderId($order_id, $data = array()) {
 		$sql = "SELECT t.*, CONCAT(t.reference_prefix, LPAD(t.reference_no, 4, '0')) AS reference, tt.name AS transaction_type, u.username FROM " . DB_PREFIX . "transaction t LEFT JOIN " . DB_PREFIX . "transaction_type tt ON (tt.transaction_type_id = t.transaction_type_id) LEFT JOIN " . DB_PREFIX . "user u ON (u.user_id = t.user_id) WHERE order_id = '" . (int)$order_id . "'";
@@ -467,37 +458,37 @@ class ModelAccountingTransaction extends Model {
 		return $query->rows;
 	}
 
-	public function getTransactionsTotalByOrderId($order_id, $data = array()) {
-		$sql = "SELECT SUM(amount) AS total FROM " . DB_PREFIX . "transaction WHERE order_id = '" . (int)$order_id . "'";
+	// public function getTransactionsTotalByOrderId($order_id, $data = array()) {
+	// 	$sql = "SELECT SUM(amount) AS total FROM " . DB_PREFIX . "transaction WHERE order_id = '" . (int)$order_id . "'";
 
-		if (!empty($data['label'])) {
-			$sql .= " AND label = '" . $this->db->escape($data['label']) . "'";
+	// 	if (!empty($data['label'])) {
+	// 		$sql .= " AND label = '" . $this->db->escape($data['label']) . "'";
 			
-			if (!empty($data['label_id'])) {
-				$sql .= " AND label_id = '" . (int)$data['label_id'] . "'";
-			}
-		}
+	// 		if (!empty($data['label_id'])) {
+	// 			$sql .= " AND label_id = '" . (int)$data['label_id'] . "'";
+	// 		}
+	// 	}
 
-		$query = $this->db->query($sql);
+	// 	$query = $this->db->query($sql);
 
-		return $query->row['total'];
-	}
+	// 	return $query->row['total'];
+	// }
 
-	public function getTransactionsCountByOrderId($order_id, $data = array()) {
-		$sql = "SELECT COUNT(*) AS total FROM " . DB_PREFIX . "transaction WHERE order_id = '" . (int)$order_id . "'";
+	// public function getTransactionsCountByOrderId($order_id, $data = array()) {
+	// 	$sql = "SELECT COUNT(*) AS total FROM " . DB_PREFIX . "transaction WHERE order_id = '" . (int)$order_id . "'";
 
-		if (!empty($data['label'])) {
-			$sql .= " AND label = '" . $this->db->escape($data['label']) . "'";
+	// 	if (!empty($data['label'])) {
+	// 		$sql .= " AND label = '" . $this->db->escape($data['label']) . "'";
 			
-			if (!empty($data['label_id'])) {
-				$sql .= " AND label_id = '" . (int)$data['label_id'] . "'";
-			}
-		}
+	// 		if (!empty($data['label_id'])) {
+	// 			$sql .= " AND label_id = '" . (int)$data['label_id'] . "'";
+	// 		}
+	// 	}
 
-		$query = $this->db->query($sql);
+	// 	$query = $this->db->query($sql);
 
-		return $query->row['total'];
-	}
+	// 	return $query->row['total'];
+	// }
 
 	public function getTransactionsCountByTransactionTypeId($transaction_type_id) {//Used by Transaction Type
 		$sql = "SELECT COUNT(*) AS total FROM " . DB_PREFIX . "transaction WHERE transaction_type_id = '" . (int)$transaction_type_id . "'";
@@ -599,19 +590,15 @@ class ModelAccountingTransaction extends Model {
 		return $query->row['total'];
 	}
 
-	public function getTransactionsSummary($data = []) {
-		$sql = "SELECT t.*, tt.*, SUM(t.amount) AS total FROM " . DB_PREFIX . "transaction t LEFT JOIN " . DB_PREFIX . "transaction_type tt ON (tt.transaction_type_id = t.transaction_type_id)";
+	public function getTransactionsSummary($order_id, $data) {
+		$sql = "SELECT t.*, tt.*, SUM(t.amount) AS total FROM " . DB_PREFIX . "transaction t LEFT JOIN " . DB_PREFIX . "transaction_type tt ON (tt.transaction_type_id = t.transaction_type_id) WHERE t.order_id = '" . (int)$order_id . "'";
 
 		$implode = array();
 
-		if (isset($data['order_id'])) {
-			$implode[] = "t.order_id = '" . (int)$data['order_id'] . "'";
-		}
-
 		$label_data = array(
-			'supplier',
+			'customer',
 			'vendor',
-			'customer'
+			'supplier'
 		);
 		
 		if (isset($data['label']) && in_array($data['label'], $label_data)) {
@@ -622,50 +609,123 @@ class ModelAccountingTransaction extends Model {
 			}
 		}
 
+		$category_data = array(
+			'order',
+			'deposit'
+		);
+		
+		if (isset($data['category_label']) && in_array($data['category_label'], $category_data)) {
+			$implode[] = "tt.category_label = '" . $this->db->escape($data['category_label']) . "'";
+		}
+
+		$account_type_data = array(
+			'D',
+			'C'
+		);
+		
+		if (isset($data['account_type']) && in_array($data['account_type'], $account_type_data)) {
+			$implode[] = "tt.account_type = '" . $this->db->escape($data['account_type']) . "'";
+		}
+
 		if (isset($data['transaction_type_id'])) {
 			$implode[] = "transaction_type_id = '" . (int)$data['transaction_type_id'] . "'";
 		}
 
 		if ($implode) {
-			$sql .= " WHERE " . implode(" AND ", $implode);
+			$sql .= " AND " . implode(" AND ", $implode);
 		}
 
 		$group_data = array(
 			't.label',
 			't.label_id',
-			'tt.client_label',
 			'tt.category_label',
-			'tt.category_label, tt.account_type',
-			't.label_id, tt.category_label',
 			't.transaction_type_id'
 		);
 		
-		if (isset($data['group']) && in_array($data['group'], $group_data)) {
-			$sql .= " GROUP BY " . $data['group'];
-		} else {
-			$sql .= " GROUP BY label";
+		if (!isset($data['group']) || !in_array($data['group'], $group_data)) {
+			$data['group'] = 'tt.category_label';
 		}
 
-		$sort_data = array(
-			't.label',
-			't.label_id',
-			't.transaction_type_id'
-		);
+		$sql .= " GROUP BY tt.account_type, " . $data['group'];
+		$sql .= " ORDER BY tt.account_type, " . $data['group'] . " ASC";
 
-		if (isset($data['sort']) && in_array($data['sort'], $sort_data)) {
-			$sql .= " ORDER BY " . $data['sort'];
-		} else {
-			$sql .= " ORDER BY " . $data['group'];
-		}
+		// if (isset($data['sort']) && in_array($data['sort'], $group_data)) {
+		// 	$sql .= " ORDER BY " . $data['group'];
+		// } else {
+		// 	$sql .= " ORDER BY t.label, t.label_id, tt.category_label, tt.account_type";
+		// }
 
-		$sql .= " ASC";
+		// $sql .= " ASC";
 
 		$query = $this->db->query($sql);
 
 		return $query->rows;
 	}
 
-//Akan diganti ke getTransactionsSummary($order_id, $label)
+	public function getTransactionsTotalSummary($order_id, $data) {
+		$sql = "SELECT tt.account_type, SUM(t.amount) AS total FROM " . DB_PREFIX . "transaction t LEFT JOIN " . DB_PREFIX . "transaction_type tt ON (tt.transaction_type_id = t.transaction_type_id) WHERE t.order_id = '" . (int)$order_id . "'";
+
+		$implode = array();
+
+		$label_data = array(
+			'customer',
+			'vendor',
+			'supplier'
+		);
+		
+		if (isset($data['label']) && in_array($data['label'], $label_data)) {
+			$implode[] = "t.label = '" . $this->db->escape($data['label']) . "'";
+
+			if (isset($data['label_id'])) {
+				$implode[] = "t.label_id = '" . $this->db->escape($data['label_id']) . "'";
+			}
+		}
+
+		$category_data = array(
+			'order',
+			'deposit'
+		);
+		
+		if (isset($data['category_label']) && in_array($data['category_label'], $category_data)) {
+			$implode[] = "tt.category_label = '" . $this->db->escape($data['category_label']) . "'";
+		}
+
+		$account_type_data = array(
+			'D',
+			'C'
+		);
+		
+		if (isset($data['account_type']) && in_array($data['account_type'], $account_type_data)) {
+			$implode[] = "tt.account_type = '" . $this->db->escape($data['account_type']) . "'";
+		}
+
+		if (isset($data['transaction_type_id'])) {
+			$implode[] = "transaction_type_id = '" . (int)$data['transaction_type_id'] . "'";
+		}
+
+		if ($implode) {
+			$sql .= " AND " . implode(" AND ", $implode);
+		}
+
+		$sql .= " GROUP BY tt.account_type";
+
+		$query = $this->db->query($sql);
+
+		$debit = 0;
+		$credit = 0;
+
+		foreach ($query->rows as $value) {
+			if ($value['account_type'] == 'D') {
+				$debit = $value['total'];
+			} elseif ($value['account_type'] == 'C') {
+				$credit = $value['total'];
+			}
+		}
+
+		return $debit - $credit;
+	}
+
+	//Akan diganti ke getTransactionsSummary($order_id, $label)
 	public function getTransactionsLabelSummaryByOrderId($order_id, $label) {
 		$label_data = array(
 			'supplier',
