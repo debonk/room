@@ -36,42 +36,6 @@ class ModelAccountingTransaction extends Model {
 		$this->db->query("INSERT INTO " . DB_PREFIX . "transaction SET account_from_id = '" . (int)$data['account_from_id'] . "', account_to_id = '" . (int)$data['account_to_id'] . "', label = '" . $this->db->escape($data['label']) . "', label_id = '" . (int)$data['label_id'] . "', order_id = '" . (int)$data['order_id'] . "', transaction_type_id = '" . (int)$data['transaction_type_id'] . "', date = DATE('" . $this->db->escape($data['date']) . "'), payment_method = '" . $this->db->escape($data['payment_method']) . "', description = '" . $this->db->escape($data['description']) . "', amount = '" . (float)$data['amount'] . "', customer_name = '" . $this->db->escape($data['customer_name']) . "', reference_prefix = '" . $this->db->escape($data['reference_prefix']) . "', reference_no = '" . (int)$data['reference_no'] . "', edit_permission = '0', date_added = NOW(), user_id = '" . $this->user->getId() . "'");
 	}
 
-/* 	public function addTransaction($data) {
-		if (!isset($data['label_id'])) {
-			$data['label_id'] = 0;
-		}
-		
-		if (!isset($data['order_id'])) {
-			$data['order_id'] = 0;
-		}
-		
-		if (!isset($data['payment_method'])) {
-			$data['payment_method'] = '';
-		}
-
-		$this->load->model('accounting/account');
-		$account_to_info = $this->model_accounting_account->getAccount($data['account_to_id']);
-
-		$label_data = array(
-			'B'	=> 'asset',
-			'L'	=> 'liability',
-			'Q'	=> 'equity',
-			'R'	=> 'revenue',
-			'E'	=> 'expense'
-		);
-		
-        if (!isset($data['label'])) {
-			$data['label'] = $account_to_info['component'];
-        }
-      
-        if (!isset($data['reference_prefix'])) {
-			$data['reference_prefix'] = array_search($account_to_info['component'], $label_data) . date('ym');
-			$data['reference_no'] = $this->getTransactionNoMax($data['reference_prefix']) + 1;
-        }
-      
-		$this->db->query("INSERT INTO " . DB_PREFIX . "transaction SET account_from_id = '" . (int)$data['account_from_id'] . "', account_to_id = '" . (int)$data['account_to_id'] . "', label = '" . $this->db->escape($data['label']) . "', label_id = '" . (int)$data['label_id'] . "', order_id = '" . (int)$data['order_id'] . "', date = DATE('" . $this->db->escape($data['date']) . "'), payment_method = '" . $this->db->escape($data['payment_method']) . "', description = '" . $this->db->escape($data['description']) . "', amount = '" . (float)$data['amount'] . "', customer_name = '" . $this->db->escape($data['customer_name']) . "', reference_prefix = '" . $this->db->escape($data['reference_prefix']) . "', reference_no = '" . (int)$data['reference_no'] . "', edit_permission = '0', date_added = NOW(), user_id = '" . $this->user->getId() . "'");
-	} */
-
 	public function editTransaction($transaction_id, $data) {
 		$sql = "UPDATE " . DB_PREFIX . "transaction SET account_from_id = '" . (int)$data['account_from_id'] . "', account_to_id = '" . (int)$data['account_to_id'] . "', edit_permission = 0, date_added = NOW(), user_id = '" . $this->user->getId() . "'";
 
@@ -134,12 +98,13 @@ class ModelAccountingTransaction extends Model {
 		}
 
 		if (isset($data['filter_account_from_id']) && !is_null($data['filter_account_from_id'])) {
-			$implode[] = "t.account_from_id = '" . (int)$data['filter_account_from_id'] . "'";
+			$implode[] = "t.account_from_id LIKE '" . (int)$data['filter_account_from_id'] . "%'";
+			// $implode[] = "t.account_from_id = '" . (int)$data['filter_account_from_id'] . "'";
 		}
 
-		// if (!empty($data['filter_account_to_id']) && $data['filter_account_to_id'] == '0') {
 		if (isset($data['filter_account_to_id']) && !is_null($data['filter_account_to_id'])) {
-			$implode[] = "t.account_to_id = '" . (int)$data['filter_account_to_id'] . "'";
+			$implode[] = "t.account_to_id LIKE '" . (int)$data['filter_account_to_id'] . "%'";
+			// $implode[] = "t.account_to_id = '" . (int)$data['filter_account_to_id'] . "'";
 		}
 
 		if (!empty($data['filter_description'])) {
@@ -234,11 +199,11 @@ class ModelAccountingTransaction extends Model {
 		}
 
 		if (isset($data['filter_account_from_id']) && !is_null($data['filter_account_from_id'])) {
-			$implode[] = "t.account_from_id = '" . (int)$data['filter_account_from_id'] . "'";
+			$implode[] = "t.account_from_id LIKE '" . (int)$data['filter_account_from_id'] . "%'";
 		}
 
 		if (isset($data['filter_account_to_id']) && !is_null($data['filter_account_to_id'])) {
-			$implode[] = "t.account_to_id = '" . (int)$data['filter_account_to_id'] . "'";
+			$implode[] = "t.account_to_id LIKE '" . (int)$data['filter_account_to_id'] . "%'";
 		}
 
 		if (!empty($data['filter_description'])) {
@@ -298,11 +263,11 @@ class ModelAccountingTransaction extends Model {
 		}
 
 		if (isset($data['filter_account_from_id']) && !is_null($data['filter_account_from_id'])) {
-			$implode[] = "t.account_from_id = '" . (int)$data['filter_account_from_id'] . "'";
+			$implode[] = "t.account_from_id LIKE '" . (int)$data['filter_account_from_id'] . "%'";
 		}
 
 		if (isset($data['filter_account_to_id']) && !is_null($data['filter_account_to_id'])) {
-			$implode[] = "t.account_to_id = '" . (int)$data['filter_account_to_id'] . "'";
+			$implode[] = "t.account_to_id LIKE '" . (int)$data['filter_account_to_id'] . "%'";
 		}
 
 		if (!empty($data['filter_description'])) {

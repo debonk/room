@@ -296,13 +296,13 @@ class ControllerAccountingTransaction extends Controller {
 		if (isset($this->request->get['filter_account_from_id'])) {
 			$filter_account_from_id = $this->request->get['filter_account_from_id'];
 		} else {
-			$filter_account_from_id = '';
+			$filter_account_from_id = null;
 		}
 
 		if (isset($this->request->get['filter_account_to_id'])) {
 			$filter_account_to_id = $this->request->get['filter_account_to_id'];
 		} else {
-			$filter_account_to_id = '';
+			$filter_account_to_id = null;
 		}
 
 		if (isset($this->request->get['filter_description'])) {

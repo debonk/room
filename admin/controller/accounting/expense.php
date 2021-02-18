@@ -278,13 +278,13 @@ class ControllerAccountingExpense extends Controller {
 		if (isset($this->request->get['filter_account_from_id'])) {
 			$filter_account_from_id = $this->request->get['filter_account_from_id'];
 		} else {
-			$filter_account_from_id = '';
+			$filter_account_from_id = null;
 		}
 
 		if (isset($this->request->get['filter_account_to_id'])) {
 			$filter_account_to_id = $this->request->get['filter_account_to_id'];
 		} else {
-			$filter_account_to_id = '';
+			$filter_account_to_id = null;
 		}
 
 		if (isset($this->request->get['filter_description'])) {
@@ -546,8 +546,10 @@ class ControllerAccountingExpense extends Controller {
 		$data['token'] = $this->session->data['token'];
 
 		$this->load->model('accounting/account');
-		$data['accounts_from'] = $this->model_accounting_account->getAccountsMenuByComponent(['asset']);
-		$data['accounts_to'] = $this->model_accounting_account->getAccountsMenuByComponent(['expense'], ['direct_cost']);
+		$data['accounts_from'] = $this->model_accounting_account->getAccountsMenuByParentId([111]);
+		$data['accounts_to'] = $this->model_accounting_account->getAccountsMenuByParentId([5141,8121]);
+		// $data['accounts_from'] = $this->model_accounting_account->getAccountsMenuByComponent(['asset']);
+		// $data['accounts_to'] = $this->model_accounting_account->getAccountsMenuByComponent(['expense'], ['direct_cost']);
 		
 		$data['filter_account_from_id'] = $filter_account_from_id;
 		$data['filter_account_to_id'] = $filter_account_to_id;
@@ -733,8 +735,10 @@ class ControllerAccountingExpense extends Controller {
 		$data['token'] = $this->session->data['token'];
 
 		$this->load->model('accounting/account');
-		$data['accounts_from'] = $this->model_accounting_account->getAccountsMenuByComponent(['asset']);
-		$data['accounts_to'] = $this->model_accounting_account->getAccountsMenuByComponent(['expense'], ['direct_cost']);
+		$data['accounts_from'] = $this->model_accounting_account->getAccountsMenuByParentId([111]);
+		$data['accounts_to'] = $this->model_accounting_account->getAccountsMenuByParentId([5141,8121]);
+		// $data['accounts_from'] = $this->model_accounting_account->getAccountsMenuByComponent(['asset']);
+		// $data['accounts_to'] = $this->model_accounting_account->getAccountsMenuByComponent(['expense'], ['direct_cost']);
 		
 		$data['header'] = $this->load->controller('common/header');
 		$data['column_left'] = $this->load->controller('common/column_left');

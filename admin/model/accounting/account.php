@@ -50,7 +50,8 @@ class ModelAccountingAccount extends Model {
             $implode = array();
 
             if (isset($data['filter_parent_id'])) {
-                $implode[] = "parent_id = '" . (int)$data['filter_parent_id'] . "'";
+                $implode[] = "account_id LIKE '" . (int)$data['filter_parent_id'] . "%'"; // base menggunakan account_id agar akun itu sendiri termasuk dlm selection
+                // $implode[] = "parent_id = '" . (int)$data['filter_parent_id'] . "'";
             }
 
 			if (isset($data['filter_status']) && !is_null($data['filter_status'])) {
@@ -162,7 +163,7 @@ class ModelAccountingAccount extends Model {
 		$implode = array();
 
 		if (isset($data['filter_parent_id'])) {
-			$implode[] = "parent_id = '" . (int)$data['filter_parent_id'] . "'";
+                $implode[] = "account_id LIKE '" . (int)$data['filter_parent_id'] . "%'"; // base menggunakan account_id agar akun itu sendiri termasuk dlm selection
 		}
 
 		if (isset($data['filter_status']) && !is_null($data['filter_status'])) {
@@ -220,7 +221,7 @@ class ModelAccountingAccount extends Model {
 		$accounts = $this->getAccounts($filter_data);
 		
 		foreach ($accounts as $account) {
-			$child_account_count = $this->getAccountsCount($filter_parent = ['filter_parent_id' => $account['account_id']]);
+			$child_account_count = $this->getAccountsCount(['filter_parent_id' => $account['account_id']]);
 			
 			if ($child_account_count) {
 				$accounts_data[$account['account_id']] = array(
@@ -233,6 +234,44 @@ class ModelAccountingAccount extends Model {
 					'account_id'	=> $account['account_id'],
 					'text'			=> $account['account_id'] . ' - ' . $account['name']
 				);
+			}
+		}
+		
+		foreach ($childs_data as $key => $child_data) {
+			$accounts_data[$key]['child'] = $child_data;
+		}
+		
+		return $accounts_data;
+	}
+	
+	public function getAccountsMenuByParentId($parent_ids = []) {
+		$accounts_data = array();
+		$childs_data = array();
+
+		foreach ($parent_ids as $parent_id) {
+			$filter_data = array(
+				'filter_parent_id'	=> $parent_id,
+				'filter_status'		=> 1,
+				'sort' 				=> 'account_id'
+			);
+			
+			$accounts = $this->getAccounts($filter_data);
+			
+			foreach ($accounts as $account) {
+				$child_account_count = $this->getAccountsCount(['filter_parent_id' => $account['account_id']]) - 1; // kurang 1 agar parent tidak dihitung
+				
+				if ($child_account_count) {
+					$accounts_data[$account['account_id']] = array(
+						'account_id'	=> $account['account_id'],
+						'text'			=> $account['account_id'] . ' - ' . $account['name'],
+						'child'			=> array()
+					);
+				} else {
+					$childs_data[$account['parent_id']][] = array(
+						'account_id'	=> $account['account_id'],
+						'text'			=> $account['account_id'] . ' - ' . $account['name']
+					);
+				}
 			}
 		}
 		

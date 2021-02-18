@@ -36,8 +36,6 @@ class ModelSaleDocument extends Model
 
                 $order_document_id = $this->addOrderDocument($data);
 
-                // $this->db->query("UPDATE `" . DB_PREFIX . "order_purchase` SET order_document_id = '" . (int)$order_document_id . "' WHERE order_purchase_id = '" . (int)$data['update_idx'] . "'");
-
                 break;
 
             case 'vendor-admission':
@@ -45,9 +43,7 @@ class ModelSaleDocument extends Model
  
                 $order_document_id = $this->addOrderDocument($data);
 
-                // $this->db->query("UPDATE `" . DB_PREFIX . "order_purchase` SET order_document_id = '" . (int)$order_document_id . "' WHERE order_purchase_id = '" . (int)$data['update_idx'] . "'");
-
-               break;
+	            break;
 
             case 'vendor-purchase':
                 $data['reference_prefix'] = str_ireplace('{YEAR}',date('Y'),$this->config->get('config_purchase_vendor_prefix'));

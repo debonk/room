@@ -7,7 +7,6 @@ $_['text_success']       		= 'Success: You have modified expenses!';
 $_['text_add']           		= 'Tambah Transaksi Biaya';
 $_['text_edit']          		= 'Edit Transaksi Biaya';
 $_['text_list']         		= 'Daftar Transaksi';
-$_['text_customer']     		= 'Customer';
 $_['text_total']     			= 'Total';
 $_['text_reference_no'] 		= 'No Referensi';
 		
@@ -16,7 +15,7 @@ $_['column_date'] 				= 'Tanggal';
 $_['column_asset']				= 'Sumber Kas';
 $_['column_description']		= 'Keterangan';
 $_['column_reference_no']		= 'No Referensi';
-$_['column_customer_name']		= 'Nama Customer';
+$_['column_customer_name']		= 'Nama Klien';
 $_['column_amount']				= 'Jumlah';
 $_['column_expense']			= 'Pembayaran Biaya';
 $_['column_username']			= 'Username';
@@ -30,7 +29,7 @@ $_['entry_date_end']    		= 'Date End';
 $_['entry_date']    			= 'Tanggal Transaksi';
 $_['entry_description']    		= 'Keterangan';
 $_['entry_amount']    			= 'Jumlah';
-$_['entry_customer_name']    	= 'Nama Customer';
+$_['entry_customer_name']    	= 'Nama Klien';
 $_['entry_reference_no']    	= 'No Referensi';
 $_['entry_username']   		 	= 'Username';
 
