@@ -283,7 +283,7 @@ class ControllerAccountingTransaction extends Controller {
 		if (isset($this->request->get['filter_date_start'])) {
 			$filter_date_start = $this->request->get['filter_date_start'];
 		} else {
-			$filter_date_start = '';
+			$filter_date_start = date('Y-m-d', strtotime(date('Y') . '-01-01'));
 			// $filter_date_start = date('Y-m-d', strtotime(date('Y') . '-' . date('m') . '-01'));
 		}
 

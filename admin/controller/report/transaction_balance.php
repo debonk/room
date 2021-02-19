@@ -103,6 +103,7 @@ class ControllerReportTransactionBalance extends Controller {
 			'column_account',
 			'column_description',
 			'column_reference_no',
+			'column_transaction_type',
 			'column_customer_name',
 			'column_debit',
 			'column_credit',
@@ -167,7 +168,6 @@ class ControllerReportTransactionBalance extends Controller {
 		);
 
 		$data['transactions'] = array();
-		// $limit = $this->config->get('config_limit_admin');
 		$limit = 20;
 
 		$filter_data = array(
@@ -181,6 +181,7 @@ class ControllerReportTransactionBalance extends Controller {
 		$transaction_count = $this->model_report_transaction->getTransactionsCount($filter_data);
 
 		$balance_start = $this->model_report_transaction->getTransactionsTotalPrevious($filter_data);
+
 		$balance = $balance_start;
 
 		$total_debit = 0;
@@ -189,6 +190,18 @@ class ControllerReportTransactionBalance extends Controller {
 		$results = $this->model_report_transaction->getTransactions($filter_data);
 		
 		foreach ($results as $result) {
+			# Maintain Versi 1
+			if (empty($result['transaction_type'])) {
+				$result['transaction_type'] = $result['description'];
+			}
+
+			if (empty($result['account_type'])) {
+				$result['account_type'] = 'D';
+			}
+			# End Maintain
+
+			$result['amount'] *= $result['account_type'] == 'D' ? 1 : -1;
+
 			if (!empty($result['order_id'])) {
 				$reference_no = '#' . $result['order_id'] . ($result['reference_no'] ? ': ' . $result['reference'] : '');
 			} else {
@@ -197,7 +210,7 @@ class ControllerReportTransactionBalance extends Controller {
 			
 			if ($result['account_to_id'] == $filter_account_id) {
 				$account = $result['account_from'] ? $result['account_from'] : $this->language->get('text_none');
-				
+
 				if ($result['amount'] > 0) {
 					$debit = $result['amount'];
 					$credit = 0;
@@ -230,16 +243,17 @@ class ControllerReportTransactionBalance extends Controller {
 			}
 			
 			$data['transactions'][] = array(
-				'transaction_id'=> $result['transaction_id'],
-				'date'	 		=> date($this->language->get('date_format_short'), strtotime($result['date'])),
-				'account'		=> $account,
-				'description'	=> $result['description'],
-				'reference_no'  => $reference_no,
-				'customer_name'	=> $result['customer_name'],
-				'debit'      	=> $this->currency->format($debit, $this->config->get('config_currency')),
-				'credit'      	=> $this->currency->format($credit, $this->config->get('config_currency')),
-				'balance'      	=> $this->currency->format($balance, $this->config->get('config_currency')),
-				'href'          => $this->url->link('accounting/transaction/edit', 'token=' . $this->session->data['token'] . '&transaction_id=' . $result['transaction_id'] . $url, true),
+				'transaction_id'	=> $result['transaction_id'],
+				'date'	 			=> date($this->language->get('date_format_short'), strtotime($result['date'])),
+				'transaction_type'	=> $result['transaction_type'],
+				'account'			=> $account,
+				'description'		=> $result['description'],
+				'reference_no' 		=> $reference_no,
+				'customer_name'		=> $result['customer_name'],
+				'debit'      		=> $this->currency->format($debit, $this->config->get('config_currency')),
+				'credit'      		=> $this->currency->format($credit, $this->config->get('config_currency')),
+				'balance'      		=> $this->currency->format($balance, $this->config->get('config_currency')),
+				'href'         		=> $this->url->link('accounting/transaction/edit', 'token=' . $this->session->data['token'] . '&transaction_id=' . $result['transaction_id'] . $url, true),
 			);
 		}
 		

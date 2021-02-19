@@ -3,6 +3,7 @@
     <thead>
       <tr>
         <td class="text-left"><?php echo $column_date; ?></td>
+        <td class="text-left"><?php echo $column_transaction_type; ?></td>
         <td class="text-left"><?php echo $column_account; ?></td>
         <td class="text-left"><?php echo $column_reference_no; ?></td>
         <td class="text-left"><?php echo $column_description; ?></td>
@@ -12,7 +13,7 @@
         <td class="text-right"><?php echo $column_balance; ?></td>
       </tr>
       <tr class="info">
-        <td class="text-right" colspan="5"><?php echo $text_balance_start; ?></td>
+        <td class="text-right" colspan="6"><?php echo $text_balance_start; ?></td>
         <td></td><td></td>
         <td class="text-right"><?php echo $balance_start; ?></td>
       </tr>
@@ -22,6 +23,7 @@
       <?php foreach ($transactions as $transaction) { ?>
       <tr>
         <td class="text-left"><?php echo $transaction['date']; ?></td>
+        <td class="text-left"><?php echo $transaction['transaction_type']; ?></td>
         <td class="text-left"><?php echo $transaction['account']; ?></td>
         <td class="text-left"><a href="<?php echo $transaction['href']; ?>" target="_blank"><?php echo $transaction['reference_no']; ?></a></td>
         <td class="text-left"><?php echo $transaction['description']; ?></td>
@@ -33,13 +35,13 @@
       <?php } ?>
       <?php } else { ?>
       <tr>
-        <td class="text-center" colspan="8"><?php echo $text_no_results; ?></td>
+        <td class="text-center" colspan="9"><?php echo $text_no_results; ?></td>
       </tr>
       <?php } ?>
     </tbody>
     <tfoot>
       <tr class="info">
-        <td class="text-right" colspan="5"><?php echo $text_total; ?></td>
+        <td class="text-right" colspan="6"><?php echo $text_total; ?></td>
         <td class="text-right"><?php echo $total_debit; ?></td>
         <td class="text-right"><?php echo $total_credit; ?></td>
         <td></td>
