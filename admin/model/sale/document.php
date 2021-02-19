@@ -174,26 +174,4 @@ class ModelSaleDocument extends Model
 
 		return $query->rows;
 	}
-	
-	// public function getOrderDocumentsByOrderClientId($order_vendor_id)
-    // {
-    //     $order_document_data = [];
-
-    //     $query = $this->db->query("SELECT *, CONCAT(reference_prefix, LPAD(reference_no, 4, '0')) AS reference FROM " . DB_PREFIX . "order_document WHERE order_vendor_id = '" . (int)$order_vendor_id . "' ORDER BY date ASC");
-
-    //     foreach ($query->rows as $value) {
-    //         $order_document_data[$value['document_type']] = $value;
-    //     }
-
-    //     return $order_document_data;
-    // }
-
-    // public function getOrderDocumentReference($order_document_id)//blm digunakan
-    // {
-    //     $query = $this->db->query("SELECT DISTINCT CONCAT(reference_prefix, LPAD(reference_no, 4, '0')) AS reference FROM " . DB_PREFIX . "order_document WHERE order_document_id = '" . (int)$order_document_id . "'");
-
-    //     return $query->row['reference'];
-    // }
-
-    ///////////////////
 }

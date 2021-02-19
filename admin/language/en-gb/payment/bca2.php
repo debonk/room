@@ -1,10 +1,10 @@
 <?php
 // Heading
-$_['heading_title']		 = 'BCA 190.6166.888';
+$_['heading_title']		 = 'BCA 010.655.7700';
 
 // Text
 $_['text_payment']		 = 'Payment';
-$_['text_success']		 = 'Success: You have modified BCA Non PPN transfer details!';
+$_['text_success']		 = 'Success: You have modified BCA transfer details!';
 $_['text_edit']          = 'Edit BCA Transfer';
 $_['text_bca2']			 = '<a href="https://www.bca.co.id/" target="_blank"><img src="view/image/payment/bca.jpg" alt="Bank Central Asia" title="Bank Central Asia" style="border: 1px solid #EEEEEE;" /></a>';
 
@@ -21,5 +21,5 @@ $_['entry_sort_order']	 = 'Sort Order';
 $_['help_total']		 = 'The checkout total the order must reach before this payment method becomes active.';
 
 // Error
-$_['error_permission']   = 'Warning: You do not have permission to modify payment BCA 190-99-22222 transfer!';
+$_['error_permission']   = 'Warning: You do not have permission to modify payment BCA BCA 010.655.7700!';
 $_['error_bank']         = 'BCA Transfer Instructions Required!';

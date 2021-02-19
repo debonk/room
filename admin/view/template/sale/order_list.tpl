@@ -93,12 +93,11 @@
                     <?php } else { ?>
                     <a href="<?php echo $sort_event_date; ?>"><?php echo $column_event_date; ?></a>
                     <?php } ?></td>
-                  <td class="text-left"><?php if ($sort == 'primary_product') { ?>
+                  <td class="text-left" style="min-width: 20%;"><?php if ($sort == 'primary_product') { ?>
                     <a href="<?php echo $sort_primary_product; ?>" class="<?php echo strtolower($order); ?>"><?php echo $column_primary_product; ?></a>
                     <?php } else { ?>
                     <a href="<?php echo $sort_primary_product; ?>"><?php echo $column_primary_product; ?></a>
                     <?php } ?></td>
-                  <td class="text-left"><?php echo $column_invoice; ?></td>
                   <td class="text-left"><?php if ($sort == 'customer') { ?>
                     <a href="<?php echo $sort_customer; ?>" class="<?php echo strtolower($order); ?>"><?php echo $column_customer; ?></a>
                     <?php } else { ?>
@@ -109,7 +108,7 @@
                     <?php } else { ?>
                     <a href="<?php echo $sort_total; ?>"><?php echo $column_total; ?></a>
                     <?php } ?></td>
-                  <td class="text-left"><?php echo $column_balance; ?></td>
+                  <td class="text-right"><?php echo $column_vendor_balance; ?></td>
                   <td class="text-left"><?php if ($sort == 'order_status') { ?>
                     <a href="<?php echo $sort_status; ?>" class="<?php echo strtolower($order); ?>"><?php echo $column_status; ?></a>
                     <?php } else { ?>
@@ -134,12 +133,15 @@
                 <tr>
                   <td class="text-right"><?php echo $order['order_id']; ?></td>
                   <td class="text-left"><?php echo $order['event_date']; ?><br />
-                  <?php echo $text_slot . ': ' . $order['slot']; ?></td>
-                  <td class="text-left"><?php echo $order['primary_product']; ?></td>
-                  <td class="text-left"><?php echo $order['invoice_no']; ?></td>
+                  	<?php echo $text_slot . ': ' . $order['slot']; ?></td>
+                  <td class="text-left"><?php echo $order['primary_product']; ?><br />
+                  	<?php echo $text_title . ': ' . $order['title']; ?><br />
+                  	<?php echo $text_invoice . ': ' . $order['invoice_no']; ?><br />
+									</td>
                   <td class="text-left"><?php echo $order['customer']; ?></td>
-                  <td class="text-right"><?php echo $order['total']; ?></td>
-                  <td class="text-right"><?php echo $order['balance']; ?></td>
+                  <td class="text-right"><?php echo $column_total . ': ' . $order['total']; ?><br />
+                  	<?php echo $text_balance . ': ' . $order['balance']; ?></td>
+                  <td class="text-right"><?php echo $order['vendor_balance']; ?></td>
                   <td class="text-left"><?php echo $order['order_status']; ?>
 				  <?php if ($order['payment_status']) { ?>
 				    <i class="fa fa-exclamation-triangle text-warning"></i>
@@ -148,9 +150,9 @@
                   <td class="text-left"><?php echo $order['date_added']; ?></td>
                   <td class="text-left"><?php echo $order['username']; ?></td>
                   <td class="text-right nowrap">
-				    <a href="<?php echo $order['view']; ?>" data-toggle="tooltip" title="<?php echo $button_view; ?>" class="btn btn-info"><i class="fa fa-eye"></i></a>
-					<a href="<?php echo $order['edit']; ?>" data-toggle="tooltip" title="<?php echo $button_edit; ?>" class="btn btn-primary"><i class="fa fa-pencil"></i></a>
-                    <button type="button" value="<?php echo $order['order_id']; ?>" id="button-delete<?php echo $order['order_id']; ?>" data-loading-text="<?php echo $text_loading; ?>" data-toggle="tooltip" title="<?php echo $button_delete; ?>" class="btn btn-danger"><i class="fa fa-trash-o"></i></button></td>
+				    <a href="<?php echo $order['view']; ?>" data-toggle="tooltip" title="<?php echo $button_view; ?>" class="btn btn-info btn-sm"><i class="fa fa-eye"></i></a>
+					<a href="<?php echo $order['edit']; ?>" data-toggle="tooltip" title="<?php echo $button_edit; ?>" class="btn btn-primary btn-sm"><i class="fa fa-pencil"></i></a>
+                    <button type="button" value="<?php echo $order['order_id']; ?>" id="button-delete<?php echo $order['order_id']; ?>" data-loading-text="<?php echo $text_loading; ?>" data-toggle="tooltip" title="<?php echo $button_delete; ?>" class="btn btn-danger btn-sm"><i class="fa fa-trash-o"></i></button></td>
                 </tr>
                 <?php } ?>
                 <?php } else { ?>

@@ -242,12 +242,14 @@ class ControllerSaleOrder extends Controller
 	{
 		$language_items = array(
 			'heading_title',
+			'text_balance',
 			'text_loading',
 			'text_no_results',
 			'text_list',
 			'text_confirm',
 			'text_missing',
-			'text_total',
+			'text_invoice',
+			'text_title',
 			'text_slot',
 			'entry_order_id',
 			'entry_event_date',
@@ -258,12 +260,13 @@ class ControllerSaleOrder extends Controller
 			'column_order_id',
 			'column_event_date',
 			'column_primary_product',
-			'column_invoice',
 			'column_customer',
-			'column_total',
+			'column_transaction',
 			'column_balance',
+			'column_vendor_balance',
 			'column_status',
 			'column_date_added',
+			'column_total',
 			'column_username',
 			'column_action',
 			'button_calendar',
@@ -388,6 +391,7 @@ class ControllerSaleOrder extends Controller
 		$data['add'] = $this->url->link('sale/order/add', 'token=' . $this->session->data['token'] . $url, true);
 
 		$data['orders'] = array();
+		$this->load->model('accounting/transaction');
 
 		$filter_data = array(
 			'filter_order_id'      => $filter_order_id,
@@ -409,6 +413,35 @@ class ControllerSaleOrder extends Controller
 		$processing_statuses = $this->config->get('config_processing_status');
 
 		foreach ($results as $result) {
+			$summary_data = [
+				// 'label'		=> 'customer',
+				// 'label_id'	=> $result['customer_id'],
+				'group'		=> 't.label'
+			];
+
+			$transaction_total = [
+				'customer'	=> 0,
+				'vendor'	=> 0
+			];
+
+			$transactions_summary = $this->model_accounting_transaction->getTransactionsSummary($result['order_id'], $summary_data);
+			foreach ($transactions_summary as $key => $transaction_summary) {
+				// $transaction_summary['category_label'] = empty($transaction_summary['category_label']) ? 'order' : $transaction_summary['category_label'];
+				$transaction_summary['account_type'] = empty($transaction_summary['account_type']) ? 'D' : $transaction_summary['account_type'];
+
+				$transactions_summary[$transaction_summary['label']][$transaction_summary['account_type']] = $transaction_summary;
+				unset($transactions_summary[$key]);
+			}
+
+			foreach ($transactions_summary as $key => $transaction_summary) {
+				$debit = isset($transaction_summary['D']) ? $transaction_summary['D']['total'] : 0;
+				$credit = isset($transaction_summary['C']) ? $transaction_summary['C']['total'] : 0;
+
+				$transaction_total[$key] = $debit - $credit;
+			}
+			// var_dump($transaction_total);
+
+
 			$payment_status = '';
 
 			if (in_array($result['order_status_id'], $processing_statuses)) {
@@ -423,6 +456,7 @@ class ControllerSaleOrder extends Controller
 
 			$data['orders'][] = array(
 				'order_id'        => $result['order_id'],
+				'title'        	  => $result['title'],
 				'invoice_no'      => $result['invoice_no'] ? $result['invoice_prefix'] . str_pad($result['invoice_no'], 4, 0, STR_PAD_LEFT) : '',
 				'event_date'      => date($this->language->get('date_format_short'), strtotime($result['event_date'])),
 				'slot'      	  => $result['slot'],
@@ -432,7 +466,8 @@ class ControllerSaleOrder extends Controller
 				'order_status'    => $result['order_status'],
 				'payment_status'  => $payment_status,
 				'total'           => $this->currency->format($result['total'], $result['currency_code'], $result['currency_value']),
-				'balance'         => $this->currency->format($result['total'] - $result['total_paid'], $result['currency_code'], $result['currency_value']),
+				'balance'         => $this->currency->format($result['total'] - $transaction_total['customer'], $result['currency_code'], $result['currency_value']),
+				'vendor_balance'  => $this->currency->format($transaction_total['vendor'], $result['currency_code'], $result['currency_value']),
 				'date_added'      => date($this->language->get('date_format_short'), strtotime($result['date_added'])),
 				'username'        => $result['username'],
 				'shipping_code'   => $result['shipping_code'],
@@ -440,6 +475,7 @@ class ControllerSaleOrder extends Controller
 				'edit'            => $this->url->link('sale/order/edit', 'token=' . $this->session->data['token'] . '&order_id=' . $result['order_id'] . $url, true),
 			);
 		}
+		// die('---breakpoint---');
 
 		$data['token'] = $this->session->data['token'];
 

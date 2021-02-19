@@ -67,6 +67,9 @@ class ControllerSaleCustomer extends Controller
 
 		$customer_transaction_summary = $this->model_accounting_transaction->getTransactionsSummary($order_id, $summary_data);
 		foreach ($customer_transaction_summary as $key => $transaction_summary) {
+			$transaction_summary['category_label'] = empty($transaction_summary['category_label']) ? 'order' : $transaction_summary['category_label'];
+			$transaction_summary['account_type'] = empty($transaction_summary['account_type']) ? 'D' : $transaction_summary['account_type'];
+
 			$customer_transaction_summary[$transaction_summary['category_label']][$transaction_summary['account_type']] = $transaction_summary;
 			unset($customer_transaction_summary[$key]);
 		}

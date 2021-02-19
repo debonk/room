@@ -221,7 +221,7 @@ class ModelAccountingAccount extends Model {
 		$accounts = $this->getAccounts($filter_data);
 		
 		foreach ($accounts as $account) {
-			$child_account_count = $this->getAccountsCount(['filter_parent_id' => $account['account_id']]);
+			$child_account_count = $this->getAccountsCount(['filter_parent_id' => $account['account_id']]) - 1;
 			
 			if ($child_account_count) {
 				$accounts_data[$account['account_id']] = array(

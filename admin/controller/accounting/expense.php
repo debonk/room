@@ -266,13 +266,15 @@ class ControllerAccountingExpense extends Controller {
 		if (isset($this->request->get['filter_date_start'])) {
 			$filter_date_start = $this->request->get['filter_date_start'];
 		} else {
-			$filter_date_start = date('Y-m-d', strtotime(date('Y') . '-' . date('m') . '-01'));
+			$filter_date_start = '';
+			// $filter_date_start = date('Y-m-d', strtotime(date('Y') . '-' . date('m') . '-01'));
 		}
 
 		if (isset($this->request->get['filter_date_end'])) {
 			$filter_date_end = $this->request->get['filter_date_end'];
 		} else {
-			$filter_date_end = date('Y-m-t');
+			$filter_date_end = '';
+			// $filter_date_end = date('Y-m-t');
 		}
 
 		if (isset($this->request->get['filter_account_from_id'])) {
@@ -320,7 +322,7 @@ class ControllerAccountingExpense extends Controller {
 		if (isset($this->request->get['order'])) {
 			$order = $this->request->get['order'];
 		} else {
-			$order = 'ASC';
+			$order = 'DESC';
 		}
 
 		if (isset($this->request->get['page'])) {
