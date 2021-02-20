@@ -1,8 +1,8 @@
 <?php
-class ControllerReportSaleDocument extends Controller {
-	private $error = array();
-
-	public function index() {
+class ControllerReportSaleDocument extends Controller
+{
+	public function index()
+	{
 		$this->load->language('report/sale_document');
 
 		$this->document->setTitle($this->language->get('heading_title'));
@@ -12,7 +12,8 @@ class ControllerReportSaleDocument extends Controller {
 		$this->getList();
 	}
 
-	protected function getList() {
+	protected function getList()
+	{
 		$language_items = array(
 			'heading_title',
 			'text_list',
@@ -34,7 +35,7 @@ class ControllerReportSaleDocument extends Controller {
 		foreach ($language_items as $language_item) {
 			$data[$language_item] = $this->language->get($language_item);
 		}
-		
+
 		if (isset($this->request->get['filter_reference'])) {
 			$filter_reference = $this->request->get['filter_reference'];
 		} else {
@@ -50,13 +51,13 @@ class ControllerReportSaleDocument extends Controller {
 		if (isset($this->request->get['sort'])) {
 			$sort = $this->request->get['sort'];
 		} else {
-			$sort = 'order_id, date, type_id';
+			$sort = 'order_id DESC, reference';
 		}
 
 		if (isset($this->request->get['order'])) {
 			$order = $this->request->get['order'];
 		} else {
-			$order = 'ASC';
+			$order = 'DESC';
 		}
 
 		if (isset($this->request->get['page'])) {
@@ -112,27 +113,36 @@ class ControllerReportSaleDocument extends Controller {
 		);
 
 		$transaction_count = $this->model_report_sale->getDocumentsCount($filter_data);
-	
+
 		$results = $this->model_report_sale->getDocuments($filter_data);
+		// var_dump($results);die('---breakpoint---');
 
 		foreach ($results as $result) {
 			switch ($result['type']) {
-				case 'order':
-					$document_type = $this->language->get('text_agreement');
+				case 'customer-order':
+					$document_type = $this->language->get('text_customer_agreement');
 					break;
-				
-				case 'transaction':
-					$document_type = $this->language->get('text_receipt');
+
+				case 'customer-transaction':
+					$document_type = $this->language->get('text_customer_receipt');
 					break;
-				
-				case 'vendor_agreement':
-					$document_type = $this->language->get('text_vendor_agreement');
-					break;
-				
-				case 'vendor_admission':
+
+				case 'vendor-admission':
 					$document_type = $this->language->get('text_vendor_admission');
 					break;
-				
+
+				case 'vendor-agreement':
+					$document_type = $this->language->get('text_vendor_agreement');
+					break;
+
+				case 'vendor-purchase':
+					$document_type = $this->language->get('text_vendor_purchase');
+					break;
+
+				case 'vendor-transaction':
+					$document_type = $this->language->get('text_vendor_receipt');
+					break;
+
 				default:
 					$document_type = '';
 			}
@@ -146,7 +156,7 @@ class ControllerReportSaleDocument extends Controller {
 				$text_printed = $this->language->get('text_printed');
 				$text_not_printed = $this->language->get('text_not_printed');
 			}
-			
+
 			$data['documents'][] = array(
 				'type'      		=> $result['type'],
 				'code'      		=> $result['type'] . '/' . $result['type_id'],
@@ -161,9 +171,9 @@ class ControllerReportSaleDocument extends Controller {
 				'modify'			=> $modify,
 				'text_printed'		=> $text_printed,
 				'text_not_printed'	=> $text_not_printed
-            );
+			);
 		}
-		
+
 		$url = '';
 
 		if (isset($this->request->get['filter_reference'])) {
@@ -184,7 +194,6 @@ class ControllerReportSaleDocument extends Controller {
 			$url .= '&page=' . $this->request->get['page'];
 		}
 
-		
 		$data['sort_order_id'] = $this->url->link('report/sale_document', 'token=' . $this->session->data['token'] . '&sort=order_id' . $url, true);
 		$data['sort_type'] = $this->url->link('report/sale_document', 'token=' . $this->session->data['token'] . '&sort=type' . $url, true);
 		$data['sort_date'] = $this->url->link('report/sale_document', 'token=' . $this->session->data['token'] . '&sort=date' . $url, true);
@@ -228,7 +237,7 @@ class ControllerReportSaleDocument extends Controller {
 
 		$data['sort'] = $sort;
 		$data['order'] = $order;
-		
+
 		$data['header'] = $this->load->controller('common/header');
 		$data['column_left'] = $this->load->controller('common/column_left');
 		$data['footer'] = $this->load->controller('common/footer');
@@ -236,7 +245,8 @@ class ControllerReportSaleDocument extends Controller {
 		$this->response->setOutput($this->load->view('report/sale_document', $data));
 	}
 
-	public function togglePrintStatus() {
+	public function togglePrintStatus()
+	{
 		$this->load->language('report/sale_document');
 
 		$json = array();
@@ -252,8 +262,8 @@ class ControllerReportSaleDocument extends Controller {
 
 			$document_code = explode('/', $document_code);
 
-			switch ($document_code[0]) {
-				case 'order':
+			switch (true) {
+				case ($document_code[0] == 'customer-order'):
 					$this->load->model('sale/order');
 
 					$order_info = $this->model_sale_order->getOrder($document_code[1]);
@@ -266,14 +276,13 @@ class ControllerReportSaleDocument extends Controller {
 						}
 
 						$this->model_sale_order->editOrderPrintStatus($document_code[1], $printed_status);
-
 					} else {
 						$json['error'] = $this->language->get('error_not_found');
 					}
 
 					break;
-				
-				case 'transaction':
+
+				case ($document_code[0] == 'customer-transaction' || $document_code[0] == 'vendor-transaction'):
 					$this->load->model('accounting/transaction');
 
 					$transaction_info = $this->model_accounting_transaction->getTransaction($document_code[1]);
@@ -286,59 +295,37 @@ class ControllerReportSaleDocument extends Controller {
 						}
 
 						$this->model_accounting_transaction->editTransactionPrintStatus($document_code[1], $printed_status);
-
 					} else {
 						$json['error'] = $this->language->get('error_not_found');
 					}
 
 					break;
-				
-				case 'vendor_agreement':
-					$this->load->model('sale/order');
 
-					$order_vendor_info = $this->model_sale_order->getOrderVendorByOrderVendorId($document_code[1]);
+				case ($document_code[0] == 'vendor-admission' || $document_code[0] == 'vendor-agreement' || $document_code[0] == 'vendor-purchase'):
+					$this->load->model('sale/document');
 
-					if ($order_vendor_info) {
-						if ($order_vendor_info['agreement_printed']) {
+					$order_document_info = $this->model_sale_document->getOrderDocument($document_code[1]);
+
+					if ($order_document_info) {
+						if ($order_document_info['printed']) {
 							$printed_status = 0;
 						} else {
 							$printed_status = 1;
 						}
 
-						$this->model_sale_order->setOrderVendorPrintStatus($document_code[1], 'agreement', $printed_status);
-
+						$this->model_sale_document->editDocumentPrintStatus($document_code[1], $printed_status);
 					} else {
 						$json['error'] = $this->language->get('error_not_found');
 					}
 
 					break;
-				
-				case 'vendor_admission':
-					$this->load->model('sale/order');
 
-					$order_vendor_info = $this->model_sale_order->getOrderVendorByOrderVendorId($document_code[1]);
-
-					if ($order_vendor_info) {
-						if ($order_vendor_info['admission_printed']) {
-							$printed_status = 0;
-						} else {
-							$printed_status = 1;
-						}
-
-						$this->model_sale_order->setOrderVendorPrintStatus($document_code[1], 'admission', $printed_status);
-
-					} else {
-						$json['error'] = $this->language->get('error_not_found');
-					}
-
-					break;
-				
 				default:
 					$json['error'] = $this->language->get('error_not_found');
 					$printed_status = 0;
 			}
 		}
-		
+
 		if (!$json) {
 			$json['success'] = $this->language->get('text_success');
 			$json['printed'] = $printed_status;

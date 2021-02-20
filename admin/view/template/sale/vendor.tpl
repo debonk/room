@@ -94,6 +94,9 @@
 					<?php echo $column_transaction_type; ?>
 				</td>
 				<td class="text-left">
+					<?php echo $column_reference; ?>
+				</td>
+				<td class="text-left">
 					<?php echo $column_asset; ?>
 				</td>
 				<td class="text-left">
@@ -127,6 +130,9 @@
 					<?php echo $vendor_transaction['transaction_type']; ?>
 				</td>
 				<td class="text-left">
+					<?php echo $vendor_transaction['reference']; ?>
+				</td>
+				<td class="text-left">
 					<?php echo $vendor_transaction['asset']; ?>
 				</td>
 				<td class="text-left">
@@ -158,7 +164,7 @@
 			<?php } ?>
 			<?php } else { ?>
 			<tr>
-				<td class="text-center" colspan="9">
+				<td class="text-center" colspan="10">
 					<?php echo $text_no_results; ?>
 				</td>
 			</tr>

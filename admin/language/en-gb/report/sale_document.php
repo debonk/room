@@ -3,16 +3,18 @@
 $_['heading_title']             = 'Documents Report';
 
 // Text
-$_['text_success']              = 'Success: You have modified document print status!';
+$_['text_customer_agreement']	= 'Surat Kesepakatan';
+$_['text_customer_receipt']		= 'Kuitansi';
 $_['text_list']         		= 'Daftar Dokumen';
+$_['text_not_printed']    	    = 'Not Printed';
+$_['text_printed']    	        = 'Printed';
 $_['text_set_print']    	    = 'Not Printed, Click to set as Printed';
 $_['text_set_unprint']    	    = 'Printed, Click to set as Unprinted';
-$_['text_printed']    	        = 'Printed';
-$_['text_not_printed']    	    = 'Not Printed';
-$_['text_agreement']     		= 'Surat Kesepakatan';
-$_['text_receipt']              = 'Kuitansi';
-$_['text_vendor_agreement']     = 'Surat Kesepakatan Vendor';
+$_['text_success']              = 'Success: You have modified document print status!';
 $_['text_vendor_admission']     = 'Surat Ijin Masuk';
+$_['text_vendor_agreement']     = 'Surat Kesepakatan Vendor';
+$_['text_vendor_purchase']     	= 'Surat Pemesanan Vendor';
+$_['text_vendor_receipt']		= 'Kuitansi Vendor';
 		
 // Column		
 $_['column_date'] 				= 'Tanggal';

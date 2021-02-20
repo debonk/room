@@ -12,16 +12,17 @@ $_['text_print_confirm']       	 	= 'Are you sure?\nPrint Dokumen hanya diperbol
 // Column
 $_['column_action']				= 'Action';
 $_['column_amount']				= 'Jumlah';
+$_['column_asset']    			= 'Rekening Kas/Bank';
 $_['column_balance']			= 'Saldo';
 $_['column_credit']				= 'Kredit';
-$_['column_date']          		= 'Tanggal';
 $_['column_date_added']      	= 'Tanggal Entry';
+$_['column_date']          		= 'Tanggal';
 $_['column_debit']          	= 'Debet';
 $_['column_description']      	= 'Keterangan';
-$_['column_asset']    			= 'Rekening Kas/Bank';
+$_['column_reference']			= 'No Referensi';
 $_['column_transaction_type']	= 'Jenis Transaksi';
-$_['column_vendor']          	= 'Nama Vendor';
 $_['column_username']        	= 'User';
+$_['column_vendor']          	= 'Nama Vendor';
 
 // Entry
 $_['entry_amount']        	 	 = 'Jumlah';

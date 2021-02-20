@@ -446,13 +446,11 @@ class ModelReportSale extends Model {
 		if (!$query->num_rows) {
 			$implode_sql = array();
 			
-			$implode_sql[] = "SELECT 'order' AS type, o.order_id AS type_id, o.order_id, DATE(o.date_added) AS date, CONCAT(o.invoice_prefix, LPAD(o.invoice_no, 4, '0')) AS reference, CONCAT(o.firstname, ' ', o.lastname) AS customer, o.printed, u.username FROM `" . DB_PREFIX . "order` o LEFT JOIN `" . DB_PREFIX . "user` u ON (u.user_id = o.user_id) WHERE o.order_id > 0 AND o.invoice_no > 0 ";
+			$implode_sql[] = "SELECT 'customer-order' AS type, o.order_id AS type_id, o.order_id, DATE(o.date_added) AS date, CONCAT(o.invoice_prefix, LPAD(o.invoice_no, 4, '0')) AS reference, CONCAT(o.firstname, ' ', o.lastname) AS customer, o.printed, u.username FROM `" . DB_PREFIX . "order` o LEFT JOIN `" . DB_PREFIX . "user` u ON (u.user_id = o.user_id) WHERE o.order_id > 0 AND o.invoice_no > 0 ";
 			
-			$implode_sql[] = "SELECT 'transaction' AS type, t.transaction_id AS type_id, t.order_id, t.date AS date, CONCAT(t.reference_no, LPAD(t.transaction_no, 4, '0')) AS reference, t.customer_name AS customer, t.printed, u.username FROM `" . DB_PREFIX . "transaction` t LEFT JOIN `" . DB_PREFIX . "user` u ON (u.user_id = t.user_id) WHERE t.label IN ('vendor', 'customer')";
-
-			$implode_sql[] = "SELECT 'vendor_agreement' AS type, ov1.order_vendor_id AS type_id, ov1.order_id, DATE(ov1.date_added) AS date, CONCAT(ov1.agreement_prefix, LPAD(ov1.reference_no, 4, '0')) AS reference, v.vendor_name AS customer, ov1.agreement_printed AS printed, u.username FROM `" . DB_PREFIX . "order_vendor` ov1 LEFT JOIN `" . DB_PREFIX . "vendor` v ON (v.vendor_id = ov1.vendor_id) LEFT JOIN `" . DB_PREFIX . "user` u ON (u.user_id = ov1.user_id)";
-
-			$implode_sql[] = "SELECT 'vendor_admission' AS type, ov2.order_vendor_id AS type_id, ov2.order_id, DATE(ov2.date_added) AS date, CONCAT(ov2.admission_prefix, LPAD(ov2.reference_no, 4, '0')) AS reference, v.vendor_name AS customer, ov2.admission_printed AS printed, u.username FROM `" . DB_PREFIX . "order_vendor` ov2 LEFT JOIN `" . DB_PREFIX . "vendor` v ON (v.vendor_id = ov2.vendor_id) LEFT JOIN `" . DB_PREFIX . "user` u ON (u.user_id = ov2.user_id)";
+			$implode_sql[] = "SELECT CONCAT(t.label, '-transaction') AS type, t.transaction_id AS type_id, t.order_id, t.date AS date, CONCAT(t.reference_prefix, LPAD(t.reference_no, 4, '0')) AS reference, t.customer_name AS customer, t.printed, u.username FROM `" . DB_PREFIX . "transaction` t LEFT JOIN `" . DB_PREFIX . "user` u ON (u.user_id = t.user_id) WHERE t.label IN ('vendor', 'customer')";
+			
+			$implode_sql[] = "SELECT CONCAT(od.client_type, '-', od.document_type) AS type, od.order_document_id AS type_id, od.order_id, od.date AS date, CONCAT(od.reference_prefix, LPAD(od.reference_no, 4, '0')) AS reference, ov.vendor_name AS customer, od.printed, u.username FROM `" . DB_PREFIX . "order_document` od LEFT JOIN `" . DB_PREFIX . "order_vendor` ov ON (ov.order_vendor_id = od.client_id) LEFT JOIN `" . DB_PREFIX . "user` u ON (u.user_id = od.user_id)";
 
 			if ($implode_sql) {
 				$sql = " CREATE VIEW " . $view_name . " AS " . implode(" UNION ", $implode_sql);
@@ -488,13 +486,14 @@ class ModelReportSale extends Model {
 			'reference',
 			'customer',
 			'printed',
-			'username'
+			'username',
+			'order_id DESC, reference'
 		);
 
 		if (isset($data['sort']) && in_array($data['sort'], $sort_data)) {
 			$sql .= " ORDER BY " . $data['sort'];
 		} else {
-			$sql .= " ORDER BY order_id, date, type_id";
+			$sql .= " ORDER BY order_id DESC, reference";
 		}
 
 		if (isset($data['order']) && ($data['order'] == 'DESC')) {

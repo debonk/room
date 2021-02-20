@@ -67,8 +67,12 @@ class ControllerSaleCustomer extends Controller
 
 		$customer_transaction_summary = $this->model_accounting_transaction->getTransactionsSummary($order_id, $summary_data);
 		foreach ($customer_transaction_summary as $key => $transaction_summary) {
-			$transaction_summary['category_label'] = empty($transaction_summary['category_label']) ? 'order' : $transaction_summary['category_label'];
-			$transaction_summary['account_type'] = empty($transaction_summary['account_type']) ? 'D' : $transaction_summary['account_type'];
+			# Maintain Version 1
+			if (empty($transaction_summary['category_label'])) {
+				$transaction_summary['category_label'] = 'order';
+				$transaction_summary['account_type'] = 'D';
+			}
+			# End Maintain
 
 			$customer_transaction_summary[$transaction_summary['category_label']][$transaction_summary['account_type']] = $transaction_summary;
 			unset($customer_transaction_summary[$key]);
@@ -107,6 +111,12 @@ class ControllerSaleCustomer extends Controller
 		$results = $this->model_accounting_transaction->getTransactions($filter_data);
 
 		foreach ($results as $result) {
+			# Maintain Version 1 
+			if (empty($result['transaction_type'])) {
+				$result['transaction_type'] = $result['description'];
+			}
+			# End Maintain
+
 			$data['customer_transactions'][] = array(
 				'transaction_id'	=> $result['transaction_id'],
 				'date'				=> date($this->language->get('date_format_short'), strtotime($result['date'])),

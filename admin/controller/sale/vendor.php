@@ -22,6 +22,7 @@ class ControllerSaleVendor extends Controller
 			'column_date',
 			'column_description',
 			'column_credit',
+			'column_reference',
 			'column_transaction_type',
 			'column_username',
 			'column_vendor',
@@ -74,7 +75,19 @@ class ControllerSaleVendor extends Controller
 
 		$order_vendors = $this->model_sale_order->getOrderVendors($order_id);
 
+		# Maintain Version 1
+		$this->load->model('catalog/vendor');
+		# End Maintain
+
 		foreach ($order_vendors as $order_vendor) {
+			# Maintain Version 1
+			if (empty($order_vendor['vendor_name'])) {
+				$vendor_info = $this->model_catalog_vendor->getVendor($order_vendor['vendor_id']);
+				$order_vendor['vendor_name'] = $vendor_info['vendor_name'];
+				$order_vendor['vendor_type'] = $vendor_info['vendor_type'];
+			}
+			# End Maintain
+
 			$summary_data = [
 				'label'		=> 'vendor',
 				'label_id'	=> $order_vendor['vendor_id'],
@@ -82,9 +95,16 @@ class ControllerSaleVendor extends Controller
 			];
 
 			$transaction_summary_data = [];
-
+			
 			$transactions_summary = $this->model_accounting_transaction->getTransactionsSummary($order_id, $summary_data);
 			foreach ($transactions_summary as $key => $transaction_summary) {
+				# Maintain Version 1
+				if (empty($transaction_summary['category_label'])) {
+					$transaction_summary['category_label'] = 'deposit';
+					$transaction_summary['account_type'] = 'D';
+				}
+				# End Maintain
+
 				$transactions_summary[$transaction_summary['category_label']][$transaction_summary['account_type']] = $transaction_summary;
 				unset($transactions_summary[$key]);
 			}
@@ -170,8 +190,19 @@ class ControllerSaleVendor extends Controller
 		$results = $this->model_accounting_transaction->getTransactions($filter_data);
 
 		foreach ($results as $result) {
-			$code = explode('-', $result['reference'])[1];
-			switch ($code) {
+			$code = explode('-', $result['reference']);
+
+			# Maintain Version 1 
+			if (!isset($code[1])) {
+				$code[1] = '';
+			}
+
+			if (empty($result['transaction_type'])) {
+				$result['transaction_type'] = $result['description'];
+			}
+			# End Maintain
+
+			switch ($code[1]) {
 				case 'KW':
 					$href = $this->url->link('sale/order/receipt', 'token=' . $this->session->data['token'] . '&transaction_id=' . $result['transaction_id'], true);
 
@@ -183,7 +214,7 @@ class ControllerSaleVendor extends Controller
 					break;
 
 				default:
-					$href = '';
+					$href = '#';
 
 					break;
 			}
@@ -193,6 +224,7 @@ class ControllerSaleVendor extends Controller
 				'date'				=> date($this->language->get('date_format_short'), strtotime($result['date'])),
 				'transaction_type'	=> $result['transaction_type'],
 				'vendor_name'		=> $result['customer_name'],
+				'reference'			=> $result['reference'],
 				'asset'				=> $result['payment_method'],
 				'description'		=> $result['description'],
 				'amount'			=> $this->currency->format(($result['account_type'] == 'C' ? -1 : 1) * $result['amount'], $order_info['currency_code'], $order_info['currency_value']),

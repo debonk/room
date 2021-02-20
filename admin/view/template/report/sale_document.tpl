@@ -148,9 +148,9 @@ $('.btn-print').on('click', function(e) {
           $('#content > .container-fluid').prepend('<div class="alert alert-success"><i class="fa fa-check-circle"></i> ' + json['success'] + ' <button type="button" class="close" data-dismiss="alert">&times;</button></div>');
 
           if (json['printed']) {
-            $(node).removeClass('btn-warning').addClass('btn-success');
+						$(node).removeClass('btn-success').addClass('btn-warning');
           } else {
-            $(node).removeClass('btn-success').addClass('btn-warning');
+            $(node).removeClass('btn-warning').addClass('btn-success');
           }
         }
       },

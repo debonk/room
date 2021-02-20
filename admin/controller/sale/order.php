@@ -1438,40 +1438,23 @@ class ControllerSaleOrder extends Controller
 
 			$order_vendors = $this->model_sale_order->getOrderVendors($order_id);
 
-			$this->load->model('sale/document');
-
+			# Maintain Version 1
+			$this->load->model('catalog/vendor');
+			# End Maintain
+			
 			foreach ($order_vendors as $order_vendor) {
-				$filter_data = [
-					'filter_order_id'		=> $order_id,
-					'filter_client_type'	=> 'vendor',
-					'filter_client_id'		=> $order_vendor['order_vendor_id'],
-					'sort'					=> 't.date',
-					'order'					=> 'ASC'
-				];
-	
-				$document_data = [];
-
-				$order_documents = $this->model_sale_document->getOrderDocuments($filter_data);
-
-				foreach ($order_documents as $order_document) {
-					if ($order_document['document_type'] == 'agreement') {
-						$href = $this->url->link('sale/order/vendorAgreement', 'token=' . $this->session->data['token'] . '&order_id=' . $order_id . '&vendor_id=' . $order_vendor['vendor_id'], true);
-					} elseif ($order_document['document_type'] == 'admission') {
-						$href = $this->url->link('sale/order/admission', 'token=' . $this->session->data['token'] . '&order_id=' . $order_id . '&vendor_id=' . $order_vendor['vendor_id'], true);
-					} else {
-						$href = '';
-					}
-
-					$document_data[] = [
-						'href'		=> $href,
-						'printed'	=> $order_document['printed']
-					];
+				# Maintain Version 1
+				if (empty($order_vendor['vendor_name'])) {
+					$vendor_info = $this->model_catalog_vendor->getVendor($order_vendor['vendor_id']);
+					$order_vendor['vendor_name'] = $vendor_info['vendor_name'];
+					$order_vendor['vendor_type'] = $vendor_info['vendor_type'];
 				}
+				# End Maintain
 
 				$data['order_vendors'][] = array(
 					'vendor_id' 		=> $order_vendor['vendor_id'],
 					'title' 			=> $order_vendor['vendor_name'] . ' - ' . $order_vendor['vendor_type'],
-					'document'			=> $document_data
+					// 'document'			=> $document_data
 				);
 			}
 
