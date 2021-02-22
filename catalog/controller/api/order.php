@@ -922,22 +922,20 @@ class ControllerApiOrder extends Controller
 					$this->load->model('accounting/transaction');
 
 					$filter_data = array(
-						'filter_account_from_id' => $this->config->get('config_adjustment_account_id'),
-						'filter_order_id'	 	 => $order_id,
-						// 'filter_label'	 	 	 => 'revenue'
+						'account_from_id' => $this->config->get('config_adjustment_account_id'),
 					);
 
-					if ($this->model_accounting_transaction->getTransactionsTotalByOrderId($order_id, $filter_data)) {
+					if ($this->model_accounting_transaction->getTransactionsTotalSummary($order_id, $filter_data)) {
 						$json['error'] = $this->language->get('error_adjustment');
 					}
 
 					$filter_data = array(
-						'filter_account_from_id' => $this->config->get('config_prepaid_account_id'),
-						'filter_order_id'	 	 => $order_id,
-						'filter_label'	 	 	 => 'customer'
+						'account_from_id' 	=> $this->config->get('config_prepaid_account_id'),
+						'label'	 	 	 	=> 'customer',
+						'category_label'	=> 'order'
 					);
 
-					if ($order_info['total'] <> $this->model_accounting_transaction->getTransactionsTotalByOrderId($order_id, $filter_data)) {
+					if ($order_info['total'] != $this->model_accounting_transaction->getTransactionsTotalSummary($order_id, $filter_data)) {
 						$json['error'] = $this->language->get('error_adjustment_amount');
 					}
 				}

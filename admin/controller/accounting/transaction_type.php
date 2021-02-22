@@ -117,6 +117,27 @@ class ControllerAccountingTransactionType extends Controller
 
 	protected function getList()
 	{
+		$language_items = array(
+			'heading_title',
+			'text_list',
+			'text_no_results',
+			'text_confirm',
+			'column_client_label',
+			'column_category_label',
+			'column_name',
+			'column_account_credit',
+			'column_account_debit',
+			'column_account_type',
+			'column_sort_order',
+			'column_action',
+			'button_add',
+			'button_edit',
+			'button_delete'
+		);
+		foreach ($language_items as $language_item) {
+			$data[$language_item] = $this->language->get($language_item);
+		}
+		
 		if (isset($this->request->get['sort'])) {
 			$sort = $this->request->get['sort'];
 		} else {
@@ -183,26 +204,13 @@ class ControllerAccountingTransactionType extends Controller
 				'name'                  => $result['name'],
 				'client_label'			=> $result['client_label'],
 				'category_label'		=> $result['category_label'],
+				'account_type'			=> $result['account_type'],
+				'account_debit'			=> $result['account_debit_id'] ? $result['account_debit_id'] . '-' . $result['account_debit'] : '-',
+				'account_credit'		=> $result['account_credit_id'] ? $result['account_credit_id'] . '-' . $result['account_credit'] : '-',
 				'sort_order'            => $result['sort_order'],
 				'edit'                  => $this->url->link('accounting/transaction_type/edit', 'token=' . $this->session->data['token'] . '&transaction_type_id=' . $result['transaction_type_id'] . $url, true)
 			);
 		}
-
-		$data['heading_title'] = $this->language->get('heading_title');
-
-		$data['text_list'] = $this->language->get('text_list');
-		$data['text_no_results'] = $this->language->get('text_no_results');
-		$data['text_confirm'] = $this->language->get('text_confirm');
-
-		$data['column_client_label'] = $this->language->get('column_client_label');
-		$data['column_category_label'] = $this->language->get('column_category_label');
-		$data['column_name'] = $this->language->get('column_name');
-		$data['column_sort_order'] = $this->language->get('column_sort_order');
-		$data['column_action'] = $this->language->get('column_action');
-
-		$data['button_add'] = $this->language->get('button_add');
-		$data['button_edit'] = $this->language->get('button_edit');
-		$data['button_delete'] = $this->language->get('button_delete');
 
 		if (isset($this->error['warning'])) {
 			$data['error_warning'] = $this->error['warning'];
@@ -277,8 +285,16 @@ class ControllerAccountingTransactionType extends Controller
 
 		$language_items = array(
 			'heading_title',
+			'text_credit',
+			'text_debit',
+			'text_none',
+			'text_select',
+			'entry_account_credit',
+			'entry_account_debit',
+			'entry_account_type',
 			'entry_client_label',
 			'entry_category_label',
+			'entry_manual_select',
 			'entry_name',
 			'entry_sort_order',
 			'button_save',
@@ -345,38 +361,39 @@ class ControllerAccountingTransactionType extends Controller
 			$transaction_type_info = $this->model_accounting_transaction_type->getTransactionType($this->request->get['transaction_type_id']);
 		}
 
-		if (isset($this->request->post['client_label'])) {
-			$data['client_label'] = $this->request->post['client_label'];
-		} elseif (!empty($transaction_type_info)) {
-			$data['client_label'] = $transaction_type_info['client_label'];
-		} else {
-			$data['client_label'] = '';
+		$input_items = array(
+			'name',
+			'client_label',
+			'category_label',
+			'account_debit_id',
+			'account_credit_id',
+			'manual_select',
+			'sort_order'
+		);
+		foreach ($input_items as $input_item) {
+			if (isset($this->request->post[$input_item])) {
+				$data[$input_item] = $this->request->post[$input_item];
+			} elseif (!empty($transaction_type_info)) {
+				$data[$input_item] = $transaction_type_info[$input_item];
+			} else {
+				$data[$input_item] = '';
+			}
 		}
 
-		if (isset($this->request->post['category_label'])) {
-			$data['category_label'] = $this->request->post['category_label'];
+		if (isset($this->request->post['account_type'])) {
+			$data['account_type'] = $this->request->post['account_type'];
 		} elseif (!empty($transaction_type_info)) {
-			$data['category_label'] = $transaction_type_info['category_label'];
+			$data['account_type'] = $transaction_type_info['account_type'];
 		} else {
-			$data['category_label'] = '';
+			$data['account_type'] = 'D';
 		}
 
-		if (isset($this->request->post['name'])) {
-			$data['name'] = $this->request->post['name'];
-		} elseif (!empty($transaction_type_info)) {
-			$data['name'] = $transaction_type_info['name'];
-		} else {
-			$data['name'] = '';
-		}
+		$data['clients_label'] = $this->model_accounting_transaction_type->getClientsLabel();
+		$data['categories_label'] = $this->model_accounting_transaction_type->getCategoriesLabel();
 
-		if (isset($this->request->post['sort_order'])) {
-			$data['sort_order'] = $this->request->post['sort_order'];
-		} elseif (!empty($transaction_type_info)) {
-			$data['sort_order'] = $transaction_type_info['sort_order'];
-		} else {
-			$data['sort_order'] = '';
-		}
-
+		$this->load->model('accounting/account');
+		$data['accounts'] = $this->model_accounting_account->getAccountsMenuByComponent();
+		
 		$data['header'] = $this->load->controller('common/header');
 		$data['column_left'] = $this->load->controller('common/column_left');
 		$data['footer'] = $this->load->controller('common/footer');

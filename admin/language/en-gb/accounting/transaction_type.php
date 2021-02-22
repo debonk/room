@@ -1,24 +1,31 @@
 <?php
 // Heading
-$_['heading_title']     	= 'Tipe Transaksi';
+$_['heading_title']     	= 'Transaction Type';
 
 // Text	
 $_['text_success']      	= 'Success: You have modified transaction types!';
-$_['text_list']         	= 'Daftar Tipe Transaksi';
-$_['text_add']          	= 'Tambah Tipe Transaksi';
-$_['text_edit']         	= 'Ubah Tipe Transaksi';
+$_['text_list']         	= 'Transaction Type List';
+$_['text_add']          	= 'Add Transaction Type';
+$_['text_edit']         	= 'Edit Transaction Type';
 
 // Column
-$_['column_name']       	= 'Tipe Transaksi';
+$_['column_name']       	= 'Transaction Type';
+$_['column_account_credit']	= 'Credit Account';
+$_['column_account_debit']	= 'Debit Account';
+$_['column_account_type']	= 'Account Type';
 $_['column_client_label']	= 'Client Label';
 $_['column_category_label']	= 'Category Label';
 $_['column_sort_order'] 	= 'Sort Order';
 $_['column_action']     	= 'Action';
 
 // Entry
-$_['entry_name']        	= 'Tipe Transaksi';
+$_['entry_account_credit']  = 'Credit Account';
+$_['entry_account_debit']   = 'Debit Account';
+$_['entry_account_type']    = 'Account Type';
 $_['entry_client_label']	= 'Client Label';
 $_['entry_category_label']	= 'Category Label';
+$_['entry_manual_select']	= 'Manual Select';
+$_['entry_name']        	= 'Transaction Type';
 $_['entry_sort_order']  	= 'Sort Order';
 
 // Error

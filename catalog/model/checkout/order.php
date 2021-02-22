@@ -420,10 +420,10 @@ class ModelCheckoutOrder extends Model {
 				}
 			}
 
-			// Update the DB with the new statuses
+			# Update the DB with the new statuses
 			$this->db->query("UPDATE `" . DB_PREFIX . "order` SET order_status_id = '" . (int)$order_status_id . "', date_modified = NOW() WHERE order_id = '" . (int)$order_id . "'");
 
-			// If current order status is not complete but new status is complete then commence adjustment transaction
+			# If current order status is not complete but new status is complete then commence adjustment transaction
 			if (!in_array($order_info['order_status_id'], $this->config->get('config_complete_status')) && in_array($order_status_id, $this->config->get('config_complete_status'))) {
 				$this->load->model('accounting/transaction');
 
@@ -431,29 +431,30 @@ class ModelCheckoutOrder extends Model {
 				$revenue_id = $this->config->get('config_adjustment_account_id');
 			
 				$filter_data = array(
-					'filter_account_from_id' => $liability_id,
-					'filter_order_id'	 	 => $order_id,
-					'filter_label'	 	 	 => 'customer'
+					'account_from_id' 	=> $liability_id,
+					'label'	 	 	 	=> 'customer',
+					'category_label'	=> 'order'
 				);
 		
-				$amount = $this->model_accounting_transaction->getTransactionsTotalByOrderId($order_id, $filter_data);
+				$amount = $this->model_accounting_transaction->getTransactionsTotalSummary($order_id, $filter_data);
 				
 				$reference_prefix = 'R' . date('ym');
-				$reference_no = $this->model_accounting_transaction->getTransactionNoMax($reference_prefix) + 1;
+				$reference_no = $this->model_accounting_transaction->getLastReferenceNo($reference_prefix) + 1;
 		
 				$transaction_data = array(
-					'order_id'			=> $order_id,
-					'account_from_id'	=> $revenue_id,
-					'account_to_id'		=> $liability_id,
-					'label'				=> 'revenue',
-					'reference_prefix'	=> $reference_prefix,
-					'reference_no' 		=> $reference_no,
-					'date' 				=> date('Y-m-d'),
-					'payment_method'	=> '',
-					'description' 		=> 'Adjustment Transaction from Order #' . $order_id . ': ' . $order_info['firstname'] . ' ' . $order_info['lastname'],
-					'amount' 			=> $amount,
-					'customer_name' 	=> 'system',
-					'user_id' 			=> $user_id
+					'order_id'				=> $order_id,
+					'account_from_id'		=> $revenue_id,
+					'account_to_id'			=> $liability_id,
+					'label'					=> 'revenue',
+					'transaction_type_id'	=> 0,
+					'reference_prefix'		=> $reference_prefix,
+					'reference_no' 			=> $reference_no,
+					'date' 					=> date('Y-m-d'),
+					'payment_method'		=> '',
+					'description' 			=> 'Adjustment Transaction from Order #' . $order_id . ': ' . $order_info['firstname'] . ' ' . $order_info['lastname'],
+					'amount' 				=> $amount,
+					'customer_name' 		=> 'system',
+					'user_id' 				=> $user_id
 				);
 
 				$this->addTransaction($transaction_data);
@@ -1014,7 +1015,7 @@ class ModelCheckoutOrder extends Model {
 			$data['label_id'] = 0;
 		}
 		
-		$this->db->query("INSERT INTO " . DB_PREFIX . "transaction SET account_from_id = '" . (int)$data['account_from_id'] . "', account_to_id = '" . (int)$data['account_to_id'] . "', label = '" . $this->db->escape($data['label']) . "', label_id = '" . (int)$data['label_id'] . "', order_id = '" . (int)$data['order_id'] . "', reference_no = '" . (int)$data['reference_no'] . "', date = DATE('" . $this->db->escape($data['date']) . "'), payment_method = '" . $this->db->escape($data['payment_method']) . "', description = '" . $this->db->escape($data['description']) . "', amount = '" . (float)$data['amount'] . "', customer_name = '" . $this->db->escape($data['customer_name']) . "', reference_prefix = '" . $this->db->escape($data['reference_prefix']) . "', edit_permission = '0', date_added = NOW(), user_id = '" . (int)$data['user_id'] . "'");
+		$this->db->query("INSERT INTO " . DB_PREFIX . "transaction SET account_from_id = '" . (int)$data['account_from_id'] . "', account_to_id = '" . (int)$data['account_to_id'] . "', label = '" . $this->db->escape($data['label']) . "', label_id = '" . (int)$data['label_id'] . "', order_id = '" . (int)$data['order_id'] . "', transaction_type_id = '" . (int)$data['transaction_type_id'] . "', reference_no = '" . (int)$data['reference_no'] . "', date = '" . $this->db->escape($data['date']) . "', payment_method = '" . $this->db->escape($data['payment_method']) . "', description = '" . $this->db->escape($data['description']) . "', amount = '" . (float)$data['amount'] . "', customer_name = '" . $this->db->escape($data['customer_name']) . "', reference_prefix = '" . $this->db->escape($data['reference_prefix']) . "', printed = 0, edit_permission = '0', date_added = NOW(), user_id = '" . (int)$data['user_id'] . "'");
 	}
 
 	public function getSlotUsed($slot_idx) {

@@ -3,12 +3,12 @@ class ModelAccountingTransactionType extends Model
 {
 	public function addTransactionType($data)
 	{
-		$this->db->query("INSERT INTO " . DB_PREFIX . "transaction_type SET client_label = '" . $this->db->escape($data['client_label']) . "', category_label = '" . $this->db->escape($data['category_label']) . "', name = '" . $this->db->escape($data['name']) . "', sort_order = '" . (int)$data['sort_order'] . "'");
+		$this->db->query("INSERT INTO " . DB_PREFIX . "transaction_type SET client_label = '" . $this->db->escape($data['client_label']) . "', category_label = '" . $this->db->escape($data['category_label']) . "', name = '" . $this->db->escape($data['name']) . "', account_type = '" . $this->db->escape($data['account_type']) . "', manual_select = '" . (int)$data['manual_select'] . "', account_debit_id = '" . (int)$data['account_debit_id'] . "', account_credit_id = '" . (int)$data['account_credit_id'] . "', sort_order = '" . (int)$data['sort_order'] . "'");
 	}
 
 	public function editTransactionType($transaction_type_id, $data)
 	{
-		$this->db->query("UPDATE " . DB_PREFIX . "transaction_type SET client_label = '" . $this->db->escape($data['client_label']) . "', category_label = '" . $this->db->escape($data['category_label']) . "', name = '" . $this->db->escape($data['name']) . "', sort_order = '" . (int)$data['sort_order'] . "' WHERE transaction_type_id = '" . (int)$transaction_type_id . "'");
+		$this->db->query("UPDATE " . DB_PREFIX . "transaction_type SET client_label = '" . $this->db->escape($data['client_label']) . "', category_label = '" . $this->db->escape($data['category_label']) . "', name = '" . $this->db->escape($data['name']) . "', account_type = '" . $this->db->escape($data['account_type']) . "', manual_select = '" . (int)$data['manual_select'] . "', account_debit_id = '" . (int)$data['account_debit_id'] . "', account_credit_id = '" . (int)$data['account_credit_id'] . "', sort_order = '" . (int)$data['sort_order'] . "' WHERE transaction_type_id = '" . (int)$transaction_type_id . "'");
 	}
 
 	public function deleteTransactionType($transaction_type_id)
@@ -25,7 +25,7 @@ class ModelAccountingTransactionType extends Model
 
 	public function getTransactionTypes($data = array())
 	{
-		$sql = "SELECT * FROM " . DB_PREFIX . "transaction_type";
+		$sql = "SELECT tt.*, a1.name AS account_debit, a2.name AS account_credit FROM " . DB_PREFIX . "transaction_type tt LEFT JOIN " . DB_PREFIX . "account a1 ON (a1.account_id = tt.account_debit_id) LEFT JOIN " . DB_PREFIX . "account a2 ON (a2.account_id = tt.account_credit_id)";
 
 		$sort_data = array(
 			'client_label',
@@ -70,6 +70,37 @@ class ModelAccountingTransactionType extends Model
 		return $query->row['total'];
 	}
 
+	public function getTransactionTypesMenu($data = [])
+	{
+		$sql = "SELECT transaction_type_id, name FROM " . DB_PREFIX . "transaction_type";
+
+		$implode = array();
+
+		if (isset($data['client_label'])) {
+			$implode[] = "client_label = '" . $this->db->escape($data['client_label']) . "'";
+		}
+
+		if (isset($data['category_label'])) {
+			$implode[] = "category_label = '" . $this->db->escape($data['category_label']) . "'";
+		}
+
+		if (isset($data['manual_select']) && !is_null($data['manual_select'])) {
+			$implode[] = "manual_select = '" . $this->db->escape($data['manual_select']) . "'";
+		} else {
+			$implode[] = "manual_select = 1";
+		}
+
+		if ($implode) {
+			$sql .= " WHERE " . implode(" AND ", $implode);
+		}
+
+		$sql .= " ORDER BY sort_order ASC";
+
+		$query = $this->db->query($sql);
+
+		return $query->rows;
+	}
+
 	public function getTransactionTypesByLabel($client_label, $category_label = '')
 	{
 		if (!empty($client_label) || !empty($category_label)) {
@@ -112,5 +143,45 @@ class ModelAccountingTransactionType extends Model
 		}
 
 		return $label_data;
+	}
+
+	public function getClientsLabel()
+	{
+		$client_label_data = [];
+
+		$client_data = [
+			'customer',
+			'vendor',
+			'supplier'
+		];
+
+		foreach ($client_data as $client) {
+			$client_label_data[] = [
+				'value'	=> $client,
+				'text'	=> ucfirst($client)
+			];
+		}
+
+		return $client_label_data;
+	}
+
+	public function getCategoriesLabel()
+	{
+		$category_label_data = [];
+
+		$category_data = [
+			'order',
+			'deposit',
+			'purchase'
+		];
+
+		foreach ($category_data as $category) {
+			$category_label_data[] = [
+				'value'	=> $category,
+				'text'	=> ucfirst($category)
+			];
+		}
+
+		return $category_label_data;
 	}
 }

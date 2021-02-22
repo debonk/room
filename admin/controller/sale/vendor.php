@@ -262,12 +262,12 @@ class ControllerSaleVendor extends Controller
 			# Transaction Types
 			$this->load->model('accounting/transaction_type');
 
-			$data['transaction_types'] = $this->model_accounting_transaction_type->getTransactionTypesByLabel('vendor');
+			$data['transaction_types'] = $this->model_accounting_transaction_type->getTransactionTypesMenu(['client_label' => 'vendor']);
 
 			# Accounts
 			$this->load->model('accounting/account');
 
-			$data['assets'] = $this->model_accounting_account->getAccountsMenuByComponent([''], ['current_asset']);
+			$data['assets'] = $this->model_accounting_account->getAccountsMenuByParentId([1111,1112]);
 		}
 
 		$data['token'] = $this->session->data['token'];

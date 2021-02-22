@@ -62,10 +62,10 @@
 					<?= $column_transaction_type; ?>
 				</td>
 				<td class="text-left">
-					<?= $column_asset; ?>
+					<?= $column_reference; ?>
 				</td>
 				<td class="text-left">
-					<?= $column_reference; ?>
+					<?= $column_asset; ?>
 				</td>
 				<td class="text-left">
 					<?= $column_description; ?>
@@ -95,10 +95,10 @@
 					<?= $customer_transaction['transaction_type']; ?>
 				</td>
 				<td class="text-left">
-					<?= $customer_transaction['asset']; ?>
+					<?= $customer_transaction['reference']; ?>
 				</td>
 				<td class="text-left">
-					<?= $customer_transaction['reference']; ?>
+					<?= $customer_transaction['asset']; ?>
 				</td>
 				<td class="text-left">
 					<?= $customer_transaction['description']; ?>
