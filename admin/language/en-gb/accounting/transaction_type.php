@@ -34,3 +34,6 @@ $_['error_name']        	= 'Tipe Transaksi harus diisi antara 3 - 64 karakter!';
 $_['error_client_label']	= 'Client Label harus diisi antara 3 - 16 karakter!';
 $_['error_category_label']	= 'Category Label harus diisi antara 3 - 16 karakter!';
 $_['error_transaction'] 	= 'Warning: Tipe Transaksi tidak bisa dihapus karena terkait dengan %s transaksi!';
+
+// Help
+$_['help_account_type'] 	= 'Tipe akun atas Kas/Bank';

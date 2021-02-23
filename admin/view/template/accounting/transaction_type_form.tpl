@@ -98,8 +98,7 @@
 						</div>
 					</div>
 					<div class="form-group">
-						<label class="col-sm-2 control-label" for="input-account-type">
-							<?php echo $entry_account_type; ?>
+						<label class="col-sm-2 control-label" for="input-account-type"><span data-toggle="tooltip" title="<?php echo $help_account_type; ?>"><?php echo $entry_account_type; ?></span>
 						</label>
 						<div class="col-sm-10">
 							<select name="account_type" id="input-account-type" class="form-control">

@@ -298,7 +298,8 @@ class ControllerAccountingTransactionType extends Controller
 			'entry_name',
 			'entry_sort_order',
 			'button_save',
-			'button_cancel'
+			'button_cancel',
+			'help_account_type'
 		);
 		foreach ($language_items as $language_item) {
 			$data[$language_item] = $this->language->get($language_item);
