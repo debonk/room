@@ -1407,9 +1407,9 @@ class ControllerSaleOrder extends Controller
 			$totals = $this->model_sale_order->getOrderTotals($this->request->get['order_id']);
 
 			$summary_data = [
-				'label'				=> 'customer',
-				'label_id'			=> $order_info['customer_id'],
+				'client_label'		=> 'customer',
 				'category_label'	=> 'order',
+				'client_id'			=> $order_info['customer_id'],
 			];
 	
 			$transaction_total = $this->model_accounting_transaction->getTransactionsTotalSummary($order_id, $summary_data);
@@ -1489,6 +1489,7 @@ class ControllerSaleOrder extends Controller
 			// $expired = false;
 
 			$payment_phases = $this->model_sale_order->getPaymentPhases($order_id);
+			// var_dump($payment_phases);//die('---breakpoint---');
 
 			foreach ($payment_phases as $payment_phase) {
 				$limit_date_in = $this->model_localisation_local_date->getInFormatDate(date('Y-m-d', $payment_phase['limit_stamp']));
@@ -1936,8 +1937,8 @@ class ControllerSaleOrder extends Controller
 			$this->load->model('accounting/transaction');
 
 			$filter_data = array(
-				'label'		=> 'vendor',
-				'label_id'	=> $this->request->post['vendor_id']
+				'client_label'	=> 'vendor',
+				'client_id'		=> $this->request->post['vendor_id']
 			);
 
 			$transaction_total = $this->model_accounting_transaction->getTransactionsTotalSummary($order_id, $filter_data);

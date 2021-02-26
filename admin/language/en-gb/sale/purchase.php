@@ -4,7 +4,7 @@ $_['heading_title']				= 'Purchase';
 
 // Text
 $_['text_complete']				= 'Completed';
-$_['text_complete_confirm']		= 'Pastikan nilai Total dan No Invoice Vendor sudah sesuai dengan nilai pada Invoice Vendor sebelum melanjutkan!';
+$_['text_complete_confirm']		= 'Pastikan nilai Total dan No Invoice Vendor sudah sesuai dengan data invoice yang diterima dari vendor sebelum melanjutkan!';
 $_['text_internal']				= 'Internal';
 $_['text_pending']     			= 'Pending';
 $_['text_preview']     			= 'Preview';

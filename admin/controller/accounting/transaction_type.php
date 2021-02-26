@@ -129,6 +129,7 @@ class ControllerAccountingTransactionType extends Controller
 			'column_account_debit',
 			'column_account_type',
 			'column_sort_order',
+			'column_transaction_label',
 			'column_action',
 			'button_add',
 			'button_edit',
@@ -204,6 +205,7 @@ class ControllerAccountingTransactionType extends Controller
 				'name'                  => $result['name'],
 				'client_label'			=> $result['client_label'],
 				'category_label'		=> $result['category_label'],
+				'transaction_label'		=> $result['transaction_label'],
 				'account_type'			=> $result['account_type'],
 				'account_debit'			=> $result['account_debit_id'] ? $result['account_debit_id'] . '-' . $result['account_debit'] : '-',
 				'account_credit'		=> $result['account_credit_id'] ? $result['account_credit_id'] . '-' . $result['account_credit'] : '-',
@@ -297,6 +299,7 @@ class ControllerAccountingTransactionType extends Controller
 			'entry_manual_select',
 			'entry_name',
 			'entry_sort_order',
+			'entry_transaction_label',
 			'button_save',
 			'button_cancel',
 			'help_account_type'
@@ -309,6 +312,7 @@ class ControllerAccountingTransactionType extends Controller
 			'warning',
 			'client_label',
 			'category_label',
+			'transaction_label',
 			'name'
 		);
 		foreach ($error_items as $error_item) {
@@ -366,6 +370,8 @@ class ControllerAccountingTransactionType extends Controller
 			'name',
 			'client_label',
 			'category_label',
+			'transaction_label',
+			'account_type',
 			'account_debit_id',
 			'account_credit_id',
 			'manual_select',
@@ -381,16 +387,17 @@ class ControllerAccountingTransactionType extends Controller
 			}
 		}
 
-		if (isset($this->request->post['account_type'])) {
-			$data['account_type'] = $this->request->post['account_type'];
-		} elseif (!empty($transaction_type_info)) {
-			$data['account_type'] = $transaction_type_info['account_type'];
-		} else {
-			$data['account_type'] = 'D';
-		}
+		// if (isset($this->request->post['account_type'])) {
+		// 	$data['account_type'] = $this->request->post['account_type'];
+		// } elseif (!empty($transaction_type_info)) {
+		// 	$data['account_type'] = $transaction_type_info['account_type'];
+		// } else {
+		// 	$data['account_type'] = 'D';
+		// }
 
 		$data['clients_label'] = $this->model_accounting_transaction_type->getClientsLabel();
 		$data['categories_label'] = $this->model_accounting_transaction_type->getCategoriesLabel();
+		$data['transactions_label'] = $this->model_accounting_transaction_type->getTransactionsLabel();
 
 		$this->load->model('accounting/account');
 		$data['accounts'] = $this->model_accounting_account->getAccountsMenuByComponent();
@@ -408,8 +415,16 @@ class ControllerAccountingTransactionType extends Controller
 			$this->error['warning'] = $this->language->get('error_permission');
 		}
 
-		if ((utf8_strlen(trim($this->request->post['client_label'])) < 2) || (utf8_strlen(trim($this->request->post['client_label'])) > 16)) {
+		if (empty($this->request->post['client_label'])) {
 			$this->error['client_label'] = $this->language->get('error_client_label');
+		}
+
+		if (empty($this->request->post['category_label'])) {
+			$this->error['category_label'] = $this->language->get('error_category_label');
+		}
+
+		if (empty($this->request->post['transaction_label'])) {
+			$this->error['transaction_label'] = $this->language->get('error_transaction_label');
 		}
 
 		if ((utf8_strlen(trim($this->request->post['category_label'])) < 2) || (utf8_strlen(trim($this->request->post['category_label'])) > 16)) {

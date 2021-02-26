@@ -61,8 +61,8 @@ class ControllerSaleCustomer extends Controller
 		$data['customers_transaction_summary'] = [];
 
 		$summary_data = [
-			'label'		=> 'customer',
-			'group'		=> 'tt.category_label'
+			'client_label'	=> 'customer',
+			'group'			=> 't.category_label'
 		];
 
 		$customer_transaction_summary = $this->model_accounting_transaction->getTransactionsSummary($order_id, $summary_data);
@@ -70,11 +70,11 @@ class ControllerSaleCustomer extends Controller
 			# Maintain Version 1
 			if (empty($transaction_summary['category_label'])) {
 				$transaction_summary['category_label'] = 'order';
-				$transaction_summary['account_type'] = 'D';
+				$transaction_summary['transaction_label'] = 'payment';
 			}
 			# End Maintain
 
-			$customer_transaction_summary[$transaction_summary['category_label']][$transaction_summary['account_type']] = $transaction_summary;
+			$customer_transaction_summary[$transaction_summary['category_label']][$transaction_summary['transaction_label']] = $transaction_summary;
 			unset($customer_transaction_summary[$key]);
 		}
 
@@ -83,15 +83,15 @@ class ControllerSaleCustomer extends Controller
 		}
 
 		foreach ($customer_transaction_summary as $key => $transaction_summary) {
-			if ('customer-' . $key == 'customer-deposit') {
+			if ($key == 'deposit') {
 				$amount = $this->config->get('config_customer_deposit');
-			} elseif (!isset($customer_transaction_summary['order']) || $key == 'order') {
+			} elseif ($key == 'order' || !isset($customer_transaction_summary['order'])) {
 				$amount = $order_info['total'];
 			}
 
-			$debit = isset($transaction_summary['D']) ? $transaction_summary['D']['total'] : 0;
-			$credit = isset($transaction_summary['C']) ? $transaction_summary['C']['total'] : 0;
-			$total = $debit - $credit;
+			$payment = isset($transaction_summary['payment']) ? $transaction_summary['payment']['debit'] : 0;
+			$refund = isset($transaction_summary['refund']) ? $transaction_summary['refund']['credit'] : 0;
+			$total = $payment - $refund;
 
 			$data['customers_transaction_summary'][] = [
 				'transaction_type' 	=> $this->language->get('text_category_' . $key),
@@ -104,15 +104,16 @@ class ControllerSaleCustomer extends Controller
 		$data['customer_transactions'] = [];
 
 		$filter_data = [
-			'filter_order_id'	=> $order_id,
-			'filter_label'		=> 'customer',
-			'sort'				=> 't.date DESC, t.transaction_id',
-			'order'				=> 'DESC',
-			'start'				=> ($page - 1) * $limit,
-			'limit'				=> $limit
+			'filter_order_id'		=> $order_id,
+			'filter_client_label'	=> 'customer',
+			'sort'					=> 't.date DESC, t.transaction_id',
+			'order'					=> 'DESC',
+			'start'					=> ($page - 1) * $limit,
+			'limit'					=> $limit
 		];
 
 		$results = $this->model_accounting_transaction->getTransactions($filter_data);
+		var_dump($results);die('---breakpoint---');
 
 		foreach ($results as $result) {
 			# Maintain Version 1 
@@ -218,6 +219,8 @@ class ControllerSaleCustomer extends Controller
 			$this->load->model('accounting/transaction_type');
 			$this->load->model('accounting/transaction');
 
+			$account_data = [];
+
 			$reference_prefix = str_ireplace('{YEAR}', date('Y', strtotime($this->request->post['customer_transaction_date'])), $this->config->get('config_receipt_customer_prefix'));
 
 			$last_reference_no = $this->model_accounting_transaction->getLastReferenceNo($reference_prefix);
@@ -233,25 +236,45 @@ class ControllerSaleCustomer extends Controller
 			$account_debit_id = empty($transaction_type_info['account_debit_id']) ? $this->request->post['customer_transaction_asset_id'] : ($transaction_type_info['account_debit_id']);
 			$account_credit_id = empty($transaction_type_info['account_credit_id']) ? $this->request->post['customer_transaction_asset_id'] : ($transaction_type_info['account_credit_id']);
 
-			$asset_info = $this->model_accounting_account->getAccount($this->request->post['customer_transaction_asset_id']);
+			$account_data[$account_debit_id] = $this->request->post['customer_transaction_amount'];
+			$account_data[$account_credit_id] = -$this->request->post['customer_transaction_amount'];
 
 			$transaction_data = array(
 				'order_id'				=> $order_id,
-				'account_to_id'			=> $account_debit_id,
-				'account_from_id'		=> $account_credit_id,
 				'label'					=> 'customer',
 				'label_id'				=> $order_info['customer_id'],
-				'transaction_type_id' 	=> $this->request->post['customer_transaction_type_id'],
 				'date' 					=> $this->request->post['customer_transaction_date'],
-				'payment_method'		=> $asset_info['name'],
-				'description' 			=> $this->request->post['customer_transaction_description'],
-				'amount' 				=> $this->request->post['customer_transaction_amount'],
+				'description' 			=> $transaction_type_info['name'],
+				'account_data' 			=> $account_data,
 				'customer_name' 		=> $order_info['customer'],
-				'reference_prefix'		=> $reference_prefix,
-				'reference_no' 			=> $reference_no
+				'reference_prefix' 		=> $reference_prefix,
+				'reference_no'			=> $reference_no
 			);
 
-			$this->model_accounting_transaction->addTransaction($transaction_data);
+			// $this->model_accounting_transaction->addTransaction($transaction_data);
+
+
+			// $account_debit_id = empty($transaction_type_info['account_debit_id']) ? $this->request->post['customer_transaction_asset_id'] : ($transaction_type_info['account_debit_id']);
+			// $account_credit_id = empty($transaction_type_info['account_credit_id']) ? $this->request->post['customer_transaction_asset_id'] : ($transaction_type_info['account_credit_id']);
+
+			// $asset_info = $this->model_accounting_account->getAccount($this->request->post['customer_transaction_asset_id']);
+
+			// $transaction_data = array(
+			// 	'order_id'				=> $order_id,
+			// 	'account_to_id'			=> $account_debit_id,
+			// 	'account_from_id'		=> $account_credit_id,
+			// 	'label'					=> 'customer',
+			// 	'label_id'				=> $order_info['customer_id'],
+			// 	'transaction_type_id' 	=> $this->request->post['customer_transaction_type_id'],
+			// 	'date' 					=> $this->request->post['customer_transaction_date'],
+			// 	'payment_method'		=> $asset_info['name'],
+			// 	'description' 			=> $this->request->post['customer_transaction_description'],
+			// 	'amount' 				=> $this->request->post['customer_transaction_amount'],
+			// 	'customer_name' 		=> $order_info['customer'],
+			// 	'reference_prefix'		=> $reference_prefix,
+			// 	'reference_no' 			=> $reference_no
+			// );
+			// $this->model_accounting_transaction->addTransaction($transaction_data);
 
 			if ($transaction_type_info['category_label'] == 'order') {
 				$payment_phases = $this->model_sale_order->getPaymentPhases($order_id);

@@ -569,9 +569,10 @@ class ModelSaleOrder extends Model {
 		$this->load->model('accounting/transaction');
 		
 		$summary_data = [
-			'label'				=> 'customer',
-			'label_id'			=> $order_info['customer_id'],
-			'category_label'	=> 'order'
+			'client_label'		=> 'customer',
+			'category_label'	=> 'order',
+			// 'transaction_label'	=> 'refund',
+			'client_id'			=> $order_info['customer_id']
 		];
 
 		$transaction_total = $this->model_accounting_transaction->getTransactionsTotalSummary($order_id, $summary_data);

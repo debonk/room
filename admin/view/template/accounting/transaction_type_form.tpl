@@ -72,6 +72,11 @@
 								<?php } ?>
 								<?php } ?>
 							</select>
+							<?php if ($error_client_label) { ?>
+							<div class="text-danger">
+								<?php echo $error_client_label; ?>
+							</div>
+							<?php } ?>
 						</div>
 					</div>
 					<div class="form-group required">
@@ -95,25 +100,67 @@
 								<?php } ?>
 								<?php } ?>
 							</select>
+							<?php if ($error_client_label) { ?>
+							<div class="text-danger">
+								<?php echo $error_client_label; ?>
+							</div>
+							<?php } ?>
+						</div>
+					</div>
+					<div class="form-group required">
+						<label class="col-sm-2 control-label" for="input-transaction-label">
+							<?php echo $entry_transaction_label; ?>
+						</label>
+						<div class="col-sm-10">
+							<select name="transaction_label" id="input-transaction-label" class="form-control">
+								<option value="">
+									<?php echo $text_select; ?>
+								</option>
+								<?php foreach ($transactions_label as $label) { ?>
+								<?php if ($label['value'] == $transaction_label) { ?>
+								<option value="<?php echo $label['value']; ?>" selected="selected">
+									<?php echo $label['text']; ?>
+								</option>
+								<?php } else { ?>
+								<option value="<?php echo $label['value']; ?>">
+									<?php echo $label['text']; ?>
+								</option>
+								<?php } ?>
+								<?php } ?>
+							</select>
+							<?php if ($error_client_label) { ?>
+							<div class="text-danger">
+								<?php echo $error_client_label; ?>
+							</div>
+							<?php } ?>
 						</div>
 					</div>
 					<div class="form-group">
-						<label class="col-sm-2 control-label" for="input-account-type"><span data-toggle="tooltip" title="<?php echo $help_account_type; ?>"><?php echo $entry_account_type; ?></span>
+						<label class="col-sm-2 control-label" for="input-account-type"><span data-toggle="tooltip"
+								title="<?php echo $help_account_type; ?>">
+								<?php echo $entry_account_type; ?>
+							</span>
 						</label>
 						<div class="col-sm-10">
 							<select name="account_type" id="input-account-type" class="form-control">
+								<option value="">
+									<?php echo $text_none; ?>
+								</option>
 								<?php if ($account_type == 'D') { ?>
 								<option value="D" selected="selected">
 									<?php echo $text_debit; ?>
-								</option>
-								<option value="C">
-									<?php echo $text_credit; ?>
 								</option>
 								<?php } else { ?>
 								<option value="D">
 									<?php echo $text_debit; ?>
 								</option>
+								<?php } ?>
+								<?php if ($account_type == 'C') { ?>
 								<option value="C" selected="selected">
+									<?php echo $text_credit; ?>
+								</option>
+								<?php } else { ?>
+								<option value="D">
 									<?php echo $text_credit; ?>
 								</option>
 								<?php } ?>
@@ -184,8 +231,7 @@
 						</label>
 						<div class="col-sm-10">
 							<?php if ($manual_select) { ?>
-							<input type="checkbox" name="manual_select" value="1" id="input-manual-select" 
-								checked="checked" />
+							<input type="checkbox" name="manual_select" value="1" id="input-manual-select" checked="checked" />
 							<?php } else { ?>
 							<input type="checkbox" name="manual_select" value="1" id="input-manual-select" />
 							<?php } ?>

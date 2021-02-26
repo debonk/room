@@ -50,6 +50,7 @@
                     <?php } else { ?>
                     <a href="<?php echo $sort_category_label; ?>"><?php echo $column_category_label; ?></a>
                     <?php } ?></td>
+                  <td class="text-left"><?php echo $column_transaction_label; ?></td>
                   <td class="text-left"><?php echo $column_account_type; ?></td>
                   <td class="text-left"><?php echo $column_account_debit; ?></td>
                   <td class="text-left"><?php echo $column_account_credit; ?></td>
@@ -73,6 +74,7 @@
                   <td class="text-left"><?php echo $transaction_type['name']; ?></td>
                   <td class="text-left"><?php echo $transaction_type['client_label']; ?></td>
                   <td class="text-left"><?php echo $transaction_type['category_label']; ?></td>
+                  <td class="text-left"><?php echo $transaction_type['transaction_label']; ?></td>
                   <td class="text-left"><?php echo $transaction_type['account_type']; ?></td>
                   <td class="text-left"><?php echo $transaction_type['account_debit']; ?></td>
                   <td class="text-left"><?php echo $transaction_type['account_credit']; ?></td>
@@ -82,7 +84,7 @@
                 <?php } ?>
                 <?php } else { ?>
                 <tr>
-                  <td class="text-center" colspan="5"><?php echo $text_no_results; ?></td>
+                  <td class="text-center" colspan="9"><?php echo $text_no_results; ?></td>
                 </tr>
                 <?php } ?>
               </tbody>

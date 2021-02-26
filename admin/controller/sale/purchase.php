@@ -336,9 +336,6 @@ class ControllerSalePurchase extends Controller
 						$order_purchase_product_data[] = [
 							'order_product_id'	=> $order_product_info['order_product_id'],
 							'product_id'		=> $product_id,
-							// 'name'				=> $order_product_info['name'],
-							// 'model'				=> $order_product_info['model'],
-							// 'unit_class'		=> $order_product_info['unit_class'],
 							'quantity'			=> $product['quantity'],
 							'price'				=> $product['purchase_price'],
 							'total'				=> $product['quantity'] * $product['purchase_price']
@@ -347,13 +344,9 @@ class ControllerSalePurchase extends Controller
 				}
 
 				$order_purchase_data = [
-					// 'order_document_id'		=> 0,
 					'order_vendor_id'		=> $vendor_id ? $vendor_data['order_vendor_id'] : 0,
 					'order_id'				=> $order_id,
 					'vendor_id'				=> $vendor_id,
-					// 'adjustment'			=> 0,
-					// 'comment'				=> '',
-					// 'completed'				=> 0,
 					'product'				=> $order_purchase_product_data
 				];
 
@@ -425,37 +418,47 @@ class ControllerSalePurchase extends Controller
 
 			$this->model_sale_purchase->editOrderPurchase($order_purchase_info['order_purchase_id'], $order_purchase_data);
 
-			$amount = [];
+			$account_data = [];
 
 			$order_purchase_products = $this->model_sale_purchase->getOrderPurchaseProducts($order_purchase_info['order_purchase_id']);
-			$amount['initial'] = array_sum(array_column($order_purchase_products, 'total'));
-
-			if (!empty($this->request->post['adjustment'])) {
-				$amount['discount'] = $this->request->post['adjustment'];
-			}
+			$total = array_sum(array_column($order_purchase_products, 'total'));
 
 			$this->load->model('accounting/transaction');
 
-			foreach ($transaction_types as $transaction_type) {
-				if (!empty($amount[$transaction_type['transaction_label']])) {
-					$transaction_data = array(
-						'order_id'				=> $order_id,
-						'account_to_id'			=> $transaction_type['account_debit_id'],
-						'account_from_id'		=> $transaction_type['account_credit_id'],
-						'label'					=> 'vendor',
-						'label_id'				=> $vendor_id,
-						'transaction_type_id' 	=> $transaction_type['transaction_type_id'],
-						'date' 					=> date('Y-m-d'),
-						'description' 			=> $transaction_type['name'],
-						'amount' 				=> $amount[$transaction_type['transaction_label']],
-						'customer_name' 		=> $order_purchase_info['vendor_name'],
-						'reference_prefix' 		=> $order_purchase_info['reference_prefix'],
-						'reference_no'			=> $order_purchase_info['reference_no']
-					);
+			$initial_transaction_info = $this->model_accounting_transaction_type->getTransactionTypeByLabel('vendor', 'purchase', 'initial');
+			$account_data[$initial_transaction_info['account_debit_id']] = $total;
+			$account_data[$initial_transaction_info['account_credit_id']] = -$total;
 
-					$this->model_accounting_transaction->addTransaction($transaction_data);
+			if (!empty($this->request->post['adjustment'])) {
+				$adjustment_transaction_info = $this->model_accounting_transaction_type->getTransactionTypeByLabel('vendor', 'purchase', 'discount');
+
+				if (isset($account_data[$adjustment_transaction_info['account_debit_id']])) {
+					$account_data[$adjustment_transaction_info['account_debit_id']] -= $this->request->post['adjustment'];
+				} else {
+					$account_data[$adjustment_transaction_info['account_debit_id']] = -$this->request->post['adjustment'];
+				}
+
+				if (isset($account_data[$adjustment_transaction_info['account_credit_id']])) {
+					$account_data[$adjustment_transaction_info['account_credit_id']] += $this->request->post['adjustment'];
+				} else {
+					$account_data[$adjustment_transaction_info['account_credit_id']] = $this->request->post['adjustment'];
 				}
 			}
+
+			$transaction_data = array(
+				'order_id'				=> $order_id,
+				'label'					=> 'vendor',
+				'label_id'				=> $vendor_id,
+				'date' 					=> date('Y-m-d'),
+				'description' 			=> $initial_transaction_info['name'],
+				'account_data' 			=> $account_data,
+				'customer_name' 		=> $order_purchase_info['vendor_name'],
+				'reference_prefix' 		=> $order_purchase_info['reference_prefix'],
+				'reference_no'			=> $order_purchase_info['reference_no']
+			);
+
+			$this->model_accounting_transaction->addTransaction($transaction_data);
+
 			$json['success'] = $this->language->get('text_purchase_completed');
 		}
 
