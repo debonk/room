@@ -10,7 +10,7 @@ $_['text_print_confirm']       	 		= 'Are you sure?\nPrint Dokumen hanya diperbo
 
 // Column
 $_['column_action']				= 'Action';
-$_['column_amount']				= 'Ketentuan';
+$_['column_amount']				= 'Jumlah';
 $_['column_balance']			= 'Saldo';
 $_['column_date']				= 'Tanggal';
 $_['column_date_added']			= 'Tanggal Entry';

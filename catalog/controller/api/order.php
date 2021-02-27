@@ -934,6 +934,7 @@ class ControllerApiOrder extends Controller
 						'label'	 	 	 	=> 'customer',
 						'category_label'	=> 'order'
 					);
+					// print_r($this->model_accounting_transaction->getTransactionsTotalSummary($order_id, $filter_data));//die('---breakpoint---');
 
 					if ($order_info['total'] != $this->model_accounting_transaction->getTransactionsTotalSummary($order_id, $filter_data)) {
 						$json['error'] = $this->language->get('error_adjustment_amount');

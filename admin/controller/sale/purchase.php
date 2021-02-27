@@ -386,10 +386,32 @@ class ControllerSalePurchase extends Controller
 
 			if (!$order_purchase_info) {
 				$json['error'] = $this->language->get('error_order');
+			} elseif (!$order_purchase_info['printed']) {
+				$json['error'] = $this->language->get('error_print');
 			}
 
 			if (!$this->request->post['vendor_reference']) {
 				$json['error_vendor_reference'] = $this->language->get('error_vendor_reference');
+			}
+		}
+
+		if (!$json) {
+			$this->load->model('accounting/transaction_type');
+
+			$transaction_types = [];
+
+			$transaction_types['initial'] = $this->model_accounting_transaction_type->getTransactionTypeByLabel('vendor', 'purchase', 'initial');
+
+			if (empty($transaction_types['initial'])) {
+				$json['error'] = sprintf($this->language->get('error_transaction_type'), 'vendor-purchase-initial');
+			}
+
+			if (!empty($this->request->post['adjustment'])) {
+				$transaction_types['discount'] = $this->model_accounting_transaction_type->getTransactionTypeByLabel('vendor', 'purchase', 'discount');
+				
+				if (empty($transaction_types['discount'])) {
+					$json['error'] = sprintf($this->language->get('error_transaction_type'), 'vendor-purchase-discount');
+				}
 			}
 		}
 
@@ -406,19 +428,16 @@ class ControllerSalePurchase extends Controller
 			$amount = [];
 
 			$order_purchase_products = $this->model_sale_purchase->getOrderPurchaseProducts($order_purchase_info['order_purchase_id']);
-			$amount['purchase'] = array_sum(array_column($order_purchase_products, 'total'));
+			$amount['initial'] = array_sum(array_column($order_purchase_products, 'total'));
 
 			if (!empty($this->request->post['adjustment'])) {
 				$amount['discount'] = $this->request->post['adjustment'];
 			}
 
-			$this->load->model('accounting/transaction_type');
 			$this->load->model('accounting/transaction');
 
-			$transaction_types = $this->model_accounting_transaction_type->getTransactionTypesByLabel('vendor', 'order');
-
 			foreach ($transaction_types as $transaction_type) {
-				if (isset($amount[$transaction_type['category_label']])) {
+				if (!empty($amount[$transaction_type['transaction_label']])) {
 					$transaction_data = array(
 						'order_id'				=> $order_id,
 						'account_to_id'			=> $transaction_type['account_debit_id'],
@@ -428,7 +447,7 @@ class ControllerSalePurchase extends Controller
 						'transaction_type_id' 	=> $transaction_type['transaction_type_id'],
 						'date' 					=> date('Y-m-d'),
 						'description' 			=> $transaction_type['name'],
-						'amount' 				=> $amount[$transaction_type['category_label']],
+						'amount' 				=> $amount[$transaction_type['transaction_label']],
 						'customer_name' 		=> $order_purchase_info['vendor_name'],
 						'reference_prefix' 		=> $order_purchase_info['reference_prefix'],
 						'reference_no'			=> $order_purchase_info['reference_no']
@@ -437,7 +456,6 @@ class ControllerSalePurchase extends Controller
 					$this->model_accounting_transaction->addTransaction($transaction_data);
 				}
 			}
-
 			$json['success'] = $this->language->get('text_purchase_completed');
 		}
 

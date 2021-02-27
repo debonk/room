@@ -78,8 +78,12 @@ class ControllerSaleCustomer extends Controller
 			unset($customer_transaction_summary[$key]);
 		}
 
+		if ($this->config->get('config_customer_deposit') && !isset($customer_transaction_summary['deposit'])) {
+			$customer_transaction_summary['deposit'] = [];
+		}
+
 		foreach ($customer_transaction_summary as $key => $transaction_summary) {
-			if ('customer-' . $key == $this->config->get('config_customer_deposit_label')) {
+			if ('customer-' . $key == 'customer-deposit') {
 				$amount = $this->config->get('config_customer_deposit');
 			} elseif (!isset($customer_transaction_summary['order']) || $key == 'order') {
 				$amount = $order_info['total'];
@@ -249,17 +253,19 @@ class ControllerSaleCustomer extends Controller
 
 			$this->model_accounting_transaction->addTransaction($transaction_data);
 
-			$payment_phases = $this->model_sale_order->getPaymentPhases($order_id);
-			foreach ($payment_phases as $payment_phase) {
-				if ($payment_phase['paid_status']) {
-					$order_status_id = $payment_phase['order_status_id'];
+			if ($transaction_type_info['category_label'] == 'order') {
+				$payment_phases = $this->model_sale_order->getPaymentPhases($order_id);
+				foreach ($payment_phases as $payment_phase) {
+					if ($payment_phase['paid_status']) {
+						$order_status_id = $payment_phase['order_status_id'];
+					}
+				}
+
+				if ($order_info['order_status_id'] != $order_status_id) {
+					$this->model_sale_order->addOrderHistory($order_id, $order_status_id);
 				}
 			}
 
-			if ($order_info['order_status_id'] != $order_status_id) {
-				$this->model_sale_order->addOrderHistory($order_id, $order_status_id);
-			}
-			
 			$json['success'] = $this->language->get('text_customer_transaction_added');
 		}
 

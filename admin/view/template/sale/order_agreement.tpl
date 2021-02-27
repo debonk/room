@@ -455,7 +455,7 @@
                   <?= $text_pihak_penyewa; ?>
                 </td>
                 <td>
-                  <?= $store_owner; ?><br /><br /><br /><br /><br /><br />
+                  <?= $store_owner; ?><br /><br /><br /><br /><br /><br /><br />
                 </td>
               </tr>
               <tr>
@@ -492,6 +492,7 @@
         </div>
       </div>
     </div>
+    <?php if ($preview) {$x++;} ?>
     <?php } ?>
   </div>
 </body>

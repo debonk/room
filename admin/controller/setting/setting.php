@@ -656,16 +656,6 @@ class ControllerSettingSetting extends Controller {
 			$data['config_customer_deposit'] = $this->config->get('config_customer_deposit');
 		}
 
-		if (isset($this->request->post['config_customer_deposit_label'])) {
-			$data['config_customer_deposit_label'] = $this->request->post['config_customer_deposit_label'];
-		} else {
-			$data['config_customer_deposit_label'] = $this->config->get('config_customer_deposit_label');
-		}
-
-		$this->load->model('accounting/transaction_type');
-
-		$data['transaction_type_labels'] = $this->model_accounting_transaction_type->geTransactionTypeLabels();
-
 		if (isset($this->request->post['config_limit_admin'])) {
 			$data['config_limit_admin'] = $this->request->post['config_limit_admin'];
 		} else {
@@ -806,7 +796,7 @@ class ControllerSettingSetting extends Controller {
 
 		$this->load->model('accounting/account');
 
-		$data['liability_accounts'] = $this->model_accounting_account->getAccountsMenuByComponent($component = ['liability']);
+		$data['liability_accounts'] = $this->model_accounting_account->getAccountsMenuByComponent();
 		$data['revenue_accounts'] = $this->model_accounting_account->getAccountsMenuByComponent($component = ['revenue']);
 		$data['asset_accounts'] = $this->model_accounting_account->getAccountsMenuByComponent($component = ['asset']);
 

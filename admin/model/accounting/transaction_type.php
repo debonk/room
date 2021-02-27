@@ -101,6 +101,16 @@ class ModelAccountingTransactionType extends Model
 		return $query->rows;
 	}
 
+	public function getTransactionTypeByLabel($client_label, $category_label, $transaction_label)
+	{
+		$sql = "SELECT DISTINCT * FROM " . DB_PREFIX . "transaction_type WHERE client_label = '" . $this->db->escape($client_label) . "' AND category_label = '" . $this->db->escape($category_label) . "' AND transaction_label = '" . $this->db->escape($transaction_label) . "'";
+
+		$query = $this->db->query($sql);
+
+		return $query->row;
+	}
+
+	// Blm digunakan
 	public function getTransactionTypesByLabel($client_label, $category_label = '')
 	{
 		if (!empty($client_label) || !empty($category_label)) {
@@ -128,21 +138,6 @@ class ModelAccountingTransactionType extends Model
 		} else {
 			return;
 		}
-	}
-
-	public function geTransactionTypeLabels()
-	{
-		$sql = "SELECT DISTINCT CONCAT(client_label, '-', category_label) AS label FROM " . DB_PREFIX . "transaction_type ORDER BY label ASC";
-
-		$query = $this->db->query($sql);
-
-		$label_data = [];
-
-		foreach ($query->rows as $label) {
-			$label_data[] = $label['label'];
-		}
-
-		return $label_data;
 	}
 
 	public function getClientsLabel()

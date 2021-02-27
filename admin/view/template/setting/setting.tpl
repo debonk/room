@@ -325,21 +325,6 @@
                     <?php } ?>
                   </div>
                 </div>
-                <div class="form-group">
-                  <label class="col-sm-2 control-label" for="input-customer-deposit-label"><?php echo $entry_customer_deposit_label; ?></label>
-                  <div class="col-sm-10">
-                    <select name="config_customer_deposit_label" id="input-customer-deposit-label" class="form-control">
-                      <option value=""><?php echo $text_none; ?></option>
-                      <?php foreach ($transaction_type_labels as $transaction_type_label) { ?>
-                      <?php if ($transaction_type_label == $config_customer_deposit_label) { ?>
-                      <option value="<?php echo $transaction_type_label; ?>" selected="selected"><?php echo $transaction_type_label; ?></option>
-                      <?php } else { ?>
-                      <option value="<?php echo $transaction_type_label; ?>"><?php echo $transaction_type_label; ?></option>
-                      <?php } ?>
-                      <?php } ?>
-                    </select>
-                  </div>
-                </div>
               </fieldset>
               <fieldset>
                 <legend><?php echo $text_product; ?></legend>
@@ -1761,7 +1746,7 @@
       </div>
     </div>
   </div>
-  <script type="text/javascript"><!--
+  <script type="text/javascript">
 $('select[name=\'config_theme\']').on('change', function() {
 	$.ajax({
 		url: 'index.php?route=setting/setting/theme&token=<?php echo $token; ?>&theme=' + this.value,
@@ -1782,8 +1767,8 @@ $('select[name=\'config_theme\']').on('change', function() {
 });
 
 $('select[name=\'config_theme\']').trigger('change');
-//--></script> 
-  <script type="text/javascript"><!--
+</script> 
+<script type="text/javascript">
 $('select[name=\'config_country_id\']').on('change', function() {
 	$.ajax({
 		url: 'index.php?route=localisation/country/country&token=<?php echo $token; ?>&country_id=' + this.value,
@@ -1822,5 +1807,5 @@ $('select[name=\'config_country_id\']').on('change', function() {
 });
 
 $('select[name=\'config_country_id\']').trigger('change');
-//--></script></div>
+</script></div>
 <?php echo $footer; ?> 

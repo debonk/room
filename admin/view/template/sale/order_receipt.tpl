@@ -124,7 +124,7 @@
 								<?php echo $text_pihak; ?>
 							</td>
 							<td>
-								<?php echo $store_owner; ?><br /><br /><br /><br /><br /><br />
+								<?php echo $store_owner; ?><br /><br /><br /><br /><br /><br /><br />
 							</td>
 						</tr>
 						<tr>

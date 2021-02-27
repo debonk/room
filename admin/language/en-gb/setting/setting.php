@@ -62,7 +62,6 @@ $_['entry_country']                   = 'Country';
 $_['entry_currency']                  = 'Currency';
 $_['entry_currency_auto']             = 'Auto Update Currency';
 $_['entry_customer_deposit']          = 'Customer Deposit';
-$_['entry_customer_deposit_label']    = 'Customer Deposit Transaction Label';
 $_['entry_customer_group']            = 'Customer Group';
 $_['entry_customer_group_display']    = 'Customer Groups';
 $_['entry_customer_online']           = 'Customers Online';

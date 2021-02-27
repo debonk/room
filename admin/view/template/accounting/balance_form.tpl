@@ -175,10 +175,10 @@
 			</div>
 		</div>
 	</div>
-	<script type="text/javascript">< !--
+	<script type="text/javascript">
 			$('.date').datetimepicker({
 				pickTime: false
 			});
-//--></script>
+</script>
 </div>
 <?php echo $footer; ?>

@@ -549,10 +549,8 @@ class ControllerAccountingBalance extends Controller {
 
 		$this->load->model('accounting/account');
 	
-		$data['accounts_from'] = $this->model_accounting_account->getAccountsMenuByParentId([111,711]);
-		$data['accounts_to'] = $this->model_accounting_account->getAccountsMenuByParentId([111]);
-		// $data['accounts_from'] = $this->model_accounting_account->getAccountsMenuByComponent(['asset'], ['other_income']);
-		// $data['accounts_to'] = $this->model_accounting_account->getAccountsMenuByComponent(['asset']);
+		$data['accounts_from'] = $this->model_accounting_account->getAccountsMenuByParentId([111, 114, 711]);
+		$data['accounts_to'] = $this->model_accounting_account->getAccountsMenuByParentId([111, 114]);
 
 		$data['filter_account_from_id'] = $filter_account_from_id;
 		$data['filter_account_to_id'] = $filter_account_to_id;
@@ -738,10 +736,8 @@ class ControllerAccountingBalance extends Controller {
 		$data['token'] = $this->session->data['token'];
 
 		$this->load->model('accounting/account');
-		$data['accounts_from'] = $this->model_accounting_account->getAccountsMenuByParentId([111,711]);
-		$data['accounts_to'] = $this->model_accounting_account->getAccountsMenuByParentId([111]);
-		// $data['accounts_from'] = $this->model_accounting_account->getAccountsMenuByComponent(['asset'], ['other_income']);
-		// $data['accounts_to'] = $this->model_accounting_account->getAccountsMenuByComponent(['asset']);
+		$data['accounts_from'] = $this->model_accounting_account->getAccountsMenuByParentId([111, 114, 711]);
+		$data['accounts_to'] = $this->model_accounting_account->getAccountsMenuByParentId([111, 114]);
 		
 		$data['header'] = $this->load->controller('common/header');
 		$data['column_left'] = $this->load->controller('common/column_left');

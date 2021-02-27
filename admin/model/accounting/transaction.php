@@ -576,7 +576,8 @@ class ModelAccountingTransaction extends Model {
 
 		$category_data = array(
 			'order',
-			'deposit'
+			'deposit',
+			'purchase'
 		);
 		
 		if (isset($data['category_label']) && in_array($data['category_label'], $category_data)) {
@@ -628,7 +629,7 @@ class ModelAccountingTransaction extends Model {
 	}
 
 	public function getTransactionsTotalSummary($order_id, $data) {
-		$sql = "SELECT tt.account_type, SUM(t.amount) AS total FROM " . DB_PREFIX . "transaction t LEFT JOIN " . DB_PREFIX . "transaction_type tt ON (tt.transaction_type_id = t.transaction_type_id) WHERE t.order_id = '" . (int)$order_id . "'";
+		$sql = "SELECT t.transaction_id, tt.account_type, SUM(t.amount) AS total FROM " . DB_PREFIX . "transaction t LEFT JOIN " . DB_PREFIX . "transaction_type tt ON (tt.transaction_type_id = t.transaction_type_id) WHERE t.order_id = '" . (int)$order_id . "'";
 
 		$implode = array();
 
@@ -648,7 +649,8 @@ class ModelAccountingTransaction extends Model {
 
 		$category_data = array(
 			'order',
-			'deposit'
+			'deposit',
+			'purchase'
 		);
 		
 		if (isset($data['category_label']) && in_array($data['category_label'], $category_data)) {

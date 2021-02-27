@@ -121,9 +121,6 @@
 					<?= $column_vendor; ?>
 				</td>
 				<td class="text-left">
-					<?= $column_reference; ?>
-				</td>
-				<td class="text-left">
 					<?= $column_product; ?>
 				</td>
 				<td class="text-right">
@@ -147,11 +144,9 @@
 			<?php if ($order_purchases) { ?>
 			<?php foreach ($order_purchases as $order_purchase) { ?>
 			<tr>
-				<td class="text-left" rowspan="2">
-					<?= $order_purchase['vendor_name']; ?>
-				</td>
-				<td class="text-left" rowspan="2">
-					<?= $order_purchase['reference']; ?>
+				<td class="text-left td-top" rowspan="2">
+					<p><?= $order_purchase['vendor_name']; ?></p>
+					<p><?= $column_reference . ': ' . $order_purchase['reference']; ?></p>
 				</td>
 				<td class="text-left">
 					<?php foreach ($order_purchase['order_product'] as $order_product) { ?>

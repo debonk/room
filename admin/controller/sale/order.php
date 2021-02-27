@@ -2423,33 +2423,38 @@ class ControllerSaleOrder extends Controller
 			$data['transactions'] = array();
 
 			$filter_data = array(
-				'label'		=> 'customer'
+				'label'				=> 'customer',
+				'category_label'	=> 'order'
 			);
 
-			$transactions = $this->model_accounting_transaction->getTransactionsDescriptionSummaryByOrderId($order_id, $filter_data);
+			$transactions_total['order'] = $this->model_accounting_transaction->getTransactionsTotalSummary($order_id, $filter_data);
 
-			$transactions_total = 0;
+			$filter_data = array(
+				'label'				=> 'customer',
+				'category_label'	=> 'deposit'
+			);
 
-			foreach ($transactions as $transaction) {
-				$date_in = $this->model_localisation_local_date->getInFormatDate($transaction['date']);
+			$transactions_total['deposit'] = $this->model_accounting_transaction->getTransactionsTotalSummary($order_id, $filter_data);
 
-				$transactions_total += $transaction['amount'];
-
-				$data['transactions'][] = array(
-					'title'	=> $transaction['description'],
-					'text'	=> $this->currency->format($transaction['amount'], $order_info['currency_code'], $order_info['currency_value']) . ' (' . $date_in['long_date'] . ')'
-				);
+			foreach ($transactions_total as $category => $total) {
+				if ($total) {
+					$data['transactions'][] = array(
+						'title'	=> $category ? $this->language->get('text_category_' . $category) : '',
+						'text'	=> $this->currency->format($total, $order_info['currency_code'], $order_info['currency_value'])
+					);
+				}
 			}
+			// var_dump($data['transactions']);die('---breakpoint---');
 
 			$data['text_transactions'] = array();
 
 			$down_payment = round($order_info['total'] * $this->config->get('config_down_payment_amount') / 100000, 0) * 1000;
 
-			if ($down_payment > $transactions_total) {
-				$data['text_transactions']['text_uang_muka'] = sprintf($this->language->get('text_uang_muka'), $this->currency->format($down_payment - $transactions_total, $order_info['currency_code'], $order_info['currency_value']));
+			if ($down_payment > $transactions_total['order']) {
+				$data['text_transactions']['text_uang_muka'] = sprintf($this->language->get('text_uang_muka'), $this->currency->format($down_payment - $transactions_total['order'], $order_info['currency_code'], $order_info['currency_value']));
 				$data['text_transactions']['text_pelunasan'] = sprintf($this->language->get('text_pelunasan'), $this->currency->format($order_info['total'] - $down_payment, $order_info['currency_code'], $order_info['currency_value']));
-			} elseif ($order_info['total'] > $transactions_total) {
-				$data['text_transactions']['text_pelunasan'] = sprintf($this->language->get('text_pelunasan'), $this->currency->format($order_info['total'] - $transactions_total, $order_info['currency_code'], $order_info['currency_value']));
+			} elseif ($order_info['total'] > $transactions_total['order']) {
+				$data['text_transactions']['text_pelunasan'] = sprintf($this->language->get('text_pelunasan'), $this->currency->format($order_info['total'] - $transactions_total['order'], $order_info['currency_code'], $order_info['currency_value']));
 			}
 
 			$no_rekening = $this->config->get($order_info['payment_code'] . '_bank' . $order_info['language_id']);
@@ -2474,7 +2479,8 @@ class ControllerSaleOrder extends Controller
 
 			if ($preview) {
 				$data['preview'] = 1;
-				$data['letter_content'] = 'letter-content';
+				# Agar preview only bisa diprint.
+				// $data['letter_content'] = 'letter-content';
 			} else {
 				$data['preview'] = 0;
 				$data['letter_content'] = '';

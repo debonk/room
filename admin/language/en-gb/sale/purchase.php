@@ -14,8 +14,8 @@ $_['text_print_confirm']       	= 'Are you sure?\nPrint Dokumen hanya diperboleh
 $_['text_process']				= 'Process';
 $_['text_product_list']			= 'Daftar Produk';
 $_['text_purchase']				= 'Purchase Order';
-$_['text_purchase_updated']		= 'Success: Purchase Order Diperbaharui';
-$_['text_purchase_completed']	= 'Success: Purchase Order Selesai';
+$_['text_purchase_updated']		= 'Success: Purchase Order Diperbaharui!';
+$_['text_purchase_completed']	= 'Success: Purchase Order telah dikonfirmasi!';
 $_['text_success']				= 'Success: You have modified purchase!';
 $_['text_vendor_excluded']		= '*Vendor belum didaftarkan';
 
@@ -41,8 +41,10 @@ $_['error_permission']			= 'Warning: You do not have permission to modify order 
 $_['error_order']				= 'Warning: Order tidak ditemukan!';
 $_['error_initial_payment']		= 'Warning: Tanda Jadi harus dibayar terlebih dahulu!';
 $_['error_order_purchase']		= 'Warning: Purchase order yang telah selesai tidak bisa diedit!';
+$_['error_print']				= 'Warning: Pastikan PO telah dicetak dan disampaikan kepada vendor yang bersangkutan!';
 $_['error_product_excluded']	= 'Warning: Sebagian produk tidak termasuk dalam pesanan ini!';
 $_['error_product_total']		= 'Warning: Jumlah produk tidak sesuai dengan kebutuhan pesanan!';
+$_['error_transaction_type']	= 'Warning: Jenis transaksi untuk PO tidak ditemukan! Hubungi Administrator! (Code: %s)';
 $_['error_vendor_excluded']		= 'Warning: Sebagian vendor belum didaftarkan!';
 $_['error_vendor_reference']	= 'Invoice Vendor harus diisi';
 

@@ -643,6 +643,10 @@ input[type="checkbox"]:checked::after, .checkbox input[type="checkbox"]:checked:
 	min-height: 400px;
 }
 
+table tbody > tr > td.td-top{
+	vertical-align: top;
+}
+
 /* Fix form control bug */
 .form-control {
   height: 35.15px;
