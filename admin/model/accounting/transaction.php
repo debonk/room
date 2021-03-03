@@ -1,6 +1,6 @@
 <?php
 class ModelAccountingTransaction extends Model {
-	private $client_label_data = ['customer', 'vendor', 'supplier'];
+	private $client_label_data = ['system', 'customer', 'vendor', 'supplier'];
 	private $category_label_data = ['order', 'deposit', 'purchase'];
 	private $transaction_label_data = ['initial', 'discount', 'payment', 'refund', 'complete'];
 		
@@ -184,7 +184,7 @@ class ModelAccountingTransaction extends Model {
 	}
 
 	public function getTransactions($data = array()) {
-		$sql = "SELECT t.*, CONCAT(t.reference_prefix, LPAD(t.reference_no, 4, '0')) AS reference, o.invoice_no, o.invoice_prefix, o.firstname, o.lastname, a.name AS account, SUM(ta.debit) AS total, u.username FROM " . DB_PREFIX . "transaction t LEFT JOIN " . DB_PREFIX . "order o ON (o.order_id = t.order_id) LEFT JOIN " . DB_PREFIX . "transaction_account ta ON (ta.transaction_id = t.transaction_id) LEFT JOIN " . DB_PREFIX . "account a ON (a.account_id = ta.account_id) LEFT JOIN " . DB_PREFIX . "user u ON (u.user_id = t.user_id)";
+		$sql = "SELECT t.*, CONCAT(t.reference_prefix, LPAD(t.reference_no, 4, '0')) AS reference, tt.name AS transaction_type, o.invoice_no, o.invoice_prefix, o.firstname, o.lastname, a.name AS account, SUM(ta.debit) AS total, u.username FROM " . DB_PREFIX . "transaction t LEFT JOIN " . DB_PREFIX . "transaction_type tt ON (tt.transaction_type_id = t.transaction_type_id) LEFT JOIN " . DB_PREFIX . "order o ON (o.order_id = t.order_id) LEFT JOIN " . DB_PREFIX . "transaction_account ta ON (ta.transaction_id = t.transaction_id) LEFT JOIN " . DB_PREFIX . "account a ON (a.account_id = ta.account_id) LEFT JOIN " . DB_PREFIX . "user u ON (u.user_id = t.user_id)";
 
 		$implode = array();
 

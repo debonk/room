@@ -549,7 +549,7 @@ class ControllerAccountingExpense extends Controller {
 
 		$this->load->model('accounting/account');
 		$data['accounts_from'] = $this->model_accounting_account->getAccountsMenuByParentId([111]);
-		$data['accounts_to'] = $this->model_accounting_account->getAccountsMenuByParentId([5141,8121]);
+		$data['accounts_to'] = $this->model_accounting_account->getAccountsMenuByParentId([5141,8121,2131]);
 		// $data['accounts_from'] = $this->model_accounting_account->getAccountsMenuByComponent(['asset']);
 		// $data['accounts_to'] = $this->model_accounting_account->getAccountsMenuByComponent(['expense'], ['direct_cost']);
 		
@@ -738,7 +738,7 @@ class ControllerAccountingExpense extends Controller {
 
 		$this->load->model('accounting/account');
 		$data['accounts_from'] = $this->model_accounting_account->getAccountsMenuByParentId([111]);
-		$data['accounts_to'] = $this->model_accounting_account->getAccountsMenuByParentId([5141,8121]);
+		$data['accounts_to'] = $this->model_accounting_account->getAccountsMenuByParentId([5141,8121,2131]);
 		// $data['accounts_from'] = $this->model_accounting_account->getAccountsMenuByComponent(['asset']);
 		// $data['accounts_to'] = $this->model_accounting_account->getAccountsMenuByComponent(['expense'], ['direct_cost']);
 		

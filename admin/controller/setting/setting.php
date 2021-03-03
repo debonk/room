@@ -84,7 +84,6 @@ class ControllerSettingSetting extends Controller {
 		$data['entry_currency_auto'] = $this->language->get('entry_currency_auto');
 		$data['entry_currency'] = $this->language->get('entry_currency');
 		$data['entry_customer_deposit'] = $this->language->get('entry_customer_deposit');
-		$data['entry_customer_deposit_label'] = $this->language->get('entry_customer_deposit_label');
 		$data['entry_customer_group_display'] = $this->language->get('entry_customer_group_display');
 		$data['entry_customer_group'] = $this->language->get('entry_customer_group');
 		$data['entry_customer_online'] = $this->language->get('entry_customer_online');

@@ -200,7 +200,7 @@ class ControllerReportTransactionBalance extends Controller {
 			}
 			# End Maintain
 
-			$result['amount'] *= $result['account_type'] == 'D' ? 1 : -1;
+			//$result['amount'] *= $result['account_type'] == 'D' ? 1 : -1;
 
 			if (!empty($result['order_id'])) {
 				$reference_no = '#' . $result['order_id'] . ($result['reference_no'] ? ': ' . $result['reference'] : '');

@@ -51,7 +51,6 @@
                     <a href="<?php echo $sort_category_label; ?>"><?php echo $column_category_label; ?></a>
                     <?php } ?></td>
                   <td class="text-left"><?php echo $column_transaction_label; ?></td>
-                  <td class="text-left"><?php echo $column_account_type; ?></td>
                   <td class="text-left"><?php echo $column_account_debit; ?></td>
                   <td class="text-left"><?php echo $column_account_credit; ?></td>
                   <td class="text-right"><?php if ($sort == 'sort_order') { ?>
@@ -73,11 +72,22 @@
                     <?php } ?></td>
                   <td class="text-left"><?php echo $transaction_type['name']; ?></td>
                   <td class="text-left"><?php echo $transaction_type['client_label']; ?></td>
-                  <td class="text-left"><?php echo $transaction_type['category_label']; ?></td>
-                  <td class="text-left"><?php echo $transaction_type['transaction_label']; ?></td>
-                  <td class="text-left"><?php echo $transaction_type['account_type']; ?></td>
-                  <td class="text-left"><?php echo $transaction_type['account_debit']; ?></td>
-                  <td class="text-left"><?php echo $transaction_type['account_credit']; ?></td>
+									<td class="text-left"><?php echo $transaction_type['category_label']; ?></td>
+                  <td class="text-left">
+										<?php foreach ($transaction_type['transaction_label'] as $transaction_label) { ?>
+										<?php echo $transaction_label; ?><br>
+										<?php } ?>
+									</td>
+                  <td class="text-left">
+										<?php foreach ($transaction_type['account_debit'] as $account_debit) { ?>
+										<?php echo $account_debit; ?><br>
+										<?php } ?>
+									</td>
+                  <td class="text-left">
+										<?php foreach ($transaction_type['account_credit'] as $account_credit) { ?>
+										<?php echo $account_credit; ?><br>
+										<?php } ?>
+									</td>
                   <td class="text-right"><?php echo $transaction_type['sort_order']; ?></td>
                   <td class="text-right"><a href="<?php echo $transaction_type['edit']; ?>" data-toggle="tooltip" title="<?php echo $button_edit; ?>" class="btn btn-primary"><i class="fa fa-pencil"></i></a></td>
                 </tr>

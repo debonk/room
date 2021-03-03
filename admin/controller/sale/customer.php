@@ -117,9 +117,9 @@ class ControllerSaleCustomer extends Controller
 
 		foreach ($results as $result) {
 			# Maintain Version 1 
-			if (empty($result['transaction_type'])) {
-				$result['transaction_type'] = $result['description'];
-			}
+			// if (empty($result['transaction_type'])) {
+			// 	$result['transaction_type'] = $result['description'];
+			// }
 			# End Maintain
 
 			$data['customer_transactions'][] = array(

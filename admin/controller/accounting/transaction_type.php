@@ -127,7 +127,6 @@ class ControllerAccountingTransactionType extends Controller
 			'column_name',
 			'column_account_credit',
 			'column_account_debit',
-			'column_account_type',
 			'column_sort_order',
 			'column_transaction_label',
 			'column_action',
@@ -200,15 +199,26 @@ class ControllerAccountingTransactionType extends Controller
 		$results = $this->model_accounting_transaction_type->getTransactionTypes($filter_data);
 
 		foreach ($results as $result) {
+			$transaction_type_account_data = [];
+
+			$transaction_type_accounts = $this->model_accounting_transaction_type->getTransactionTypeAccounts($result['transaction_type_id']);
+			
+			foreach ($transaction_type_accounts as $value) {
+				$transaction_type_account_data[] = [
+					'transaction_label'		=> $value['transaction_label'],
+					'account_debit'			=> $value['account_debit_id'] ? $value['account_debit_id'] . '-' . $value['account_debit'] : '-',
+					'account_credit'		=> $value['account_credit_id'] ? $value['account_credit_id'] . '-' . $value['account_credit'] : '-'
+				];
+			}
+
 			$data['transaction_types'][] = array(
 				'transaction_type_id'   => $result['transaction_type_id'],
 				'name'                  => $result['name'],
 				'client_label'			=> $result['client_label'],
 				'category_label'		=> $result['category_label'],
-				'transaction_label'		=> $result['transaction_label'],
-				'account_type'			=> $result['account_type'],
-				'account_debit'			=> $result['account_debit_id'] ? $result['account_debit_id'] . '-' . $result['account_debit'] : '-',
-				'account_credit'		=> $result['account_credit_id'] ? $result['account_credit_id'] . '-' . $result['account_credit'] : '-',
+				'transaction_label'		=> array_column($transaction_type_account_data, 'transaction_label'),
+				'account_debit'			=> array_column($transaction_type_account_data, 'account_debit'),
+				'account_credit'		=> array_column($transaction_type_account_data, 'account_credit'),
 				'sort_order'            => $result['sort_order'],
 				'edit'                  => $this->url->link('accounting/transaction_type/edit', 'token=' . $this->session->data['token'] . '&transaction_type_id=' . $result['transaction_type_id'] . $url, true)
 			);
@@ -287,22 +297,24 @@ class ControllerAccountingTransactionType extends Controller
 
 		$language_items = array(
 			'heading_title',
-			'text_credit',
-			'text_debit',
+			'text_account',
 			'text_none',
 			'text_select',
 			'entry_account_credit',
 			'entry_account_debit',
-			'entry_account_type',
+			// 'entry_account_type',
 			'entry_client_label',
 			'entry_category_label',
 			'entry_manual_select',
 			'entry_name',
 			'entry_sort_order',
 			'entry_transaction_label',
+			'column_action',
+			'button_account_add',
+			'button_remove',
 			'button_save',
 			'button_cancel',
-			'help_account_type'
+			'help_manual_select'
 		);
 		foreach ($language_items as $language_item) {
 			$data[$language_item] = $this->language->get($language_item);
@@ -370,8 +382,8 @@ class ControllerAccountingTransactionType extends Controller
 			'name',
 			'client_label',
 			'category_label',
-			'transaction_label',
-			'account_type',
+			// 'transaction_label',
+			// 'account_type',
 			'account_debit_id',
 			'account_credit_id',
 			'manual_select',
@@ -387,13 +399,15 @@ class ControllerAccountingTransactionType extends Controller
 			}
 		}
 
-		// if (isset($this->request->post['account_type'])) {
-		// 	$data['account_type'] = $this->request->post['account_type'];
-		// } elseif (!empty($transaction_type_info)) {
-		// 	$data['account_type'] = $transaction_type_info['account_type'];
-		// } else {
-		// 	$data['account_type'] = 'D';
-		// }
+		if (isset($this->request->post['transaction_type_account'])) {
+			$data['transaction_type_accounts'] = $this->request->post['transaction_type_account'];
+		} elseif (isset($this->request->get['transaction_type_id'])) {
+			$data['transaction_type_accounts'] = $this->model_accounting_transaction_type->getTransactionTypeAccounts($this->request->get['transaction_type_id']);
+		} else {
+			$data['transaction_type_accounts'] = array();
+		}
+
+		$data['transaction_type_accounts_idx'] = ($data['transaction_type_accounts'] ? max(array_keys($data['transaction_type_accounts'])) + 1 : 0);
 
 		$data['clients_label'] = $this->model_accounting_transaction_type->getClientsLabel();
 		$data['categories_label'] = $this->model_accounting_transaction_type->getCategoriesLabel();
@@ -423,16 +437,22 @@ class ControllerAccountingTransactionType extends Controller
 			$this->error['category_label'] = $this->language->get('error_category_label');
 		}
 
-		if (empty($this->request->post['transaction_label'])) {
-			$this->error['transaction_label'] = $this->language->get('error_transaction_label');
-		}
-
-		if ((utf8_strlen(trim($this->request->post['category_label'])) < 2) || (utf8_strlen(trim($this->request->post['category_label'])) > 16)) {
-			$this->error['category_label'] = $this->language->get('error_category_label');
-		}
-
 		if ((utf8_strlen(trim($this->request->post['name'])) < 3) || (utf8_strlen(trim($this->request->post['name'])) > 64)) {
 			$this->error['name'] = $this->language->get('error_name');
+		}
+
+		if (!isset($this->request->post['transaction_type_account'])) {
+			$this->error['warning'] = $this->language->get('error_account');
+		} else {
+			foreach ($this->request->post['transaction_type_account'] as $transaction_type_account) {
+				if (!$transaction_type_account['transaction_label']) {
+					$this->error['warning'] = $this->language->get('error_transaction_label');
+				}
+			}
+		}
+
+		if ($this->error && !isset($this->error['warning'])) {
+			$this->error['warning'] = $this->language->get('error_warning');
 		}
 
 		return !$this->error;

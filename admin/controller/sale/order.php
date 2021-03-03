@@ -1409,7 +1409,7 @@ class ControllerSaleOrder extends Controller
 			$summary_data = [
 				'client_label'		=> 'customer',
 				'category_label'	=> 'order',
-				'client_id'			=> $order_info['customer_id'],
+				// 'client_id'			=> $order_info['customer_id'],
 			];
 	
 			$transaction_total = $this->model_accounting_transaction->getTransactionsTotalSummary($order_id, $summary_data);

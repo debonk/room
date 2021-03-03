@@ -1152,6 +1152,9 @@ class ControllerCustomerCustomer extends Controller {
 			$this->error['warning'] = $this->language->get('error_permission');
 		}
 
+		# Customer tidak boleh dihapus
+		$this->error['warning'] = $this->language->get('error_permission');
+
 		return !$this->error;
 	}
 

@@ -129,7 +129,7 @@
 			<?php } ?>
 			<?php } else { ?>
 			<tr>
-				<td class="text-center" colspan="8">
+				<td class="text-center" colspan="9">
 					<?= $text_no_results; ?>
 				</td>
 			</tr>
