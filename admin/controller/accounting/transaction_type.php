@@ -216,7 +216,7 @@ class ControllerAccountingTransactionType extends Controller
 				'name'                  => $result['name'],
 				'client_label'			=> $result['client_label'],
 				'category_label'		=> $result['category_label'],
-				'transaction_label'		=> array_column($transaction_type_account_data, 'transaction_label'),
+				'transaction_label'		=> $result['transaction_label'],
 				'account_debit'			=> array_column($transaction_type_account_data, 'account_debit'),
 				'account_credit'		=> array_column($transaction_type_account_data, 'account_credit'),
 				'sort_order'            => $result['sort_order'],
@@ -382,10 +382,10 @@ class ControllerAccountingTransactionType extends Controller
 			'name',
 			'client_label',
 			'category_label',
-			// 'transaction_label',
+			'transaction_label',
 			// 'account_type',
-			'account_debit_id',
-			'account_credit_id',
+			// 'account_debit_id',
+			// 'account_credit_id',
 			'manual_select',
 			'sort_order'
 		);
@@ -435,6 +435,10 @@ class ControllerAccountingTransactionType extends Controller
 
 		if (empty($this->request->post['category_label'])) {
 			$this->error['category_label'] = $this->language->get('error_category_label');
+		}
+
+		if (empty($this->request->post['transaction_label'])) {
+			$this->error['transaction_label'] = $this->language->get('error_transaction_label');
 		}
 
 		if ((utf8_strlen(trim($this->request->post['name'])) < 3) || (utf8_strlen(trim($this->request->post['name'])) > 64)) {

@@ -391,21 +391,19 @@ class ControllerSalePurchase extends Controller
 		if (!$json) {
 			$this->load->model('accounting/transaction_type');
 
-			$transaction_types = [];
+			$transaction_type_info = $this->model_accounting_transaction_type->getTransactionType($this->config->get('config_vendor_purchase_initial_id'));
 
-			$transaction_types['initial'] = $this->model_accounting_transaction_type->getTransactionTypeByLabel('vendor', 'purchase', 'initial');
-
-			if (empty($transaction_types['initial'])) {
+			if (empty($transaction_type_info)) {
 				$json['error'] = sprintf($this->language->get('error_transaction_type'), 'vendor-purchase-initial');
 			}
 
-			if (!empty($this->request->post['adjustment'])) {
-				$transaction_types['discount'] = $this->model_accounting_transaction_type->getTransactionTypeByLabel('vendor', 'purchase', 'discount');
+			// if (!empty($this->request->post['adjustment'])) {
+			// 	$transaction_types['discount'] = $this->model_accounting_transaction_type->getTransactionTypeByLabel('vendor', 'purchase', 'discount');
 				
-				if (empty($transaction_types['discount'])) {
-					$json['error'] = sprintf($this->language->get('error_transaction_type'), 'vendor-purchase-discount');
-				}
-			}
+			// 	if (empty($transaction_types['discount'])) {
+			// 		$json['error'] = sprintf($this->language->get('error_transaction_type'), 'vendor-purchase-discount');
+			// 	}
+			// }
 		}
 
 		if (!$json) {
@@ -419,42 +417,71 @@ class ControllerSalePurchase extends Controller
 			$this->model_sale_purchase->editOrderPurchase($order_purchase_info['order_purchase_id'], $order_purchase_data);
 
 			$account_data = [];
+			$account_total = [];
 
 			$order_purchase_products = $this->model_sale_purchase->getOrderPurchaseProducts($order_purchase_info['order_purchase_id']);
 			$total = array_sum(array_column($order_purchase_products, 'total'));
 
+			
 			$this->load->model('accounting/transaction');
 
-			$initial_transaction_info = $this->model_accounting_transaction_type->getTransactionTypeByLabel('vendor', 'purchase', 'initial');
-			$account_data[$initial_transaction_info['account_debit_id']] = $total;
-			$account_data[$initial_transaction_info['account_credit_id']] = -$total;
+			$transaction_type_accounts = $this->model_accounting_transaction_type->getTransactionTypeAccounts($transaction_type_info['transaction_type_id']);
+
+			foreach ($transaction_type_accounts as $key => $transaction_type_account) {
+				$transaction_type_accounts[$transaction_type_account['transaction_label']] = $transaction_type_account;
+				unset($transaction_type_accounts[$key]);
+			}
+			
+			$account_total[$transaction_type_accounts['initial']['account_debit_id']] = $total;
+			$account_total[$transaction_type_accounts['initial']['account_credit_id']] = -$total;
 
 			if (!empty($this->request->post['adjustment'])) {
-				$adjustment_transaction_info = $this->model_accounting_transaction_type->getTransactionTypeByLabel('vendor', 'purchase', 'discount');
+				$total += $this->request->post['adjustment'];
 
-				if (isset($account_data[$adjustment_transaction_info['account_debit_id']])) {
-					$account_data[$adjustment_transaction_info['account_debit_id']] -= $this->request->post['adjustment'];
+				# Account Data
+				if (isset($account_total[$transaction_type_accounts['discount']['account_debit_id']])) {
+					$account_total[$transaction_type_accounts['discount']['account_debit_id']] -= $this->request->post['adjustment'];
 				} else {
-					$account_data[$adjustment_transaction_info['account_debit_id']] = -$this->request->post['adjustment'];
+					$account_total[$transaction_type_accounts['discount']['account_debit_id']] = -$this->request->post['adjustment'];
 				}
 
-				if (isset($account_data[$adjustment_transaction_info['account_credit_id']])) {
-					$account_data[$adjustment_transaction_info['account_credit_id']] += $this->request->post['adjustment'];
+				if (isset($account_total[$transaction_type_accounts['discount']['account_credit_id']])) {
+					$account_total[$transaction_type_accounts['discount']['account_credit_id']] += $this->request->post['adjustment'];
 				} else {
-					$account_data[$adjustment_transaction_info['account_credit_id']] = $this->request->post['adjustment'];
+					$account_total[$transaction_type_accounts['discount']['account_credit_id']] = $this->request->post['adjustment'];
+				}
+			}
+
+			foreach ($account_total as $account_id => $value) {
+				if ($value > 0) {
+					$account_data[] = [
+						'account_id'		=> $account_id,
+						'debit'				=> $value,
+						'credit'			=> 0
+					];
+				} elseif ($value < 0) {
+					$account_data[] = [
+						'account_id'		=> $account_id,
+						'debit'				=> 0,
+						'credit'			=> $value
+					];
 				}
 			}
 
 			$transaction_data = array(
 				'order_id'				=> $order_id,
-				'label'					=> 'vendor',
-				'label_id'				=> $vendor_id,
-				'date' 					=> date('Y-m-d'),
-				'description' 			=> $initial_transaction_info['name'],
-				'account_data' 			=> $account_data,
+				'client_label'			=> $transaction_type_info['client_label'],
+				'category_label'		=> $transaction_type_info['category_label'],
+				'transaction_label'		=> $transaction_type_info['transaction_label'],
+				'client_id'				=> $vendor_id,
+				'transaction_type_id'	=> $transaction_type_info['transaction_type_id'],
+				'date' 					=> $order_purchase_info['date'],
+				'description' 			=> $transaction_type_info['name'],
+				'amount' 				=> $total,
 				'customer_name' 		=> $order_purchase_info['vendor_name'],
 				'reference_prefix' 		=> $order_purchase_info['reference_prefix'],
-				'reference_no'			=> $order_purchase_info['reference_no']
+				'reference_no'			=> $order_purchase_info['reference_no'],
+				'account_data' 			=> $account_data
 			);
 
 			$this->model_accounting_transaction->addTransaction($transaction_data);

@@ -1,6 +1,8 @@
 <?php
-class ModelReportTransaction extends Model {
-	public function getTransactions($data = array()) {
+class ModelReportTransaction extends Model
+{
+	public function getTransactions($data = array())
+	{
 		$sql = "SELECT t.*, CONCAT(t.reference_prefix, LPAD(t.reference_no, 4, '0')) AS reference, a1.name AS account_from, a2.name AS account_to, tt.account_type, tt.name AS transaction_type FROM " . DB_PREFIX . "transaction t LEFT JOIN " . DB_PREFIX . "account a1 ON (a1.account_id = t.account_from_id) LEFT JOIN " . DB_PREFIX . "account a2 ON (a2.account_id = t.account_to_id) LEFT JOIN " . DB_PREFIX . "transaction_type tt ON (tt.transaction_type_id = t.transaction_type_id)";
 
 		$implode = array();
@@ -22,7 +24,7 @@ class ModelReportTransaction extends Model {
 		}
 
 		$sql .= " ORDER BY t.date, t.transaction_id ASC";
-		
+
 		if (isset($data['start']) || isset($data['limit'])) {
 			if ($data['start'] < 0) {
 				$data['start'] = 0;
@@ -40,7 +42,8 @@ class ModelReportTransaction extends Model {
 		return $query->rows;
 	}
 
-	public function getTransactionsCount($data = array()) {
+	public function getTransactionsCount($data = array())
+	{
 		$sql = "SELECT COUNT(*) AS total FROM " . DB_PREFIX . "transaction t";
 
 		$implode = array();
@@ -66,7 +69,8 @@ class ModelReportTransaction extends Model {
 		return $query->row['total'];
 	}
 
-	public function getTransactionsSubTotal($data = array()) {
+	public function getTransactionsSubTotal($data = array())
+	{
 		$sql = "SELECT t.account_to_id, tt.account_type, t.amount FROM " . DB_PREFIX . "transaction t LEFT JOIN " . DB_PREFIX . "transaction_type tt ON (tt.transaction_type_id = t.transaction_type_id)";
 
 		$implode = array();
@@ -88,7 +92,7 @@ class ModelReportTransaction extends Model {
 		}
 
 		$sql .= " ORDER BY t.date, t.transaction_id ASC";
-		
+
 		if (isset($data['start']) || isset($data['limit'])) {
 			if ($data['start'] < 0) {
 				$data['start'] = 0;
@@ -102,16 +106,16 @@ class ModelReportTransaction extends Model {
 		}
 
 		$query = $this->db->query($sql);
-		
+
 		$total = 0;
-		
+
 		foreach ($query->rows as $transaction) {
-			# Maintain Versi 1
-			if (empty($transaction['account_type'])) {
-				$transaction['account_type'] = 'D';
-			}
-			# End Maintain
-			$transaction['amount'] *= $transaction['account_type'] == 'D' ? 1 : -1;
+			// # Maintain Versi 1
+			// if (empty($transaction['account_type'])) {
+			// 	$transaction['account_type'] = 'D';
+			// }
+			// # End Maintain
+			// $transaction['amount'] *= $transaction['account_type'] == 'D' ? 1 : -1;
 
 			if ($transaction['account_to_id'] == $data['filter_account_id']) {
 				$total += $transaction['amount'];
@@ -123,26 +127,27 @@ class ModelReportTransaction extends Model {
 		return $total;
 	}
 
-	public function getTransactionsTotalPrevious($data = []) {
+	public function getTransactionsTotalPrevious($data = [])
+	{
 		if (!empty($data['filter_date_start'])) {
 			$sql = "SELECT t.account_to_id, tt.account_type, SUM(t.amount) AS total FROM " . DB_PREFIX . "transaction t LEFT JOIN " . DB_PREFIX . "transaction_type tt ON (tt.transaction_type_id = t.transaction_type_id) WHERE t.date < '" . $this->db->escape($data['filter_date_start']) . "'";
 
 			$sql .= " AND (t.account_to_id = '" . (int)$data['filter_account_id'] . "' OR t.account_from_id = '" . (int)$data['filter_account_id'] . "')";
 
-			$sql .= " GROUP BY t.account_to_id, tt.account_type";
+			$sql .= " GROUP BY t.account_to_id";
 
 			$query = $this->db->query($sql);
 
 			$total = 0;
 
 			foreach ($query->rows as $value) {
-				# Maintain Versi 1
-				if (empty($value['account_type'])) {
-					$value['account_type'] = 'D';
-				}
-				# End Maintain
+				// # Maintain Versi 1
+				// if (empty($value['account_type'])) {
+				// 	$value['account_type'] = 'D';
+				// }
+				// # End Maintain
 
-				$value['total'] *= $value['account_type'] == 'D' ? 1 : -1;
+				// $value['total'] *= $value['account_type'] == 'D' ? 1 : -1;
 
 				if ($value['account_to_id'] == $data['filter_account_id']) {
 					$total += $value['total'];
@@ -157,7 +162,7 @@ class ModelReportTransaction extends Model {
 				$data['start'] = 0;
 
 				$subtotal = $this->getTransactionsSubTotal($data);
-				
+
 				$total += $subtotal;
 			}
 		} else {

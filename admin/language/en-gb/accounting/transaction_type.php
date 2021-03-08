@@ -38,6 +38,7 @@ $_['error_client_label']		= 'Client Label harus ditentukan!';
 $_['error_category_label']		= 'Category Label harus ditentukan!';
 $_['error_transaction_label']	= 'Transaction Label harus ditentukan!';
 $_['error_transaction'] 		= 'Warning: Tipe Transaksi tidak bisa dihapus karena terkait dengan %s transaksi!';
+$_['error_warning']             = 'Warning: Please check the form carefully for errors!';
 
 // Help
 $_['help_manual_select'] 		= 'Centang agar termasuk dalam entry menu manual.';

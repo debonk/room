@@ -73,11 +73,7 @@
                   <td class="text-left"><?php echo $transaction_type['name']; ?></td>
                   <td class="text-left"><?php echo $transaction_type['client_label']; ?></td>
 									<td class="text-left"><?php echo $transaction_type['category_label']; ?></td>
-                  <td class="text-left">
-										<?php foreach ($transaction_type['transaction_label'] as $transaction_label) { ?>
-										<?php echo $transaction_label; ?><br>
-										<?php } ?>
-									</td>
+									<td class="text-left"><?php echo $transaction_type['transaction_label']; ?></td>
                   <td class="text-left">
 										<?php foreach ($transaction_type['account_debit'] as $account_debit) { ?>
 										<?php echo $account_debit; ?><br>

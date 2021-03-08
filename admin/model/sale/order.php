@@ -310,7 +310,7 @@ class ModelSaleOrder extends Model {
 	}
 
 	public function getOrderVendor($order_id, $vendor_id) {
-		$query = $this->db->query("SELECT DISTINCT ov.*, v.*, vt.name AS vendor_type, vt.deposit, (SELECT SUM(t.amount) FROM " . DB_PREFIX . "transaction t WHERE t.order_id = ov.order_id AND t.label = 'vendor' AND t.label_id = v.vendor_id) AS total FROM " . DB_PREFIX . "order_vendor ov LEFT JOIN " . DB_PREFIX . "vendor v ON (v.vendor_id = ov.vendor_id) LEFT JOIN " . DB_PREFIX . "vendor_type vt ON (vt.vendor_type_id = v.vendor_type_id) WHERE ov.order_id = '" . (int)$order_id . "' AND ov.vendor_id = '" . (int)$vendor_id . "'");
+		$query = $this->db->query("SELECT DISTINCT ov.*, v.*, vt.name AS vendor_type, vt.deposit, (SELECT SUM(t.amount) FROM " . DB_PREFIX . "transaction t WHERE t.order_id = ov.order_id AND t.client_label = 'vendor' AND t.client_id = v.vendor_id) AS total FROM " . DB_PREFIX . "order_vendor ov LEFT JOIN " . DB_PREFIX . "vendor v ON (v.vendor_id = ov.vendor_id) LEFT JOIN " . DB_PREFIX . "vendor_type vt ON (vt.vendor_type_id = v.vendor_type_id) WHERE ov.order_id = '" . (int)$order_id . "' AND ov.vendor_id = '" . (int)$vendor_id . "'");
 
 		return $query->row;
 	}
@@ -570,9 +570,7 @@ class ModelSaleOrder extends Model {
 		
 		$summary_data = [
 			'client_label'		=> 'customer',
-			'category_label'	=> 'order',
-			// 'transaction_label'	=> 'refund',
-			'client_id'			=> $order_info['customer_id']
+			'category_label'	=> 'order'
 		];
 
 		$transaction_total = $this->model_accounting_transaction->getTransactionsTotalSummary($order_id, $summary_data);

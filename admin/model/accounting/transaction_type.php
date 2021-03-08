@@ -3,11 +3,11 @@ class ModelAccountingTransactionType extends Model
 {
 	private $client_data = ['system', 'customer', 'vendor', 'supplier'];
 	private $category_data = ['order', 'deposit', 'purchase'];
-	private $transaction_data = ['initial', 'discount', 'payment', 'refund', 'complete'];
+	private $transaction_data = ['initial', 'discount', 'cashin', 'cashout', 'complete'];
 
 	public function addTransactionType($data)
 	{
-		$this->db->query("INSERT INTO " . DB_PREFIX . "transaction_type SET client_label = '" . $this->db->escape($data['client_label']) . "', category_label = '" . $this->db->escape($data['category_label']) . "', name = '" . $this->db->escape($data['name']) . "', manual_select = '" . (int)$data['manual_select'] . "', sort_order = '" . (int)$data['sort_order'] . "'");
+		$this->db->query("INSERT INTO " . DB_PREFIX . "transaction_type SET client_label = '" . $this->db->escape($data['client_label']) . "', category_label = '" . $this->db->escape($data['category_label']) . "', transaction_label = '" . $this->db->escape($data['transaction_label']) . "', name = '" . $this->db->escape($data['name']) . "', manual_select = '" . (int)$data['manual_select'] . "', sort_order = '" . (int)$data['sort_order'] . "'");
 
 		$transaction_type_id = $this->db->getLastId();
 
@@ -18,7 +18,7 @@ class ModelAccountingTransactionType extends Model
 
 	public function editTransactionType($transaction_type_id, $data)
 	{
-		$this->db->query("UPDATE " . DB_PREFIX . "transaction_type SET client_label = '" . $this->db->escape($data['client_label']) . "', category_label = '" . $this->db->escape($data['category_label']) . "', transaction_label = '" . $this->db->escape($data['transaction_label']) . "', name = '" . $this->db->escape($data['name']) . "', account_type = '" . $this->db->escape($data['account_type']) . "', manual_select = '" . (int)$data['manual_select'] . "', account_debit_id = '" . (int)$data['account_debit_id'] . "', account_credit_id = '" . (int)$data['account_credit_id'] . "', sort_order = '" . (int)$data['sort_order'] . "' WHERE transaction_type_id = '" . (int)$transaction_type_id . "'");
+		$this->db->query("UPDATE " . DB_PREFIX . "transaction_type SET client_label = '" . $this->db->escape($data['client_label']) . "', category_label = '" . $this->db->escape($data['category_label']) . "', transaction_label = '" . $this->db->escape($data['transaction_label']) . "', name = '" . $this->db->escape($data['name']) . "', manual_select = '" . (int)$data['manual_select'] . "', sort_order = '" . (int)$data['sort_order'] . "' WHERE transaction_type_id = '" . (int)$transaction_type_id . "'");
 
 		$this->db->query("DELETE FROM " . DB_PREFIX . "transaction_type_account WHERE transaction_type_id = '" . (int)$transaction_type_id . "'");
 

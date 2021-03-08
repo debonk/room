@@ -234,7 +234,8 @@
                 </b>
               </td>
             </tr>
-            <?php foreach ($products['included'] as $product) { ?>
+            <?php if (isset($products['included'])) { ?>
+						<?php foreach ($products['included'] as $product) { ?>
             <tr>
               <td style="width: 1%;"></td>
               <td style="width: 40%;">
@@ -273,7 +274,8 @@
             <?php } ?>
             <?php } ?>
             <?php } ?>
-            <?php foreach ($product_primary['attribute'] as $attribute_group => $attributes) { ?>
+            <?php if ($product_primary['attribute']) { ?>
+						<?php foreach ($product_primary['attribute'] as $attribute_group => $attributes) { ?>
             <tr>
               <td></td>
               <td>
@@ -282,15 +284,17 @@
             </tr>
             <?php foreach ($attributes as $attribute) { ?>
             <tr class="text-italic">
-              <td></td>
-              <td>&nbsp;&nbsp;-&nbsp;
+              <td style="width: 1%;"></td>
+              <td style="width: 40%;">&nbsp;&nbsp;-&nbsp;
                 <?= $attribute['name']; ?>
               </td>
-              <td>:</td>
-              <td>
+              <td style="width: 1%;">:</td>
+              <td style="width: 58%;">
                 <?= $attribute['value']; ?>
               </td>
             </tr>
+            <?php } ?>
+            <?php } ?>
             <?php } ?>
             <?php } ?>
             <?php if (isset($products['additional'])) { ?>

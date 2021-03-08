@@ -652,6 +652,54 @@
                   <?php echo $text_auto_transaction; ?>
                 </legend>
                 <div class="form-group">
+                  <label class="col-sm-2 control-label" for="input-customer-order-initial"><span data-toggle="tooltip"
+                      title="<?php echo $help_customer_order_initial; ?>">
+                      <?php echo $entry_customer_order_initial; ?>
+                    </span></label>
+                  <div class="col-sm-10">
+                    <select name="config_customer_order_initial_id" id="input-customer-order_initial" class="form-control">
+                      <option value="">
+                        <?php echo $text_select; ?>
+                      </option>
+                      <?php foreach ($transaction_types as $transaction_type) { ?>
+                        <?php if ($transaction_type['transaction_type_id'] == $config_customer_order_initial_id) { ?>
+                        <option value="<?php echo $transaction_type['transaction_type_id']; ?>" selected="selected">
+                          <?php echo $transaction_type['name']; ?>
+                        </option>
+                        <?php } else { ?>
+                        <option value="<?php echo $transaction_type['transaction_type_id']; ?>">
+                          <?php echo $transaction_type['name']; ?>
+                        </option>
+                        <?php } ?>
+                      <?php } ?>
+                    </select>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="col-sm-2 control-label" for="input-vendor-purchase-initial"><span data-toggle="tooltip"
+                      title="<?php echo $help_vendor_purchase_initial; ?>">
+                      <?php echo $entry_vendor_purchase_initial; ?>
+                    </span></label>
+                  <div class="col-sm-10">
+                    <select name="config_vendor_purchase_initial_id" id="input-vendor-purchase_initial" class="form-control">
+                      <option value="">
+                        <?php echo $text_select; ?>
+                      </option>
+                      <?php foreach ($transaction_types as $transaction_type) { ?>
+                        <?php if ($transaction_type['transaction_type_id'] == $config_vendor_purchase_initial_id) { ?>
+                        <option value="<?php echo $transaction_type['transaction_type_id']; ?>" selected="selected">
+                          <?php echo $transaction_type['name']; ?>
+                        </option>
+                        <?php } else { ?>
+                        <option value="<?php echo $transaction_type['transaction_type_id']; ?>">
+                          <?php echo $transaction_type['name']; ?>
+                        </option>
+                        <?php } ?>
+                      <?php } ?>
+                    </select>
+                  </div>
+                </div>
+                <div class="form-group">
                   <label class="col-sm-2 control-label" for="input-prepaid-account"><span data-toggle="tooltip"
                       title="<?php echo $help_prepaid_account; ?>">
                       <?php echo $entry_prepaid_account; ?>
@@ -666,36 +714,6 @@
                         <?php if ($account['child']) { ?>
                         <?php foreach ($account['child'] as $child) { ?>
                         <?php if ($child['account_id'] == $config_prepaid_account_id) { ?>
-                        <option value="<?php echo $child['account_id']; ?>" selected="selected">
-                          <?php echo $child['text']; ?>
-                        </option>
-                        <?php } else { ?>
-                        <option value="<?php echo $child['account_id']; ?>">
-                          <?php echo $child['text']; ?>
-                        </option>
-                        <?php } ?>
-                        <?php } ?>
-                        <?php } ?>
-                      </optgroup>
-                      <?php } ?>
-                    </select>
-                  </div>
-                </div>
-                <div class="form-group">
-                  <label class="col-sm-2 control-label" for="input-vendor-deposit-account"><span data-toggle="tooltip"
-                      title="<?php echo $help_vendor_deposit_account; ?>">
-                      <?php echo $entry_vendor_deposit_account; ?>
-                    </span></label>
-                  <div class="col-sm-10">
-                    <select name="config_vendor_deposit_account_id" id="input-vendor-deposit-account" class="form-control">
-                      <option value="">
-                        <?php echo $text_select; ?>
-                      </option>
-                      <?php foreach ($liability_accounts as $account) { ?>
-                      <optgroup label="<?php echo $account['text']; ?>">
-                        <?php if ($account['child']) { ?>
-                        <?php foreach ($account['child'] as $child) { ?>
-                        <?php if ($child['account_id'] == $config_vendor_deposit_account_id) { ?>
                         <option value="<?php echo $child['account_id']; ?>" selected="selected">
                           <?php echo $child['text']; ?>
                         </option>

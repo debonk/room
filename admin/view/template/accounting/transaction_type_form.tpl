@@ -100,9 +100,37 @@
 								<?php } ?>
 								<?php } ?>
 							</select>
-							<?php if ($error_client_label) { ?>
+							<?php if ($error_category_label) { ?>
 							<div class="text-danger">
-								<?php echo $error_client_label; ?>
+								<?php echo $error_category_label; ?>
+							</div>
+							<?php } ?>
+						</div>
+					</div>
+					<div class="form-group required">
+						<label class="col-sm-2 control-label" for="input-transaction-label">
+							<?php echo $entry_transaction_label; ?>
+						</label>
+						<div class="col-sm-10">
+							<select name="transaction_label" class="form-control">
+								<option value="">
+									<?php echo $text_select; ?>
+								</option>
+								<?php foreach ($transactions_label as $label) { ?>
+								<?php if ($label['value'] == $transaction_label) { ?>
+								<option value="<?php echo $label['value']; ?>" selected="selected">
+									<?php echo $label['text']; ?>
+								</option>
+								<?php } else { ?>
+								<option value="<?php echo $label['value']; ?>">
+									<?php echo $label['text']; ?>
+								</option>
+								<?php } ?>
+								<?php } ?>
+							</select>
+							<?php if ($error_transaction_label) { ?>
+							<div class="text-danger">
+								<?php echo $error_transaction_label; ?>
 							</div>
 							<?php } ?>
 						</div>

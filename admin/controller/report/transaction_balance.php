@@ -195,9 +195,13 @@ class ControllerReportTransactionBalance extends Controller {
 				$result['transaction_type'] = $result['description'];
 			}
 
-			if (empty($result['account_type'])) {
-				$result['account_type'] = 'D';
-			}
+			//if ($result['label'] == 'expense' || $result['label'] == 'liability') {
+			//	$result['account_type'] = 'C';
+			//}
+
+			//if (empty($result['account_type'])) {
+			//	$result['account_type'] = 'D';
+			//}
 			# End Maintain
 
 			//$result['amount'] *= $result['account_type'] == 'D' ? 1 : -1;
@@ -227,21 +231,21 @@ class ControllerReportTransactionBalance extends Controller {
 			} else {
 				$account = $result['account_to'] ? $result['account_to'] : $this->language->get('text_none');
 
-				if ($result['amount'] < 0) {
-					$debit = -$result['amount'];
-					$credit = 0;
-					$balance += $debit;
-					
-					$total_debit += $debit;
-				} else {
+				if ($result['amount'] > 0) {
 					$debit = 0;
 					$credit = $result['amount'];
 					$balance -= $credit;
 					
 					$total_credit += $credit;
+				} else {
+					$debit = -$result['amount'];
+					$credit = 0;
+					$balance += $debit;
+					
+					$total_debit += $debit;
 				}
 			}
-			
+
 			$data['transactions'][] = array(
 				'transaction_id'	=> $result['transaction_id'],
 				'date'	 			=> date($this->language->get('date_format_short'), strtotime($result['date'])),

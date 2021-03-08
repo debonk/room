@@ -1,8 +1,7 @@
 <?php
 // Text
 $_['text_category_deposit']			= 'Jaminan';
-$_['text_category_order']			= 'Perlengkapan Acara';
-$_['text_category_purchase']		= 'Penyediaan Perlengkapan Acara';
+$_['text_category_purchase']		= 'Jasa Vendor';
 $_['text_vendor']                	= 'Vendors';
 $_['text_vendor_transaction']	 	= 'Vendor Transaction';
 $_['text_vendor_transaction_add']	= 'Add Vendor Transaction';

@@ -439,8 +439,6 @@ class ControllerSaleOrder extends Controller
 
 				$transaction_total[$key] = $debit - $credit;
 			}
-			// var_dump($transaction_total);
-
 
 			$payment_status = '';
 
@@ -1381,7 +1379,6 @@ class ControllerSaleOrder extends Controller
 					);
 				}
 
-
 				$data['products'][] = array(
 					'order_product_id' => $product['order_product_id'],
 					'product_id'       => $product['product_id'],
@@ -1408,8 +1405,7 @@ class ControllerSaleOrder extends Controller
 
 			$summary_data = [
 				'client_label'		=> 'customer',
-				'category_label'	=> 'order',
-				// 'client_id'			=> $order_info['customer_id'],
+				'category_label'	=> 'order'
 			];
 	
 			$transaction_total = $this->model_accounting_transaction->getTransactionsTotalSummary($order_id, $summary_data);
@@ -1489,7 +1485,6 @@ class ControllerSaleOrder extends Controller
 			// $expired = false;
 
 			$payment_phases = $this->model_sale_order->getPaymentPhases($order_id);
-			// var_dump($payment_phases);//die('---breakpoint---');
 
 			foreach ($payment_phases as $payment_phase) {
 				$limit_date_in = $this->model_localisation_local_date->getInFormatDate(date('Y-m-d', $payment_phase['limit_stamp']));
@@ -2445,7 +2440,6 @@ class ControllerSaleOrder extends Controller
 					);
 				}
 			}
-			// var_dump($data['transactions']);die('---breakpoint---');
 
 			$data['text_transactions'] = array();
 

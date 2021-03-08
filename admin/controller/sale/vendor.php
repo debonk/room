@@ -89,38 +89,33 @@ class ControllerSaleVendor extends Controller
 			# End Maintain
 
 			$summary_data = [
-				'label'		=> 'vendor',
-				'label_id'	=> $order_vendor['vendor_id'],
-				'group'		=> 'tt.category_label'
+				'client_label'	=> 'vendor',
+				'client_id'		=> $order_vendor['vendor_id'],
+				// 'group'			=> 'tt.category_label'
 			];
 
 			$transaction_summary_data = [];
 			
 			$transactions_summary = $this->model_accounting_transaction->getTransactionsSummary($order_id, $summary_data);
-			foreach ($transactions_summary as $key => $transaction_summary) {
-				# Maintain Version 1
-				if (empty($transaction_summary['category_label'])) {
-					$transaction_summary['category_label'] = 'deposit';
-					$transaction_summary['account_type'] = 'D';
-				}
-				# End Maintain
 
-				$transactions_summary[$transaction_summary['category_label']][$transaction_summary['account_type']] = $transaction_summary;
+			foreach ($transactions_summary as $key => $transaction_summary) {
+				$transactions_summary[$transaction_summary['category_label']][$transaction_summary['transaction_label']] = $transaction_summary;
 				unset($transactions_summary[$key]);
 			}
 
 			$admission_status = $order_admission_status;
 
 			foreach ($transactions_summary as $key => $transaction_summary) {
-				$debit = isset($transaction_summary['D']) ? $transaction_summary['D']['total'] : 0;
-				$credit = isset($transaction_summary['C']) ? $transaction_summary['C']['total'] : 0;
+				$cashin = isset($transaction_summary['cashin']) ? $transaction_summary['cashin']['total'] : 0;
+				$cashout = isset($transaction_summary['cashout']) ? $transaction_summary['cashout']['total'] : 0;
+				$total = $cashin - $cashout;
 
 				$transaction_summary_data[$key] = [
 					'transaction_type' 	=> $key ? $this->language->get('text_category_' . $key) : '',
-					'debit'				=> $this->currency->format($debit, $order_info['currency_code'], $order_info['currency_value']),
-					'credit'			=> $this->currency->format($credit, $order_info['currency_code'], $order_info['currency_value']),
-					'balance'			=> $this->currency->format($debit - $credit, $order_info['currency_code'], $order_info['currency_value']),
-					'balance_value'		=> $debit - $credit
+					'debit'				=> $this->currency->format($cashin, $order_info['currency_code'], $order_info['currency_value']),
+					'credit'			=> $this->currency->format($cashout, $order_info['currency_code'], $order_info['currency_value']),
+					'balance'			=> $this->currency->format($total, $order_info['currency_code'], $order_info['currency_value']),
+					'balance_value'		=> $total
 				];
 			}
 
@@ -179,12 +174,12 @@ class ControllerSaleVendor extends Controller
 		$data['vendor_transactions'] = array();
 
 		$filter_data = array(
-			'filter_order_id'	=> $order_id,
-			'filter_label'		=> 'vendor',
-			'sort'				=> 't.date',
-			'order'				=> 'DESC',
-			'start'				=> ($page - 1) * $limit,
-			'limit'				=> $limit
+			'filter_order_id'		=> $order_id,
+			'filter_client_label'	=> 'vendor',
+			'sort'					=> 't.date',
+			'order'					=> 'DESC',
+			'start'					=> ($page - 1) * $limit,
+			'limit'					=> $limit
 		);
 
 		$results = $this->model_accounting_transaction->getTransactions($filter_data);
@@ -209,7 +204,7 @@ class ControllerSaleVendor extends Controller
 					break;
 
 				case 'PO':
-					$href = $this->url->link('sale/purchase/purchaseOrderDocument', 'token=' . $this->session->data['token'] . '&order_id=' . $result['order_id'] . '&vendor_id=' . $result['label_id'], true);
+					$href = $this->url->link('sale/purchase/purchaseOrderDocument', 'token=' . $this->session->data['token'] . '&order_id=' . $result['order_id'] . '&vendor_id=' . $result['client_id'], true);
 
 					break;
 
@@ -217,6 +212,12 @@ class ControllerSaleVendor extends Controller
 					$href = '#';
 
 					break;
+			}
+
+			if ($result['transaction_label'] == 'cashin') {
+				$amount = $result['amount'];
+			} elseif ($result['transaction_label'] == 'cashout') {
+				$amount = -$result['amount'];
 			}
 
 			$data['vendor_transactions'][] = array(
@@ -227,7 +228,7 @@ class ControllerSaleVendor extends Controller
 				'reference'			=> $result['reference'],
 				'asset'				=> $result['payment_method'],
 				'description'		=> $result['description'],
-				'amount'			=> $this->currency->format(($result['account_type'] == 'C' ? -1 : 1) * $result['amount'], $order_info['currency_code'], $order_info['currency_value']),
+				'amount'			=> $this->currency->format($amount, $order_info['currency_code'], $order_info['currency_value']),
 				'date_added'		=> date($this->language->get('date_format_short'), strtotime($result['date_added'])),
 				'username'			=> $result['username'],
 				'receipt'	 		=> $href,
@@ -349,28 +350,44 @@ class ControllerSaleVendor extends Controller
 				$reference_no = $this->config->get('config_reference_start') + 1;
 			}
 
-			$transaction_type_info = $this->model_accounting_transaction_type->getTransactionType($this->request->post['vendor_transaction_type_id']);
-
-			$account_debit_id = empty($transaction_type_info['account_debit_id']) ? $this->request->post['vendor_transaction_asset_id'] : ($transaction_type_info['account_debit_id']);
-			$account_credit_id = empty($transaction_type_info['account_credit_id']) ? $this->request->post['vendor_transaction_asset_id'] : ($transaction_type_info['account_credit_id']);
-
 			$asset_info = $this->model_accounting_account->getAccount($this->request->post['vendor_transaction_asset_id']);
 
-			$transaction_data = array(
+			$transaction_type_info = $this->model_accounting_transaction_type->getTransactionType($this->request->post['vendor_transaction_type_id']);
+			$transaction_type_accounts = $this->model_accounting_transaction_type->getTransactionTypeAccounts($transaction_type_info['transaction_type_id']);
+
+			foreach ($transaction_type_accounts as $transaction_type_account) {
+				$account_debit_id = empty($transaction_type_info['account_debit_id']) ? $this->request->post['vendor_transaction_asset_id'] : ($transaction_type_info['account_debit_id']);
+				$account_credit_id = empty($transaction_type_info['account_credit_id']) ? $this->request->post['vendor_transaction_asset_id'] : ($transaction_type_info['account_credit_id']);
+	
+				$account_data[] = [
+					'account_id'		=> $account_debit_id,
+					'debit'				=> $this->request->post['vendor_transaction_amount'],
+					'credit'			=> 0
+				];
+
+				$account_data[] = [
+					'account_id'		=> $account_credit_id,
+					'debit'				=> 0,
+					'credit'			=> $this->request->post['vendor_transaction_amount']
+				];
+			}
+
+			$transaction_data = [
 				'order_id'				=> $order_id,
-				'account_to_id'			=> $account_debit_id,
-				'account_from_id'		=> $account_credit_id,
-				'label'					=> 'vendor',
-				'label_id'				=> $this->request->post['vendor_transaction_vendor_id'],
-				'transaction_type_id' 	=> $this->request->post['vendor_transaction_type_id'],
+				'client_label'			=> $transaction_type_info['client_label'],
+				'category_label'		=> $transaction_type_info['category_label'],
+				'transaction_label'		=> $transaction_type_info['transaction_label'],
+				'client_id'				=> $this->request->post['vendor_transaction_vendor_id'],
+				'transaction_type_id'	=> $transaction_type_info['transaction_type_id'],
 				'date' 					=> $this->request->post['vendor_transaction_date'],
 				'payment_method'		=> $asset_info['name'],
 				'description' 			=> $this->request->post['vendor_transaction_description'],
 				'amount' 				=> $this->request->post['vendor_transaction_amount'],
 				'customer_name' 		=> $vendor_info['vendor_name'],
 				'reference_prefix' 		=> $reference_prefix,
-				'reference_no'			=> $reference_no
-			);
+				'reference_no'			=> $reference_no,
+				'account_data' 			=> $account_data
+			];
 
 			$this->model_accounting_transaction->addTransaction($transaction_data);
 

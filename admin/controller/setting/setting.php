@@ -87,6 +87,7 @@ class ControllerSettingSetting extends Controller {
 		$data['entry_customer_group_display'] = $this->language->get('entry_customer_group_display');
 		$data['entry_customer_group'] = $this->language->get('entry_customer_group');
 		$data['entry_customer_online'] = $this->language->get('entry_customer_online');
+		$data['entry_customer_order_initial'] = $this->language->get('entry_customer_order_initial');
 		$data['entry_customer_price'] = $this->language->get('entry_customer_price');
 		$data['entry_down_payment_amount'] = $this->language->get('entry_down_payment_amount');
 		$data['entry_down_payment_limit'] = $this->language->get('entry_down_payment_limit');
@@ -170,7 +171,7 @@ class ControllerSettingSetting extends Controller {
 		$data['entry_tax'] = $this->language->get('entry_tax');
 		$data['entry_telephone'] = $this->language->get('entry_telephone');
 		$data['entry_theme'] = $this->language->get('entry_theme');
-		$data['entry_vendor_deposit_account'] = $this->language->get('entry_vendor_deposit_account');
+		$data['entry_vendor_purchase_initial'] = $this->language->get('entry_vendor_purchase_initial');
 		$data['entry_voucher_max'] = $this->language->get('entry_voucher_max');
 		$data['entry_voucher_min'] = $this->language->get('entry_voucher_min');
 		$data['entry_weight_class'] = $this->language->get('entry_weight_class');
@@ -200,6 +201,7 @@ class ControllerSettingSetting extends Controller {
 		$data['help_customer_group_display'] = $this->language->get('help_customer_group_display');
 		$data['help_customer_group'] = $this->language->get('help_customer_group');
 		$data['help_customer_online'] = $this->language->get('help_customer_online');
+		$data['help_customer_order_initial'] = $this->language->get('help_customer_order_initial');
 		$data['help_customer_price'] = $this->language->get('help_customer_price');
 		$data['help_down_payment_limit'] = $this->language->get('help_down_payment_limit');
 		$data['help_down_payment_status'] = $this->language->get('help_down_payment_status');
@@ -250,7 +252,7 @@ class ControllerSettingSetting extends Controller {
 		$data['help_tax_customer'] = $this->language->get('help_tax_customer');
 		$data['help_tax_default'] = $this->language->get('help_tax_default');
 		$data['help_transaction_initial_payment'] = $this->language->get('help_transaction_initial_payment');
-		$data['help_vendor_deposit_account'] = $this->language->get('help_vendor_deposit_account');
+		$data['help_vendor_purchase_initial'] = $this->language->get('help_vendor_purchase_initial');
 		$data['help_voucher_max'] = $this->language->get('help_voucher_max');
 		$data['help_voucher_min'] = $this->language->get('help_voucher_min');
 
@@ -769,6 +771,22 @@ class ControllerSettingSetting extends Controller {
 			$data['config_account_mail'] = $this->config->get('config_account_mail');
 		}
 
+		if (isset($this->request->post['config_customer_order_initial_id'])) {
+			$data['config_customer_order_initial_id'] = $this->request->post['config_customer_order_initial_id'];
+		} else {
+			$data['config_customer_order_initial_id'] = $this->config->get('config_customer_order_initial_id');
+		}
+
+		if (isset($this->request->post['config_vendor_purchase_initial_id'])) {
+			$data['config_vendor_purchase_initial_id'] = $this->request->post['config_vendor_purchase_initial_id'];
+		} else {
+			$data['config_vendor_purchase_initial_id'] = $this->config->get('config_vendor_purchase_initial_id');
+		}
+
+		$this->load->model('accounting/transaction_type');
+
+		$data['transaction_types'] = $this->model_accounting_transaction_type->getTransactionTypes();
+
 		if (isset($this->request->post['config_asset_account_id'])) {
 			$data['config_asset_account_id'] = $this->request->post['config_asset_account_id'];
 		} else {
@@ -779,12 +797,6 @@ class ControllerSettingSetting extends Controller {
 			$data['config_prepaid_account_id'] = $this->request->post['config_prepaid_account_id'];
 		} else {
 			$data['config_prepaid_account_id'] = $this->config->get('config_prepaid_account_id');
-		}
-
-		if (isset($this->request->post['config_vendor_deposit_account_id'])) {
-			$data['config_vendor_deposit_account_id'] = $this->request->post['config_vendor_deposit_account_id'];
-		} else {
-			$data['config_vendor_deposit_account_id'] = $this->config->get('config_vendor_deposit_account_id');
 		}
 
 		if (isset($this->request->post['config_adjustment_account_id'])) {
