@@ -43,13 +43,13 @@
 			<div class="panel-body">
 				<div class="well">
 					<div class="row">
-						<div class="col-sm-6 col-md-3">
+						<div class="col-sm-6 col-md-4">
 							<div class="form-group">
 								<label class="control-label" for="input-date-start">
 									<?php echo $entry_date_start; ?>
 								</label>
 								<div class="input-group date">
-									<input type="text" name="filter_date_start" value="<?php echo $filter_date_start; ?>"
+									<input type="text" name="filter[date_start]" value="<?php echo $filter['date_start']; ?>"
 										placeholder="<?php echo $entry_date_start; ?>" data-date-format="YYYY-MM-DD" id="input-date-start"
 										class="form-control" />
 									<span class="input-group-btn">
@@ -62,7 +62,7 @@
 									<?php echo $entry_date_end; ?>
 								</label>
 								<div class="input-group date">
-									<input type="text" name="filter_date_end" value="<?php echo $filter_date_end; ?>"
+									<input type="text" name="filter[date_end]" value="<?php echo $filter['date_end']; ?>"
 										placeholder="<?php echo $entry_date_end; ?>" data-date-format="YYYY-MM-DD" id="input-date-end"
 										class="form-control" />
 									<span class="input-group-btn">
@@ -70,18 +70,32 @@
 									</span>
 								</div>
 							</div>
+							<div class="form-group">
+								<label class="control-label" for="input-order-id">
+									<?php echo $entry_order_id; ?>
+								</label>
+								<input type="text" name="filter[order_id]" value="<?php echo $filter['order_id']; ?>"
+									placeholder="<?php echo $entry_order_id; ?>" id="input-description" class="form-control" />
+							</div>
 						</div>
-						<div class="col-sm-6 col-md-3">
+						<div class="col-sm-6 col-md-4">
+							<div class="form-group">
+								<label class="control-label" for="input-reference">
+									<?php echo $entry_reference; ?>
+								</label>
+								<input type="text" name="filter[reference]" value="<?php echo $filter['reference']; ?>"
+									placeholder="<?php echo $entry_reference; ?>" id="input-reference" class="form-control" />
+							</div>
 							<div class="form-group">
 								<label class="control-label" for="input-transaction-type">
 									<?php echo $entry_transaction_type; ?>
 								</label>
-								<select name="filter_transaction_type_id" id="input-transaction-type" class="form-control">
-									<option value="*">
+								<select name="filter[transaction_type_id]" id="input-transaction-type" class="form-control">
+									<option value="">
 										<?php echo $text_all; ?>
 									</option>
 									<?php foreach ($transaction_types as $transaction_type) { ?>
-									<?php if ($transaction_type['transaction_type_id'] == $filter_transaction_type_id) { ?>
+									<?php if ($transaction_type['transaction_type_id'] == $filter['transaction_type_id']) { ?>
 									<option value="<?php echo $transaction_type['transaction_type_id']; ?>" selected="selected">
 										<?php echo $transaction_type['name']; ?>
 									</option>
@@ -97,12 +111,12 @@
 								<label class="control-label" for="input-account">
 									<?php echo $entry_account; ?>
 								</label>
-								<select name="filter_account_id" id="input-account" class="form-control">
-									<option value="*">
+								<select name="filter[account_id]" id="input-account" class="form-control">
+									<option value="">
 										<?php echo $text_all; ?>
 									</option>
 									<?php foreach ($accounts as $account) { ?>
-									<?php if ($account['account_id'] == $filter_account_id) { ?>
+									<?php if ($account['account_id'] == $filter['account_id']) { ?>
 									<option value="<?php echo $account['account_id']; ?>" selected="selected">
 										<?php echo $account['text']; ?>
 									</option>
@@ -113,7 +127,7 @@
 									<?php } ?>
 									<?php if ($account['child']) { ?>
 									<?php foreach ($account['child'] as $child) { ?>
-									<?php if ($child['account_id'] == $filter_account_id) { ?>
+									<?php if ($child['account_id'] == $filter['account_id']) { ?>
 									<option value="<?php echo $child['account_id']; ?>" selected="selected">&nbsp;&nbsp;&nbsp;
 										<?php echo $child['text']; ?>
 									</option>
@@ -128,48 +142,28 @@
 								</select>
 							</div>
 						</div>
-						<div class="col-sm-6 col-md-3">
-							<div class="form-group">
-								<label class="control-label" for="input-reference-no">
-									<?php echo $entry_reference_no; ?>
-								</label>
-								<input type="text" name="filter_reference_no" value="<?php echo $filter_reference_no; ?>"
-									placeholder="<?php echo $entry_reference_no; ?>" id="input-reference-no" class="form-control" />
-							</div>
+						<div class="col-sm-6 col-md-4">
 							<div class="form-group">
 								<label class="control-label" for="input-description">
 									<?php echo $entry_description; ?>
 								</label>
-								<input type="text" name="filter_description" value="<?php echo $filter_description; ?>"
+								<input type="text" name="filter[description]" value="<?php echo $filter['description']; ?>"
 									placeholder="<?php echo $entry_description; ?>" id="input-description" class="form-control" />
 							</div>
-						</div>
-						<div class="col-sm-6 col-md-3">
 							<div class="form-group">
 								<label class="control-label" for="input-customer-name">
 									<?php echo $entry_customer_name; ?>
 								</label>
-								<input type="text" name="filter_customer_name" value="<?php echo $filter_customer_name; ?>"
+								<input type="text" name="filter[customer_name]" value="<?php echo $filter['customer_name']; ?>"
 									placeholder="<?php echo $entry_customer_name; ?>" id="input-customer-name" class="form-control" />
 							</div>
 							<div class="form-group">
 								<label class="control-label" for="input-username">
 									<?php echo $entry_username; ?>
 								</label>
-								<input type="text" name="filter_username" value="<?php echo $filter_username; ?>"
+								<input type="text" name="filter[username]" value="<?php echo $filter['username']; ?>"
 									placeholder="<?php echo $entry_username; ?>" id="input-username" class="form-control" />
 							</div>
-						</div>
-						<div class="col-sm-6 col-md-3">
-							<div class="form-group">
-								<label class="control-label" for="input-order-id">
-									<?php echo $entry_order_id; ?>
-								</label>
-								<input type="text" name="filter_order_id" value="<?php echo $filter_order_id; ?>"
-									placeholder="<?php echo $entry_order_id; ?>" id="input-description" class="form-control" />
-							</div>
-						</div>
-						<div class="col-sm-6 col-md-3 pull-right">
 							<button type="button" id="button-filter" class="btn btn-primary pull-right"><i class="fa fa-search"></i>
 								<?php echo $button_filter; ?>
 							</button>
@@ -208,11 +202,11 @@
 									<td class="text-left">
 										<?php if ($sort == 'reference') { ?>
 										<a href="<?php echo $sort_reference; ?>" class="<?php echo strtolower($order); ?>">
-											<?php echo $column_reference_no; ?>
+											<?php echo $column_reference; ?>
 										</a>
 										<?php } else { ?>
 										<a href="<?php echo $sort_reference; ?>">
-											<?php echo $column_reference_no; ?>
+											<?php echo $column_reference; ?>
 										</a>
 										<?php } ?>
 									</td>
@@ -289,13 +283,13 @@
 									<td class="text-left">
 										<?php echo $transaction['transaction_type']; ?>
 									</td>
-										<?php if ($transaction['order_url']) { ?>
+									<?php if ($transaction['order_url']) { ?>
 									<td class="text-left"><a href="<?php echo $transaction['order_url']; ?>" target="_blank">
-											<?php echo $transaction['reference_no']; ?>
+											<?php echo $transaction['reference']; ?>
 										</a></td>
 									<?php } else { ?>
 									<td class="text-left">
-										<?php echo $transaction['reference_no']; ?>
+										<?php echo $transaction['reference']; ?>
 									</td>
 									<?php } ?>
 									<td class="text-left">
@@ -374,56 +368,32 @@
 		$('#button-filter').on('click', function () {
 			url = 'index.php?route=accounting/transaction&token=<?php echo $token; ?>';
 
-			var filter_date_start = $('input[name=\'filter_date_start\']').val();
-			if (filter_date_start) {
-				url += '&filter_date_start=' + encodeURIComponent(filter_date_start);
-			}
+			let filter_items = [
+				'date_start',
+				'date_end',
+				'account_id',
+				'transaction_type_id',
+				'description',
+				'reference',
+				'order_id',
+				'customer_name',
+				'username'
+			];
 
-			var filter_date_end = $('input[name=\'filter_date_end\']').val();
-			if (filter_date_end) {
-				url += '&filter_date_end=' + encodeURIComponent(filter_date_end);
-			}
+			let filter = [];
 
-			var filter_transaction_type_id = $('select[name=\'filter_transaction_type_id\']').val();
-			if (filter_transaction_type_id != '*') {
-				url += '&filter_transaction_type_id=' + encodeURIComponent(filter_transaction_type_id);
-			}
+			for (let i = 0; i < filter_items.length; i++) {
+				filter[filter_items[i]] = $('[name=\'filter[' + filter_items[i] + ']\']').val();
 
-			var filter_account_id = $('select[name=\'filter_account_id\']').val();
-			if (filter_account_id != '*') {
-				url += '&filter_account_id=' + encodeURIComponent(filter_account_id);
-			}
-
-			var filter_description = $('input[name=\'filter_description\']').val();
-			if (filter_description) {
-				url += '&filter_description=' + encodeURIComponent(filter_description);
-			}
-
-			var filter_reference_no = $('input[name=\'filter_reference_no\']').val();
-			if (filter_reference_no) {
-				url += '&filter_reference_no=' + encodeURIComponent(filter_reference_no);
-			}
-
-			var filter_order_id = $('input[name=\'filter_order_id\']').val();
-			if (filter_order_id) {
-				url += '&filter_order_id=' + encodeURIComponent(filter_order_id);
-			}
-
-			var filter_customer_name = $('input[name=\'filter_customer_name\']').val();
-			if (filter_customer_name) {
-				url += '&filter_customer_name=' + encodeURIComponent(filter_customer_name);
-			}
-
-			var filter_username = $('input[name=\'filter_username\']').val();
-			if (filter_username) {
-				url += '&filter_username=' + encodeURIComponent(filter_username);
+				if (filter[filter_items[i]]) {
+					url += '&filter_' + filter_items[i] + '=' + encodeURIComponent(filter[filter_items[i]]);
+				}
 			}
 
 			location = url;
 		});
 	</script>
 	<script type="text/javascript">
-
 		$('#form-transaction').on('click', 'button[id^=\'btn-lock-toggle\']', function (e) {
 			var node = this;
 

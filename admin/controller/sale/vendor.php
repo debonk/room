@@ -174,12 +174,11 @@ class ControllerSaleVendor extends Controller
 		$data['vendor_transactions'] = array();
 
 		$filter_data = array(
-			'filter_order_id'		=> $order_id,
-			'filter_client_label'	=> 'vendor',
-			'sort'					=> 't.date',
-			'order'					=> 'DESC',
-			'start'					=> ($page - 1) * $limit,
-			'limit'					=> $limit
+			'filter'	=> ['order_id' => $order_id, 'client_label' => 'vendor'],
+			'sort'		=> 't.date',
+			'order'		=> 'DESC',
+			'start'		=> ($page - 1) * $limit,
+			'limit'		=> $limit
 		);
 
 		$results = $this->model_accounting_transaction->getTransactions($filter_data);

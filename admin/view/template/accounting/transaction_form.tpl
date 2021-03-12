@@ -39,11 +39,11 @@
 					class="form-horizontal">
 					<div class="form-group">
 						<label class="col-sm-2 control-label">
-							<?php echo $text_reference_no; ?>
+							<?php echo $text_reference; ?>
 						</label>
 						<div class="col-sm-10">
 							<h4 class="form-control-static">
-								<?php echo $reference_no; ?>
+								<?php echo $reference; ?>
 							</h4>
 						</div>
 					</div>

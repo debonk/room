@@ -9,14 +9,14 @@ $_['text_add']           		= 'Tambah Transaksi';
 $_['text_edit']          		= 'Edit Transaksi';
 $_['text_list']         		= 'Daftar Transaksi';
 $_['text_total']     			= 'Total';
-$_['text_reference_no'] 		= 'No Referensi';
+$_['text_reference'] 			= 'No Referensi';
 		
 // Column		
 $_['column_date'] 				= 'Tanggal';
 $_['column_account_credit']		= 'Akun Kredit';
 $_['column_account_debit']		= 'Akun Debet';
 $_['column_description']		= 'Keterangan';
-$_['column_reference_no']		= 'No Referensi';
+$_['column_reference']			= 'No Referensi';
 $_['column_customer_name']		= 'Nama Klien';
 $_['column_amount']				= 'Jumlah';
 $_['column_transaction_type']	= 'Jenis Transaksi';
@@ -34,7 +34,7 @@ $_['entry_date_end']    		= 'Date End';
 $_['entry_debit']    			= 'Debet';
 $_['entry_description']    		= 'Keterangan';
 $_['entry_order_id']    		= 'Order ID';
-$_['entry_reference_no']    	= 'No Referensi';
+$_['entry_reference']    		= 'No Referensi';
 $_['entry_transaction_type']  	= 'Jenis Transaksi';
 $_['entry_username']   		 	= 'Username';
 

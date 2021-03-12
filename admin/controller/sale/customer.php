@@ -93,12 +93,11 @@ class ControllerSaleCustomer extends Controller
 		$data['customer_transactions'] = [];
 
 		$filter_data = [
-			'filter_order_id'		=> $order_id,
-			'filter_client_label'	=> 'customer',
-			'sort'					=> 't.date DESC, t.transaction_id',
-			'order'					=> 'DESC',
-			'start'					=> ($page - 1) * $limit,
-			'limit'					=> $limit
+			'filter'	=> ['order_id' => $order_id, 'client_label' => 'customer'],
+			'sort'		=> 't.date DESC, t.transaction_id',
+			'order'		=> 'DESC',
+			'start'		=> ($page - 1) * $limit,
+			'limit'		=> $limit
 		];
 
 		$results = $this->model_accounting_transaction->getTransactions($filter_data);

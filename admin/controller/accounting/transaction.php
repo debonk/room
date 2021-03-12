@@ -3,6 +3,31 @@ class ControllerAccountingTransaction extends Controller
 {
 	private $error = array();
 
+	private $filter_items = array(
+		'date_start',
+		'date_end',
+		'account_id',
+		'transaction_type_id',
+		'description',
+		'reference',
+		'order_id',
+		'customer_name',
+		'username'
+	);
+
+	private function urlFilter()
+	{
+		$url_filter = '';
+
+		foreach ($this->filter_items as $filter_item) {
+			if (isset($this->request->get['filter_' . $filter_item])) {
+				$url_filter .= '&filter_' . $filter_item . '=' . $this->request->get['filter_' . $filter_item];
+			}
+		}
+
+		return $url_filter;
+	}
+
 	public function index()
 	{
 		$this->load->language('accounting/transaction');
@@ -27,43 +52,7 @@ class ControllerAccountingTransaction extends Controller
 
 			$this->session->data['success'] = $this->language->get('text_success');
 
-			$url = '';
-
-			if (isset($this->request->get['filter_date_start'])) {
-				$url .= '&filter_date_start=' . $this->request->get['filter_date_start'];
-			}
-
-			if (isset($this->request->get['filter_date_end'])) {
-				$url .= '&filter_date_end=' . $this->request->get['filter_date_end'];
-			}
-
-			if (isset($this->request->get['filter_account_id'])) {
-				$url .= '&filter_account_id=' . $this->request->get['filter_account_id'];
-			}
-
-			if (isset($this->request->get['filter_transaction_type_id'])) {
-				$url .= '&filter_transaction_type_id=' . $this->request->get['filter_transaction_type_id'];
-			}
-
-			if (isset($this->request->get['filter_description'])) {
-				$url .= '&filter_description=' . $this->request->get['filter_description'];
-			}
-
-			if (isset($this->request->get['filter_reference_no'])) {
-				$url .= '&filter_reference_no=' . $this->request->get['filter_reference_no'];
-			}
-
-			if (isset($this->request->get['filter_order_id'])) {
-				$url .= '&filter_order_id=' . $this->request->get['filter_order_id'];
-			}
-
-			if (isset($this->request->get['filter_customer_name'])) {
-				$url .= '&filter_customer_name=' . $this->request->get['filter_customer_name'];
-			}
-
-			if (isset($this->request->get['filter_username'])) {
-				$url .= '&filter_username=' . $this->request->get['filter_username'];
-			}
+			$url = $this->urlFilter();
 
 			if (isset($this->request->get['sort'])) {
 				$url .= '&sort=' . $this->request->get['sort'];
@@ -96,43 +85,7 @@ class ControllerAccountingTransaction extends Controller
 
 			$this->session->data['success'] = $this->language->get('text_success');
 
-			$url = '';
-
-			if (isset($this->request->get['filter_date_start'])) {
-				$url .= '&filter_date_start=' . $this->request->get['filter_date_start'];
-			}
-
-			if (isset($this->request->get['filter_date_end'])) {
-				$url .= '&filter_date_end=' . $this->request->get['filter_date_end'];
-			}
-
-			if (isset($this->request->get['filter_account_id'])) {
-				$url .= '&filter_account_id=' . $this->request->get['filter_account_id'];
-			}
-
-			if (isset($this->request->get['filter_transaction_type_id'])) {
-				$url .= '&filter_transaction_type_id=' . $this->request->get['filter_transaction_type_id'];
-			}
-
-			if (isset($this->request->get['filter_description'])) {
-				$url .= '&filter_description=' . $this->request->get['filter_description'];
-			}
-
-			if (isset($this->request->get['filter_reference_no'])) {
-				$url .= '&filter_reference_no=' . $this->request->get['filter_reference_no'];
-			}
-
-			if (isset($this->request->get['filter_order_id'])) {
-				$url .= '&filter_order_id=' . $this->request->get['filter_order_id'];
-			}
-
-			if (isset($this->request->get['filter_customer_name'])) {
-				$url .= '&filter_customer_name=' . $this->request->get['filter_customer_name'];
-			}
-
-			if (isset($this->request->get['filter_username'])) {
-				$url .= '&filter_username=' . $this->request->get['filter_username'];
-			}
+			$url = $this->urlFilter();
 
 			if (isset($this->request->get['sort'])) {
 				$url .= '&sort=' . $this->request->get['sort'];
@@ -167,43 +120,7 @@ class ControllerAccountingTransaction extends Controller
 
 			$this->session->data['success'] = $this->language->get('text_success');
 
-			$url = '';
-
-			if (isset($this->request->get['filter_date_start'])) {
-				$url .= '&filter_date_start=' . $this->request->get['filter_date_start'];
-			}
-
-			if (isset($this->request->get['filter_date_end'])) {
-				$url .= '&filter_date_end=' . $this->request->get['filter_date_end'];
-			}
-
-			if (isset($this->request->get['filter_account_id'])) {
-				$url .= '&filter_account_id=' . $this->request->get['filter_account_id'];
-			}
-
-			if (isset($this->request->get['filter_transaction_type_id'])) {
-				$url .= '&filter_transaction_type_id=' . $this->request->get['filter_transaction_type_id'];
-			}
-
-			if (isset($this->request->get['filter_description'])) {
-				$url .= '&filter_description=' . $this->request->get['filter_description'];
-			}
-
-			if (isset($this->request->get['filter_reference_no'])) {
-				$url .= '&filter_reference_no=' . $this->request->get['filter_reference_no'];
-			}
-
-			if (isset($this->request->get['filter_order_id'])) {
-				$url .= '&filter_order_id=' . $this->request->get['filter_order_id'];
-			}
-
-			if (isset($this->request->get['filter_customer_name'])) {
-				$url .= '&filter_customer_name=' . $this->request->get['filter_customer_name'];
-			}
-
-			if (isset($this->request->get['filter_username'])) {
-				$url .= '&filter_username=' . $this->request->get['filter_username'];
-			}
+			$url = $this->urlFilter();
 
 			if (isset($this->request->get['sort'])) {
 				$url .= '&sort=' . $this->request->get['sort'];
@@ -239,7 +156,7 @@ class ControllerAccountingTransaction extends Controller
 			'column_account_credit',
 			'column_account_debit',
 			'column_description',
-			'column_reference_no',
+			'column_reference',
 			'column_customer_name',
 			'column_amount',
 			'column_transaction_type',
@@ -249,7 +166,7 @@ class ControllerAccountingTransaction extends Controller
 			'entry_date_end',
 			'entry_account',
 			'entry_description',
-			'entry_reference_no',
+			'entry_reference',
 			'entry_order_id',
 			'entry_customer_name',
 			'entry_transaction_type',
@@ -285,60 +202,16 @@ class ControllerAccountingTransaction extends Controller
 			$data['selected'] = array();
 		}
 
-		if (isset($this->request->get['filter_date_start'])) {
-			$filter_date_start = $this->request->get['filter_date_start'];
-		} else {
-			$filter_date_start = date('Y-m-d', strtotime(date('Y') . '-01-01'));
-			// $filter_date_start = date('Y-m-d', strtotime(date('Y') . '-' . date('m') . '-01'));
+		foreach ($this->filter_items as $filter_item) {
+			if (isset($this->request->get['filter_' . $filter_item])) {
+				$filter[$filter_item] = $this->request->get['filter_' . $filter_item];
+			} else {
+				$filter[$filter_item] = null;
+			}
 		}
 
-		if (isset($this->request->get['filter_date_end'])) {
-			$filter_date_end = $this->request->get['filter_date_end'];
-		} else {
-			$filter_date_end = '';
-			// $filter_date_end = date('Y-m-t');
-		}
-
-		if (isset($this->request->get['filter_account_id'])) {
-			$filter_account_id = $this->request->get['filter_account_id'];
-		} else {
-			$filter_account_id = null;
-		}
-
-		if (isset($this->request->get['filter_transaction_type_id'])) {
-			$filter_transaction_type_id = $this->request->get['filter_transaction_type_id'];
-		} else {
-			$filter_transaction_type_id = null;
-		}
-
-		if (isset($this->request->get['filter_description'])) {
-			$filter_description = $this->request->get['filter_description'];
-		} else {
-			$filter_description = '';
-		}
-
-		if (isset($this->request->get['filter_reference_no'])) {
-			$filter_reference_no = $this->request->get['filter_reference_no'];
-		} else {
-			$filter_reference_no = '';
-		}
-
-		if (isset($this->request->get['filter_order_id'])) {
-			$filter_order_id = $this->request->get['filter_order_id'];
-		} else {
-			$filter_order_id = '';
-		}
-
-		if (isset($this->request->get['filter_customer_name'])) {
-			$filter_customer_name = $this->request->get['filter_customer_name'];
-		} else {
-			$filter_customer_name = '';
-		}
-
-		if (isset($this->request->get['filter_username'])) {
-			$filter_username = $this->request->get['filter_username'];
-		} else {
-			$filter_username = '';
+		if (empty($filter['date_start'])) {
+			$filter['date_start'] = date('Y-m-d', strtotime(date('Y') . '-01-01'));
 		}
 
 		if (isset($this->request->get['sort'])) {
@@ -359,43 +232,7 @@ class ControllerAccountingTransaction extends Controller
 			$page = 1;
 		}
 
-		$url = '';
-
-		if (isset($this->request->get['filter_date_start'])) {
-			$url .= '&filter_date_start=' . $this->request->get['filter_date_start'];
-		}
-
-		if (isset($this->request->get['filter_date_end'])) {
-			$url .= '&filter_date_end=' . $this->request->get['filter_date_end'];
-		}
-
-		if (isset($this->request->get['filter_account_id'])) {
-			$url .= '&filter_account_id=' . $this->request->get['filter_account_id'];
-		}
-
-		if (isset($this->request->get['filter_transaction_type_id'])) {
-			$url .= '&filter_transaction_type_id=' . $this->request->get['filter_transaction_type_id'];
-		}
-
-		if (isset($this->request->get['filter_description'])) {
-			$url .= '&filter_description=' . $this->request->get['filter_description'];
-		}
-
-		if (isset($this->request->get['filter_reference_no'])) {
-			$url .= '&filter_reference_no=' . $this->request->get['filter_reference_no'];
-		}
-
-		if (isset($this->request->get['filter_order_id'])) {
-			$url .= '&filter_order_id=' . $this->request->get['filter_order_id'];
-		}
-
-		if (isset($this->request->get['filter_customer_name'])) {
-			$url .= '&filter_customer_name=' . $this->request->get['filter_customer_name'];
-		}
-
-		if (isset($this->request->get['filter_username'])) {
-			$url .= '&filter_username=' . $this->request->get['filter_username'];
-		}
+		$url = $this->urlFilter();
 
 		if (isset($this->request->get['sort'])) {
 			$url .= '&sort=' . $this->request->get['sort'];
@@ -428,33 +265,24 @@ class ControllerAccountingTransaction extends Controller
 		$limit = $this->config->get('config_limit_admin');
 
 		$filter_data = array(
-			'filter_date_start'	     		=> $filter_date_start,
-			'filter_date_end'	     		=> $filter_date_end,
-			'filter_transaction_type_id'	=> $filter_transaction_type_id,
-			'filter_account_id' 			=> $filter_account_id,
-			'filter_description'	 		=> $filter_description,
-			'filter_reference'	 	 		=> $filter_reference_no,
-			'filter_order_id'	 	 		=> $filter_order_id,
-			'filter_customer_name'	 		=> $filter_customer_name,
-			'filter_username'	 	 		=> $filter_username,
-			'sort'                   		=> $sort,
-			'order'                  		=> $order,
-			'start'                  		=> ($page - 1) * $limit,
-			'limit'                  		=> $limit
+			'filter'	=> $filter,
+			'sort'      => $sort,
+			'order'     => $order,
+			'start'     => ($page - 1) * $limit,
+			'limit'     => $limit
 		);
 
 		$transaction_count = $this->model_accounting_transaction->getTransactionsCount($filter_data);
 		$transaction_total = $this->model_accounting_transaction->getTransactionsTotal($filter_data);
 
 		$results = $this->model_accounting_transaction->getTransactions($filter_data);
-		// var_dump($results);//die('---breakpoint---');
 
 		foreach ($results as $result) {
 			if (!empty($result['order_id'])) {
-				$reference_no = '#' . $result['order_id'] . ($result['reference_no'] ? ': ' . $result['reference'] : '');
+				$reference = '#' . $result['order_id'] . ($result['reference_no'] ? ': ' . $result['reference'] : '');
 				$order_url = $this->url->link('sale/order/info', 'token=' . $this->session->data['token'] . '&order_id=' . $result['order_id'], true);
 			} else {
-				$reference_no = $result['reference'];
+				$reference = $result['reference'];
 				$order_url = '';
 			}
 
@@ -482,7 +310,7 @@ class ControllerAccountingTransaction extends Controller
 				'transaction_id' => $result['transaction_id'],
 				'date'	 		=> date($this->language->get('date_format_short'), strtotime($result['date'])),
 				'transaction_type'	=> $result['transaction_type'],
-				'reference_no'  => $reference_no,
+				'reference'  => $reference,
 				'description'	=> $result['description'],
 				'customer_name'	=> $result['customer_name'],
 				'account'		=> $account_data,
@@ -495,43 +323,7 @@ class ControllerAccountingTransaction extends Controller
 			);
 		}
 
-		$url = '';
-
-		if (isset($this->request->get['filter_date_start'])) {
-			$url .= '&filter_date_start=' . $this->request->get['filter_date_start'];
-		}
-
-		if (isset($this->request->get['filter_date_end'])) {
-			$url .= '&filter_date_end=' . $this->request->get['filter_date_end'];
-		}
-
-		if (isset($this->request->get['filter_account_id'])) {
-			$url .= '&filter_account_id=' . $this->request->get['filter_account_id'];
-		}
-
-		if (isset($this->request->get['filter_transaction_type_id'])) {
-			$url .= '&filter_transaction_type_id=' . $this->request->get['filter_transaction_type_id'];
-		}
-
-		if (isset($this->request->get['filter_description'])) {
-			$url .= '&filter_description=' . $this->request->get['filter_description'];
-		}
-
-		if (isset($this->request->get['filter_reference_no'])) {
-			$url .= '&filter_reference_no=' . $this->request->get['filter_reference_no'];
-		}
-
-		if (isset($this->request->get['filter_order_id'])) {
-			$url .= '&filter_order_id=' . $this->request->get['filter_order_id'];
-		}
-
-		if (isset($this->request->get['filter_customer_name'])) {
-			$url .= '&filter_customer_name=' . $this->request->get['filter_customer_name'];
-		}
-
-		if (isset($this->request->get['filter_username'])) {
-			$url .= '&filter_username=' . $this->request->get['filter_username'];
-		}
+		$url = $this->urlFilter();
 
 		if ($order == 'ASC') {
 			$url .= '&order=DESC';
@@ -551,43 +343,7 @@ class ControllerAccountingTransaction extends Controller
 		$data['sort_amount'] = $this->url->link('accounting/transaction', 'token=' . $this->session->data['token'] . '&sort=t.amount' . $url, true);
 		$data['sort_username'] = $this->url->link('accounting/transaction', 'token=' . $this->session->data['token'] . '&sort=u.username' . $url, true);
 
-		$url = '';
-
-		if (isset($this->request->get['filter_date_start'])) {
-			$url .= '&filter_date_start=' . $this->request->get['filter_date_start'];
-		}
-
-		if (isset($this->request->get['filter_date_end'])) {
-			$url .= '&filter_date_end=' . $this->request->get['filter_date_end'];
-		}
-
-		if (isset($this->request->get['filter_account_id'])) {
-			$url .= '&filter_account_id=' . $this->request->get['filter_account_id'];
-		}
-
-		if (isset($this->request->get['filter_transaction_type_id'])) {
-			$url .= '&filter_transaction_type_id=' . $this->request->get['filter_transaction_type_id'];
-		}
-
-		if (isset($this->request->get['filter_description'])) {
-			$url .= '&filter_description=' . $this->request->get['filter_description'];
-		}
-
-		if (isset($this->request->get['filter_reference_no'])) {
-			$url .= '&filter_reference_no=' . $this->request->get['filter_reference_no'];
-		}
-
-		if (isset($this->request->get['filter_order_id'])) {
-			$url .= '&filter_order_id=' . $this->request->get['filter_order_id'];
-		}
-
-		if (isset($this->request->get['filter_customer_name'])) {
-			$url .= '&filter_customer_name=' . $this->request->get['filter_customer_name'];
-		}
-
-		if (isset($this->request->get['filter_username'])) {
-			$url .= '&filter_username=' . $this->request->get['filter_username'];
-		}
+		$url = $this->urlFilter();
 
 		if (isset($this->request->get['sort'])) {
 			$url .= '&sort=' . $this->request->get['sort'];
@@ -615,16 +371,7 @@ class ControllerAccountingTransaction extends Controller
 		$this->load->model('accounting/account');
 		$data['accounts'] = $this->model_accounting_account->getAccountsMenuByComponent();
 
-		$data['filter_account_id'] = $filter_account_id;
-		$data['filter_transaction_type_id'] = $filter_transaction_type_id;
-		$data['filter_date_start'] = $filter_date_start;
-		$data['filter_date_end'] = $filter_date_end;
-		$data['filter_description'] = $filter_description;
-		$data['filter_reference_no'] = $filter_reference_no;
-		$data['filter_order_id'] = $filter_order_id;
-		$data['filter_customer_name'] = $filter_customer_name;
-		$data['filter_username'] = $filter_username;
-
+		$data['filter'] = $filter;
 		$data['sort'] = $sort;
 		$data['order'] = $order;
 
@@ -646,7 +393,7 @@ class ControllerAccountingTransaction extends Controller
 			'text_account',
 			'text_none',
 			'text_select',
-			'text_reference_no',
+			'text_reference',
 			'entry_account',
 			'entry_credit',
 			'entry_date',
@@ -654,7 +401,7 @@ class ControllerAccountingTransaction extends Controller
 			'entry_description',
 			'entry_amount',
 			'entry_customer_name',
-			'entry_reference_no',
+			'entry_reference',
 			'entry_transaction_type',
 			'column_action',
 			'button_account_add',
@@ -682,43 +429,7 @@ class ControllerAccountingTransaction extends Controller
 			}
 		}
 
-		$url = '';
-
-		if (isset($this->request->get['filter_date_start'])) {
-			$url .= '&filter_date_start=' . $this->request->get['filter_date_start'];
-		}
-
-		if (isset($this->request->get['filter_date_end'])) {
-			$url .= '&filter_date_end=' . $this->request->get['filter_date_end'];
-		}
-
-		if (isset($this->request->get['filter_transaction_type_id'])) {
-			$url .= '&filter_transaction_type_id=' . $this->request->get['filter_transaction_type_id'];
-		}
-
-		if (isset($this->request->get['filter_account_id'])) {
-			$url .= '&filter_account_id=' . $this->request->get['filter_account_id'];
-		}
-
-		if (isset($this->request->get['filter_description'])) {
-			$url .= '&filter_description=' . $this->request->get['filter_description'];
-		}
-
-		if (isset($this->request->get['filter_reference_no'])) {
-			$url .= '&filter_reference_no=' . $this->request->get['filter_reference_no'];
-		}
-
-		if (isset($this->request->get['filter_order_id'])) {
-			$url .= '&filter_order_id=' . $this->request->get['filter_order_id'];
-		}
-
-		if (isset($this->request->get['filter_customer_name'])) {
-			$url .= '&filter_customer_name=' . $this->request->get['filter_customer_name'];
-		}
-
-		if (isset($this->request->get['filter_username'])) {
-			$url .= '&filter_username=' . $this->request->get['filter_username'];
-		}
+		$url = $this->urlFilter();
 
 		if (isset($this->request->get['sort'])) {
 			$url .= '&sort=' . $this->request->get['sort'];
@@ -789,14 +500,14 @@ class ControllerAccountingTransaction extends Controller
 		$data['transaction_accounts_idx'] = ($data['transaction_accounts'] ? max(array_keys($data['transaction_accounts'])) + 1 : 0);
 
 		if (!empty($transaction_info)) {
-			$data['reference_no'] = $transaction_info['reference'];
+			$data['reference'] = $transaction_info['reference'];
 			$data['order_id'] = $transaction_info['order_id'];
 
 			if ($transaction_info['order_id']) {
 				$data['transaction_type'] = $transaction_info['transaction_type'];
 			}
 		} else {
-			$data['reference_no'] = '-';
+			$data['reference'] = '-';
 			$data['order_id'] = 0;
 		}
 

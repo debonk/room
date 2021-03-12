@@ -45,7 +45,7 @@ class ControllerPurchasePurchase extends Controller
 		$this->load->model('localisation/local_date');
 
 		if (($this->request->server['REQUEST_METHOD'] == 'POST') && $this->validateForm()) {
-		$this->model_purchase_purchase->addPurchase($this->request->post);
+			$this->model_purchase_purchase->addPurchase($this->request->post);
 
 			$this->session->data['success'] = $this->language->get('text_success');
 
