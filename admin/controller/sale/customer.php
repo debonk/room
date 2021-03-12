@@ -100,9 +100,9 @@ class ControllerSaleCustomer extends Controller
 			'start'					=> ($page - 1) * $limit,
 			'limit'					=> $limit
 		];
-		
+
 		$results = $this->model_accounting_transaction->getTransactions($filter_data);
-		
+
 		foreach ($results as $result) {
 			// $total = 0;
 
@@ -112,9 +112,9 @@ class ControllerSaleCustomer extends Controller
 			// 	# Maintain Version 1 
 			// 	if (empty($transaction_accounts['transaction_label'])) {
 			// 		$this->load->model('accounting/transaction_type');
-	
+
 			// 		$transaction_type_account_info = $this->model_accounting_transaction_type->getTransactionTypeAccounts($result['transaction_type_id']);
-	
+
 			// 		$transaction_account['transaction_label'] = $transaction_type_account_info[0]['transaction_label'];
 			// 	}
 			// 	# End Maintain
@@ -169,7 +169,7 @@ class ControllerSaleCustomer extends Controller
 		# Accounts
 		$this->load->model('accounting/account');
 
-		$data['assets'] = $this->model_accounting_account->getAccountsMenuByParentId([1111,1112]);
+		$data['assets'] = $this->model_accounting_account->getAccountsMenuByParentId([1111, 1112]);
 
 		$data['token'] = $this->session->data['token'];
 		$data['order_id'] = $order_id;
@@ -183,54 +183,83 @@ class ControllerSaleCustomer extends Controller
 
 		$json = array();
 
-		if (!$this->user->hasPermission('modify', 'sale/order') || !$this->user->hasPermission('modify', 'sale/customer')) {
-			$json['error']['warning'] = $this->language->get('error_permission');
-		} else {
-			if (empty($this->request->post['customer_transaction_date'])) {
-				$json['error_customer_transaction']['date'] = $this->language->get('error_transaction_date');
-			}
+		switch (false) {
+			case $json:
+				if (!$this->user->hasPermission('modify', 'sale/order') || !$this->user->hasPermission('modify', 'sale/customer')) {
+					$json['error']['warning'] = $this->language->get('error_permission');
 
-			if (empty($this->request->post['customer_transaction_type_id'])) {
-				$json['error_customer_transaction']['type'] = $this->language->get('error_transaction_type');
-			}
+					break;
+				} else {
+					if (empty($this->request->post['customer_transaction_date'])) {
+						$json['error_customer_transaction']['date'] = $this->language->get('error_transaction_date');
+					}
 
-			if (empty($this->request->post['customer_transaction_asset_id'])) {
-				$json['error_customer_transaction']['asset'] = $this->language->get('error_transaction_asset');
-			}
+					if (empty($this->request->post['customer_transaction_type_id'])) {
+						$json['error_customer_transaction']['type'] = $this->language->get('error_transaction_type');
+					}
 
-			if (utf8_strlen($this->request->post['customer_transaction_description']) > 256) {
-				$json['error_customer_transaction']['description'] = $this->language->get('error_transaction_description');
-			}
+					if (empty($this->request->post['customer_transaction_asset_id'])) {
+						$json['error_customer_transaction']['asset'] = $this->language->get('error_transaction_asset');
+					}
 
-			if (empty((float)$this->request->post['customer_transaction_amount']) || (float)$this->request->post['customer_transaction_amount'] <= 0) {
-				$json['error_customer_transaction']['amount'] = $this->language->get('error_transaction_amount');
-			}
+					if (utf8_strlen($this->request->post['customer_transaction_description']) > 256) {
+						$json['error_customer_transaction']['description'] = $this->language->get('error_transaction_description');
+					}
 
-			if ($json) {
-				$json['error']['warning'] = $this->language->get('error_warning');
-			}
+					if (empty((float)$this->request->post['customer_transaction_amount']) || (float)$this->request->post['customer_transaction_amount'] <= 0) {
+						$json['error_customer_transaction']['amount'] = $this->language->get('error_transaction_amount');
+					}
+
+					if ($json) {
+						$json['error']['warning'] = $this->language->get('error_warning');
+
+						break;
+					}
+				}
+
+				$order_id = isset($this->request->get['order_id']) ? $this->request->get['order_id'] : 0;
+
+				$this->load->model('sale/order');
+				$order_info = $this->model_sale_order->getOrder($order_id);
+
+				if (!$order_info) {
+					$json['error']['warning'] = $this->language->get('error_order');
+
+					break;
+				}
+
+				if (!in_array($order_info['order_status_id'], $this->config->get('config_status_with_payment'))) {
+					$json['error']['warning'] = $this->language->get('error_order_status');
+
+					break;
+				}
+
+				$this->load->model('accounting/account');
+				$asset_info = $this->model_accounting_account->getAccount($this->request->post['customer_transaction_asset_id']);
+
+				if (!$asset_info) {
+					$json['error']['warning'] = $this->language->get('error_asset_not_found');
+
+					break;
+				}
+
+				$this->load->model('accounting/transaction_type');
+				$transaction_type_info = $this->model_accounting_transaction_type->getTransactionType($this->request->post['customer_transaction_type_id']);
+
+				if (!$transaction_type_info) {
+					$json['error']['warning'] = $this->language->get('error_type_not_found');
+
+					break;
+				}
+
+			default:
+				break;
 		}
 
 		if (!$json) {
-			$order_id = isset($this->request->get['order_id']) ? $this->request->get['order_id'] : 0;
-
-			$this->load->model('sale/order');
-
-			$order_info = $this->model_sale_order->getOrder($order_id);
-
-			if (!$order_info) {
-				$json['error']['warning'] = $this->language->get('error_order');
-			} elseif (!in_array($order_info['order_status_id'], $this->config->get('config_status_with_payment'))) {
-				$json['error']['warning'] = $this->language->get('error_order_status');
-			}
-		}
-
-		if (!$json) {
-			$this->load->model('accounting/account');
-			$this->load->model('accounting/transaction_type');
 			$this->load->model('accounting/transaction');
 
-			$account_data = [];
+			$transaction_account = [];
 
 			$reference_prefix = str_ireplace('{YEAR}', date('Y', strtotime($this->request->post['customer_transaction_date'])), $this->config->get('config_receipt_customer_prefix'));
 
@@ -242,22 +271,19 @@ class ControllerSaleCustomer extends Controller
 				$reference_no = $this->config->get('config_reference_start') + 1;
 			}
 
-			$asset_info = $this->model_accounting_account->getAccount($this->request->post['customer_transaction_asset_id']);
-
-			$transaction_type_info = $this->model_accounting_transaction_type->getTransactionType($this->request->post['customer_transaction_type_id']);
 			$transaction_type_accounts = $this->model_accounting_transaction_type->getTransactionTypeAccounts($transaction_type_info['transaction_type_id']);
 
 			foreach ($transaction_type_accounts as $transaction_type_account) {
 				$account_debit_id = empty($transaction_type_account['account_debit_id']) ? $this->request->post['customer_transaction_asset_id'] : ($transaction_type_account['account_debit_id']);
 				$account_credit_id = empty($transaction_type_account['account_credit_id']) ? $this->request->post['customer_transaction_asset_id'] : ($transaction_type_account['account_credit_id']);
 
-				$account_data[] = [
+				$transaction_account[] = [
 					'account_id'		=> $account_debit_id,
 					'debit'				=> $this->request->post['customer_transaction_amount'],
 					'credit'			=> 0
 				];
 
-				$account_data[] = [
+				$transaction_account[] = [
 					'account_id'		=> $account_credit_id,
 					'debit'				=> 0,
 					'credit'			=> $this->request->post['customer_transaction_amount']
@@ -266,11 +292,8 @@ class ControllerSaleCustomer extends Controller
 
 			$transaction_data = array(
 				'order_id'				=> $order_id,
-				'client_label'			=> $transaction_type_info['client_label'],
-				'category_label'		=> $transaction_type_info['category_label'],
-				'transaction_label'		=> $transaction_type_info['transaction_label'],
+				'transaction_type_id'	=> $this->request->post['customer_transaction_type_id'],
 				'client_id'				=> $order_info['customer_id'],
-				'transaction_type_id'	=> $transaction_type_info['transaction_type_id'],
 				'date' 					=> $this->request->post['customer_transaction_date'],
 				'description' 			=> $this->request->post['customer_transaction_description'],
 				'payment_method' 		=> $asset_info['name'],
@@ -278,9 +301,9 @@ class ControllerSaleCustomer extends Controller
 				'customer_name' 		=> $order_info['customer'],
 				'reference_prefix' 		=> $reference_prefix,
 				'reference_no'			=> $reference_no,
-				'account_data' 			=> $account_data
+				'transaction_account' 	=> $transaction_account
 			);
-
+	
 			$this->model_accounting_transaction->addTransaction($transaction_data);
 
 			if ($transaction_type_info['category_label'] == 'order') {

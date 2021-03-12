@@ -1,15 +1,19 @@
 <?php
 class ModelAccountingTransaction extends Model
 {
-	private $client_data = ['system', 'customer', 'vendor', 'supplier'];
-	private $category_data = ['order', 'deposit', 'purchase'];
+	private $client_data = ['system', 'customer', 'vendor', 'supplier', 'finance'];
+	private $category_data = ['order', 'deposit', 'purchase', 'expense', 'asset'];
 	private $transaction_data = ['initial', 'discount', 'cashin', 'cashout', 'complete'];
 
 	public function addTransaction($data)
 	{
+		$this->load->model('accounting/transaction_type');
+
+		$transaction_type_info = $this->model_accounting_transaction_type->getTransactionType($data['transaction_type_id']);
+
 		$field_data = [
-			'category_label',
-			'transaction_label',
+			// 'category_label',
+			// 'transaction_label',
 			'client_id',
 			'order_id',
 			'payment_method',
@@ -30,18 +34,17 @@ class ModelAccountingTransaction extends Model
 				'E'	=> 'expense'
 			);
 
-			$data['reference_prefix'] = array_search($data['client_label'], $label_data) . date('ym');
+			$data['reference_prefix'] = array_search($transaction_type_info['category_label'], $label_data) . date('ym');
 			$data['reference_no'] = $this->getLastReferenceNo($data['reference_prefix']) + 1;
 		}
 
-		$this->db->query("INSERT INTO " . DB_PREFIX . "transaction SET client_label = '" . $this->db->escape($data['client_label']) . "', category_label = '" . $this->db->escape($data['category_label']) . "', transaction_label = '" . $this->db->escape($data['transaction_label']) . "', client_id = '" . (int)$data['client_id'] . "', order_id = '" . (int)$data['order_id'] . "', transaction_type_id = '" . (int)$data['transaction_type_id'] . "', date = DATE('" . $this->db->escape($data['date']) . "'), description = '" . $this->db->escape($data['description']) . "', payment_method = '" . $this->db->escape($data['payment_method']) . "', amount = '" . (float)$data['amount'] . "', customer_name = '" . $this->db->escape($data['customer_name']) . "', reference_prefix = '" . $this->db->escape($data['reference_prefix']) . "', reference_no = '" . (int)$data['reference_no'] . "', printed = '0', transaction_tax_id = '" . (int)$data['transaction_tax_id'] . "', edit_permission = '0', date_added = NOW(), user_id = '" . $this->user->getId() . "'");
+		$this->db->query("INSERT INTO " . DB_PREFIX . "transaction SET client_label = '" . $this->db->escape($transaction_type_info['client_label']) . "', category_label = '" . $this->db->escape($transaction_type_info['category_label']) . "', transaction_label = '" . $this->db->escape($transaction_type_info['transaction_label']) . "', client_id = '" . (int)$data['client_id'] . "', order_id = '" . (int)$data['order_id'] . "', transaction_type_id = '" . (int)$data['transaction_type_id'] . "', date = DATE('" . $this->db->escape($data['date']) . "'), description = '" . $this->db->escape($data['description']) . "', payment_method = '" . $this->db->escape($data['payment_method']) . "', amount = '" . (float)$data['amount'] . "', customer_name = '" . $this->db->escape($data['customer_name']) . "', reference_prefix = '" . $this->db->escape($data['reference_prefix']) . "', reference_no = '" . (int)$data['reference_no'] . "', printed = '0', transaction_tax_id = '" . (int)$data['transaction_tax_id'] . "', edit_permission = '0', date_added = NOW(), user_id = '" . $this->user->getId() . "'");
 
 		$transaction_id = $this->db->getLastId();
 
-		if (isset($data['account_data'])) {
-			foreach ($data['account_data'] as $account_data) {
-				$this->db->query("INSERT INTO " . DB_PREFIX . "transaction_account SET transaction_id = '" . (int)$transaction_id . "', account_id = '" . (int)$account_data['account_id'] . "', debit = '" . (float)$account_data['debit'] . "', credit = '" . (float)$account_data['credit'] . "'");
-				// $this->db->query("INSERT INTO " . DB_PREFIX . "transaction_account SET transaction_id = '" . (int)$transaction_id . "', transaction_label = '" . $this->db->escape($account_data['transaction_label']) . "', account_id = '" . (int)$account_data['account_id'] . "', debit = '" . (float)$account_data['debit'] . "', credit = '" . (float)$account_data['credit'] . "'");
+		if (isset($data['transaction_account'])) {
+			foreach ($data['transaction_account'] as $transaction_account) {
+				$this->db->query("INSERT INTO " . DB_PREFIX . "transaction_account SET transaction_id = '" . (int)$transaction_id . "', account_id = '" . (int)$transaction_account['account_id'] . "', debit = '" . (float)$transaction_account['debit'] . "', credit = '" . (float)$transaction_account['credit'] . "'");
 			}
 		}
 	}
@@ -50,56 +53,47 @@ class ModelAccountingTransaction extends Model
 	{
 		$sql = "UPDATE " . DB_PREFIX . "transaction SET edit_permission = 0, date_added = NOW(), user_id = '" . $this->user->getId() . "'";
 
-		$implode = array();
+		if (isset($data['transaction_type_id'])) {
+			$implode = array();
 
-		if (isset($data['client_label'])) {
-			$implode[] = "client_label = '" . $this->db->escape($data['client_label']) . "'";
+			$this->load->model('accounting/transaction_type');
+			$transaction_type_info = $this->model_accounting_transaction_type->getTransactionType($data['transaction_type_id']);
+
+			if ($transaction_type_info) {
+				$implode[] = "client_label = '" . $this->db->escape($transaction_type_info['client_label']) . "', category_label = '" . $this->db->escape($transaction_type_info['category_label']) . "', transaction_label = '" . $this->db->escape($transaction_type_info['transaction_label']) . "'";
+			}
+
+			if (isset($data['client_id'])) {
+				$implode[] = "client_id = '" . $this->db->escape($data['client_id']) . "'";
+			}
+
+			if (isset($data['date'])) {
+				$implode[] = "date = DATE('" . $this->db->escape($data['date']) . "')";
+			}
+
+			if (isset($data['description'])) {
+				$implode[] = "description = '" . $this->db->escape($data['description']) . "'";
+			}
+
+			if (isset($data['customer_name'])) {
+				$implode[] = "customer_name = '" . $this->db->escape($data['customer_name']) . "'";
+			}
+
+			if ($implode) {
+				$sql .= ", " . implode(", ", $implode);
+			}
 		}
-
-		if (isset($data['category_label'])) {
-			$implode[] = "category_label = '" . $this->db->escape($data['category_label']) . "'";
-		}
-
-		if (isset($data['transaction_label'])) {
-			$implode[] = "transaction_label = '" . $this->db->escape($data['transaction_label']) . "'";
-		}
-
-		if (isset($data['client_id'])) {
-			$implode[] = "client_id = '" . $this->db->escape($data['client_id']) . "'";
-		}
-
-		if (isset($data['date'])) {
-			$implode[] = "date = DATE('" . $this->db->escape($data['date']) . "')";
-		}
-
-		if (isset($data['description'])) {
-			$implode[] = "description = '" . $this->db->escape($data['description']) . "'";
-		}
-
-		if (isset($data['customer_name'])) {
-			$implode[] = "customer_name = '" . $this->db->escape($data['customer_name']) . "'";
-		}
-
-		if ($implode) {
-			$sql .= ", " . implode(", ", $implode);
-		}
-
+		
 		$sql .= " WHERE transaction_id = '" . (int)$transaction_id . "'";
 
 		$this->db->query($sql);
 
 		$this->db->query("DELETE FROM " . DB_PREFIX . "transaction_account WHERE transaction_id = '" . (int)$transaction_id . "'");
 
-		foreach ($data['account_data'] as $account_id => $value) {
-			if ($value > 0) {
-				$debit = $value;
-				$credit = 0;
-			} elseif ($value < 0) {
-				$debit = 0;
-				$credit = -$value;
+		if (isset($data['transaction_account'])) {
+			foreach ($data['transaction_account'] as $transaction_account) {
+				$this->db->query("INSERT INTO " . DB_PREFIX . "transaction_account SET transaction_id = '" . (int)$transaction_id . "', account_id = '" . (int)$transaction_account['account_id'] . "', debit = '" . (float)$transaction_account['debit'] . "', credit = '" . (float)$transaction_account['credit'] . "'");
 			}
-
-			$this->db->query("INSERT INTO " . DB_PREFIX . "transaction_account SET transaction_id = '" . (int)$transaction_id . "', account_id = '" . (int)$account_id . "', debit = '" . (float)$debit . "', credit = '" . (float)$credit . "'");
 		}
 	}
 
@@ -117,6 +111,116 @@ class ModelAccountingTransaction extends Model
 	}
 
 	public function getTransactions($data = array())
+	{
+		$sql = "SELECT t.*, CONCAT(t.reference_prefix, LPAD(t.reference_no, 4, '0')) AS reference, tt.name AS transaction_type, o.invoice_no, o.invoice_prefix, o.firstname, o.lastname, u.username FROM " . DB_PREFIX . "transaction t LEFT JOIN " . DB_PREFIX . "transaction_type tt ON (tt.transaction_type_id = t.transaction_type_id) LEFT JOIN " . DB_PREFIX . "order o ON (o.order_id = t.order_id) LEFT JOIN " . DB_PREFIX . "user u ON (u.user_id = t.user_id)";
+		
+		if (!empty($data['filter_account_id'])) {
+			$sql .= " LEFT JOIN " . DB_PREFIX . "transaction_account ta ON (ta.transaction_id = t.transaction_id)";
+		}
+
+		$implode = array();
+
+		if (isset($data['filter_client_label']) && in_array($data['filter_client_label'], $this->client_data)) {
+			$implode[] = "t.client_label = '" . $this->db->escape($data['filter_client_label']) . "'";
+
+			if (isset($data['filter_client_id'])) {
+				$implode[] = "t.client_id = '" . $this->db->escape($data['filter_client_id']) . "'";
+			}
+		}
+
+		if (isset($data['filter_category_label']) && in_array($data['category_label'], $this->category_data)) {
+			$implode[] = "t.category_label = '" . $this->db->escape($data['filter_category_label']) . "'";
+		}
+
+		if (isset($data['filter_transaction_label']) && in_array($data['transaction_label'], $this->transaction_data)) {
+			$implode[] = "t.transaction_label = '" . $this->db->escape($data['filter_transaction_label']) . "'";
+		}
+
+		if (!empty($data['filter_date_start'])) {
+			$implode[] = "DATE(t.date) >= '" . $this->db->escape($data['filter_date_start']) . "'";
+		}
+
+		if (!empty($data['filter_date_end'])) {
+			$implode[] = "DATE(t.date) <= '" . $this->db->escape($data['filter_date_end']) . "'";
+		}
+
+		if (!empty($data['filter_transaction_type_id'])) {
+			$implode[] = "t.transaction_type_id = '" . (int)$data['filter_transaction_type_id'] . "'";
+		}
+
+		if (!empty($data['filter_description'])) {
+			$implode[] = "t.description LIKE '%" . $this->db->escape($data['filter_description']) . "%'";
+		}
+
+		if (!empty($data['filter_reference'])) {
+			$implode[] = "CONCAT(t.reference_prefix, LPAD(t.reference_no, 4, '0')) LIKE '%" . $this->db->escape($data['filter_reference']) . "%'";
+		}
+
+		if (!empty($data['filter_order_id'])) {
+			$implode[] = "t.order_id = '" . (int)$data['filter_order_id'] . "'";
+		}
+
+		if (!empty($data['filter_customer_name'])) {
+			$implode[] = "t.customer_name LIKE '%" . $this->db->escape($data['filter_customer_name']) . "%'";
+		}
+
+		if (!empty($data['filter_username'])) {
+			$implode[] = "u.username = '" . $this->db->escape($data['filter_username']) . "'";
+		}
+
+		if (!empty($data['filter_account_id'])) {
+			$implode[] = "ta.account_id LIKE '" . (int)$data['filter_account_id'] . "%'";
+		}
+
+		if ($implode) {
+			$sql .= " WHERE " . implode(" AND ", $implode);
+		}
+
+		$sql .= " GROUP BY t.transaction_id";
+
+		$sort_data = array(
+			't.order_id',
+			't.date',
+			't.description',
+			'reference',
+			't.customer_name',
+			'transaction_type',
+			'total',
+			'u.username',
+			't.date DESC, t.transaction_id'
+		);
+
+		if (isset($data['sort']) && in_array($data['sort'], $sort_data)) {
+			$sql .= " ORDER BY " . $data['sort'];
+		} else {
+			$sql .= " ORDER BY t.date";
+		}
+
+		if (isset($data['order']) && ($data['order'] == 'DESC')) {
+			$sql .= " DESC";
+		} else {
+			$sql .= " ASC";
+		}
+
+		if (isset($data['start']) || isset($data['limit'])) {
+			if ($data['start'] < 0) {
+				$data['start'] = 0;
+			}
+
+			if ($data['limit'] < 1) {
+				$data['limit'] = 20;
+			}
+
+			$sql .= " LIMIT " . (int)$data['start'] . "," . (int)$data['limit'];
+		}
+		// print_r($sql);die('---breakpoint---');
+
+		$query = $this->db->query($sql);
+
+		return $query->rows;
+	}
+
+	public function getTransactionsOld($data = array())
 	{
 		$sql = "SELECT t.*, CONCAT(t.reference_prefix, LPAD(t.reference_no, 4, '0')) AS reference, tt.name AS transaction_type, o.invoice_no, o.invoice_prefix, o.firstname, o.lastname, u.username FROM " . DB_PREFIX . "transaction t LEFT JOIN " . DB_PREFIX . "transaction_type tt ON (tt.transaction_type_id = t.transaction_type_id) LEFT JOIN " . DB_PREFIX . "order o ON (o.order_id = t.order_id) LEFT JOIN " . DB_PREFIX . "user u ON (u.user_id = t.user_id)";
 
@@ -216,6 +320,7 @@ class ModelAccountingTransaction extends Model
 
 			$sql .= " LIMIT " . (int)$data['start'] . "," . (int)$data['limit'];
 		}
+		print_r($sql);die('---breakpoint---');
 
 		$query = $this->db->query($sql);
 
@@ -224,7 +329,11 @@ class ModelAccountingTransaction extends Model
 
 	public function getTransactionsCount($data = array())
 	{
-		$sql = "SELECT COUNT(*) AS total FROM " . DB_PREFIX . "transaction t LEFT JOIN " . DB_PREFIX . "transaction_type tt ON (tt.transaction_type_id = t.transaction_type_id) LEFT JOIN " . DB_PREFIX . "order o ON (o.order_id = t.order_id) LEFT JOIN " . DB_PREFIX . "user u ON (u.user_id = t.user_id)";
+		$sql = "SELECT COUNT(t.transaction_id) AS total FROM " . DB_PREFIX . "transaction t LEFT JOIN " . DB_PREFIX . "transaction_type tt ON (tt.transaction_type_id = t.transaction_type_id) LEFT JOIN " . DB_PREFIX . "order o ON (o.order_id = t.order_id) LEFT JOIN " . DB_PREFIX . "user u ON (u.user_id = t.user_id)";
+
+		if (!empty($data['filter_account_id'])) {
+			$sql .= " LEFT JOIN " . DB_PREFIX . "transaction_account ta ON (ta.transaction_id = t.transaction_id)";
+		}
 
 		$implode = array();
 
@@ -252,9 +361,9 @@ class ModelAccountingTransaction extends Model
 			$implode[] = "DATE(t.date) <= '" . $this->db->escape($data['filter_date_end']) . "'";
 		}
 
-		// if (isset($data['filter_account_id']) && !is_null($data['filter_account_id'])) {
-		// 	$implode[] = "ta.account_id LIKE '" . (int)$data['filter_account_id'] . "%'";
-		// }
+		if (!empty($data['filter_transaction_type_id'])) {
+			$implode[] = "t.transaction_type_id = '" . (int)$data['filter_transaction_type_id'] . "'";
+		}
 
 		if (!empty($data['filter_description'])) {
 			$implode[] = "t.description LIKE '%" . $this->db->escape($data['filter_description']) . "%'";
@@ -276,11 +385,80 @@ class ModelAccountingTransaction extends Model
 			$implode[] = "u.username = '" . $this->db->escape($data['filter_username']) . "'";
 		}
 
-		// if (!empty($data['accounts'])) {
-		// 	$accounts_data = "'" . implode("', '", $data['accounts']) . "'";
+		if (!empty($data['filter_account_id'])) {
+			$implode[] = "ta.account_id LIKE '" . (int)$data['filter_account_id'] . "%'";
+		}
 
-		// 	$implode[] = "ta.account_id IN (" . $accounts_data . ")";
-		// }
+		if ($implode) {
+			$sql .= " WHERE " . implode(" AND ", $implode);
+		}
+
+		$query = $this->db->query($sql);
+
+		return $query->row['total'];
+	}
+
+	public function getTransactionsTotal($data = array())
+	{
+		$sql = "SELECT SUM(t.amount) AS total FROM " . DB_PREFIX . "transaction t LEFT JOIN " . DB_PREFIX . "transaction_type tt ON (tt.transaction_type_id = t.transaction_type_id) LEFT JOIN " . DB_PREFIX . "order o ON (o.order_id = t.order_id) LEFT JOIN " . DB_PREFIX . "user u ON (u.user_id = t.user_id)";
+
+		if (!empty($data['filter_account_id'])) {
+			$sql .= " LEFT JOIN " . DB_PREFIX . "transaction_account ta ON (ta.transaction_id = t.transaction_id)";
+		}
+
+		$implode = array();
+
+		if (isset($data['filter_client_label']) && in_array($data['filter_client_label'], $this->client_data)) {
+			$implode[] = "t.client_label = '" . $this->db->escape($data['filter_client_label']) . "'";
+
+			if (isset($data['filter_client_id'])) {
+				$implode[] = "t.client_id = '" . $this->db->escape($data['filter_client_id']) . "'";
+			}
+		}
+
+		if (isset($data['filter_category_label']) && in_array($data['category_label'], $this->category_data)) {
+			$implode[] = "t.category_label = '" . $this->db->escape($data['filter_category_label']) . "'";
+		}
+
+		if (isset($data['filter_transaction_label']) && in_array($data['transaction_label'], $this->transaction_data)) {
+			$implode[] = "t.transaction_label = '" . $this->db->escape($data['filter_transaction_label']) . "'";
+		}
+
+		if (!empty($data['filter_date_start'])) {
+			$implode[] = "DATE(t.date) >= '" . $this->db->escape($data['filter_date_start']) . "'";
+		}
+
+		if (!empty($data['filter_date_end'])) {
+			$implode[] = "DATE(t.date) <= '" . $this->db->escape($data['filter_date_end']) . "'";
+		}
+
+		if (!empty($data['filter_transaction_type_id'])) {
+			$implode[] = "t.transaction_type_id = '" . (int)$data['filter_transaction_type_id'] . "'";
+		}
+
+		if (!empty($data['filter_description'])) {
+			$implode[] = "t.description LIKE '%" . $this->db->escape($data['filter_description']) . "%'";
+		}
+
+		if (!empty($data['filter_reference'])) {
+			$implode[] = "CONCAT(t.reference_prefix, LPAD(t.reference_no, 4, '0')) LIKE '%" . $this->db->escape($data['filter_reference']) . "%'";
+		}
+
+		if (!empty($data['filter_order_id'])) {
+			$implode[] = "t.order_id = '" . (int)$data['filter_order_id'] . "'";
+		}
+
+		if (!empty($data['filter_customer_name'])) {
+			$implode[] = "t.customer_name LIKE '%" . $this->db->escape($data['filter_customer_name']) . "%'";
+		}
+
+		if (!empty($data['filter_username'])) {
+			$implode[] = "u.username = '" . $this->db->escape($data['filter_username']) . "'";
+		}
+
+		if (!empty($data['filter_account_id'])) {
+			$implode[] = "ta.account_id LIKE '" . (int)$data['filter_account_id'] . "%'";
+		}
 
 		if ($implode) {
 			$sql .= " WHERE " . implode(" AND ", $implode);
@@ -296,71 +474,6 @@ class ModelAccountingTransaction extends Model
 		$query = $this->db->query("SELECT ta.*, a.name AS account FROM " . DB_PREFIX . "transaction_account ta LEFT JOIN " . DB_PREFIX . "account a ON (a.account_id = ta.account_id) WHERE transaction_id = '" . (int)$transaction_id . "'");
 
 		return $query->rows;
-	}
-
-	public function getTransactionsTotal($data = array())
-	{
-		$sql = "SELECT SUM(amount) AS total FROM " . DB_PREFIX . "transaction t LEFT JOIN " . DB_PREFIX . "account a ON (a.account_id = t.account_to_id) LEFT JOIN " . DB_PREFIX . "order o ON (o.order_id = t.order_id) LEFT JOIN " . DB_PREFIX . "user u ON (u.user_id = t.user_id)";
-
-		$implode = array();
-
-		if (!empty($data['filter_label'])) {
-			$implode[] = "t.label = '" . $this->db->escape($data['filter_label']) . "'";
-
-			if (!empty($data['filter_label_id'])) {
-				$implode[] = "t.label_id = '" . $this->db->escape($data['filter_label_id']) . "'";
-			}
-		}
-
-		if (!empty($data['filter_date_start'])) {
-			$implode[] = "DATE(t.date) >= '" . $this->db->escape($data['filter_date_start']) . "'";
-		}
-
-		if (!empty($data['filter_date_end'])) {
-			$implode[] = "DATE(t.date) <= '" . $this->db->escape($data['filter_date_end']) . "'";
-		}
-
-		if (isset($data['filter_account_from_id']) && !is_null($data['filter_account_from_id'])) {
-			$implode[] = "t.account_from_id LIKE '" . (int)$data['filter_account_from_id'] . "%'";
-		}
-
-		if (isset($data['filter_account_to_id']) && !is_null($data['filter_account_to_id'])) {
-			$implode[] = "t.account_to_id LIKE '" . (int)$data['filter_account_to_id'] . "%'";
-		}
-
-		if (!empty($data['filter_description'])) {
-			$implode[] = "t.description LIKE '%" . $this->db->escape($data['filter_description']) . "%'";
-		}
-
-		if (!empty($data['filter_reference'])) {
-			$implode[] = "CONCAT(t.reference_prefix, LPAD(t.reference_no, 4, '0')) LIKE '%" . $this->db->escape($data['filter_reference']) . "%'";
-		}
-
-		if (!empty($data['filter_order_id'])) {
-			$implode[] = "t.order_id = '" . (int)$data['filter_order_id'] . "'";
-		}
-
-		if (!empty($data['filter_customer_name'])) {
-			$implode[] = "t.customer_name LIKE '%" . $this->db->escape($data['filter_customer_name']) . "%'";
-		}
-
-		if (!empty($data['filter_username'])) {
-			$implode[] = "u.username = '" . $this->db->escape($data['filter_username']) . "'";
-		}
-
-		if (!empty($data['accounts_to'])) {
-			$accounts_to_data = "'" . implode("', '", $data['accounts_to']) . "'";
-
-			$implode[] = "t.account_to_id IN (" . $accounts_to_data . ")";
-		}
-
-		if ($implode) {
-			$sql .= " WHERE " . implode(" AND ", $implode);
-		}
-
-		$query = $this->db->query($sql);
-
-		return $query->row['total'];
 	}
 
 	public function getTransactionsSubTotal($data = array())
@@ -517,6 +630,13 @@ class ModelAccountingTransaction extends Model
 	// 	return $query->row['total'];
 	// }
 
+	public function getTransactionByTransactionTypeId($transaction_type_id)
+	{
+		$query = $this->db->query("SELECT DISTINCT t.*, CONCAT(t.reference_prefix, LPAD(t.reference_no, 4, '0')) AS reference, tt.name AS transaction_type FROM " . DB_PREFIX . "transaction t LEFT JOIN " . DB_PREFIX . "transaction_type tt ON (tt.transaction_type_id = t.transaction_type_id) WHERE t.transaction_type_id = '" . (int)$transaction_type_id . "'");
+
+		return $query->row;
+	}
+
 	public function getTransactionsCountByTransactionTypeId($transaction_type_id)
 	{ //Used by Transaction Type
 		$sql = "SELECT COUNT(*) AS total FROM " . DB_PREFIX . "transaction WHERE transaction_type_id = '" . (int)$transaction_type_id . "'";
@@ -537,7 +657,7 @@ class ModelAccountingTransaction extends Model
 
 	public function getTransactionsCountByAccountId($account_id)
 	{ //Used by account
-		$sql = "SELECT COUNT(*) AS total FROM " . DB_PREFIX . "transaction WHERE account_from_id = '" . (int)$account_id . "' OR account_to_id = '" . (int)$account_id . "'";
+		$sql = "SELECT COUNT(*) AS total FROM " . DB_PREFIX . "transaction WHERE account_credit_id = '" . (int)$account_id . "' OR account_debit_id = '" . (int)$account_id . "'";
 
 		$query = $this->db->query($sql);
 

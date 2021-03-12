@@ -37,14 +37,16 @@ $_['entry_comment']				= 'Catatan:';
 $_['entry_vendor_reference']	= 'Invoice Vendor:';
 
 // Error
-$_['error_permission']			= 'Warning: You do not have permission to modify order purchases!';
-$_['error_order']				= 'Warning: Order tidak ditemukan!';
+$_['error_development']			= 'Warning: Reverse for development. Vendor ini tidak memerlukan PO!';
 $_['error_initial_payment']		= 'Warning: Tanda Jadi harus dibayar terlebih dahulu!';
 $_['error_order_purchase']		= 'Warning: Purchase order yang telah selesai tidak bisa diedit!';
+$_['error_order']				= 'Warning: Order tidak ditemukan!';
+$_['error_permission']			= 'Warning: You do not have permission to modify order purchases!';
 $_['error_print']				= 'Warning: Pastikan PO telah dicetak dan disampaikan kepada vendor yang bersangkutan!';
 $_['error_product_excluded']	= 'Warning: Sebagian produk tidak termasuk dalam pesanan ini!';
 $_['error_product_total']		= 'Warning: Jumlah produk tidak sesuai dengan kebutuhan pesanan!';
 $_['error_transaction_type']	= 'Warning: Jenis transaksi untuk PO tidak ditemukan! Hubungi Administrator! (Code: %s)';
+$_['error_transaction']			= 'Warning: Transaksi pemesanan sewa vendor telah ada sebelumnya!';
 $_['error_vendor_excluded']		= 'Warning: Sebagian vendor belum didaftarkan!';
 $_['error_vendor_reference']	= 'Invoice Vendor harus diisi';
 

@@ -1,8 +1,10 @@
 <?php
-class ControllerAccountingTransaction extends Controller {
+class ControllerAccountingTransaction extends Controller
+{
 	private $error = array();
 
-	public function index() {
+	public function index()
+	{
 		$this->load->language('accounting/transaction');
 
 		$this->document->setTitle($this->language->get('heading_title'));
@@ -12,7 +14,8 @@ class ControllerAccountingTransaction extends Controller {
 		$this->getList();
 	}
 
-	public function add() {
+	public function add()
+	{
 		$this->load->language('accounting/transaction');
 
 		$this->document->setTitle($this->language->get('heading_title'));
@@ -20,7 +23,6 @@ class ControllerAccountingTransaction extends Controller {
 		$this->load->model('accounting/transaction');
 
 		if (($this->request->server['REQUEST_METHOD'] == 'POST') && $this->validateForm()) {
-
 			$this->model_accounting_transaction->addTransaction($this->request->post);
 
 			$this->session->data['success'] = $this->language->get('text_success');
@@ -35,12 +37,12 @@ class ControllerAccountingTransaction extends Controller {
 				$url .= '&filter_date_end=' . $this->request->get['filter_date_end'];
 			}
 
-			if (isset($this->request->get['filter_account_from_id'])) {
-				$url .= '&filter_account_from_id=' . $this->request->get['filter_account_from_id'];
+			if (isset($this->request->get['filter_account_id'])) {
+				$url .= '&filter_account_id=' . $this->request->get['filter_account_id'];
 			}
 
-			if (isset($this->request->get['filter_account_to_id'])) {
-				$url .= '&filter_account_to_id=' . $this->request->get['filter_account_to_id'];
+			if (isset($this->request->get['filter_transaction_type_id'])) {
+				$url .= '&filter_transaction_type_id=' . $this->request->get['filter_transaction_type_id'];
 			}
 
 			if (isset($this->request->get['filter_description'])) {
@@ -80,8 +82,9 @@ class ControllerAccountingTransaction extends Controller {
 
 		$this->getForm();
 	}
-	
-	public function edit() {
+
+	public function edit()
+	{
 		$this->load->language('accounting/transaction');
 
 		$this->document->setTitle($this->language->get('heading_title'));
@@ -89,7 +92,6 @@ class ControllerAccountingTransaction extends Controller {
 		$this->load->model('accounting/transaction');
 
 		if (($this->request->server['REQUEST_METHOD'] == 'POST') && $this->validateForm()) {
-
 			$this->model_accounting_transaction->editTransaction($this->request->get['transaction_id'], $this->request->post);
 
 			$this->session->data['success'] = $this->language->get('text_success');
@@ -104,12 +106,12 @@ class ControllerAccountingTransaction extends Controller {
 				$url .= '&filter_date_end=' . $this->request->get['filter_date_end'];
 			}
 
-			if (isset($this->request->get['filter_account_from_id'])) {
-				$url .= '&filter_account_from_id=' . $this->request->get['filter_account_from_id'];
+			if (isset($this->request->get['filter_account_id'])) {
+				$url .= '&filter_account_id=' . $this->request->get['filter_account_id'];
 			}
 
-			if (isset($this->request->get['filter_account_to_id'])) {
-				$url .= '&filter_account_to_id=' . $this->request->get['filter_account_to_id'];
+			if (isset($this->request->get['filter_transaction_type_id'])) {
+				$url .= '&filter_transaction_type_id=' . $this->request->get['filter_transaction_type_id'];
 			}
 
 			if (isset($this->request->get['filter_description'])) {
@@ -149,8 +151,9 @@ class ControllerAccountingTransaction extends Controller {
 
 		$this->getForm();
 	}
-	
-	public function delete() {
+
+	public function delete()
+	{
 		$this->load->language('accounting/transaction');
 
 		$this->document->setTitle($this->language->get('heading_title'));
@@ -174,12 +177,12 @@ class ControllerAccountingTransaction extends Controller {
 				$url .= '&filter_date_end=' . $this->request->get['filter_date_end'];
 			}
 
-			if (isset($this->request->get['filter_account_from_id'])) {
-				$url .= '&filter_account_from_id=' . $this->request->get['filter_account_from_id'];
+			if (isset($this->request->get['filter_account_id'])) {
+				$url .= '&filter_account_id=' . $this->request->get['filter_account_id'];
 			}
 
-			if (isset($this->request->get['filter_account_to_id'])) {
-				$url .= '&filter_account_to_id=' . $this->request->get['filter_account_to_id'];
+			if (isset($this->request->get['filter_transaction_type_id'])) {
+				$url .= '&filter_transaction_type_id=' . $this->request->get['filter_transaction_type_id'];
 			}
 
 			if (isset($this->request->get['filter_description'])) {
@@ -220,7 +223,8 @@ class ControllerAccountingTransaction extends Controller {
 		$this->getList();
 	}
 
-	protected function getList() {
+	protected function getList()
+	{
 		$language_items = array(
 			'heading_title',
 			'text_list',
@@ -232,22 +236,23 @@ class ControllerAccountingTransaction extends Controller {
 			'text_select',
 			'text_none',
 			'column_date',
-			'column_account_from',
-			'column_account_to',
+			'column_account_credit',
+			'column_account_debit',
 			'column_description',
 			'column_reference_no',
 			'column_customer_name',
 			'column_amount',
+			'column_transaction_type',
 			'column_username',
 			'column_action',
 			'entry_date_start',
 			'entry_date_end',
-			'entry_account_from',
-			'entry_account_to',
+			'entry_account',
 			'entry_description',
 			'entry_reference_no',
 			'entry_order_id',
 			'entry_customer_name',
+			'entry_transaction_type',
 			'entry_username',
 			'button_filter',
 			'button_add',
@@ -259,7 +264,7 @@ class ControllerAccountingTransaction extends Controller {
 		foreach ($language_items as $language_item) {
 			$data[$language_item] = $this->language->get($language_item);
 		}
-		
+
 		if (isset($this->error['warning'])) {
 			$data['error_warning'] = $this->error['warning'];
 		} else {
@@ -294,16 +299,16 @@ class ControllerAccountingTransaction extends Controller {
 			// $filter_date_end = date('Y-m-t');
 		}
 
-		if (isset($this->request->get['filter_account_from_id'])) {
-			$filter_account_from_id = $this->request->get['filter_account_from_id'];
+		if (isset($this->request->get['filter_account_id'])) {
+			$filter_account_id = $this->request->get['filter_account_id'];
 		} else {
-			$filter_account_from_id = null;
+			$filter_account_id = null;
 		}
 
-		if (isset($this->request->get['filter_account_to_id'])) {
-			$filter_account_to_id = $this->request->get['filter_account_to_id'];
+		if (isset($this->request->get['filter_transaction_type_id'])) {
+			$filter_transaction_type_id = $this->request->get['filter_transaction_type_id'];
 		} else {
-			$filter_account_to_id = null;
+			$filter_transaction_type_id = null;
 		}
 
 		if (isset($this->request->get['filter_description'])) {
@@ -364,12 +369,12 @@ class ControllerAccountingTransaction extends Controller {
 			$url .= '&filter_date_end=' . $this->request->get['filter_date_end'];
 		}
 
-		if (isset($this->request->get['filter_account_from_id'])) {
-			$url .= '&filter_account_from_id=' . $this->request->get['filter_account_from_id'];
+		if (isset($this->request->get['filter_account_id'])) {
+			$url .= '&filter_account_id=' . $this->request->get['filter_account_id'];
 		}
 
-		if (isset($this->request->get['filter_account_to_id'])) {
-			$url .= '&filter_account_to_id=' . $this->request->get['filter_account_to_id'];
+		if (isset($this->request->get['filter_transaction_type_id'])) {
+			$url .= '&filter_transaction_type_id=' . $this->request->get['filter_transaction_type_id'];
 		}
 
 		if (isset($this->request->get['filter_description'])) {
@@ -423,26 +428,27 @@ class ControllerAccountingTransaction extends Controller {
 		$limit = $this->config->get('config_limit_admin');
 
 		$filter_data = array(
-			'filter_date_start'	     => $filter_date_start,
-			'filter_date_end'	     => $filter_date_end,
-			'filter_account_from_id' => $filter_account_from_id,
-			'filter_account_to_id'	 => $filter_account_to_id,
-			'filter_description'	 => $filter_description,
-			'filter_reference'	 	 => $filter_reference_no,
-			'filter_order_id'	 	 => $filter_order_id,
-			'filter_customer_name'	 => $filter_customer_name,
-			'filter_username'	 	 => $filter_username,
-			'sort'                   => $sort,
-			'order'                  => $order,
-			'start'                  => ($page - 1) * $limit,
-			'limit'                  => $limit
+			'filter_date_start'	     		=> $filter_date_start,
+			'filter_date_end'	     		=> $filter_date_end,
+			'filter_transaction_type_id'	=> $filter_transaction_type_id,
+			'filter_account_id' 			=> $filter_account_id,
+			'filter_description'	 		=> $filter_description,
+			'filter_reference'	 	 		=> $filter_reference_no,
+			'filter_order_id'	 	 		=> $filter_order_id,
+			'filter_customer_name'	 		=> $filter_customer_name,
+			'filter_username'	 	 		=> $filter_username,
+			'sort'                   		=> $sort,
+			'order'                  		=> $order,
+			'start'                  		=> ($page - 1) * $limit,
+			'limit'                  		=> $limit
 		);
 
 		$transaction_count = $this->model_accounting_transaction->getTransactionsCount($filter_data);
 		$transaction_total = $this->model_accounting_transaction->getTransactionsTotal($filter_data);
 
 		$results = $this->model_accounting_transaction->getTransactions($filter_data);
-		
+		// var_dump($results);//die('---breakpoint---');
+
 		foreach ($results as $result) {
 			if (!empty($result['order_id'])) {
 				$reference_no = '#' . $result['order_id'] . ($result['reference_no'] ? ': ' . $result['reference'] : '');
@@ -451,24 +457,44 @@ class ControllerAccountingTransaction extends Controller {
 				$reference_no = $result['reference'];
 				$order_url = '';
 			}
-			
+
+			$account_data = [
+				'debit'		=> [],
+				'credit'	=> []
+			];
+
+			$transaction_accounts = $this->model_accounting_transaction->getTransactionAccounts($result['transaction_id']);
+			foreach ($transaction_accounts as $transaction_account) {
+				if ($transaction_account['debit'] > 0 || $transaction_account['credit'] < 0) {
+					$account_data['debit'][] = $transaction_account['account_id'] . ' - ' . $transaction_account['account'];
+				} else {
+					$account_data['credit'][] = $transaction_account['account_id'] . ' - ' . $transaction_account['account'];
+				}
+			}
+
+			if (empty($account_data['debit']) || empty($account_data['credit']) || (array_sum(array_column($transaction_accounts, 'debit')) != array_sum(array_column($transaction_accounts, 'credit')))) {
+				$uncomplete = true;
+			} else {
+				$uncomplete = false;
+			}
+
 			$data['transactions'][] = array(
-				'transaction_id'=> $result['transaction_id'],
+				'transaction_id' => $result['transaction_id'],
 				'date'	 		=> date($this->language->get('date_format_short'), strtotime($result['date'])),
-				'account_from'	=> $result['account_from'] ? $result['account_from'] : $this->language->get('text_none'),
-				'account_to'	=> $result['account_to'] ? $result['account_to'] : $this->language->get('text_none'),
-				'description'	=> $result['description'],
+				'transaction_type'	=> $result['transaction_type'],
 				'reference_no'  => $reference_no,
+				'description'	=> $result['description'],
 				'customer_name'	=> $result['customer_name'],
+				'account'		=> $account_data,
 				'amount'      	=> $this->currency->format($result['amount'], $this->config->get('config_currency')),
 				'username'      => $result['username'],
 				'order_url'     => $order_url,
 				'unlock'		=> $result['edit_permission'],
 				'edit'          => $this->url->link('accounting/transaction/edit', 'token=' . $this->session->data['token'] . '&transaction_id=' . $result['transaction_id'] . $url, true),
-				'uncomplete'    => min($result['account_from_id'], $result['account_to_id']) == 0 ? true : false
+				'uncomplete'    => $uncomplete
 			);
 		}
-		
+
 		$url = '';
 
 		if (isset($this->request->get['filter_date_start'])) {
@@ -479,12 +505,12 @@ class ControllerAccountingTransaction extends Controller {
 			$url .= '&filter_date_end=' . $this->request->get['filter_date_end'];
 		}
 
-		if (isset($this->request->get['filter_account_from_id'])) {
-			$url .= '&filter_account_from_id=' . $this->request->get['filter_account_from_id'];
+		if (isset($this->request->get['filter_account_id'])) {
+			$url .= '&filter_account_id=' . $this->request->get['filter_account_id'];
 		}
 
-		if (isset($this->request->get['filter_account_to_id'])) {
-			$url .= '&filter_account_to_id=' . $this->request->get['filter_account_to_id'];
+		if (isset($this->request->get['filter_transaction_type_id'])) {
+			$url .= '&filter_transaction_type_id=' . $this->request->get['filter_transaction_type_id'];
 		}
 
 		if (isset($this->request->get['filter_description'])) {
@@ -518,8 +544,7 @@ class ControllerAccountingTransaction extends Controller {
 		}
 
 		$data['sort_date'] = $this->url->link('accounting/transaction', 'token=' . $this->session->data['token'] . '&sort=t.date' . $url, true);
-		$data['sort_account_from'] = $this->url->link('accounting/transaction', 'token=' . $this->session->data['token'] . '&sort=account_from' . $url, true);
-		$data['sort_account_to'] = $this->url->link('accounting/transaction', 'token=' . $this->session->data['token'] . '&sort=account_to' . $url, true);
+		$data['sort_transaction_type'] = $this->url->link('accounting/transaction', 'token=' . $this->session->data['token'] . '&sort=transaction_type' . $url, true);
 		$data['sort_description'] = $this->url->link('accounting/transaction', 'token=' . $this->session->data['token'] . '&sort=t.description' . $url, true);
 		$data['sort_reference'] = $this->url->link('accounting/transaction', 'token=' . $this->session->data['token'] . '&sort=reference' . $url, true);
 		$data['sort_customer_name'] = $this->url->link('accounting/transaction', 'token=' . $this->session->data['token'] . '&sort=t.customer_name' . $url, true);
@@ -536,12 +561,12 @@ class ControllerAccountingTransaction extends Controller {
 			$url .= '&filter_date_end=' . $this->request->get['filter_date_end'];
 		}
 
-		if (isset($this->request->get['filter_account_from_id'])) {
-			$url .= '&filter_account_from_id=' . $this->request->get['filter_account_from_id'];
+		if (isset($this->request->get['filter_account_id'])) {
+			$url .= '&filter_account_id=' . $this->request->get['filter_account_id'];
 		}
 
-		if (isset($this->request->get['filter_account_to_id'])) {
-			$url .= '&filter_account_to_id=' . $this->request->get['filter_account_to_id'];
+		if (isset($this->request->get['filter_transaction_type_id'])) {
+			$url .= '&filter_transaction_type_id=' . $this->request->get['filter_transaction_type_id'];
 		}
 
 		if (isset($this->request->get['filter_description'])) {
@@ -584,12 +609,14 @@ class ControllerAccountingTransaction extends Controller {
 
 		$data['token'] = $this->session->data['token'];
 
+		$this->load->model('accounting/transaction_type');
+		$data['transaction_types'] = $this->model_accounting_transaction_type->getTransactionTypes();
+
 		$this->load->model('accounting/account');
-		$data['accounts_from'] = $this->model_accounting_account->getAccountsMenuByComponent();
-		$data['accounts_to'] = $this->model_accounting_account->getAccountsMenuByComponent();
-		
-		$data['filter_account_from_id'] = $filter_account_from_id;
-		$data['filter_account_to_id'] = $filter_account_to_id;
+		$data['accounts'] = $this->model_accounting_account->getAccountsMenuByComponent();
+
+		$data['filter_account_id'] = $filter_account_id;
+		$data['filter_transaction_type_id'] = $filter_transaction_type_id;
 		$data['filter_date_start'] = $filter_date_start;
 		$data['filter_date_end'] = $filter_date_end;
 		$data['filter_description'] = $filter_description;
@@ -600,7 +627,7 @@ class ControllerAccountingTransaction extends Controller {
 
 		$data['sort'] = $sort;
 		$data['order'] = $order;
-		
+
 		$data['total'] = $this->currency->format($transaction_total, $this->config->get('config_currency'));
 
 		$data['header'] = $this->load->controller('common/header');
@@ -610,34 +637,42 @@ class ControllerAccountingTransaction extends Controller {
 		$this->response->setOutput($this->load->view('accounting/transaction_list', $data));
 	}
 
-	protected function getForm() {
+	protected function getForm()
+	{
 		$data['text_form'] = !isset($this->request->get['transaction_id']) ? $this->language->get('text_add') : $this->language->get('text_edit');
 
 		$language_items = array(
 			'heading_title',
+			'text_account',
+			'text_none',
 			'text_select',
 			'text_reference_no',
-			'entry_account_from',
-			'entry_account_to',
+			'entry_account',
+			'entry_credit',
 			'entry_date',
+			'entry_debit',
 			'entry_description',
 			'entry_amount',
 			'entry_customer_name',
 			'entry_reference_no',
+			'entry_transaction_type',
+			'column_action',
+			'button_account_add',
+			'button_remove',
 			'button_save',
 			'button_cancel'
 		);
 		foreach ($language_items as $language_item) {
 			$data[$language_item] = $this->language->get($language_item);
 		}
-		
+
 		$error_items = array(
 			'warning',
-			'account_from',
-			'account_to',
+			'transaction_type',
 			'date',
 			'description',
-			'amount'
+			'amount',
+			'account'
 		);
 		foreach ($error_items as $error_item) {
 			if (isset($this->error[$error_item])) {
@@ -646,7 +681,7 @@ class ControllerAccountingTransaction extends Controller {
 				$data['error_' . $error_item] = '';
 			}
 		}
-		
+
 		$url = '';
 
 		if (isset($this->request->get['filter_date_start'])) {
@@ -657,12 +692,12 @@ class ControllerAccountingTransaction extends Controller {
 			$url .= '&filter_date_end=' . $this->request->get['filter_date_end'];
 		}
 
-		if (isset($this->request->get['filter_account_from_id'])) {
-			$url .= '&filter_account_from_id=' . $this->request->get['filter_account_from_id'];
+		if (isset($this->request->get['filter_transaction_type_id'])) {
+			$url .= '&filter_transaction_type_id=' . $this->request->get['filter_transaction_type_id'];
 		}
 
-		if (isset($this->request->get['filter_account_to_id'])) {
-			$url .= '&filter_account_to_id=' . $this->request->get['filter_account_to_id'];
+		if (isset($this->request->get['filter_account_id'])) {
+			$url .= '&filter_account_id=' . $this->request->get['filter_account_id'];
 		}
 
 		if (isset($this->request->get['filter_description'])) {
@@ -715,63 +750,51 @@ class ControllerAccountingTransaction extends Controller {
 			$data['action'] = $this->url->link('accounting/transaction/edit', 'token=' . $this->session->data['token'] . '&transaction_id=' . $this->request->get['transaction_id'] . $url, true);
 		}
 
+		$data['breadcrumbs'][] = array(
+			'text' => $data['text_form'],
+			'href' => $data['action']
+		);
+
 		$data['cancel'] = $this->url->link('accounting/transaction', 'token=' . $this->session->data['token'] . $url, true);
 
 		if (isset($this->request->get['transaction_id'])) {
 			$transaction_info = $this->model_accounting_transaction->getTransaction($this->request->get['transaction_id']);
 		}
-		
-		if (isset($this->request->post['account_from_id'])) {
-			$data['account_from_id'] = $this->request->post['account_from_id'];
-		} elseif (!empty($transaction_info)) {
-			$data['account_from_id'] = $transaction_info['account_from_id'];
-		} else {
-			$data['account_from_id'] = '';
+
+		$input_items = array(
+			'transaction_type_id',
+			'date',
+			'description',
+			'amount',
+			'customer_name'
+		);
+		foreach ($input_items as $input_item) {
+			if (isset($this->request->post[$input_item])) {
+				$data[$input_item] = $this->request->post[$input_item];
+			} elseif (!empty($transaction_info)) {
+				$data[$input_item] = $transaction_info[$input_item];
+			} else {
+				$data[$input_item] = '';
+			}
 		}
 
-		if (isset($this->request->post['account_to_id'])) {
-			$data['account_to_id'] = $this->request->post['account_to_id'];
-		} elseif (!empty($transaction_info)) {
-			$data['account_to_id'] = $transaction_info['account_to_id'];
+		if (isset($this->request->post['transaction_account'])) {
+			$data['transaction_accounts'] = $this->request->post['transaction_account'];
+		} elseif (isset($this->request->get['transaction_id'])) {
+			$data['transaction_accounts'] = $this->model_accounting_transaction->getTransactionAccounts($this->request->get['transaction_id']);
 		} else {
-			$data['account_to_id'] = '';
+			$data['transaction_accounts'] = array();
 		}
 
-		if (isset($this->request->post['date'])) {
-			$data['date'] = $this->request->post['date'];
-		} elseif (!empty($transaction_info)) {
-			$data['date'] = $transaction_info['date'];
-		} else {
-			$data['date'] = '';
-		}
-
-		if (isset($this->request->post['description'])) {
-			$data['description'] = $this->request->post['description'];
-		} elseif (!empty($transaction_info)) {
-			$data['description'] = $transaction_info['description'];
-		} else {
-			$data['description'] = '';
-		}
-
-		if (isset($this->request->post['amount'])) {
-			$data['amount'] = $this->request->post['amount'];
-		} elseif (!empty($transaction_info)) {
-			$data['amount'] = $transaction_info['amount'];
-		} else {
-			$data['amount'] = '';
-		}
-
-		if (isset($this->request->post['customer_name'])) {
-			$data['customer_name'] = $this->request->post['customer_name'];
-		} elseif (!empty($transaction_info)) {
-			$data['customer_name'] = $transaction_info['customer_name'];
-		} else {
-			$data['customer_name'] = '';
-		}
+		$data['transaction_accounts_idx'] = ($data['transaction_accounts'] ? max(array_keys($data['transaction_accounts'])) + 1 : 0);
 
 		if (!empty($transaction_info)) {
 			$data['reference_no'] = $transaction_info['reference'];
 			$data['order_id'] = $transaction_info['order_id'];
+
+			if ($transaction_info['order_id']) {
+				$data['transaction_type'] = $transaction_info['transaction_type'];
+			}
 		} else {
 			$data['reference_no'] = '-';
 			$data['order_id'] = 0;
@@ -779,10 +802,13 @@ class ControllerAccountingTransaction extends Controller {
 
 		$data['token'] = $this->session->data['token'];
 
+		$this->load->model('accounting/transaction_type');
+		$data['transaction_types'] = $this->model_accounting_transaction_type->getTransactionTypesMenu(['client_label' => 'finance']);
+		// $data['transaction_types'] = $this->model_accounting_transaction_type->getTransactionTypes();
+
 		$this->load->model('accounting/account');
-		$data['accounts_from'] = $this->model_accounting_account->getAccountsMenuByComponent();
-		$data['accounts_to'] = $this->model_accounting_account->getAccountsMenuByComponent();
-		
+		$data['accounts'] = $this->model_accounting_account->getAccountsMenuByComponent();
+
 		$data['header'] = $this->load->controller('common/header');
 		$data['column_left'] = $this->load->controller('common/column_left');
 		$data['footer'] = $this->load->controller('common/footer');
@@ -790,17 +816,14 @@ class ControllerAccountingTransaction extends Controller {
 		$this->response->setOutput($this->load->view('accounting/transaction_form', $data));
 	}
 
-	protected function validateForm() {
+	protected function validateForm()
+	{
 		if (!$this->user->hasPermission('modify', 'accounting/transaction')) {
 			$this->error['warning'] = $this->language->get('error_permission');
 		}
 
-		if (empty($this->request->post['account_from_id'])) {
-			$this->error['account_from'] = $this->language->get('error_account_from');
-		}
-
-		if (empty($this->request->post['account_to_id'])) {
-			$this->error['account_to'] = $this->language->get('error_account_to');
+		if (isset($this->request->post['transaction_type_id']) && empty($this->request->post['transaction_type_id'])) {
+			$this->error['transaction_type'] = $this->language->get('error_transaction_type');
 		}
 
 		if (isset($this->request->post['date']) && empty($this->request->post['date'])) {
@@ -814,7 +837,17 @@ class ControllerAccountingTransaction extends Controller {
 		if (isset($this->request->post['amount']) && empty((float)$this->request->post['amount'])) {
 			$this->error['amount'] = $this->language->get('error_amount');
 		}
-		
+
+		if (!isset($this->request->post['transaction_account'])) {
+			$this->error['warning'] = $this->language->get('error_account');
+		} else {
+			foreach ($this->request->post['transaction_account'] as $transaction_account) {
+				if (!$transaction_account['account_id']) {
+					$this->error['warning'] = $this->language->get('error_account');
+				}
+			}
+		}
+
 		if ($this->error && !isset($this->error['warning'])) {
 			$this->error['warning'] = $this->language->get('error_warning');
 		}
@@ -822,15 +855,30 @@ class ControllerAccountingTransaction extends Controller {
 		return !$this->error;
 	}
 
-	protected function validateDelete() {
+	protected function validateDelete()
+	{
 		if (!$this->user->hasPermission('modify', 'accounting/transaction')) {
 			$this->error['warning'] = $this->language->get('error_permission');
 		}
 
+		$this->load->model('accounting/transaction');
+		$this->load->model('sale/order');
+
+		foreach ($this->request->post['selected'] as $transaction_id) {
+			$transaction_info = $this->model_accounting_transaction->getTransaction($transaction_id);
+
+			$order_info = $this->model_sale_order->getOrder($transaction_info);
+
+			if (in_array($order_info['order_status_id'], $this->config->get('config_complete_status'))) {
+				$this->error['warning'] = $this->language->get('error_order_status');
+			}
+		}
+
 		return !$this->error;
 	}
-	
-	public function editPermission() {
+
+	public function editPermission()
+	{
 		$this->load->language('accounting/transaction');
 
 		$json = array();
@@ -840,21 +888,21 @@ class ControllerAccountingTransaction extends Controller {
 		} else {
 			$this->load->model('accounting/transaction');
 			$transaction_info = $this->model_accounting_transaction->getTransaction($this->request->post['transaction_id']);
-			
+
 			if (!$transaction_info) {
 				$json['error'] = $this->language->get('error_not_found');
 			} elseif ($transaction_info['order_id']) {
 				$json['error'] = $this->language->get('error_order_permission');
 			}
 		}
-		
+
 		if (!$json) {
 			if ($transaction_info['edit_permission']) {
 				$set_permission = 0;
 			} else {
 				$set_permission = 1;
 			}
-			
+
 			$this->model_accounting_transaction->editEditPermission($this->request->post['transaction_id'], $set_permission);
 
 			$json['success'] = $this->language->get('text_success');

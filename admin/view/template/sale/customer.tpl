@@ -234,8 +234,6 @@
 	</button>
 </div>
 <script type="text/javascript">
-	$('.alert, .text-danger').remove();
-
 	$('#customer-transaction button[id^=\'button-print\']').on('click', function (e) {
 		const transaction_id = this.value;
 

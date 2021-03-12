@@ -29,13 +29,16 @@ $_['entry_description']			= 'Keterangan';
 $_['entry_transaction_type']	= 'Jenis Transaksi';
 
 // Error
+$_['error_asset_not_found']     		= 'Warning: Rekening Aset tidak ditemukan!';
 $_['error_order']     					= 'Warning: Order tidak ditemukan!';
-$_['error_order_status']     			= 'Warning: Order Status tidak sesuai!';
+$_['error_order_status']     			= 'Warning: Order Status tidak sesuai. Update order status jika diperlukan!';
+$_['error_permission']   				= 'Warning: You do not have permission to modify order customer!';
 $_['error_transaction_amount']			= 'Jumlah harus diisi dan hrs lebih besar dari 0!';
 $_['error_transaction_date']			= 'Tentukan Tanggal Transaksi!';
 $_['error_transaction_description']		= 'Keterangan tidak boleh melebihi 256 karakter!';
 $_['error_transaction_asset']			= 'Pilih Rekening Kas/Bank!';
 $_['error_transaction_type']			= 'Pilih Jenis Transaksi!';
+$_['error_type_not_found']				= 'Warning: Jenis Transaksi tidak ditemukan!';
 $_['error_warning']    					= 'Warning: Please check the form carefully for errors!';
 
 // Help

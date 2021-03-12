@@ -366,44 +366,68 @@ class ControllerSalePurchase extends Controller
 
 		$this->load->language('sale/purchase');
 
-		$this->load->model('sale/purchase');
+		switch (false) {
+			case $json:
+				if (!$this->user->hasPermission('modify', 'sale/order') || !$this->user->hasPermission('modify', 'sale/purchase')) {
+					$json['error']['warning'] = $this->language->get('error_permission');
 
-		if (!$this->user->hasPermission('modify', 'sale/purchase')) {
-			$json['error'] = $this->language->get('error_permission');
-		} else {
-			$order_id = isset($this->request->get['order_id']) ? $this->request->get['order_id'] : 0;
+					break;
+				}
 
-			$vendor_id = isset($this->request->post['vendor_id']) ? $this->request->post['vendor_id'] : 0;
+				$this->load->model('sale/purchase');
 
-			$order_purchase_info = $this->model_sale_purchase->getOrderPurchase($order_id, $vendor_id);
+				$order_id = isset($this->request->get['order_id']) ? $this->request->get['order_id'] : 0;
 
-			if (!$order_purchase_info) {
-				$json['error'] = $this->language->get('error_order');
-			} elseif (!$order_purchase_info['printed']) {
-				$json['error'] = $this->language->get('error_print');
-			}
+				$vendor_id = isset($this->request->post['vendor_id']) ? $this->request->post['vendor_id'] : 0;
 
-			if (!$this->request->post['vendor_reference']) {
-				$json['error_vendor_reference'] = $this->language->get('error_vendor_reference');
-			}
-		}
+				if (!$vendor_id) {
+					$json['error'] = $this->language->get('error_development');
 
-		if (!$json) {
-			$this->load->model('accounting/transaction_type');
+					break;
+				}
 
-			$transaction_type_info = $this->model_accounting_transaction_type->getTransactionType($this->config->get('config_vendor_purchase_initial_id'));
+				$order_purchase_info = $this->model_sale_purchase->getOrderPurchase($order_id, $vendor_id);
 
-			if (empty($transaction_type_info)) {
-				$json['error'] = sprintf($this->language->get('error_transaction_type'), 'vendor-purchase-initial');
-			}
+				if (!$order_purchase_info) {
+					$json['error'] = $this->language->get('error_order');
 
-			// if (!empty($this->request->post['adjustment'])) {
-			// 	$transaction_types['discount'] = $this->model_accounting_transaction_type->getTransactionTypeByLabel('vendor', 'purchase', 'discount');
-				
-			// 	if (empty($transaction_types['discount'])) {
-			// 		$json['error'] = sprintf($this->language->get('error_transaction_type'), 'vendor-purchase-discount');
-			// 	}
-			// }
+					break;
+				}
+
+				if (!$order_purchase_info['printed']) {
+					$json['error'] = $this->language->get('error_print');
+
+					break;
+				}
+
+				if (!$this->request->post['vendor_reference']) {
+					$json['error_vendor_reference'] = $this->language->get('error_vendor_reference');
+
+					break;
+				}
+
+				$this->load->model('accounting/transaction_type');
+
+				$transaction_type_info = $this->model_accounting_transaction_type->getTransactionType($this->config->get('config_vendor_purchase_initial_id'));
+
+				if (empty($transaction_type_info)) {
+					$json['error'] = sprintf($this->language->get('error_transaction_type'), 'vendor-purchase-initial');
+
+					break;
+				}
+
+				$this->load->model('accounting/transaction');
+
+				$transaction_purchase_info = $this->model_accounting_transaction->getTransactionByTransactionTypeId($transaction_type_info['transaction_type_id']);
+
+				if ($transaction_purchase_info) {
+					$json['error'] = $this->language->get('error_transaction');
+
+					break;
+				}
+
+			default:
+				break;
 		}
 
 		if (!$json) {
@@ -416,14 +440,11 @@ class ControllerSalePurchase extends Controller
 
 			$this->model_sale_purchase->editOrderPurchase($order_purchase_info['order_purchase_id'], $order_purchase_data);
 
-			$account_data = [];
+			$transaction_account = [];
 			$account_total = [];
 
 			$order_purchase_products = $this->model_sale_purchase->getOrderPurchaseProducts($order_purchase_info['order_purchase_id']);
 			$total = array_sum(array_column($order_purchase_products, 'total'));
-
-			
-			$this->load->model('accounting/transaction');
 
 			$transaction_type_accounts = $this->model_accounting_transaction_type->getTransactionTypeAccounts($transaction_type_info['transaction_type_id']);
 
@@ -431,7 +452,7 @@ class ControllerSalePurchase extends Controller
 				$transaction_type_accounts[$transaction_type_account['transaction_label']] = $transaction_type_account;
 				unset($transaction_type_accounts[$key]);
 			}
-			
+
 			$account_total[$transaction_type_accounts['initial']['account_debit_id']] = $total;
 			$account_total[$transaction_type_accounts['initial']['account_credit_id']] = -$total;
 
@@ -454,34 +475,31 @@ class ControllerSalePurchase extends Controller
 
 			foreach ($account_total as $account_id => $value) {
 				if ($value > 0) {
-					$account_data[] = [
+					$transaction_account[] = [
 						'account_id'		=> $account_id,
 						'debit'				=> $value,
 						'credit'			=> 0
 					];
 				} elseif ($value < 0) {
-					$account_data[] = [
+					$transaction_account[] = [
 						'account_id'		=> $account_id,
 						'debit'				=> 0,
-						'credit'			=> $value
+						'credit'			=> -$value
 					];
 				}
 			}
 
 			$transaction_data = array(
 				'order_id'				=> $order_id,
-				'client_label'			=> $transaction_type_info['client_label'],
-				'category_label'		=> $transaction_type_info['category_label'],
-				'transaction_label'		=> $transaction_type_info['transaction_label'],
-				'client_id'				=> $vendor_id,
 				'transaction_type_id'	=> $transaction_type_info['transaction_type_id'],
+				'client_id'				=> $vendor_id,
 				'date' 					=> $order_purchase_info['date'],
 				'description' 			=> $transaction_type_info['name'],
 				'amount' 				=> $total,
 				'customer_name' 		=> $order_purchase_info['vendor_name'],
 				'reference_prefix' 		=> $order_purchase_info['reference_prefix'],
 				'reference_no'			=> $order_purchase_info['reference_no'],
-				'account_data' 			=> $account_data
+				'transaction_account' 	=> $transaction_account
 			);
 
 			$this->model_accounting_transaction->addTransaction($transaction_data);

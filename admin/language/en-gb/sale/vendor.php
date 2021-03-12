@@ -41,15 +41,18 @@ $_['button_vendor_remove']      = 'Hapus Vendor';
 $_['help_amount']        		 = 'Isi dengan nilai positif.';
 
 // Error
+$_['error_asset_not_found']     		= 'Warning: Rekening Aset tidak ditemukan!';
 $_['error_order']     					= 'Warning: Order tidak ditemukan!';
 $_['error_order_vendor']			    = 'Vendor tidak terdaftar dalam pesanan ini!';
+$_['error_permission']   				= 'Warning: You do not have permission to modify order vendor!';
+$_['error_purchase_not_found']     		= 'Warning: Data pemesanan jasa vendor tidak ditemukan!';
 $_['error_transaction_amount']			= 'Jumlah harus diisi dan hrs lebih besar dari 0!';
-// $_['error_transaction_amount']			= 'Jumlah harus diisi! (Isi dengan negatif untuk pengembalian dana).';
 $_['error_transaction_date']			= 'Tentukan Tanggal Transaksi!';
 $_['error_transaction_description']		= 'Keterangan tidak boleh melebihi 256 karakter!';
 $_['error_transaction_asset']			= 'Pilih Rekening Kas/Bank!';
 $_['error_transaction_type']			= 'Pilih Jenis Transaksi!';
 $_['error_transaction_vendor']			= 'Vendor harus ditentukan!';
+$_['error_type_not_found']				= 'Warning: Jenis Transaksi tidak ditemukan!';
 $_['error_warning']    					= 'Warning: Please check the form carefully for errors!';
 
 // Document

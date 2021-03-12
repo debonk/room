@@ -683,14 +683,20 @@
 	</div>
 	<script type="text/javascript">
 		$('.nav-tabs a[href="#tab-purchase"]').on('click', function () {
+			$('.alert, .text-danger').remove();
+			
 			$('#order-purchase').load('index.php?route=sale/purchase/orderPurchase&token=<?php echo $token; ?>&order_id=<?php echo $order_id; ?>');
 		});
 
 		$('.nav-tabs a[href="#tab-customer"]').on('click', function () {
+			$('.alert, .text-danger').remove();
+
 			$('#order-customer').load('index.php?route=sale/customer&token=<?php echo $token; ?>&order_id=<?php echo $order_id; ?>');
 		});
 
 		$('.nav-tabs a[href="#tab-vendor"]').on('click', function () {
+			$('.alert, .text-danger').remove();
+			
 			$('#order-vendor').load('index.php?route=sale/vendor&token=<?php echo $token; ?>&order_id=<?php echo $order_id; ?>');
 		});
 

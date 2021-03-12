@@ -1,8 +1,8 @@
 <?php
 class ModelAccountingTransactionType extends Model
 {
-	private $client_data = ['system', 'customer', 'vendor', 'supplier'];
-	private $category_data = ['order', 'deposit', 'purchase'];
+	private $client_data = ['system', 'customer', 'vendor', 'supplier', 'finance'];
+	private $category_data = ['order', 'deposit', 'purchase', 'expense', 'asset'];
 	private $transaction_data = ['initial', 'discount', 'cashin', 'cashout', 'complete'];
 
 	public function addTransactionType($data)

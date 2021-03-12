@@ -315,14 +315,14 @@
 					$('#button-complete').button('reset');
 				},
 				success: function (json) {
-					$('.alert').remove();
+					$('.alert, .text-danger').remove();
 
 					if (json['error']) {
 						$('#order-purchase #purchase-order').before('<div class="alert alert-danger"><i class="fa fa-exclamation-circle"></i> ' + json['error'] + ' <button type="button" class="close" data-dismiss="alert">&times;</button></div>');
 					}
 
 					if (json['error_vendor_reference']) {
-						alert(json['error_vendor_reference']);
+						$('#purchase-order input[name^=\'order_purchase[' + idx + '][vendor_reference]\']').after('<div class="text-danger">' + json['error_vendor_reference'] + '</div>');
 					}
 
 					if (json['success']) {

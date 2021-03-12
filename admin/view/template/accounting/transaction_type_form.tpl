@@ -158,7 +158,7 @@
 								placeholder="<?php echo $entry_sort_order; ?>" id="input-sort-order" class="form-control" />
 						</div>
 					</div>
-					<br>
+					<div class="form-group"></div>
 					<legend>
 						<?php echo $text_account; ?>
 					</legend>

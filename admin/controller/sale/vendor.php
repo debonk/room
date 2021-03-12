@@ -95,7 +95,7 @@ class ControllerSaleVendor extends Controller
 			];
 
 			$transaction_summary_data = [];
-			
+
 			$transactions_summary = $this->model_accounting_transaction->getTransactionsSummary($order_id, $summary_data);
 
 			foreach ($transactions_summary as $key => $transaction_summary) {
@@ -268,7 +268,7 @@ class ControllerSaleVendor extends Controller
 			# Accounts
 			$this->load->model('accounting/account');
 
-			$data['assets'] = $this->model_accounting_account->getAccountsMenuByParentId([1111,1112]);
+			$data['assets'] = $this->model_accounting_account->getAccountsMenuByParentId([1111, 1112]);
 		}
 
 		$data['token'] = $this->session->data['token'];
@@ -283,62 +283,124 @@ class ControllerSaleVendor extends Controller
 
 		$json = array();
 
-		if (!$this->user->hasPermission('modify', 'sale/order') || !$this->user->hasPermission('modify', 'sale/vendor')) {
-			$json['error']['warning'] = $this->language->get('error_permission');
-		} else {
-			if (empty($this->request->post['vendor_transaction_vendor_id'])) {
-				$json['error_vendor_transaction']['vendor'] = $this->language->get('error_transaction_vendor');
-			}
+		switch (false) {
+			case $json:
+				if (!$this->user->hasPermission('modify', 'sale/order') || !$this->user->hasPermission('modify', 'sale/vendor')) {
+					$json['error']['warning'] = $this->language->get('error_permission');
 
-			if (empty($this->request->post['vendor_transaction_date'])) {
-				$json['error_vendor_transaction']['date'] = $this->language->get('error_transaction_date');
-			}
+					break;
+				} else {
+					if (empty($this->request->post['vendor_transaction_vendor_id'])) {
+						$json['error_vendor_transaction']['vendor'] = $this->language->get('error_transaction_vendor');
+					}
 
-			if (empty($this->request->post['vendor_transaction_type_id'])) {
-				$json['error_vendor_transaction']['type'] = $this->language->get('error_transaction_type');
-			}
+					if (empty($this->request->post['vendor_transaction_date'])) {
+						$json['error_vendor_transaction']['date'] = $this->language->get('error_transaction_date');
+					}
 
-			if (empty($this->request->post['vendor_transaction_asset_id'])) {
-				$json['error_vendor_transaction']['asset'] = $this->language->get('error_transaction_asset');
-			}
+					if (empty($this->request->post['vendor_transaction_type_id'])) {
+						$json['error_vendor_transaction']['type'] = $this->language->get('error_transaction_type');
+					}
 
-			if (utf8_strlen($this->request->post['vendor_transaction_description']) > 256) {
-				$json['error_vendor_transaction']['description'] = $this->language->get('error_transaction_description');
-			}
+					if (empty($this->request->post['vendor_transaction_asset_id'])) {
+						$json['error_vendor_transaction']['asset'] = $this->language->get('error_transaction_asset');
+					}
 
-			if (empty((float)$this->request->post['vendor_transaction_amount']) || (float)$this->request->post['vendor_transaction_amount'] <= 0) {
-				$json['error_vendor_transaction']['amount'] = $this->language->get('error_transaction_amount');
-			}
+					if (utf8_strlen($this->request->post['vendor_transaction_description']) > 256) {
+						$json['error_vendor_transaction']['description'] = $this->language->get('error_transaction_description');
+					}
 
-			if ($json) {
-				$json['error']['warning'] = $this->language->get('error_warning');
-			}
-		}
+					if (empty((float)$this->request->post['vendor_transaction_amount']) || (float)$this->request->post['vendor_transaction_amount'] <= 0) {
+						$json['error_vendor_transaction']['amount'] = $this->language->get('error_transaction_amount');
+					}
 
-		if (!$json) {
-			$order_id = isset($this->request->get['order_id']) ? $this->request->get['order_id'] : 0;
+					if ($json) {
+						$json['error']['warning'] = $this->language->get('error_warning');
 
-			$this->load->model('sale/order');
-
-			$order_info = $this->model_sale_order->getOrder($order_id);
-			$order_vendors = $this->model_sale_order->getOrderVendors($order_id);
-
-			if ($order_info) {
-				if (!in_array($this->request->post['vendor_transaction_vendor_id'], array_column($order_vendors, 'vendor_id'))) {
-					$json['error_transaction_vendor'] = $this->language->get('error_order_vendor');
+						break;
+					}
 				}
-			} else {
-				$json['error'] = $this->language->get('error_order');
-			}
+
+				$order_id = isset($this->request->get['order_id']) ? $this->request->get['order_id'] : 0;
+
+				$this->load->model('sale/order');
+				$order_info = $this->model_sale_order->getOrder($order_id);
+
+				if (!$order_info) {
+					$json['error']['warning'] = $this->language->get('error_order');
+
+					break;
+				}
+
+				$order_vendors = $this->model_sale_order->getOrderVendors($order_id);
+
+				if (!in_array($this->request->post['vendor_transaction_vendor_id'], array_column($order_vendors, 'vendor_id'))) {
+					$json['error']['warning'] = $this->language->get('error_order_vendor');
+
+					break;
+				}
+
+				$this->load->model('catalog/vendor');
+				$vendor_info = $this->model_catalog_vendor->getVendor($this->request->post['vendor_transaction_vendor_id']);
+
+				if (!$vendor_info) {
+					$json['error']['warning'] = $this->language->get('error_vendor_not_found');
+
+					break;
+				}
+
+				$this->load->model('accounting/account');
+				$asset_info = $this->model_accounting_account->getAccount($this->request->post['vendor_transaction_asset_id']);
+
+				if (!$asset_info) {
+					$json['error']['warning'] = $this->language->get('error_asset_not_found');
+
+					break;
+				}
+
+				$this->load->model('accounting/transaction_type');
+				$transaction_type_info = $this->model_accounting_transaction_type->getTransactionType($this->request->post['vendor_transaction_type_id']);
+
+				if (!$transaction_type_info) {
+					$json['error']['warning'] = $this->language->get('error_type_not_found');
+
+					break;
+				}
+
+				$this->load->model('accounting/transaction');
+
+				# Cek Pemesanan Sewa Vendor
+				if ($transaction_type_info['client_label'] . '-' . $transaction_type_info['category_label'] == 'vendor-purchase') {
+					$transaction_purchase_info = $this->model_accounting_transaction_type->getTransactionType($this->config->get('config_vendor_purchase_initial_id'));
+
+					if (empty($transaction_purchase_info)) {
+						$json['error'] = sprintf($this->language->get('error_transaction_type'), 'vendor-purchase-initial');
+
+						break;
+					}
+
+					$summary_data = [
+						'client_label'		=> $transaction_purchase_info['client_label'],
+						'category_label'	=> $transaction_purchase_info['category_label'],
+						'transaction_label'	=> $transaction_purchase_info['transaction_label'],
+						'client_id'			=> $vendor_info['vendor_id']
+					];
+
+					$transaction_total = $this->model_accounting_transaction->getTransactionsTotalSummary($order_id, $summary_data);
+
+					if (!$transaction_total) {
+						$json['error']['warning'] = $this->language->get('error_purchase_not_found');
+
+						break;
+					}
+				}
+
+			default:
+				break;
 		}
 
 		if (!$json) {
-			$this->load->model('catalog/vendor');
-			$this->load->model('accounting/account');
-			$this->load->model('accounting/transaction_type');
-			$this->load->model('accounting/transaction');
-
-			$vendor_info = $this->model_catalog_vendor->getVendor($this->request->post['vendor_transaction_vendor_id']);
+			$transaction_account = [];
 
 			$reference_prefix = str_ireplace('{YEAR}', date('Y', strtotime($this->request->post['vendor_transaction_date'])), $this->config->get('config_receipt_vendor_prefix'));
 
@@ -350,22 +412,19 @@ class ControllerSaleVendor extends Controller
 				$reference_no = $this->config->get('config_reference_start') + 1;
 			}
 
-			$asset_info = $this->model_accounting_account->getAccount($this->request->post['vendor_transaction_asset_id']);
-
-			$transaction_type_info = $this->model_accounting_transaction_type->getTransactionType($this->request->post['vendor_transaction_type_id']);
 			$transaction_type_accounts = $this->model_accounting_transaction_type->getTransactionTypeAccounts($transaction_type_info['transaction_type_id']);
 
 			foreach ($transaction_type_accounts as $transaction_type_account) {
-				$account_debit_id = empty($transaction_type_info['account_debit_id']) ? $this->request->post['vendor_transaction_asset_id'] : ($transaction_type_info['account_debit_id']);
-				$account_credit_id = empty($transaction_type_info['account_credit_id']) ? $this->request->post['vendor_transaction_asset_id'] : ($transaction_type_info['account_credit_id']);
-	
-				$account_data[] = [
+				$account_debit_id = empty($transaction_type_account['account_debit_id']) ? $this->request->post['vendor_transaction_asset_id'] : ($transaction_type_account['account_debit_id']);
+				$account_credit_id = empty($transaction_type_account['account_credit_id']) ? $this->request->post['vendor_transaction_asset_id'] : ($transaction_type_account['account_credit_id']);
+
+				$transaction_account[] = [
 					'account_id'		=> $account_debit_id,
 					'debit'				=> $this->request->post['vendor_transaction_amount'],
 					'credit'			=> 0
 				];
 
-				$account_data[] = [
+				$transaction_account[] = [
 					'account_id'		=> $account_credit_id,
 					'debit'				=> 0,
 					'credit'			=> $this->request->post['vendor_transaction_amount']
@@ -374,11 +433,8 @@ class ControllerSaleVendor extends Controller
 
 			$transaction_data = [
 				'order_id'				=> $order_id,
-				'client_label'			=> $transaction_type_info['client_label'],
-				'category_label'		=> $transaction_type_info['category_label'],
-				'transaction_label'		=> $transaction_type_info['transaction_label'],
+				'transaction_type_id'	=> $this->request->post['vendor_transaction_type_id'],
 				'client_id'				=> $this->request->post['vendor_transaction_vendor_id'],
-				'transaction_type_id'	=> $transaction_type_info['transaction_type_id'],
 				'date' 					=> $this->request->post['vendor_transaction_date'],
 				'payment_method'		=> $asset_info['name'],
 				'description' 			=> $this->request->post['vendor_transaction_description'],
@@ -386,7 +442,7 @@ class ControllerSaleVendor extends Controller
 				'customer_name' 		=> $vendor_info['vendor_name'],
 				'reference_prefix' 		=> $reference_prefix,
 				'reference_no'			=> $reference_no,
-				'account_data' 			=> $account_data
+				'transaction_account' 	=> $transaction_account
 			];
 
 			$this->model_accounting_transaction->addTransaction($transaction_data);
