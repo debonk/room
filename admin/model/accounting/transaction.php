@@ -194,7 +194,6 @@ class ModelAccountingTransaction extends Model
 
 			$sql .= " LIMIT " . (int)$data['start'] . "," . (int)$data['limit'];
 		}
-		// print_r($sql);//die('---breakpoint---');
 
 		$query = $this->db->query($sql);
 

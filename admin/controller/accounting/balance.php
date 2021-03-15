@@ -6,10 +6,10 @@ class ControllerAccountingBalance extends Controller
 	private $filter_items = array(
 		'date_start',
 		'date_end',
-		'account_id',
 		'transaction_type_id',
-		'description',
+		'account_id',
 		'reference',
+		'description',
 		'customer_name',
 		'username'
 	);
@@ -101,7 +101,7 @@ class ControllerAccountingBalance extends Controller
 				'debit'			=> 0,
 				'credit'		=> $this->request->post['amount']
 			];
-			
+
 			$this->model_accounting_transaction->editTransaction($this->request->get['transaction_id'], $this->request->post);
 
 			$this->session->data['success'] = $this->language->get('text_success');
@@ -291,7 +291,6 @@ class ControllerAccountingBalance extends Controller
 		$transaction_total = $this->model_accounting_transaction->getTransactionsTotal($filter_data);
 
 		$results = $this->model_accounting_transaction->getTransactions($filter_data);
-		// var_dump($filter_data);//die('---breakpoint---');
 
 		foreach ($results as $result) {
 			if (!empty($result['order_id'])) {
@@ -557,7 +556,7 @@ class ControllerAccountingBalance extends Controller
 			$transaction_info = $this->model_accounting_transaction->getTransaction($this->request->get['transaction_id']);
 
 			if (!$transaction_info || !$transaction_info['edit_permission']) {
-				// $this->error['warning'] = $this->language->get('error_edit');
+				$this->error['warning'] = $this->language->get('error_edit');
 			} elseif ($transaction_info['order_id']) {
 				$this->error['warning'] = $this->language->get('error_order');
 			}

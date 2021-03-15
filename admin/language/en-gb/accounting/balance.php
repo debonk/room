@@ -38,7 +38,7 @@ $_['entry_username']   		 	= 'Username';
 // Error
 $_['error_warning']             = 'Warning: Please check the form carefully for errors!';
 $_['error_permission']   		= 'Warning: You do not have permission to modify balances!';
-$_['error_edit']             	= 'Warning: Balance transaction can not be edited!';
+$_['error_edit']             	= 'Warning: Data transaksi tidak diizinkan untuk diubah/dihapus!';
 $_['error_account_credit']    	= 'Tentukan Akun Kredit!';
 $_['error_account_debit']    	= 'Tentukan Akun Debet!';
 $_['error_date']    			= 'Tanggal Transaksi harus diisi!';
