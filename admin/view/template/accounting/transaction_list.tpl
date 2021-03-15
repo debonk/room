@@ -115,6 +115,15 @@
 									<option value="">
 										<?php echo $text_all; ?>
 									</option>
+									<?php if ($filter['account_id'] === '-') { ?>
+									<option value="-" selected="selected">
+										<?php echo $text_none; ?>
+									</option>
+									<?php } else { ?>
+									<option value="-">
+										<?php echo $text_none; ?>
+									</option>
+									<?php } ?>
 									<?php foreach ($accounts as $account) { ?>
 									<?php if ($account['account_id'] == $filter['account_id']) { ?>
 									<option value="<?php echo $account['account_id']; ?>" selected="selected">

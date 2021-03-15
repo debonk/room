@@ -39,78 +39,58 @@
 					class="form-horizontal">
 					<div class="form-group">
 						<label class="col-sm-2 control-label">
-							<?php echo $text_reference_no; ?>
+							<?php echo $text_reference; ?>
 						</label>
 						<div class="col-sm-10">
 							<h4 class="form-control-static">
-								<?php echo $reference_no; ?>
+								<?php echo $reference; ?>
 							</h4>
 						</div>
 					</div>
 					<div class="form-group required">
-						<label class="col-sm-2 control-label" for="input-account-from">
-							<?php echo $entry_asset_from; ?>
+						<label class="col-sm-2 control-label" for="input-transaction-type">
+							<?php echo $entry_transaction_type; ?>
 						</label>
 						<div class="col-sm-10">
-							<select name="account_from_id" id="input-account-from" class="form-control">
-								<option value="">
-									<?php echo $text_select; ?>
+							<select name="transaction_type_id" id="input-transaction-type" class="form-control">
+								<?php foreach ($transaction_types as $transaction_type) { ?>
+								<?php if ($transaction_type['transaction_type_id'] == $transaction_type_id) { ?>
+								<option value="<?php echo $transaction_type['transaction_type_id']; ?>" selected="selected">
+									<?php echo $transaction_type['name']; ?>
 								</option>
-								<?php foreach ($accounts_from as $account) { ?>
-								<optgroup label="<?php echo $account['text']; ?>">
-									<?php if ($account['child']) { ?>
-									<?php foreach ($account['child'] as $child) { ?>
-									<?php if ($child['account_id'] == $account_from_id) { ?>
-									<option value="<?php echo $child['account_id']; ?>" selected="selected">
-										<?php echo $child['text']; ?>
-									</option>
-									<?php } else { ?>
-									<option value="<?php echo $child['account_id']; ?>">
-										<?php echo $child['text']; ?>
-									</option>
-									<?php } ?>
-									<?php } ?>
-									<?php } ?>
-								</optgroup>
+								<?php } else { ?>
+								<option value="<?php echo $transaction_type['transaction_type_id']; ?>">
+									<?php echo $transaction_type['name']; ?>
+								</option>
+								<?php } ?>
 								<?php } ?>
 							</select>
-							<?php if ($error_account_from) { ?>
+						</div>
+					</div>
+					<div class="form-group required">
+						<label class="col-sm-2 control-label" for="input-account-debit">
+							<?php echo $entry_account_debit; ?>
+						</label>
+						<div class="col-sm-10">
+							<select name="account_debit_id" id="input-account-debit" class="form-control">
+							</select>
+							<?php if ($error_account_debit) { ?>
 							<div class="text-danger">
-								<?php echo $error_account_from; ?>
+								<?php echo $error_account_debit; ?>
 							</div>
 							<?php } ?>
 						</div>
 					</div>
 					<div class="form-group required">
-						<label class="col-sm-2 control-label" for="input-account-to">
-							<?php echo $entry_asset_to; ?>
+						<label class="col-sm-2 control-label" for="input-account-credit">
+							<?php echo $entry_account_credit; ?>
 						</label>
 						<div class="col-sm-10">
-							<select name="account_to_id" id="input-account-to" class="form-control">
-								<option value="">
-									<?php echo $text_select; ?>
-								</option>
-								<?php foreach ($accounts_to as $account) { ?>
-								<optgroup label="<?php echo $account['text']; ?>">
-									<?php if ($account['child']) { ?>
-									<?php foreach ($account['child'] as $child) { ?>
-									<?php if ($child['account_id'] == $account_to_id) { ?>
-									<option value="<?php echo $child['account_id']; ?>" selected="selected">
-										<?php echo $child['text']; ?>
-									</option>
-									<?php } else { ?>
-									<option value="<?php echo $child['account_id']; ?>">
-										<?php echo $child['text']; ?>
-									</option>
-									<?php } ?>
-									<?php } ?>
-									<?php } ?>
-								</optgroup>
-								<?php } ?>
+							<select name="account_credit_id" id="input-account-credit" class="form-control">
 							</select>
-							<?php if ($error_account_to) { ?>
+							<?php if ($error_account_credit) { ?>
 							<div class="text-danger">
-								<?php echo $error_account_to; ?>
+								<?php echo $error_account_credit; ?>
 							</div>
 							<?php } ?>
 						</div>
@@ -153,8 +133,9 @@
 							<?php echo $entry_amount; ?>
 						</label>
 						<div class="col-sm-10">
-							<input type="text" name="amount" value="<?php echo $amount; ?>" placeholder="<?php echo $entry_amount; ?>"
-								id="input-amount" class="form-control" />
+							<input type="text" name="amount" value="<?php echo $amount; ?>"
+								placeholder="<?php echo $entry_amount . ' - ' . $help_amount; ?>" id="input-amount"
+								class="form-control" />
 							<?php if ($error_amount) { ?>
 							<div class="text-danger">
 								<?php echo $error_amount; ?>
@@ -176,9 +157,78 @@
 		</div>
 	</div>
 	<script type="text/javascript">
-			$('.date').datetimepicker({
-				pickTime: false
+		let account_debit, account_credit, child;
+
+		$('select[name=\'transaction_type_id\']').on('change', function () {
+			let transaction_type_id = $('select[name=\'transaction_type_id\']').val();
+
+			$.ajax({
+				url: 'index.php?route=accounting/balance/transactionTypeAccounts&token=<?php echo $token; ?>&transaction_type_id=' + transaction_type_id,
+				dataType: 'json',
+				beforeSend: function () {
+					$('select[name=\'transaction_type_id\']').after(' <i class="fa fa-circle-o-notch fa-spin"></i>');
+				},
+				complete: function () {
+					$('.fa-spin').remove();
+				},
+				success: function (json) {
+					account_debit = json['account_debit'];
+					html = '<option value=""><?php echo $text_select; ?></option>';
+
+					for (let i in account_debit) {
+						html += '	<optgroup label="' + account_debit[i]['text'] + '">';
+
+						if (account_debit[i]['child']) {
+							child = account_debit[i]['child'];
+
+							for (let j in child) {
+								if (child[j]['account_id'] == '<?php echo $account_debit_id; ?>') {
+									html += '	  <option value="' + child[j]['account_id'] + '" selected="selected">' + child[j]['text'] + '</option>';
+								} else {
+									html += '	  <option value="' + child[j]['account_id'] + '">' + child[j]['text'] + '</option>';
+								}
+							}
+						}
+
+						html += '	</optgroup>';
+					}
+					$('select[name=\'account_debit_id\']').html(html);
+
+					account_credit = json['account_credit'];
+					html = '<option value=""><?php echo $text_select; ?></option>';
+
+					for (let i in account_credit) {
+						html += '	<optgroup label="' + account_credit[i]['text'] + '">';
+
+						if (account_credit[i]['child']) {
+							child = account_credit[i]['child'];
+
+							for (let j in child) {
+								if (child[j]['account_id'] == '<?php echo $account_credit_id; ?>') {
+									html += '	  <option value="' + child[j]['account_id'] + '" selected="selected">' + child[j]['text'] + '</option>';
+								} else {
+									html += '	  <option value="' + child[j]['account_id'] + '">' + child[j]['text'] + '</option>';
+								}
+							}
+						}
+
+						html += '	</optgroup>';
+					}
+
+					$('select[name=\'account_credit_id\']').html(html);
+				},
+
+				error: function (xhr, ajaxOptions, thrownError) {
+					alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+				}
 			});
-</script>
+		});
+
+		$('select[name=\'transaction_type_id\']').trigger('change');
+
+		$('.date').datetimepicker({
+			pickTime: false
+		});
+	</script>
 </div>
 <?php echo $footer; ?>

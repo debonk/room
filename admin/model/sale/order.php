@@ -259,6 +259,12 @@ class ModelSaleOrder extends Model {
 		return $query->rows;
 	}
 
+	public function getOrderStatusId($order_id) {
+		$query = $this->db->query("SELECT order_status_id FROM " . DB_PREFIX . "order WHERE order_id = '" . (int)$order_id . "'");
+
+		return $query->row['order_status_id'];
+	}
+
 	public function getOrderProduct($order_id, $product_id) {
 		$sql = "SELECT DISTINCT * FROM " . DB_PREFIX . "order_product WHERE order_id = '" . (int)$order_id . "' AND product_id = '" . (int)$product_id . "'";
 

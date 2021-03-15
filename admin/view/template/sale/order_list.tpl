@@ -342,5 +342,11 @@ $('button[id^=\'button-delete\']').on('click', function(e) {
 $('.date').datetimepicker({
 	pickTime: false
 });
+
+$(document).keypress(function (e) {
+			if (e.which == 13) {
+				$("#button-filter").click();
+			}
+		});
 </script></div>
 <?php echo $footer; ?> 

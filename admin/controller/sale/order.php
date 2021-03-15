@@ -414,9 +414,7 @@ class ControllerSaleOrder extends Controller
 
 		foreach ($results as $result) {
 			$summary_data = [
-				// 'label'		=> 'customer',
-				// 'label_id'	=> $result['customer_id'],
-				'group'		=> 't.label'
+				'group'		=> 't.client_label'
 			];
 
 			$transaction_total = [
@@ -426,16 +424,13 @@ class ControllerSaleOrder extends Controller
 
 			$transactions_summary = $this->model_accounting_transaction->getTransactionsSummary($result['order_id'], $summary_data);
 			foreach ($transactions_summary as $key => $transaction_summary) {
-				// $transaction_summary['category_label'] = empty($transaction_summary['category_label']) ? 'order' : $transaction_summary['category_label'];
-				$transaction_summary['account_type'] = empty($transaction_summary['account_type']) ? 'D' : $transaction_summary['account_type'];
-
-				$transactions_summary[$transaction_summary['label']][$transaction_summary['account_type']] = $transaction_summary;
+				$transactions_summary[$transaction_summary['client_label']][$transaction_summary['transaction_label']] = $transaction_summary;
 				unset($transactions_summary[$key]);
 			}
 
 			foreach ($transactions_summary as $key => $transaction_summary) {
-				$debit = isset($transaction_summary['D']) ? $transaction_summary['D']['total'] : 0;
-				$credit = isset($transaction_summary['C']) ? $transaction_summary['C']['total'] : 0;
+				$debit = isset($transaction_summary['cashin']) ? $transaction_summary['cashin']['total'] : 0;
+				$credit = isset($transaction_summary['cashout']) ? $transaction_summary['cashout']['total'] : 0;
 
 				$transaction_total[$key] = $debit - $credit;
 			}
@@ -473,7 +468,6 @@ class ControllerSaleOrder extends Controller
 				'edit'            => $this->url->link('sale/order/edit', 'token=' . $this->session->data['token'] . '&order_id=' . $result['order_id'] . $url, true),
 			);
 		}
-		// die('---breakpoint---');
 
 		$data['token'] = $this->session->data['token'];
 

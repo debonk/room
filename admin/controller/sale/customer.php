@@ -103,28 +103,6 @@ class ControllerSaleCustomer extends Controller
 		$results = $this->model_accounting_transaction->getTransactions($filter_data);
 
 		foreach ($results as $result) {
-			// $total = 0;
-
-			// $transaction_accounts = $this->model_accounting_transaction->getTransactionAccounts($result['transaction_id']);
-
-			// foreach ($transaction_accounts as $transaction_account) {
-			// 	# Maintain Version 1 
-			// 	if (empty($transaction_accounts['transaction_label'])) {
-			// 		$this->load->model('accounting/transaction_type');
-
-			// 		$transaction_type_account_info = $this->model_accounting_transaction_type->getTransactionTypeAccounts($result['transaction_type_id']);
-
-			// 		$transaction_account['transaction_label'] = $transaction_type_account_info[0]['transaction_label'];
-			// 	}
-			// 	# End Maintain
-
-			// 	if ($transaction_account['transaction_label'] == 'cashin') {
-			// 		$total += $transaction_account['debit'];
-			// 	} elseif ($transaction_account['transaction_label'] == 'cashout') {
-			// 		$total -= $transaction_account['credit'];
-			// 	}
-			// }
-
 			if ($result['transaction_label'] == 'cashin') {
 				$amount = $result['amount'];
 			} elseif ($result['transaction_label'] == 'cashout') {
@@ -140,7 +118,6 @@ class ControllerSaleCustomer extends Controller
 				'reference'			=> $result['reference'],
 				'description'		=> $result['description'],
 				'amount'			=> $this->currency->format($amount, $order_info['currency_code'], $order_info['currency_value']),
-				// 'amount'			=> $this->currency->format($total, $order_info['currency_code'], $order_info['currency_value']),
 				'date_added'		=> date($this->language->get('date_format_short'), strtotime($result['date_added'])),
 				'username'			=> $result['username'],
 				'receipt'	 		=> $this->url->link('sale/order/receipt', 'token=' . $this->session->data['token'] . '&transaction_id=' . (int)$result['transaction_id'], true),

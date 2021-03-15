@@ -203,11 +203,7 @@ class ControllerAccountingTransaction extends Controller
 		}
 
 		foreach ($this->filter_items as $filter_item) {
-			if (isset($this->request->get['filter_' . $filter_item])) {
-				$filter[$filter_item] = $this->request->get['filter_' . $filter_item];
-			} else {
-				$filter[$filter_item] = null;
-			}
+			$filter[$filter_item] = isset($this->request->get['filter_' . $filter_item]) ? $this->request->get['filter_' . $filter_item] : null;
 		}
 
 		if (empty($filter['date_start'])) {
@@ -422,11 +418,7 @@ class ControllerAccountingTransaction extends Controller
 			'account'
 		);
 		foreach ($error_items as $error_item) {
-			if (isset($this->error[$error_item])) {
-				$data['error_' . $error_item] = $this->error[$error_item];
-			} else {
-				$data['error_' . $error_item] = '';
-			}
+			$data['error_' . $error_item] = isset($this->error[$error_item]) ? $this->error[$error_item] : '';
 		}
 
 		$url = $this->urlFilter();
@@ -545,7 +537,7 @@ class ControllerAccountingTransaction extends Controller
 			$this->error['description'] = $this->language->get('error_description');
 		}
 
-		if (isset($this->request->post['amount']) && empty((float)$this->request->post['amount'])) {
+		if (isset($this->request->post['amount']) && (float)$this->request->post['amount'] <= 0) {
 			$this->error['amount'] = $this->language->get('error_amount');
 		}
 
@@ -578,10 +570,12 @@ class ControllerAccountingTransaction extends Controller
 		foreach ($this->request->post['selected'] as $transaction_id) {
 			$transaction_info = $this->model_accounting_transaction->getTransaction($transaction_id);
 
-			$order_info = $this->model_sale_order->getOrder($transaction_info);
-
-			if (in_array($order_info['order_status_id'], $this->config->get('config_complete_status'))) {
-				$this->error['warning'] = $this->language->get('error_order_status');
+			if ($transaction_info['order_id']) {
+				$order_status_id = $this->model_sale_order->getOrderStatusId($transaction_info['order_id']);
+				
+				if (in_array($order_status_id, $this->config->get('config_complete_status'))) {
+					$this->error['warning'] = $this->language->get('error_order_status');
+				}
 			}
 		}
 

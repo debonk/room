@@ -46,11 +46,11 @@ $_['error_account_credit']    	= 'Tentukan Akun Kredit!';
 $_['error_account_debit']    	= 'Tentukan Akun Debet!';
 $_['error_date']    			= 'Tanggal Transaksi harus diisi!';
 $_['error_description']    		= 'Keterangan harus diisi 5 - 256 karakter!';
-$_['error_amount']    			= 'Jumlah harus diisi!';
+$_['error_amount']    			= 'Jumlah harus diisi dan hrs lebih besar dari 0!';
 $_['error_order']    			= 'Warning: Transaksi tidak bisa diedit/dihapus karena merupakan transaksi otomatis!';
 $_['error_order_permission']    = 'Warning: Tidak diijinkan untuk memberi akses edit untuk Transaksi Otomatis!';
 $_['error_not_found']	 		= 'Warning: Transaksi tidak ditemukan!';
-$_['error_order_status']		= 'Warning: Transaksi tidak bisa dihapus karena status pesanan telah "Completed"!';
+$_['error_order_status']		= 'Warning: Transaksi tidak bisa dihapus karena status pesanan telah "Complete"!';
 $_['error_transaction_type']	= 'Pilih Jenis Transaksi';
 
 // Button

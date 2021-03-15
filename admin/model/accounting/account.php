@@ -1,24 +1,29 @@
 <?php
-class ModelAccountingAccount extends Model {
-	public function addAccount($data) {
-        $this->db->query("INSERT INTO " . DB_PREFIX . "account SET account_id = '" . (int)$data['account_id'] . "', name = '" . $this->db->escape($data['name']) . "', description = '" . $this->db->escape($data['description']) . "', type = '" . $this->db->escape($data['type']) . "', parent_id = '" . (int)$data['parent_id'] . "', status = '" . (int)$data['status'] . "'");
+class ModelAccountingAccount extends Model
+{
+	public function addAccount($data)
+	{
+		$this->db->query("INSERT INTO " . DB_PREFIX . "account SET account_id = '" . (int)$data['account_id'] . "', name = '" . $this->db->escape($data['name']) . "', description = '" . $this->db->escape($data['description']) . "', type = '" . $this->db->escape($data['type']) . "', parent_id = '" . (int)$data['parent_id'] . "', status = '" . (int)$data['status'] . "'");
 
-        $this->cache->delete('account');
+		$this->cache->delete('account');
 	}
 
-	public function editAccount($account_id, $data) {
-        $this->db->query("UPDATE " . DB_PREFIX . "account SET account_id = '" . (int)$data['account_id'] . "', name = '" . $this->db->escape($data['name']) . "', description = '" . $this->db->escape($data['description']) . "', type = '" . $this->db->escape($data['type']) . "', parent_id = '" . (int)$data['parent_id'] . "', status = '" . (int)$data['status'] . "' WHERE account_id = '" . (int)$account_id . "'");
+	public function editAccount($account_id, $data)
+	{
+		$this->db->query("UPDATE " . DB_PREFIX . "account SET account_id = '" . (int)$data['account_id'] . "', name = '" . $this->db->escape($data['name']) . "', description = '" . $this->db->escape($data['description']) . "', type = '" . $this->db->escape($data['type']) . "', parent_id = '" . (int)$data['parent_id'] . "', status = '" . (int)$data['status'] . "' WHERE account_id = '" . (int)$account_id . "'");
 
-        $this->cache->delete('account');
+		$this->cache->delete('account');
 	}
 
-	public function deleteAccount($account_id) {
-        $this->db->query("DELETE FROM " . DB_PREFIX . "account WHERE account_id = '" . (int)$account_id . "'");
+	public function deleteAccount($account_id)
+	{
+		$this->db->query("DELETE FROM " . DB_PREFIX . "account WHERE account_id = '" . (int)$account_id . "'");
 
-        $this->cache->delete('account');
+		$this->cache->delete('account');
 	}
 
-	public function getAccount($account_id) {
+	public function getAccount($account_id)
+	{
 		$query = $this->db->query("SELECT DISTINCT * FROM " . DB_PREFIX . "account WHERE account_id = '" . (int)$account_id . "'");
 
 		$components = array(
@@ -28,37 +33,37 @@ class ModelAccountingAccount extends Model {
 			'liability' 	=> ['current_liability', 'liability', 'non_current_liability'],
 			'revenue' 		=> ['sale', 'revenue', 'other_income']
 		);
-		
+
 		$account_data = $query->row;
-		
+
 		foreach ($components as $key => $component) {
 			if (in_array($account_data['type'], $component)) {
 				$account_data['component'] = $key;
 
-			break;
+				break;
 			};
-
 		}
-		
+
 		return $account_data;
 	}
 
-    public function getAccounts($data = array()) {
-        if ($data) {
-            $sql = "SELECT * FROM " . DB_PREFIX . "account";
+	public function getAccounts($data = array())
+	{
+		if ($data) {
+			$sql = "SELECT * FROM " . DB_PREFIX . "account";
 
-            $implode = array();
+			$implode = array();
 
-            if (isset($data['filter_parent_id'])) {
-                $implode[] = "account_id LIKE '" . (int)$data['filter_parent_id'] . "%'"; // base menggunakan account_id agar akun itu sendiri termasuk dlm selection
-                // $implode[] = "parent_id = '" . (int)$data['filter_parent_id'] . "'";
-            }
+			if (isset($data['filter_parent_id'])) {
+				$implode[] = "account_id LIKE '" . (int)$data['filter_parent_id'] . "%'"; // base menggunakan account_id agar akun itu sendiri termasuk dlm selection
+				// $implode[] = "parent_id = '" . (int)$data['filter_parent_id'] . "'";
+			}
 
 			if (isset($data['filter_status']) && !is_null($data['filter_status'])) {
-                $implode[] = "status = '" . (int)$data['filter_status'] . "'";
-            }
+				$implode[] = "status = '" . (int)$data['filter_status'] . "'";
+			}
 
-            if (!empty($data['component']) || !empty($data['filter_type'])) {
+			if (!empty($data['component']) || !empty($data['filter_type'])) {
 				$types_data = array();
 
 				$components = array(
@@ -85,85 +90,86 @@ class ModelAccountingAccount extends Model {
 
 				$implode[] = "type IN (" . $types . ")";
 			}
-			
-            if ($implode) {
+
+			if ($implode) {
 				$sql .= " WHERE " . implode(" AND ", $implode);
-            }
-			
-            $sort_data = array(
-                'account_id',
-                'name',
-                'description',
-                'type',
-                'parent_id',
-                'status'
-            );
+			}
 
-            if (isset($data['sort']) && in_array($data['sort'], $sort_data)) {
-                if ($data['sort'] == 'account_id') {
-                    $sql .= " ORDER BY RPAD(account_id, 15, '0')";
-                } else {
-                    $sql .= " ORDER BY " . $data['sort'];
-                }
-            } else {
-                $sql .= " ORDER BY name";
-            }
+			$sort_data = array(
+				'account_id',
+				'name',
+				'description',
+				'type',
+				'parent_id',
+				'status'
+			);
 
-            if (isset($data['order']) && ($data['order'] == 'DESC')) {
-                $sql .= " DESC";
-            } else {
-                $sql .= " ASC";
-            }
+			if (isset($data['sort']) && in_array($data['sort'], $sort_data)) {
+				if ($data['sort'] == 'account_id') {
+					$sql .= " ORDER BY RPAD(account_id, 15, '0')";
+				} else {
+					$sql .= " ORDER BY " . $data['sort'];
+				}
+			} else {
+				$sql .= " ORDER BY name";
+			}
 
-            if (isset($data['start']) && isset($data['limit'])) {
-                if ($data['start'] < 0) {
-                    $data['start'] = 0;
-                }
+			if (isset($data['order']) && ($data['order'] == 'DESC')) {
+				$sql .= " DESC";
+			} else {
+				$sql .= " ASC";
+			}
 
-                if ($data['limit'] < 1) {
-                    $data['limit'] = 20;
-                }
+			if (isset($data['start']) && isset($data['limit'])) {
+				if ($data['start'] < 0) {
+					$data['start'] = 0;
+				}
 
-                $sql .= " LIMIT " . (int)$data['start'] . "," . (int)$data['limit'];
-            }
+				if ($data['limit'] < 1) {
+					$data['limit'] = 20;
+				}
 
-            $query = $this->db->query($sql);
+				$sql .= " LIMIT " . (int)$data['start'] . "," . (int)$data['limit'];
+			}
 
-            return $query->rows;
-        } else {
-            $account_data = $this->cache->get('account');
+			$query = $this->db->query($sql);
 
-            if (!$account_data) {
-                $account_data = array();
+			return $query->rows;
+		} else {
+			$account_data = $this->cache->get('account');
 
-                $query = $this->db->query("SELECT * FROM " . DB_PREFIX . "account WHERE parent_id = '0' ORDER BY RPAD(account_id, 15, '0')");
+			if (!$account_data) {
+				$account_data = array();
 
-                foreach ($query->rows as $result) {
-                    $account_data[] = array(
-                        'account_id'        => $result['account_id'],
-                        'name'              => $result['name'],
-                        'description'       => $result['description'],
-                        'type'              => $result['type'],
-                        'parent_id'         => $result['parent_id'],
-                        'status'            => $result['status'],
-                        'retained_earnings' => $result['retained_earnings']
-                    );
-                }
+				$query = $this->db->query("SELECT * FROM " . DB_PREFIX . "account WHERE parent_id = '0' ORDER BY RPAD(account_id, 15, '0')");
 
-                $this->cache->set('account', $account_data);
-            }
+				foreach ($query->rows as $result) {
+					$account_data[] = array(
+						'account_id'        => $result['account_id'],
+						'name'              => $result['name'],
+						'description'       => $result['description'],
+						'type'              => $result['type'],
+						'parent_id'         => $result['parent_id'],
+						'status'            => $result['status'],
+						'retained_earnings' => $result['retained_earnings']
+					);
+				}
 
-            return $account_data;
-        }
-    }
+				$this->cache->set('account', $account_data);
+			}
 
-	public function getAccountsCount($data = array()) {
+			return $account_data;
+		}
+	}
+
+	public function getAccountsCount($data = array())
+	{
 		$sql = "SELECT COUNT(*) AS total FROM " . DB_PREFIX . "account";
 
 		$implode = array();
 
 		if (isset($data['filter_parent_id'])) {
-                $implode[] = "account_id LIKE '" . (int)$data['filter_parent_id'] . "%'"; // base menggunakan account_id agar akun itu sendiri termasuk dlm selection
+			$implode[] = "account_id LIKE '" . (int)$data['filter_parent_id'] . "%'"; // base menggunakan account_id agar akun itu sendiri termasuk dlm selection
 		}
 
 		if (isset($data['filter_status']) && !is_null($data['filter_status'])) {
@@ -197,17 +203,18 @@ class ModelAccountingAccount extends Model {
 
 			$implode[] = "type IN (" . $types . ")";
 		}
-		
+
 		if ($implode) {
 			$sql .= " WHERE " . implode(" AND ", $implode);
 		}
 
 		$query = $this->db->query($sql);
-		
+
 		return $query->row['total'];
 	}
-	
-	public function getAccountsMenuByComponent($component = [], $type = []) {
+
+	public function getAccountsMenuByComponent($component = [], $type = [])
+	{
 		$accounts_data = array();
 		$childs_data = array();
 
@@ -217,12 +224,12 @@ class ModelAccountingAccount extends Model {
 			'filter_status'		=> 1,
 			'sort' 				=> 'account_id'
 		);
-		
+
 		$accounts = $this->getAccounts($filter_data);
-		
+
 		foreach ($accounts as $account) {
 			$child_account_count = $this->getAccountsCount(['filter_parent_id' => $account['account_id']]) - 1;
-			
+
 			if ($child_account_count) {
 				$accounts_data[$account['account_id']] = array(
 					'account_id'	=> $account['account_id'],
@@ -236,15 +243,16 @@ class ModelAccountingAccount extends Model {
 				);
 			}
 		}
-		
+
 		foreach ($childs_data as $key => $child_data) {
 			$accounts_data[$key]['child'] = $child_data;
 		}
-		
+
 		return $accounts_data;
 	}
-	
-	public function getAccountsMenuByParentId($parent_ids = []) {
+
+	public function getAccountsMenuByParentId($parent_ids = [])
+	{
 		$accounts_data = array();
 		$childs_data = array();
 
@@ -254,12 +262,16 @@ class ModelAccountingAccount extends Model {
 				'filter_status'		=> 1,
 				'sort' 				=> 'account_id'
 			);
-			
+
 			$accounts = $this->getAccounts($filter_data);
-			
+
+			if (count($accounts) == 1) {
+				$accounts[] = $this->getAccount($accounts[0]['parent_id']);
+			}
+
 			foreach ($accounts as $account) {
 				$child_account_count = $this->getAccountsCount(['filter_parent_id' => $account['account_id']]) - 1; // kurang 1 agar parent tidak dihitung
-				
+
 				if ($child_account_count) {
 					$accounts_data[$account['account_id']] = array(
 						'account_id'	=> $account['account_id'],
@@ -274,11 +286,11 @@ class ModelAccountingAccount extends Model {
 				}
 			}
 		}
-		
+
 		foreach ($childs_data as $key => $child_data) {
 			$accounts_data[$key]['child'] = $child_data;
 		}
-		
+
 		return $accounts_data;
 	}
 }
