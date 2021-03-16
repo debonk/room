@@ -1,29 +1,31 @@
 <?php
 class ModelReportTransaction extends Model
 {
-	public function getTransactions($data = array())
+	public function getTransactions($data = [])
 	{
-		$sql = "SELECT t.*, CONCAT(t.reference_prefix, LPAD(t.reference_no, 4, '0')) AS reference, a1.name AS account_from, a2.name AS account_to, tt.account_type, tt.name AS transaction_type FROM " . DB_PREFIX . "transaction t LEFT JOIN " . DB_PREFIX . "account a1 ON (a1.account_id = t.account_from_id) LEFT JOIN " . DB_PREFIX . "account a2 ON (a2.account_id = t.account_to_id) LEFT JOIN " . DB_PREFIX . "transaction_type tt ON (tt.transaction_type_id = t.transaction_type_id)";
+		$sql = "SELECT t.*, CONCAT(t.reference_prefix, LPAD(t.reference_no, 4, '0')) AS reference, tt.name AS transaction_type, SUM(ta.debit) AS debit, SUM(ta.credit) AS credit FROM " . DB_PREFIX . "transaction t LEFT JOIN " . DB_PREFIX . "transaction_type tt ON (tt.transaction_type_id = t.transaction_type_id) LEFT JOIN " . DB_PREFIX . "transaction_account ta ON (ta.transaction_id = t.transaction_id)";
 
 		$implode = array();
 
-		if (!empty($data['filter_date_start'])) {
-			$implode[] = "DATE(t.date) >= '" . $this->db->escape($data['filter_date_start']) . "'";
+		if (!empty($data['filter']['date_start'])) {
+			$implode[] = "DATE(t.date) >= '" . $this->db->escape($data['filter']['date_start']) . "'";
 		}
 
-		if (!empty($data['filter_date_end'])) {
-			$implode[] = "DATE(t.date) <= '" . $this->db->escape($data['filter_date_end']) . "'";
+		if (!empty($data['filter']['date_end'])) {
+			$implode[] = "DATE(t.date) <= '" . $this->db->escape($data['filter']['date_end']) . "'";
 		}
 
-		if (!empty($data['filter_account_id'])) {
-			$implode[] = "(t.account_from_id = '" . (int)$data['filter_account_id'] . "' OR t.account_to_id = '" . (int)$data['filter_account_id'] . "')";
+		if (!empty($data['filter']['account_id'])) {
+			$implode[] = "ta.account_id = '" . (int)$data['filter']['account_id'] . "'";
+			// $implode[] = "ta.account_id LIKE '" . (int)$data['filter']['account_id'] . "%'";
 		}
 
 		if ($implode) {
 			$sql .= " WHERE " . implode(" AND ", $implode);
 		}
 
-		$sql .= " ORDER BY t.date, t.transaction_id ASC";
+		$sql .= " GROUP BY t.transaction_id ORDER BY t.date DESC, t.transaction_id DESC";
+		// $sql .= " GROUP BY t.transaction_id ORDER BY t.date, t.transaction_id ASC";
 
 		if (isset($data['start']) || isset($data['limit'])) {
 			if ($data['start'] < 0) {
@@ -36,28 +38,29 @@ class ModelReportTransaction extends Model
 
 			$sql .= " LIMIT " . (int)$data['start'] . "," . (int)$data['limit'];
 		}
+		// var_dump($sql);die('---breakpoint---');
 
 		$query = $this->db->query($sql);
 
 		return $query->rows;
 	}
 
-	public function getTransactionsCount($data = array())
+	public function getTransactionsCount($data = [])
 	{
-		$sql = "SELECT COUNT(*) AS total FROM " . DB_PREFIX . "transaction t";
+		$sql = "SELECT COUNT(DISTINCT t.transaction_id) AS total FROM " . DB_PREFIX . "transaction t LEFT JOIN " . DB_PREFIX . "transaction_account ta ON (ta.transaction_id = t.transaction_id)";
 
 		$implode = array();
 
-		if (!empty($data['filter_date_start'])) {
-			$implode[] = "DATE(t.date) >= '" . $this->db->escape($data['filter_date_start']) . "'";
+		if (!empty($data['filter']['date_start'])) {
+			$implode[] = "DATE(t.date) >= '" . $this->db->escape($data['filter']['date_start']) . "'";
 		}
 
-		if (!empty($data['filter_date_end'])) {
-			$implode[] = "DATE(t.date) <= '" . $this->db->escape($data['filter_date_end']) . "'";
+		if (!empty($data['filter']['date_end'])) {
+			$implode[] = "DATE(t.date) <= '" . $this->db->escape($data['filter']['date_end']) . "'";
 		}
 
-		if (!empty($data['filter_account_id'])) {
-			$implode[] = "(t.account_from_id = '" . (int)$data['filter_account_id'] . "' OR t.account_to_id = '" . (int)$data['filter_account_id'] . "')";
+		if (!empty($data['filter']['account_id'])) {
+			$implode[] = "ta.account_id = '" . (int)$data['filter']['account_id'] . "'";
 		}
 
 		if ($implode) {
@@ -69,29 +72,84 @@ class ModelReportTransaction extends Model
 		return $query->row['total'];
 	}
 
-	public function getTransactionsSubTotal($data = array())
+	public function getTransactionsTotal($data = [])
 	{
-		$sql = "SELECT t.account_to_id, tt.account_type, t.amount FROM " . DB_PREFIX . "transaction t LEFT JOIN " . DB_PREFIX . "transaction_type tt ON (tt.transaction_type_id = t.transaction_type_id)";
+		$sql = "SELECT SUM(ta.debit) AS debit, SUM(ta.credit) AS credit FROM " . DB_PREFIX . "transaction_account ta LEFT JOIN " . DB_PREFIX . "transaction t ON (t.transaction_id = ta.transaction_id)";
 
 		$implode = array();
 
-		if (!empty($data['filter_date_start'])) {
-			$implode[] = "DATE(t.date) >= '" . $this->db->escape($data['filter_date_start']) . "'";
+		if (!empty($data['filter']['date_start'])) {
+			$implode[] = "DATE(t.date) >= '" . $this->db->escape($data['filter']['date_start']) . "'";
 		}
 
-		if (!empty($data['filter_date_end'])) {
-			$implode[] = "DATE(t.date) <= '" . $this->db->escape($data['filter_date_end']) . "'";
+		if (!empty($data['filter']['date_end'])) {
+			$implode[] = "DATE(t.date) <= '" . $this->db->escape($data['filter']['date_end']) . "'";
 		}
 
-		if (!empty($data['filter_account_id'])) {
-			$implode[] = "(t.account_from_id = '" . (int)$data['filter_account_id'] . "' OR t.account_to_id = '" . (int)$data['filter_account_id'] . "')";
+		if (!empty($data['filter']['account_id'])) {
+			$implode[] = "ta.account_id = '" . (int)$data['filter']['account_id'] . "'";
 		}
 
 		if ($implode) {
 			$sql .= " WHERE " . implode(" AND ", $implode);
 		}
 
-		$sql .= " ORDER BY t.date, t.transaction_id ASC";
+		$query = $this->db->query($sql);
+
+		return $query->row;
+	}
+
+	public function getTransactionAccounts($transaction_id)
+	{
+		$query = $this->db->query("SELECT ta.*, a.name AS account FROM " . DB_PREFIX . "transaction_account ta LEFT JOIN " . DB_PREFIX . "account a ON (a.account_id = ta.account_id) WHERE transaction_id = '" . (int)$transaction_id . "'");
+
+		return $query->rows;
+	}
+
+	public function getBalanceEnd($data = [])
+	{
+		unset($data['filter']['date_start']);
+
+		$transaction_end = $this->getTransactionsTotal($data);
+
+		$balance_end = $transaction_end['debit'] - $transaction_end['credit'];
+
+		if (isset($data['start']) && $data['start'] > 0) {
+			$data['limit'] = $data['start'];
+
+			$data['start'] = 0;
+
+			$subtotal = $this->getTransactionsSubTotal($data);
+
+			$balance_end -= $subtotal;
+		}
+
+		return $balance_end;
+	}
+
+	public function getTransactionsSubTotal($data = array())
+	{
+		$sql = "SELECT SUM(ta.debit) AS debit, SUM(ta.credit) AS credit FROM " . DB_PREFIX . "transaction_account ta LEFT JOIN " . DB_PREFIX . "transaction t ON (t.transaction_id = ta.transaction_id)";
+
+		$implode = array();
+
+		if (!empty($data['filter']['date_start'])) {
+			$implode[] = "DATE(t.date) >= '" . $this->db->escape($data['filter']['date_start']) . "'";
+		}
+
+		if (!empty($data['filter']['date_end'])) {
+			$implode[] = "DATE(t.date) <= '" . $this->db->escape($data['filter']['date_end']) . "'";
+		}
+
+		if (!empty($data['filter']['account_id'])) {
+			$implode[] = "ta.account_id = '" . (int)$data['filter']['account_id'] . "'";
+		}
+
+		if ($implode) {
+			$sql .= " WHERE " . implode(" AND ", $implode);
+		}
+
+		$sql .= " GROUP BY t.transaction_id ORDER BY t.date DESC, t.transaction_id DESC";
 
 		if (isset($data['start']) || isset($data['limit'])) {
 			if ($data['start'] < 0) {
@@ -110,50 +168,28 @@ class ModelReportTransaction extends Model
 		$total = 0;
 
 		foreach ($query->rows as $transaction) {
-			// # Maintain Versi 1
-			// if (empty($transaction['account_type'])) {
-			// 	$transaction['account_type'] = 'D';
-			// }
-			// # End Maintain
-			// $transaction['amount'] *= $transaction['account_type'] == 'D' ? 1 : -1;
-
-			if ($transaction['account_to_id'] == $data['filter_account_id']) {
-				$total += $transaction['amount'];
-			} else {
-				$total -= $transaction['amount'];
-			}
+			$total += $transaction['debit'] - $transaction['credit'];
 		}
 
 		return $total;
 	}
 
-	public function getTransactionsTotalPrevious($data = [])
+// Delete
+	public function getTransactionsTotalPreviousDel($data = [])
 	{
-		if (!empty($data['filter_date_start'])) {
-			$sql = "SELECT t.account_to_id, tt.account_type, SUM(t.amount) AS total FROM " . DB_PREFIX . "transaction t LEFT JOIN " . DB_PREFIX . "transaction_type tt ON (tt.transaction_type_id = t.transaction_type_id) WHERE t.date < '" . $this->db->escape($data['filter_date_start']) . "'";
+		if (!empty($data['filter']['date_start'])) {
+			$sql = "SELECT SUM(ta.debit) AS debit, SUM(ta.credit) AS credit FROM " . DB_PREFIX . "transaction_account ta LEFT JOIN " . DB_PREFIX . "transaction t ON (t.transaction_id = ta.transaction_id) WHERE t.date < '" . $this->db->escape($data['filter']['date_start']) . "'";
 
-			$sql .= " AND (t.account_to_id = '" . (int)$data['filter_account_id'] . "' OR t.account_from_id = '" . (int)$data['filter_account_id'] . "')";
+			$sql .= " AND ta.account_id = '" . (int)$data['filter']['account_id'] . "'";
 
-			$sql .= " GROUP BY t.account_to_id";
+			$sql .= " GROUP BY t.transaction_label";
 
 			$query = $this->db->query($sql);
 
-			$total = 0;
-
-			foreach ($query->rows as $value) {
-				// # Maintain Versi 1
-				// if (empty($value['account_type'])) {
-				// 	$value['account_type'] = 'D';
-				// }
-				// # End Maintain
-
-				// $value['total'] *= $value['account_type'] == 'D' ? 1 : -1;
-
-				if ($value['account_to_id'] == $data['filter_account_id']) {
-					$total += $value['total'];
-				} else {
-					$total -= $value['total'];
-				}
+			if ($query->row) {
+				$total = $query->row['debit'] - $query->row['credit'];
+			} else {
+				$total = 0;
 			}
 
 			if (isset($data['start']) && $data['start'] > 0) {

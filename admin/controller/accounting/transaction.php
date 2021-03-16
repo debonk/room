@@ -306,7 +306,7 @@ class ControllerAccountingTransaction extends Controller
 				'transaction_id' => $result['transaction_id'],
 				'date'	 		=> date($this->language->get('date_format_short'), strtotime($result['date'])),
 				'transaction_type'	=> $result['transaction_type'],
-				'reference'  => $reference,
+				'reference'  	=> $reference,
 				'description'	=> $result['description'],
 				'customer_name'	=> $result['customer_name'],
 				'account'		=> $account_data,

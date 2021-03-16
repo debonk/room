@@ -30,12 +30,12 @@
 								<label class="control-label" for="input-account">
 									<?php echo $entry_account; ?>
 								</label>
-								<select name="filter_account_id" id="input-account" class="form-control">
+								<select name="filter[account_id]" id="input-account" class="form-control">
 									<?php foreach ($accounts as $account) { ?>
 									<optgroup label="<?php echo $account['text']; ?>">
 										<?php if ($account['child']) { ?>
 										<?php foreach ($account['child'] as $child) { ?>
-										<?php if ($child['account_id'] == $filter_account_id) { ?>
+										<?php if ($child['account_id'] == $filter['account_id']) { ?>
 										<option value="<?php echo $child['account_id']; ?>" selected="selected">&nbsp;&nbsp;&nbsp;
 											<?php echo $child['text']; ?>
 										</option>
@@ -57,7 +57,7 @@
 									<?php echo $entry_date_start; ?>
 								</label>
 								<div class="input-group date">
-									<input type="text" name="filter_date_start" value="<?php echo $filter_date_start; ?>"
+									<input type="text" name="filter[date_start]" value="<?php echo $filter['date_start']; ?>"
 										placeholder="<?php echo $entry_date_start; ?>" data-date-format="YYYY-MM-DD" id="input-date-start"
 										class="form-control" />
 									<span class="input-group-btn">
@@ -72,7 +72,7 @@
 									<?php echo $entry_date_end; ?>
 								</label>
 								<div class="input-group date">
-									<input type="text" name="filter_date_end" value="<?php echo $filter_date_end; ?>"
+									<input type="text" name="filter[date_end]" value="<?php echo $filter['date_end']; ?>"
 										placeholder="<?php echo $entry_date_end; ?>" data-date-format="YYYY-MM-DD" id="input-date-end"
 										class="form-control" />
 									<span class="input-group-btn">
@@ -97,19 +97,20 @@
 		$('#button-filter').on('click', function () {
 			url = 'index.php?route=report/transaction_balance&token=<?php echo $token; ?>';
 
-			var filter_date_start = $('input[name=\'filter_date_start\']').val();
-			if (filter_date_start) {
-				url += '&filter_date_start=' + encodeURIComponent(filter_date_start);
-			}
+			let filter_items = [
+				'account_id',
+				'date_start',
+				'date_end'
+			];
 
-			var filter_date_end = $('input[name=\'filter_date_end\']').val();
-			if (filter_date_end) {
-				url += '&filter_date_end=' + encodeURIComponent(filter_date_end);
-			}
+			let filter = [];
 
-			var filter_account_id = $('select[name=\'filter_account_id\']').val();
-			if (filter_account_id) {
-				url += '&filter_account_id=' + encodeURIComponent(filter_account_id);
+			for (let i = 0; i < filter_items.length; i++) {
+				filter[filter_items[i]] = $('[name=\'filter[' + filter_items[i] + ']\']').val();
+
+				if (filter[filter_items[i]]) {
+					url += '&filter_' + filter_items[i] + '=' + encodeURIComponent(filter[filter_items[i]]);
+				}
 			}
 
 			location = url;
@@ -123,14 +124,14 @@
 			$('html').animate({ scrollTop: 150 }, 500);
 		});
 
-		var filter_account_id = encodeURIComponent($('select[name=\'filter_account_id\']').val());
+		var filter_account_id = encodeURIComponent($('select[name=\'filter[account_id]\']').val());
 
-		$('#report').load('index.php?route=report/transaction_balance/report&token=<?php echo $token; ?>&filter_account_id=' + filter_account_id + '&filter_date_start=<?php echo $filter_date_start; ?>&filter_date_end=<?php echo $filter_date_end; ?>');
+		$('#report').load('index.php?route=report/transaction_balance/report&token=<?php echo $token; ?>&filter_account_id=' + filter_account_id + '&filter_date_start=<?php echo $filter["date_start"]; ?>&filter_date_end=<?php echo $filter["date_end"]; ?>');
 
 		$('#input-account').on('change', function () {
-			var filter_account_id = encodeURIComponent($('select[name=\'filter_account_id\']').val());
-			var filter_date_start = encodeURIComponent($('input[name=\'filter_date_start\']').val());
-			var filter_date_end = encodeURIComponent($('input[name=\'filter_date_end\']').val());
+			var filter_account_id = encodeURIComponent($('select[name=\'filter[account_id]\']').val());
+			var filter_date_start = encodeURIComponent($('input[name=\'filter[date_start]\']').val());
+			var filter_date_end = encodeURIComponent($('input[name=\'filter[date_end]\']').val());
 
 			$('#report').load('index.php?route=report/transaction_balance/report&token=<?php echo $token; ?>&filter_account_id=' + filter_account_id + '&filter_date_start=' + filter_date_start + '&filter_date_end=' + filter_date_end);
 		});
