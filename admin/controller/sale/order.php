@@ -2446,6 +2446,11 @@ class ControllerSaleOrder extends Controller
 				$data['text_transactions']['text_pelunasan'] = sprintf($this->language->get('text_pelunasan'), $this->currency->format($order_info['total'] - $transactions_total['order'], $order_info['currency_code'], $order_info['currency_value']));
 			}
 
+			$deposit = $this->config->get('config_customer_deposit');
+			if ($deposit) {
+				$data['text_transactions']['text_uang_jaminan'] = sprintf($this->language->get('text_jaminan_customer'), $this->currency->format($deposit, $order_info['currency_code'], $order_info['currency_value']));
+			}
+
 			$no_rekening = $this->config->get($order_info['payment_code'] . '_bank' . $order_info['language_id']);
 			$data['no_rekening'] = str_replace(array("\r\n", "\r", "\n"), '<br />', preg_replace(array("/\s\s+/", "/\r\r+/", "/\n\n+/"), '<br />', trim($no_rekening)));
 

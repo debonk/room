@@ -667,7 +667,7 @@ class ModelSaleOrder extends Model {
 				$revenue_id = $this->config->get('config_adjustment_account_id');
 			
 				$filter_data = array(
-					'label'			=> 'customer',
+					'client_label'		=> 'customer',
 					'category_label'	=> 'order'
 				);
 		

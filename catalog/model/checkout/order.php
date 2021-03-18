@@ -128,10 +128,11 @@ class ModelCheckoutOrder extends Model {
 		$this->db->query("DELETE FROM `" . DB_PREFIX . "order` WHERE order_id = '" . (int)$order_id . "'");
 		$this->db->query("DELETE FROM `" . DB_PREFIX . "order_attribute` WHERE order_id = '" . (int)$order_id . "'");
 		$this->db->query("DELETE FROM `" . DB_PREFIX . "order_custom_field` WHERE order_id = '" . (int)$order_id . "'");
-		$this->db->query("DELETE FROM `" . DB_PREFIX . "order_documetn` WHERE order_id = '" . (int)$order_id . "'");
+		$this->db->query("DELETE FROM `" . DB_PREFIX . "order_document` WHERE order_id = '" . (int)$order_id . "'");
 		$this->db->query("DELETE FROM `" . DB_PREFIX . "order_history` WHERE order_id = '" . (int)$order_id . "'");
 		$this->db->query("DELETE FROM `" . DB_PREFIX . "order_option` WHERE order_id = '" . (int)$order_id . "'");
 		$this->db->query("DELETE FROM `" . DB_PREFIX . "order_product` WHERE order_id = '" . (int)$order_id . "'");
+		$this->db->query("DELETE FROM `" . DB_PREFIX . "order_vendor` WHERE order_id = '" . (int)$order_id . "'");
 		$this->db->query("DELETE `op`, opp FROM `" . DB_PREFIX . "order_purchase` `op`, `" . DB_PREFIX . "order_purchase_product` `opp` WHERE order_id = '" . (int)$order_id . "' AND opp.order_purchase_id = `or`.order_purchase_id");
 		$this->db->query("DELETE FROM `" . DB_PREFIX . "order_total` WHERE order_id = '" . (int)$order_id . "'");
 		$this->db->query("DELETE FROM `" . DB_PREFIX . "order_voucher` WHERE order_id = '" . (int)$order_id . "'");
