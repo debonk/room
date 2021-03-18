@@ -448,7 +448,7 @@ class ModelReportSale extends Model {
 			
 			$implode_sql[] = "SELECT 'customer-order' AS type, o.order_id AS type_id, o.order_id, DATE(o.date_added) AS date, CONCAT(o.invoice_prefix, LPAD(o.invoice_no, 4, '0')) AS reference, CONCAT(o.firstname, ' ', o.lastname) AS customer, o.printed, u.username FROM `" . DB_PREFIX . "order` o LEFT JOIN `" . DB_PREFIX . "user` u ON (u.user_id = o.user_id) WHERE o.order_id > 0 AND o.invoice_no > 0 ";
 			
-			$implode_sql[] = "SELECT CONCAT(t.label, '-transaction') AS type, t.transaction_id AS type_id, t.order_id, t.date AS date, CONCAT(t.reference_prefix, LPAD(t.reference_no, 4, '0')) AS reference, t.customer_name AS customer, t.printed, u.username FROM `" . DB_PREFIX . "transaction` t LEFT JOIN `" . DB_PREFIX . "user` u ON (u.user_id = t.user_id) WHERE t.label IN ('vendor', 'customer')";
+			$implode_sql[] = "SELECT CONCAT(t.client_label, '-transaction') AS type, t.transaction_id AS type_id, t.order_id, t.date AS date, CONCAT(t.reference_prefix, LPAD(t.reference_no, 4, '0')) AS reference, t.customer_name AS customer, t.printed, u.username FROM `" . DB_PREFIX . "transaction` t LEFT JOIN `" . DB_PREFIX . "user` u ON (u.user_id = t.user_id) WHERE t.client_label IN ('vendor', 'customer')";
 			
 			$implode_sql[] = "SELECT CONCAT(od.client_type, '-', od.document_type) AS type, od.order_document_id AS type_id, od.order_id, od.date AS date, CONCAT(od.reference_prefix, LPAD(od.reference_no, 4, '0')) AS reference, ov.vendor_name AS customer, od.printed, u.username FROM `" . DB_PREFIX . "order_document` od LEFT JOIN `" . DB_PREFIX . "order_vendor` ov ON (ov.order_vendor_id = od.client_id) LEFT JOIN `" . DB_PREFIX . "user` u ON (u.user_id = od.user_id)";
 

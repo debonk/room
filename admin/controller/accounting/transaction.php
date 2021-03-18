@@ -291,7 +291,8 @@ class ControllerAccountingTransaction extends Controller
 			foreach ($transaction_accounts as $transaction_account) {
 				if ($transaction_account['debit'] > 0 || $transaction_account['credit'] < 0) {
 					$account_data['debit'][] = $transaction_account['account_id'] . ' - ' . $transaction_account['account'];
-				} else {
+				}
+				if ($transaction_account['debit'] < 0 || $transaction_account['credit'] > 0) {
 					$account_data['credit'][] = $transaction_account['account_id'] . ' - ' . $transaction_account['account'];
 				}
 			}
@@ -403,7 +404,8 @@ class ControllerAccountingTransaction extends Controller
 			'button_account_add',
 			'button_remove',
 			'button_save',
-			'button_cancel'
+			'button_cancel',
+			'help_amount'
 		);
 		foreach ($language_items as $language_item) {
 			$data[$language_item] = $this->language->get($language_item);
@@ -521,38 +523,87 @@ class ControllerAccountingTransaction extends Controller
 
 	protected function validateForm()
 	{
-		if (!$this->user->hasPermission('modify', 'accounting/transaction')) {
-			$this->error['warning'] = $this->language->get('error_permission');
-		}
+		switch (false) {
+			case $this->error:
+				if (!$this->user->hasPermission('modify', 'accounting/transaction')) {
+					$this->error['warning'] = $this->language->get('error_permission');
 
-		if (isset($this->request->post['transaction_type_id']) && empty($this->request->post['transaction_type_id'])) {
-			$this->error['transaction_type'] = $this->language->get('error_transaction_type');
-		}
+					break;
+				} else {
+					if (isset($this->request->post['transaction_type_id']) && empty($this->request->post['transaction_type_id'])) {
+						$this->error['transaction_type'] = $this->language->get('error_transaction_type');
+					}
 
-		if (isset($this->request->post['date']) && empty($this->request->post['date'])) {
-			$this->error['date'] = $this->language->get('error_date');
-		}
+					if (isset($this->request->post['date']) && empty($this->request->post['date'])) {
+						$this->error['date'] = $this->language->get('error_date');
+					}
 
-		if (isset($this->request->post['description']) && ((utf8_strlen($this->request->post['description']) < 5) || (utf8_strlen($this->request->post['description']) > 256))) {
-			$this->error['description'] = $this->language->get('error_description');
-		}
+					if (isset($this->request->post['description']) && ((utf8_strlen($this->request->post['description']) < 5) || (utf8_strlen($this->request->post['description']) > 256))) {
+						$this->error['description'] = $this->language->get('error_description');
+					}
 
-		if (isset($this->request->post['amount']) && (float)$this->request->post['amount'] <= 0) {
-			$this->error['amount'] = $this->language->get('error_amount');
-		}
+					if (isset($this->request->post['amount']) && (float)$this->request->post['amount'] <= 0) {
+						$this->error['amount'] = $this->language->get('error_amount');
+					}
 
-		if (!isset($this->request->post['transaction_account'])) {
-			$this->error['warning'] = $this->language->get('error_account');
-		} else {
-			foreach ($this->request->post['transaction_account'] as $transaction_account) {
-				if (!$transaction_account['account_id']) {
-					$this->error['warning'] = $this->language->get('error_account');
+					if ($this->error && !isset($this->error['warning'])) {
+						$this->error['warning'] = $this->language->get('error_warning');
+
+						break;
+					}
 				}
-			}
-		}
 
-		if ($this->error && !isset($this->error['warning'])) {
-			$this->error['warning'] = $this->language->get('error_warning');
+				if (!isset($this->request->post['transaction_account'])) {
+					$this->error['warning'] = $this->language->get('error_account');
+
+					break;
+				}
+
+				foreach ($this->request->post['transaction_account'] as $transaction_account) {
+					if (!$transaction_account['account_id']) {
+						$this->error['warning'] = $this->language->get('error_account');
+
+						break;
+					}
+				}
+
+				if (count(array_unique(array_column($this->request->post['transaction_account'], 'account_id'))) < 2) {
+					$this->error['warning'] = $this->language->get('error_account');
+
+					break;
+				}
+
+				$total_debit = array_sum(array_column($this->request->post['transaction_account'], 'debit'));
+				$total_credit = array_sum(array_column($this->request->post['transaction_account'], 'credit'));
+				if ($total_debit <= 0 || $total_credit <= 0 || $total_debit != $total_credit) {
+					$this->error['warning'] = $this->language->get('error_account_amount');
+
+					break;
+				}
+
+				if (isset($this->request->get['transaction_id'])) {
+					$transaction_info = $this->model_accounting_transaction->getTransaction($this->request->get['transaction_id']);
+
+					if ($transaction_info['printed']) {
+						$this->error['warning'] = $this->language->get('error_printed');
+
+						break;
+					}
+
+					if ($transaction_info['order_id']) {
+						$this->load->model('sale/order');
+						$order_status_id = $this->model_sale_order->getOrderStatusId($transaction_info['order_id']);
+
+						if (in_array($order_status_id, $this->config->get('config_complete_status'))) {
+							$this->error['warning'] = $this->language->get('error_order_status');
+
+							break;
+						}
+					}
+				}
+
+			default:
+				break;
 		}
 
 		return !$this->error;
@@ -564,17 +615,24 @@ class ControllerAccountingTransaction extends Controller
 			$this->error['warning'] = $this->language->get('error_permission');
 		}
 
-		$this->load->model('accounting/transaction');
 		$this->load->model('sale/order');
 
 		foreach ($this->request->post['selected'] as $transaction_id) {
 			$transaction_info = $this->model_accounting_transaction->getTransaction($transaction_id);
 
+			if ($transaction_info['printed']) {
+				$this->error['warning'] = $this->language->get('error_printed');
+
+				break;
+			}
+
 			if ($transaction_info['order_id']) {
 				$order_status_id = $this->model_sale_order->getOrderStatusId($transaction_info['order_id']);
-				
+
 				if (in_array($order_status_id, $this->config->get('config_complete_status'))) {
 					$this->error['warning'] = $this->language->get('error_order_status');
+
+					break;
 				}
 			}
 		}

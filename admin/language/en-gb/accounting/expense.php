@@ -45,6 +45,7 @@ $_['error_date']    			= 'Tanggal Transaksi harus diisi!';
 $_['error_description']    		= 'Keterangan harus diisi 5 - 256 karakter!';
 $_['error_amount']    			= 'Jumlah harus diisi dan hrs lebih besar dari 0!';
 $_['error_order']    			= 'Warning: Transaksi tidak bisa diedit/dihapus karena merupakan transaksi otomatis!';
+$_['error_printed']				= 'Warning: Transaksi tidak bisa diedit/dihapus karena telah dicetak!';
 
 // Help
 $_['help_amount']        		 = 'Isi dengan nilai positif.';

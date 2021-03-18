@@ -115,7 +115,6 @@ class ControllerReportSaleDocument extends Controller
 		$transaction_count = $this->model_report_sale->getDocumentsCount($filter_data);
 
 		$results = $this->model_report_sale->getDocuments($filter_data);
-		// var_dump($results);die('---breakpoint---');
 
 		foreach ($results as $result) {
 			switch ($result['type']) {

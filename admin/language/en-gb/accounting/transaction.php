@@ -41,19 +41,24 @@ $_['entry_username']   		 	= 'Username';
 // Error
 $_['error_warning']             = 'Warning: Please check the form carefully for errors!';
 $_['error_permission']   		= 'Warning: You do not have permission to modify transactions!';
-$_['error_account']    			= 'Warning: Lengkapi Rekening Akun!';
+$_['error_account']    			= 'Warning: Lengkapi Rekening Akun! (Minimum 2 akun berbeda)';
+$_['error_account_amount']    	= 'Warning: Total Debet dan Kredit harus sama dan lebih besar dari 0!';
 $_['error_account_credit']    	= 'Tentukan Akun Kredit!';
 $_['error_account_debit']    	= 'Tentukan Akun Debet!';
 $_['error_date']    			= 'Tanggal Transaksi harus diisi!';
 $_['error_description']    		= 'Keterangan harus diisi 5 - 256 karakter!';
 $_['error_amount']    			= 'Jumlah harus diisi dan hrs lebih besar dari 0!';
+$_['error_not_found']	 		= 'Warning: Transaksi tidak ditemukan!';
 $_['error_order']    			= 'Warning: Transaksi tidak bisa diedit/dihapus karena merupakan transaksi otomatis!';
 $_['error_order_permission']    = 'Warning: Tidak diijinkan untuk memberi akses edit untuk Transaksi Otomatis!';
-$_['error_not_found']	 		= 'Warning: Transaksi tidak ditemukan!';
-$_['error_order_status']		= 'Warning: Transaksi tidak bisa dihapus karena status pesanan telah "Complete"!';
+$_['error_order_status']		= 'Warning: Transaksi tidak bisa diedit/dihapus karena status pesanan telah "Complete"!';
+$_['error_printed']				= 'Warning: Transaksi tidak bisa diedit/dihapus karena telah dicetak!';
 $_['error_transaction_type']	= 'Pilih Jenis Transaksi';
 
 // Button
 $_['button_account_add']    	= 'Add Transaction Account';
 $_['button_edit_lock']    		= 'Lock Edit Permission';
 $_['button_edit_unlock']    	= 'Give Edit Permission';
+
+// Help
+$_['help_amount']        		 = 'Isi dengan nilai positif.';

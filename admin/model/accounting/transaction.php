@@ -12,8 +12,6 @@ class ModelAccountingTransaction extends Model
 		$transaction_type_info = $this->model_accounting_transaction_type->getTransactionType($data['transaction_type_id']);
 
 		$field_data = [
-			// 'category_label',
-			// 'transaction_label',
 			'client_id',
 			'order_id',
 			'payment_method',
@@ -57,19 +55,34 @@ class ModelAccountingTransaction extends Model
 			$this->load->model('accounting/transaction_type');
 
 			$transaction_type_info = $this->model_accounting_transaction_type->getTransactionType($data['transaction_type_id']);
-			
-			$sql .= ", client_label = '" . $this->db->escape($transaction_type_info['client_label']) . "', category_label = '" . $this->db->escape($transaction_type_info['category_label']) . "', transaction_label = '" . $this->db->escape($transaction_type_info['transaction_label']) . "', transaction_type_id = '" . (int)$data['transaction_type_id'] . "', date = DATE('" . $this->db->escape($data['date']) . "'), description = '" . $this->db->escape($data['description']) . "', amount = '" . (float)$data['amount'] . "', customer_name = '" . $this->db->escape($data['customer_name']) . "'"; 
+
+			$sql .= ", client_label = '" . $this->db->escape($transaction_type_info['client_label']) . "', category_label = '" . $this->db->escape($transaction_type_info['category_label']) . "', transaction_label = '" . $this->db->escape($transaction_type_info['transaction_label']) . "', transaction_type_id = '" . (int)$data['transaction_type_id'] . "', date = DATE('" . $this->db->escape($data['date']) . "'), description = '" . $this->db->escape($data['description']) . "', amount = '" . (float)$data['amount'] . "', customer_name = '" . $this->db->escape($data['customer_name']) . "'";
 		}
-		
+
 		$sql .= " WHERE transaction_id = '" . (int)$transaction_id . "'";
-		
+
 		$this->db->query($sql);
 
 		$this->db->query("DELETE FROM " . DB_PREFIX . "transaction_account WHERE transaction_id = '" . (int)$transaction_id . "'");
 
 		if (isset($data['transaction_account'])) {
-			foreach ($data['transaction_account'] as $transaction_account) {
-				$this->db->query("INSERT INTO " . DB_PREFIX . "transaction_account SET transaction_id = '" . (int)$transaction_id . "', account_id = '" . (int)$transaction_account['account_id'] . "', debit = '" . (float)$transaction_account['debit'] . "', credit = '" . (float)$transaction_account['credit'] . "'");
+			$transaction_accounts = [];
+
+			# Combine data with same account_id
+			foreach ($data['transaction_account'] as $value) {
+				if (!isset($transaction_accounts[$value['account_id']])) {
+					$transaction_accounts[$value['account_id']] = [
+						'debit'		=> (float)$value['debit'],
+						'credit'	=> (float)$value['credit']
+					];
+				} else {
+					$transaction_accounts[$value['account_id']]['debit'] += (float)$value['debit'];
+					$transaction_accounts[$value['account_id']]['credit'] += (float)$value['credit'];
+				}
+			}
+			
+			foreach ($transaction_accounts as $account_id => $transaction_account) {
+				$this->db->query("INSERT INTO " . DB_PREFIX . "transaction_account SET transaction_id = '" . (int)$transaction_id . "', account_id = '" . (int)$account_id . "', debit = '" . (float)$transaction_account['debit'] . "', credit = '" . (float)$transaction_account['credit'] . "'");
 			}
 		}
 	}
@@ -90,7 +103,7 @@ class ModelAccountingTransaction extends Model
 	public function getTransactions($data = array())
 	{
 		$sql = "SELECT t.*, CONCAT(t.reference_prefix, LPAD(t.reference_no, 4, '0')) AS reference, tt.name AS transaction_type, o.invoice_no, o.invoice_prefix, o.firstname, o.lastname, u.username FROM " . DB_PREFIX . "transaction t LEFT JOIN " . DB_PREFIX . "transaction_type tt ON (tt.transaction_type_id = t.transaction_type_id) LEFT JOIN " . DB_PREFIX . "order o ON (o.order_id = t.order_id) LEFT JOIN " . DB_PREFIX . "user u ON (u.user_id = t.user_id)";
-		
+
 		if (!empty($data['filter']['account_id'])) {
 			$sql .= " LEFT JOIN " . DB_PREFIX . "transaction_account ta ON (ta.transaction_id = t.transaction_id)";
 		}

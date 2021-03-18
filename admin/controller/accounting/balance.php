@@ -559,6 +559,8 @@ class ControllerAccountingBalance extends Controller
 				$this->error['warning'] = $this->language->get('error_edit');
 			} elseif ($transaction_info['order_id']) {
 				$this->error['warning'] = $this->language->get('error_order');
+			} elseif ($transaction_info['printed']) {
+				$this->error['warning'] = $this->language->get('error_printed');
 			}
 		}
 
@@ -584,6 +586,10 @@ class ControllerAccountingBalance extends Controller
 				break;
 			} elseif ($transaction_info['order_id']) {
 				$this->error['warning'] = $this->language->get('error_order');
+
+				break;
+			} elseif ($transaction_info['printed']) {
+				$this->error['warning'] = $this->language->get('error_printed');
 
 				break;
 			}

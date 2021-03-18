@@ -121,7 +121,7 @@
 							</label>
 							<div class="col-sm-10">
 								<input type="text" name="amount" value="<?php echo $amount; ?>"
-									placeholder="<?php echo $entry_amount; ?>" id="input-amount" class="form-control" />
+									placeholder="<?php echo $entry_amount . ' - ' . $help_amount; ?>" id="input-amount" class="form-control" />
 								<?php if ($error_amount) { ?>
 								<div class="text-danger">
 									<?php echo $error_amount; ?>
