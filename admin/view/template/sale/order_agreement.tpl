@@ -416,7 +416,6 @@
                         </b></div>
                     </li>
                     <?php } ?>
-                    <?php if (!$preview) { ?>
                     <li>
                       <?= $text_belum_ppn; ?>
                     </li>
@@ -434,12 +433,7 @@
                           <?= $text_pembatalan_3; ?>
                         </b></div>
                     </li>
-                    <?php } else { ?>
-                    <li>
-                      <?= $text_dst ?>
-                    </li>
-                    <?php } ?>
-                  </ol>
+                 </ol>
                 </td>
               </tr>
             </tbody>
@@ -492,6 +486,8 @@
             </tbody>
           </table>
           <?php } ?>
+          <?php } else { ?>
+						<?= $text_dst; ?>
           <?php } ?>
         </div>
       </div>

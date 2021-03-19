@@ -2311,6 +2311,7 @@ class ControllerSaleOrder extends Controller
 
 			// Product Data
 			$data['products'] = array();
+			$data['venue'] = '';
 
 			$products = $this->model_sale_order->getOrderProducts($order_id);
 
@@ -2413,14 +2414,14 @@ class ControllerSaleOrder extends Controller
 			$data['transactions'] = array();
 
 			$filter_data = array(
-				'label'				=> 'customer',
+				'client_label'		=> 'customer',
 				'category_label'	=> 'order'
 			);
 
 			$transactions_total['order'] = $this->model_accounting_transaction->getTransactionsTotalSummary($order_id, $filter_data);
 
 			$filter_data = array(
-				'label'				=> 'customer',
+				'client_label'		=> 'customer',
 				'category_label'	=> 'deposit'
 			);
 
@@ -2578,6 +2579,18 @@ class ControllerSaleOrder extends Controller
 			// Product Data
 			$primary_product = $this->model_sale_order->getOrderPrimaryProduct($order_id);
 
+			$venue_info = '';
+
+			$attributes = $this->model_sale_order->getOrderAttributes($order_id, $primary_product['order_product_id']);
+
+			foreach ($attributes as $attribute) {
+				if ($attribute['attribute'] == 'Venue') {
+					$venue_info = $attribute['text'];
+				}
+			}
+
+			$venue_info .= ($venue_info ? ' - ' : '') . $data['store_name'];
+		
 			// Transaction Info
 			$transaction_date_in = $this->model_localisation_local_date->getInFormatDate($transaction_info['date']);
 			$transaction_title	= $transaction_info['transaction_type'];
@@ -2587,13 +2600,13 @@ class ControllerSaleOrder extends Controller
 			$data['amount']	= $this->currency->format(abs($transaction_info['amount']), $order_info['currency_code'], $order_info['currency_value']);
 			$data['terbilang'] = sprintf($this->language->get('text_terbilang'), $this->model_localisation_local_date->getInWord($transaction_info['amount']));
 
-			switch ($transaction_info['label']) {
+			switch ($transaction_info['client_label']) {
 				case 'customer':
 					$data['name'] = $order_info['firstname'] . ' ' . $order_info['lastname'] . ($order_info['payment_company'] ? ' - ' . $order_info['payment_company'] : '');
 
 					$address_format = sprintf($this->language->get('text_address_format'), $order_info['payment_address_1'] . ($order_info['payment_address_2'] ? ', ' . $order_info['payment_address_2'] : ''), $order_info['payment_city'], $order_info['payment_postcode'], $order_info['payment_zone'], $order_info['payment_country']);
 
-					$data['text_hal'] = sprintf($this->language->get('text_atas_persewaan'), $transaction_title, $primary_product['name'], $data['store_name'], $order_info['title'], $event_date_in['long_date']);
+					$data['text_hal'] = sprintf($this->language->get('text_atas_persewaan'), $transaction_title, $primary_product['name'], $venue_info, $order_info['title'], $event_date_in['long_date']);
 					$data['text_pihak'] = $this->language->get('text_pihak_penyewa');
 					$data['tanda_tangan'] = '( ' . $order_info['firstname'] . ' ' . $order_info['lastname'] . ' )';
 					$data['company'] = $order_info['payment_company'] ? $order_info['payment_company'] : '';
@@ -2603,13 +2616,13 @@ class ControllerSaleOrder extends Controller
 				case 'vendor':
 					$this->load->model('catalog/vendor');
 
-					$vendor_info = $this->model_catalog_vendor->getVendor($transaction_info['label_id']);
+					$vendor_info = $this->model_catalog_vendor->getVendor($transaction_info['client_id']);
 
 					$data['name'] = $vendor_info['vendor_name'] . ' - ' . $vendor_info['vendor_type'] . ($vendor_info['contact_person'] ? ' (' . $vendor_info['contact_person'] . ')' : '');
 
 					$address_format = $vendor_info['address'];
 
-					$data['text_hal'] = sprintf($this->language->get('text_atas_pelaksanaan'), $transaction_title, $order_info['title'], $data['store_name'], $event_date_in['long_date']);
+					$data['text_hal'] = sprintf($this->language->get('text_atas_pelaksanaan'), $transaction_title, $order_info['title'], $venue_info, $event_date_in['long_date']);
 					$data['text_pihak'] = $this->language->get('text_pihak_vendor');
 					$data['tanda_tangan'] = $this->language->get('text_tanda_tangan');
 					$data['company'] = $vendor_info['vendor_name'];

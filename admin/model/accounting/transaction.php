@@ -700,10 +700,6 @@ class ModelAccountingTransaction extends Model
 			$implode[] = "t.transaction_label = '" . $this->db->escape($data['transaction_label']) . "'";
 		}
 
-		// if (isset($data['account_id'])) {
-		// 	$implode[] = "ta.account_id = '" . (int)$data['account_id'] . "'";
-		// }
-
 		if ($implode) {
 			$sql .= " AND " . implode(" AND ", $implode);
 		}

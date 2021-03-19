@@ -630,8 +630,8 @@ class ControllerSaleVendor extends Controller
 
 		if ($order_vendor_info && $order_vendor_info['deposit']) {
 			$summary_data = [
-				'label'				=> 'vendor',
-				'label_id'			=> $order_vendor_info['vendor_id'],
+				'client_label'		=> 'vendor',
+				'client_id'			=> $order_vendor_info['vendor_id'],
 				'category_label'	=> 'deposit',
 				'group'				=> 'tt.category_label'
 			];
@@ -642,7 +642,7 @@ class ControllerSaleVendor extends Controller
 				$admission_status = false;
 			}
 		}
-		// $admission_status = 1;//Develompent Purpose
+		// $admission_status = 1;//Development Purpose
 
 		if ($admission_status) {
 			$this->load->model('setting/setting');

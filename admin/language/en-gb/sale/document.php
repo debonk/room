@@ -34,7 +34,7 @@ $_['text_demikian']    		= 'Demikian kesepakatan ini dibuat dan untuk mendapat p
 $_['text_pihak_penyewa']    = 'Pihak Penyewa';
 $_['text_pihak_vendor']    	= 'Pihak Vendor';
 $_['text_tanda_tangan']    	= '(__________________________)';
-$_['text_dst']    			= '....................... dst.';
+$_['text_dst']    			= '........................';
 
 // Text Receipt
 $_['title_receipt']			= 'KUITANSI';
@@ -42,8 +42,8 @@ $_['text_attn']   			= 'Hal';
 $_['text_to']   			= 'Kepada';
 $_['text_from']   			= 'Dari';
 $_['text_address_format']   = '%s<br />%s %s<br />%s, %s';
-$_['text_atas_persewaan']   = '<b>%s</b> atas Pemesanan Paket %s - %s Untuk Acara <b>"%s"</b> Pada Tanggal %s';
-$_['text_atas_pelaksanaan'] = '<b>%s</b> dalam Pelaksanaan Acara <b>"%s"</b> yang bertempat di %s Pada Tanggal %s';
+$_['text_atas_persewaan']   = '<b>%s</b> atas Pemesanan Paket %s yang Bertempat di %s Untuk Acara <b>"%s"</b> Pada Tanggal %s';
+$_['text_atas_pelaksanaan'] = '<b>%s</b> dalam Pelaksanaan Acara <b>"%s"</b> yang Bertempat di %s Pada Tanggal %s';
 $_['text_sejumlah']   		= 'TOTAL SEJUMLAH';
 $_['text_terbilang']   		= 'Terbilang: # %s rupiah #';
 $_['text_diterima']   		= '- Pembayaran dikonfirmasi oleh %s - %s';

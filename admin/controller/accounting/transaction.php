@@ -590,7 +590,8 @@ class ControllerAccountingTransaction extends Controller
 						break;
 					}
 
-					if ($transaction_info['order_id']) {
+					# Aktifkan jika edit transaksi tidak diijinkan setelah status complete
+/* 					if ($transaction_info['order_id']) {
 						$this->load->model('sale/order');
 						$order_status_id = $this->model_sale_order->getOrderStatusId($transaction_info['order_id']);
 
@@ -599,7 +600,7 @@ class ControllerAccountingTransaction extends Controller
 
 							break;
 						}
-					}
+					} */
 				}
 
 			default:
