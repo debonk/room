@@ -682,6 +682,8 @@
 		</div>
 	</div>
 	<script type="text/javascript">
+		let element_pos = $('#history').position();
+
 		$('.nav-tabs a[href="#tab-purchase"]').on('click', function () {
 			$('.alert, .text-danger').remove();
 			
@@ -1038,6 +1040,7 @@
 
 					if (json['error']) {
 						$('#history').before('<div class="alert alert-danger"><i class="fa fa-exclamation-circle"></i> ' + json['error'] + ' <button type="button" class="close" data-dismiss="alert">&times;</button></div>');
+						$('html, body').animate({ scrollTop: element_pos.top - 70 }, 500);
 					}
 
 					if (json['error_date']) {
@@ -1080,6 +1083,8 @@
 				success: function (json) {
 					if (json['error']) {
 						$('#content > .container-fluid').prepend('<div class="alert alert-danger"><i class="fa fa-exclamation-circle"></i> ' + json['error'] + ' <button type="button" class="close" data-dismiss="alert">&times;</button></div>');
+
+						$('html, body').animate({ scrollTop: element_pos.top }, 500);
 					}
 
 					if (json['success']) {
@@ -1090,7 +1095,6 @@
 						$('input[name=\'amount\']').val('');
 						$('textarea[name=\'comment\']').val('');
 						location.reload();
-
 					}
 				},
 				error: function (xhr, ajaxOptions, thrownError) {

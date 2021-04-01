@@ -177,7 +177,7 @@ class ModelSaleOrder extends Model {
 
 	public function getOrders($data = array()) {
 		// $sql = "SELECT o.order_id, o.title, o.event_date, oo.value AS session_slot, s.code AS slot_code, s.name AS slot, cr.name AS ceremony, CONCAT(o.firstname, ' ', o.lastname) AS customer, o.order_status_id, os.name AS order_status, os.class AS order_status_class, o.invoice_no, o.invoice_prefix, o.shipping_code, o.total, o.currency_code, o.currency_value, o.date_added, o.date_modified, op.name AS primary_product, op.model, u.username, (SELECT SUM(t.amount) FROM `" . DB_PREFIX . "transaction` t WHERE t.order_id = o.order_id AND t.label IN('customer', 'vendor')) AS total_paid FROM `" . DB_PREFIX . "order` o LEFT JOIN `" . DB_PREFIX . "slot` s ON (s.slot_id = o.slot_id) LEFT JOIN `" . DB_PREFIX . "ceremony` cr ON (cr.ceremony_id = o.ceremony_id) LEFT JOIN `" . DB_PREFIX . "order_product` op ON (op.order_id = o.order_id AND op.primary_type = 1) LEFT JOIN `" . DB_PREFIX . "order_option` oo ON (oo.order_id = o.order_id) LEFT JOIN `" . DB_PREFIX . "order_status` os ON (os.order_status_id = o.order_status_id AND os.language_id = '" . (int)$this->config->get('config_language_id') . "') LEFT JOIN `" . DB_PREFIX . "user` u ON (u.user_id = o.user_id)";
-		$sql = "SELECT o.order_id, o.title, o.event_date, s.code AS slot_code, s.name AS slot, CONCAT(o.firstname, ' ', o.lastname) AS customer, o.order_status_id, os.name AS order_status, os.class AS order_status_class, o.invoice_no, o.invoice_prefix, o.shipping_code, o.total, o.currency_code, o.currency_value, o.date_added, o.date_modified, op.name AS primary_product, op.model, u.username FROM `" . DB_PREFIX . "order` o LEFT JOIN `" . DB_PREFIX . "slot` s ON (s.slot_id = o.slot_id) LEFT JOIN `" . DB_PREFIX . "order_product` op ON (op.order_id = o.order_id AND op.primary_type = 1) LEFT JOIN `" . DB_PREFIX . "order_status` os ON (os.order_status_id = o.order_status_id AND os.language_id = '" . (int)$this->config->get('config_language_id') . "') LEFT JOIN `" . DB_PREFIX . "user` u ON (u.user_id = o.user_id)";
+		$sql = "SELECT o.order_id, o.title, o.event_date, s.code AS slot_code, s.name AS slot, CONCAT(o.firstname, ' ', o.lastname) AS customer, o.order_status_id, os.name AS order_status, os.class AS order_status_class, o.invoice_no, o.invoice_prefix, o.shipping_code, o.total, o.currency_code, o.currency_value, o.date_added, o.date_modified, op.name AS primary_product, op.model, op.slot_prefix, u.username FROM `" . DB_PREFIX . "order` o LEFT JOIN `" . DB_PREFIX . "slot` s ON (s.slot_id = o.slot_id) LEFT JOIN `" . DB_PREFIX . "order_product` op ON (op.order_id = o.order_id AND op.primary_type = 1) LEFT JOIN `" . DB_PREFIX . "order_status` os ON (os.order_status_id = o.order_status_id AND os.language_id = '" . (int)$this->config->get('config_language_id') . "') LEFT JOIN `" . DB_PREFIX . "user` u ON (u.user_id = o.user_id)";
 
 		if (isset($data['filter_order_status'])) {
 			$implode = array();
@@ -661,36 +661,97 @@ class ModelSaleOrder extends Model {
 
 			# If current order status is not complete but new status is complete then commence adjustment transaction
 			if (!in_array($order_info['order_status_id'], $this->config->get('config_complete_status')) && in_array($order_status_id, $this->config->get('config_complete_status'))) {
+				$order_status_info = $this->model_localisation_order_status->getOrderStatus($order_status_id);
+
 				$this->load->model('accounting/transaction');
+				$transaction_type_info = $this->model_accounting_transaction->getTransactionType($order_status_info['transaction_type_id']);
 
-				$liability_id = $this->config->get('config_prepaid_account_id');
-				$revenue_id = $this->config->get('config_adjustment_account_id');
-			
-				$filter_data = array(
-					'client_label'		=> 'customer',
-					'category_label'	=> 'order'
-				);
-		
-				$amount = $this->model_accounting_transaction->getTransactionsTotalSummary($order_id, $filter_data);
-				
-				$reference_prefix = 'R' . date('ym');
-				$reference_no = $this->model_accounting_transaction->getLastReferenceNo($reference_prefix) + 1;
-		
-				$transaction_data = array(
-					'order_id'			=> $order_id,
-					'account_from_id'	=> $revenue_id,
-					'account_to_id'		=> $liability_id,
-					'label'				=> 'revenue',
-					'reference_prefix'	=> $reference_prefix,
-					'reference_no' 		=> $reference_no,
-					'date' 				=> date('Y-m-d'),
-					'payment_method'	=> '',
-					'description' 		=> 'Adjustment Transaction from Order #' . $order_id . ': ' . $order_info['firstname'] . ' ' . $order_info['lastname'],
-					'amount' 			=> $amount,
-					'customer_name' 	=> 'system'
-				);
+				if ($transaction_type_info) {
+					$filter_data = array(
+						'client_label' 		=> $transaction_type_info['client_label'],
+						'category_label' 	=> $transaction_type_info['category_label']
+					);
 
-				$this->model_accounting_transaction->addTransaction($transaction_data);
+					$transactions_summary = $this->model_accounting_transaction->getTransactionsTotalSummary($order_id, $filter_data);
+
+					$amount = $transactions_summary['initial'] - $transactions_summary['cashin'] + $transactions_summary['cashout'];
+
+					$accounts = [];
+					$transaction_account = [];
+
+					$transaction_type_accounts = $this->model_accounting_transaction->getTransactionTypeAccounts($order_status_info['transaction_type_id']);
+					foreach ($transaction_type_accounts as $value) {
+						if (!isset($accounts[$value['account_debit_id']])) {
+							$accounts[$value['account_debit_id']] = 0;
+						}
+						if (!isset($accounts[$value['account_credit_id']])) {
+							$accounts[$value['account_credit_id']] = 0;
+						}
+					}
+
+					switch ($transaction_type_info['transaction_label']) {
+						case 'complete':
+							foreach ($transaction_type_accounts as $value) {
+								$accounts[$value['account_debit_id']] += $transactions_summary['initial'];
+								$accounts[$value['account_credit_id']] -= $transactions_summary['initial'];
+							}
+
+							break;
+
+						case 'canceled':
+							$charged_amount = $transactions_summary['cashin'] - $transactions_summary['cashout'];
+							$canceled_amount = $transactions_summary['initial'] - $charged_amount;
+
+							foreach ($transaction_type_accounts as $value) {
+								if ($value['transaction_label'] == 'charged') {
+									$accounts[$value['account_debit_id']] += $charged_amount;
+									$accounts[$value['account_credit_id']] -= $charged_amount;
+								} elseif ($value['transaction_label'] == 'canceled') {
+									$accounts[$value['account_debit_id']] += $canceled_amount;
+									$accounts[$value['account_credit_id']] -= $canceled_amount;
+								}
+							}
+
+							break;
+
+						default:
+							break;
+					}
+
+					foreach ($accounts as $account_id => $value) {
+						if ($value > 0) {
+							$transaction_account[] = [
+								'account_id'	=> $account_id,
+								'debit'			=> $value,
+								'credit'		=> 0
+							];
+						} elseif ($value < 0) {
+							$transaction_account[] = [
+								'account_id'	=> $account_id,
+								'debit'			=> 0,
+								'credit'		=> -$value
+							];
+						}
+					}
+
+					$reference_prefix = 'R' . date('ym');
+					$reference_no = $this->model_accounting_transaction->getLastReferenceNo($reference_prefix) + 1;
+
+					$transaction_data = array(
+						'transaction_type_id'	=> $transaction_type_info['transaction_type_id'],
+						'order_id'				=> $order_id,
+						'reference_prefix'		=> $reference_prefix,
+						'reference_no' 			=> $reference_no,
+						'date' 					=> date('Y-m-d'),
+						'payment_method'		=> '',
+						'description' 			=> 'Adjustment Transaction from Order #' . $order_id . ': ' . $order_info['firstname'] . ' ' . $order_info['lastname'],
+						'amount' 				=> $amount,
+						'customer_name' 		=> 'system',
+						'transaction_account' 	=> $transaction_account
+					);
+
+					$this->model_accounting_transaction->addTransaction($transaction_data);
+				}
 			}
 
 			$this->db->query("INSERT INTO " . DB_PREFIX . "order_history SET order_id = '" . (int)$order_id . "', order_status_id = '" . (int)$order_status_id . "', notify = '" . (int)$notify . "', comment = '" . $this->db->escape($comment) . "', date_added = NOW(), user_id = '" . $this->user->getId() . "'");

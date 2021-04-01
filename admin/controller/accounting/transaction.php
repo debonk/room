@@ -363,7 +363,8 @@ class ControllerAccountingTransaction extends Controller
 		$data['token'] = $this->session->data['token'];
 
 		$this->load->model('accounting/transaction_type');
-		$data['transaction_types'] = $this->model_accounting_transaction_type->getTransactionTypes();
+		// $data['transaction_types'] = $this->model_accounting_transaction_type->getTransactionTypes();
+		$data['transaction_types'] = $this->model_accounting_transaction_type->getTransactionTypesMenu(['manual_select' => '*']);
 
 		$this->load->model('accounting/account');
 		$data['accounts'] = $this->model_accounting_account->getAccountsMenuByComponent();

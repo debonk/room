@@ -3,7 +3,7 @@ class ModelAccountingTransaction extends Model
 {
 	private $client_data = ['system', 'customer', 'vendor', 'supplier', 'finance'];
 	private $category_data = ['order', 'deposit', 'purchase', 'expense', 'asset'];
-	private $transaction_data = ['initial', 'discount', 'cashin', 'cashout', 'complete'];
+	private $transaction_data = ['initial', 'discount', 'cashin', 'cashout', 'complete', 'canceled', 'charged'];
 
 	public function addTransaction($data)
 	{
@@ -114,7 +114,7 @@ class ModelAccountingTransaction extends Model
 			$implode[] = "t.client_label = '" . $this->db->escape($data['filter']['client_label']) . "'";
 
 			if (isset($data['filter']['client_id'])) {
-				$implode[] = "t.client_id = '" . $this->db->escape($data['filter']['client_id']) . "'";
+				$implode[] = "t.client_id = '" . (int)$data['filter']['client_id'] . "'";
 			}
 		}
 
@@ -227,7 +227,7 @@ class ModelAccountingTransaction extends Model
 			$implode[] = "t.client_label = '" . $this->db->escape($data['filter']['client_label']) . "'";
 
 			if (isset($data['filter']['client_id'])) {
-				$implode[] = "t.client_id = '" . $this->db->escape($data['filter']['client_id']) . "'";
+				$implode[] = "t.client_id = '" . (int)$data['filter']['client_id'] . "'";
 			}
 		}
 
@@ -298,7 +298,7 @@ class ModelAccountingTransaction extends Model
 			$implode[] = "t.client_label = '" . $this->db->escape($data['filter']['client_label']) . "'";
 
 			if (isset($data['filter']['client_id'])) {
-				$implode[] = "t.client_id = '" . $this->db->escape($data['filter']['client_id']) . "'";
+				$implode[] = "t.client_id = '" . (int)$data['filter']['client_id'] . "'";
 			}
 		}
 
@@ -516,11 +516,29 @@ class ModelAccountingTransaction extends Model
 	// 	return $query->row['total'];
 	// }
 
-	public function getTransactionByTransactionTypeId($transaction_type_id)
+	public function getTransactionByTransactionTypeId($transaction_type_id, $data = [])
+	{
+		$sql = "SELECT DISTINCT t.*, CONCAT(t.reference_prefix, LPAD(t.reference_no, 4, '0')) AS reference, tt.name AS transaction_type FROM " . DB_PREFIX . "transaction t LEFT JOIN " . DB_PREFIX . "transaction_type tt ON (tt.transaction_type_id = t.transaction_type_id) WHERE t.transaction_type_id = '" . (int)$transaction_type_id . "'";
+
+		if (isset($data['client_id'])) {
+			$sql .= " AND t.client_id = '" . (int)$data['client_id'] . "'";
+		}
+		
+		if (isset($data['order_id'])) {
+			$sql .= " AND t.order_id = '" . (int)$data['order_id'] . "'";
+		}
+
+		$query = $this->db->query($sql);
+
+		return $query->row;
+	}
+
+	//Unused
+	public function getTransactionsByTransactionTypeId($transaction_type_id)
 	{
 		$query = $this->db->query("SELECT DISTINCT t.*, CONCAT(t.reference_prefix, LPAD(t.reference_no, 4, '0')) AS reference, tt.name AS transaction_type FROM " . DB_PREFIX . "transaction t LEFT JOIN " . DB_PREFIX . "transaction_type tt ON (tt.transaction_type_id = t.transaction_type_id) WHERE t.transaction_type_id = '" . (int)$transaction_type_id . "'");
 
-		return $query->row;
+		return $query->rows;
 	}
 
 	public function getTransactionsCountByTransactionTypeId($transaction_type_id)
@@ -606,7 +624,7 @@ class ModelAccountingTransaction extends Model
 		return $query->row['total'];
 	}
 
-	public function getTransactionsTotalByLabel($label, $label_id = 0)
+	public function getTransactionsTotalByLabelDel($label, $label_id = 0)
 	{ //Used by Vendor
 		$label_data = array(
 			'supplier',
@@ -629,6 +647,40 @@ class ModelAccountingTransaction extends Model
 		return $query->row['total'];
 	}
 
+	public function getTransactionsTotalByClientLabel($client_label, $client_id, $data = [])
+	{
+		$sql = "SELECT t.transaction_label, SUM(t.amount) AS total FROM " . DB_PREFIX . "transaction t WHERE t.client_label = '" . $this->db->escape($client_label) . "' AND t.client_id = '" . (int)$client_id . "'";
+
+		$implode = array();
+
+		if (isset($data['category_label']) && in_array($data['category_label'], $this->category_data)) {
+			$implode[] = "t.category_label = '" . $this->db->escape($data['category_label']) . "'";
+		}
+
+		if (isset($data['transaction_label']) && in_array($data['transaction_label'], $this->transaction_data)) {
+			$implode[] = "t.transaction_label = '" . $this->db->escape($data['transaction_label']) . "'";
+		}
+
+		if ($implode) {
+			$sql .= " AND " . implode(" AND ", $implode);
+		}
+
+		$sql .= " GROUP BY t.transaction_label";
+
+		$query = $this->db->query($sql);
+
+		$total_data = [
+			'cashin'	=> 0,
+			'cashout'	=> 0
+		];
+
+		foreach ($query->rows as $value) {
+			$total_data[$value['transaction_label']] = $value['total'];
+		}
+
+		return $total_data['cashin'] - $total_data['cashout'];
+	}
+
 	public function getTransactionsSummary($order_id, $data)
 	{
 		$sql = "SELECT t.*, tt.*, SUM(t.amount) AS total FROM " . DB_PREFIX . "transaction t LEFT JOIN " . DB_PREFIX . "transaction_type tt ON (tt.transaction_type_id = t.transaction_type_id) WHERE t.order_id = '" . (int)$order_id . "'";
@@ -640,7 +692,7 @@ class ModelAccountingTransaction extends Model
 			$implode[] = "t.client_label = '" . $this->db->escape($data['client_label']) . "'";
 
 			if (isset($data['client_id'])) {
-				$implode[] = "t.client_id = '" . $this->db->escape($data['client_id']) . "'";
+				$implode[] = "t.client_id = '" . (int)$data['client_id'] . "'";
 			}
 		}
 
@@ -688,7 +740,7 @@ class ModelAccountingTransaction extends Model
 			$implode[] = "t.client_label = '" . $this->db->escape($data['client_label']) . "'";
 
 			if (isset($data['client_id'])) {
-				$implode[] = "t.client_id = '" . $this->db->escape($data['client_id']) . "'";
+				$implode[] = "t.client_id = '" . (int)$data['client_id'] . "'";
 			}
 		}
 

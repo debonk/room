@@ -9,17 +9,19 @@ $_['text_add']         		= 'Add Order Status';
 $_['text_edit']        		= 'Edit Order Status';
 		
 // Column		
-$_['column_class']     		= 'Style Class';
-$_['column_name']      		= 'Order Status Name';
-$_['column_sort_order']     = 'Sort Order';
-$_['column_action']    		= 'Action';
+$_['column_class']     			= 'Style Class';
+$_['column_name']      			= 'Order Status Name';
+$_['column_sort_order']     	= 'Sort Order';
+$_['column_transaction_type']   = 'Transaction Type Link';
+$_['column_action']    			= 'Action';
 		
 // Entry		
-$_['entry_name']       		= 'Order Status Name';
-$_['entry_class']      		= 'Style Class';
-$_['entry_parent_status']	= 'Parent Status';
-$_['entry_user_group']		= 'Modify Permission';
-$_['entry_sort_order']		= 'Sort Order';
+$_['entry_name']       			= 'Order Status Name';
+$_['entry_class']      			= 'Style Class';
+$_['entry_parent_status']		= 'Parent Status';
+$_['entry_user_group']			= 'Modify Permission';
+$_['entry_sort_order']			= 'Sort Order';
+$_['entry_transaction_type']	= 'Transaction Type Link';
 
 // Error
 $_['error_permission'] 		= 'Warning: You do not have permission to modify order statuses!';

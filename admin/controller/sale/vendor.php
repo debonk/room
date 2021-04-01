@@ -65,10 +65,10 @@ class ControllerSaleVendor extends Controller
 
 		$order_info = $this->model_sale_order->getOrder($order_id);
 
-		if ($this->config->get('config_complete_status_required') && !in_array($order_info['order_status_id'], $this->config->get('config_complete_status'))) {
-			$order_admission_status = false;
-		} else {
+		if ($order_info['order_status_id'] == $this->config->get('config_admission_order_status_id')) {
 			$order_admission_status = true;
+		} else {
+			$order_admission_status = false;
 		}
 
 		$data['vendor_transaction_summary'] = [];
@@ -622,10 +622,10 @@ class ControllerSaleVendor extends Controller
 		$order_info = $this->model_sale_order->getOrder($order_id);
 		$order_vendor_info = $this->model_sale_order->getOrderVendor($order_id, $vendor_id);
 
-		if ($this->config->get('config_complete_status_required') && !in_array($order_info['order_status_id'], $this->config->get('config_complete_status'))) {
-			$admission_status = false;
-		} else {
+		if ($order_info['order_status_id'] == $this->config->get('config_admission_order_status_id')) {
 			$admission_status = true;
+		} else {
+			$admission_status = false;
 		}
 
 		if ($order_vendor_info && $order_vendor_info['deposit']) {

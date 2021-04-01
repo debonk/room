@@ -792,28 +792,19 @@
               </fieldset>
               <fieldset>
                 <legend><?php echo $text_admission; ?></legend>
-                <div class="form-group">
-                  <label class="col-sm-2 control-label"><span data-toggle="tooltip" title="<?php echo $help_complete_status_required; ?>"><?php echo $entry_complete_status_required; ?></span></label>
-                  <div class="col-sm-10">
-                    <label class="radio-inline">
-                      <?php if ($config_complete_status_required) { ?>
-                      <input type="radio" name="config_complete_status_required" value="1" checked="checked" />
-                      <?php echo $text_yes; ?>
-                      <?php } else { ?>
-                      <input type="radio" name="config_complete_status_required" value="1" />
-                      <?php echo $text_yes; ?>
-                      <?php } ?>
-                    </label>
-                    <label class="radio-inline">
-                      <?php if (!$config_complete_status_required) { ?>
-                      <input type="radio" name="config_complete_status_required" value="0" checked="checked" />
-                      <?php echo $text_no; ?>
-                      <?php } else { ?>
-                      <input type="radio" name="config_complete_status_required" value="0" />
-                      <?php echo $text_no; ?>
-                      <?php } ?>
-                    </label>
-                  </div>
+								<div class="form-group">
+									<label class="col-sm-2 control-label" for="input-admission-order-status"><span data-toggle="tooltip" title="<?php echo $help_admission_order_status; ?>"><?php echo $entry_admission_order_status; ?></span></label>
+									<div class="col-sm-10">
+										<select name="config_admission_order_status_id" id="input-admission-order-status" class="form-control">
+											<?php foreach ($order_statuses as $order_status) { ?>
+											<?php if ($order_status['order_status_id'] == $config_admission_order_status_id) { ?>
+											<option value="<?php echo $order_status['order_status_id']; ?>" selected="selected"><?php echo $order_status['name']; ?></option>
+											<?php } else { ?>
+											<option value="<?php echo $order_status['order_status_id']; ?>"><?php echo $order_status['name']; ?></option>
+											<?php } ?>
+											<?php } ?>
+										</select>
+									</div>
                 </div>
               </fieldset>
               <fieldset>
@@ -1386,7 +1377,30 @@
                   </div>
                 </div>
               </div>
-            </div>
+							<div class="form-group">
+								<label class="col-sm-2 control-label"><span data-toggle="tooltip" title="<?php echo $help_lock_complete_order; ?>"><?php echo $entry_lock_complete_order; ?></span></label>
+								<div class="col-sm-10">
+									<label class="radio-inline">
+										<?php if ($config_lock_complete_order) { ?>
+										<input type="radio" name="config_lock_complete_order" value="1" checked="checked" />
+										<?php echo $text_yes; ?>
+										<?php } else { ?>
+										<input type="radio" name="config_lock_complete_order" value="1" />
+										<?php echo $text_yes; ?>
+										<?php } ?>
+									</label>
+									<label class="radio-inline">
+										<?php if (!$config_lock_complete_order) { ?>
+										<input type="radio" name="config_lock_complete_order" value="0" checked="checked" />
+										<?php echo $text_no; ?>
+										<?php } else { ?>
+										<input type="radio" name="config_lock_complete_order" value="0" />
+										<?php echo $text_no; ?>
+										<?php } ?>
+									</label>
+								</div>
+							</div>
+						</div>
             <div class="tab-pane" id="tab-image">
               <div class="form-group">
                 <label class="col-sm-2 control-label" for="input-logo"><?php echo $entry_logo; ?></label>

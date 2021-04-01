@@ -1083,7 +1083,7 @@ class ControllerPurchasePurchase extends Controller
 			$payment_method = $this->language->get('heading_title');
 
 			$transaction_data = array(
-				'purchase_id'			=> $purchase_id,
+				'purchase_id'		=> $purchase_id,
 				'account_from_id'	=> $this->config->get('config_vendor_deposit_account_id'),
 				'account_to_id'		=> $asset_id,
 				'label'				=> 'vendor',
@@ -1103,11 +1103,16 @@ class ControllerPurchasePurchase extends Controller
 
 			$json['success'] = $this->language->get('text_transaction_added');
 
-			if ($this->config->get('config_complete_status_required') && !in_array($purchase_info['purchase_status_id'], $this->config->get('config_complete_status'))) {
-				$paid_off_status = false;
-			} else {
+			if ($purchase_info['purchase_status_id'] == $this->config->get('config_admission_order_status_id')) {
 				$paid_off_status = true;
+			} else {
+				$paid_off_status = false;
 			}
+			// if ($this->config->get('config_complete_status_required') && !in_array($purchase_info['purchase_status_id'], $this->config->get('config_complete_status'))) {
+			// 	$paid_off_status = false;
+			// } else {
+			// 	$paid_off_status = true;
+			// }
 
 			if ($paid_off_status && $transaction_total >= $this->config->get('config_deposit')) {
 				$json['admission_href'] = $this->url->link('purchase/purchase/admission', 'token=' . $this->session->data['token'] . '&purchase_id=' . $purchase_id . '&vendor_id=' . $this->request->post['transaction_vendor_id'], true);

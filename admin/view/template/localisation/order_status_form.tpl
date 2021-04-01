@@ -84,7 +84,30 @@
               </div>
             </div>
           </div>
-          <div class="form-group">
+					<div class="form-group">
+						<label class="col-sm-2 control-label" for="input-transaction-type">
+							<?php echo $entry_transaction_type; ?>
+						</label>
+						<div class="col-sm-10">
+							<select name="transaction_type_id" id="input-transaction-type" class="form-control">
+								<option value="0">
+									<?php echo $text_none; ?>
+								</option>
+								<?php foreach ($transaction_types as $transaction_type) { ?>
+								<?php if ($transaction_type['transaction_type_id'] == $transaction_type_id) { ?>
+								<option value="<?php echo $transaction_type['transaction_type_id']; ?>" selected="selected">
+									<?php echo $transaction_type['name']; ?>
+								</option>
+								<?php } else { ?>
+								<option value="<?php echo $transaction_type['transaction_type_id']; ?>">
+									<?php echo $transaction_type['name']; ?>
+								</option>
+								<?php } ?>
+								<?php } ?>
+							</select>
+						</div>
+					</div>
+					<div class="form-group">
             <label class="col-sm-2 control-label" for="input-sort-order"><?php echo $entry_sort_order; ?></label>
             <div class="col-sm-10">
               <input type="text" name="sort_order" value="<?php echo $sort_order; ?>" placeholder="<?php echo $entry_sort_order; ?>" class="form-control" id="input-sort-order" />

@@ -62,6 +62,7 @@ class ControllerSettingSetting extends Controller {
 		$data['entry_address'] = $this->language->get('entry_address');
 		$data['entry_adjustment_account'] = $this->language->get('entry_adjustment_account');
 		$data['entry_admin_language'] = $this->language->get('entry_admin_language');
+		$data['entry_admission_order_status'] = $this->language->get('entry_admission_order_status');
 		$data['entry_admission_vendor_prefix'] = $this->language->get('entry_admission_vendor_prefix');
 		$data['entry_affiliate_approval'] = $this->language->get('entry_affiliate_approval');
 		$data['entry_affiliate_auto'] = $this->language->get('entry_affiliate_auto');
@@ -77,7 +78,6 @@ class ControllerSettingSetting extends Controller {
 		$data['entry_checkout_guest'] = $this->language->get('entry_checkout_guest');
 		$data['entry_checkout'] = $this->language->get('entry_checkout');
 		$data['entry_comment'] = $this->language->get('entry_comment');
-		$data['entry_complete_status_required'] = $this->language->get('entry_complete_status_required');
 		$data['entry_complete_status'] = $this->language->get('entry_complete_status');
 		$data['entry_compression'] = $this->language->get('entry_compression');
 		$data['entry_country'] = $this->language->get('entry_country');
@@ -123,6 +123,7 @@ class ControllerSettingSetting extends Controller {
 		$data['entry_length_class'] = $this->language->get('entry_length_class');
 		$data['entry_limit_admin'] = $this->language->get('entry_limit_admin');
 		$data['entry_location'] = $this->language->get('entry_location');
+		$data['entry_lock_complete_order'] = $this->language->get('entry_lock_complete_order');
 		$data['entry_login_attempts'] = $this->language->get('entry_login_attempts');
 		$data['entry_logo'] = $this->language->get('entry_logo');
 		$data['entry_mail_alert'] = $this->language->get('entry_mail_alert');
@@ -180,6 +181,7 @@ class ControllerSettingSetting extends Controller {
 		$data['help_account_mail'] = $this->language->get('help_account_mail');
 		$data['help_account'] = $this->language->get('help_account');
 		$data['help_adjustment_account'] = $this->language->get('help_adjustment_account');
+		$data['help_admission_order_status'] = $this->language->get('help_admission_order_status');
 		$data['help_affiliate_approval'] = $this->language->get('help_affiliate_approval');
 		$data['help_affiliate_auto'] = $this->language->get('help_affiliate_auto');
 		$data['help_affiliate_commission'] = $this->language->get('help_affiliate_commission');
@@ -193,7 +195,6 @@ class ControllerSettingSetting extends Controller {
 		$data['help_checkout'] = $this->language->get('help_checkout');
 		$data['help_comment'] = $this->language->get('help_comment');
 		$data['help_commission'] = $this->language->get('help_commission');
-		$data['help_complete_status_required'] = $this->language->get('help_complete_status_required');
 		$data['help_complete_status'] = $this->language->get('help_complete_status');
 		$data['help_compression'] = $this->language->get('help_compression');
 		$data['help_currency_auto'] = $this->language->get('help_currency_auto');
@@ -220,6 +221,7 @@ class ControllerSettingSetting extends Controller {
 		$data['help_invoice_prefix'] = $this->language->get('help_invoice_prefix');
 		$data['help_limit_admin'] = $this->language->get('help_limit_admin');
 		$data['help_location'] = $this->language->get('help_location');
+		$data['help_lock_complete_order'] = $this->language->get('help_lock_complete_order');
 		$data['help_login_attempts'] = $this->language->get('help_login_attempts');
 		$data['help_mail_alert'] = $this->language->get('help_mail_alert');
 		$data['help_mail_parameter'] = $this->language->get('help_mail_parameter');
@@ -817,10 +819,10 @@ class ControllerSettingSetting extends Controller {
 			$data['config_deposit'] = $this->config->get('config_deposit');
 		}
 
-		if (isset($this->request->post['config_complete_status_required'])) {
-			$data['config_complete_status_required'] = $this->request->post['config_complete_status_required'];
+		if (isset($this->request->post['config_admission_order_status_id'])) {
+			$data['config_admission_order_status_id'] = $this->request->post['config_admission_order_status_id'];
 		} else {
-			$data['config_complete_status_required'] = $this->config->get('config_complete_status_required');
+			$data['config_admission_order_status_id'] = $this->config->get('config_admission_order_status_id');
 		}
 
 		if (isset($this->request->post['config_cart_weight'])) {
@@ -1150,6 +1152,12 @@ class ControllerSettingSetting extends Controller {
 			$data['config_status_with_payment'] = $this->config->get('config_status_with_payment');
 		} else {
 			$data['config_status_with_payment'] = array();
+		}
+
+		if (isset($this->request->post['config_lock_complete_order'])) {
+			$data['config_lock_complete_order'] = $this->request->post['config_lock_complete_order'];
+		} else {
+			$data['config_lock_complete_order'] = $this->config->get('config_lock_complete_order');
 		}
 
 		if (isset($this->request->post['config_logo'])) {

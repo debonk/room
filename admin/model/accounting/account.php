@@ -1,6 +1,14 @@
 <?php
 class ModelAccountingAccount extends Model
 {
+	private $components = [
+		'asset' 		=> ['current_asset', 'fixed_asset', 'non_current_asset', 'prepayment'],
+		'equity' 		=> ['equity'],
+		'expense' 		=> ['depreciation', 'direct_cost', 'expense', 'overhead'],
+		'liability' 	=> ['current_liability', 'liability', 'non_current_liability'],
+		'revenue' 		=> ['sale', 'revenue', 'other_income']
+	];
+
 	public function addAccount($data)
 	{
 		$this->db->query("INSERT INTO " . DB_PREFIX . "account SET account_id = '" . (int)$data['account_id'] . "', name = '" . $this->db->escape($data['name']) . "', description = '" . $this->db->escape($data['description']) . "', type = '" . $this->db->escape($data['type']) . "', parent_id = '" . (int)$data['parent_id'] . "', status = '" . (int)$data['status'] . "'");
@@ -211,6 +219,11 @@ class ModelAccountingAccount extends Model
 		$query = $this->db->query($sql);
 
 		return $query->row['total'];
+	}
+
+	public function getMainComponents()
+	{
+		return array_keys($this->components);
 	}
 
 	public function getAccountsMenuByComponent($component = [], $type = [])

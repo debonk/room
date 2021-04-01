@@ -226,7 +226,7 @@ class ModelCatalogProduct extends Model {
 
 		$this->db->query("DELETE FROM " . DB_PREFIX . "product_vendor WHERE product_id = '" . (int)$product_id . "'");
 
-		if (!empty($data['product_vendor'])) {
+		if (isset($data['product_vendor'])) {
 			foreach ($data['product_vendor'] as $product_vendor) {
 				if ($product_vendor['vendor_id']) {
 					// Removes duplicates

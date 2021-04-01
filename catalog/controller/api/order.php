@@ -254,6 +254,7 @@ class ControllerApiOrder extends Controller
 						'total'        => $product['total'],
 						'tax'          => $this->tax->getTax($product['price'], $product['tax_class_id']),
 						'reward'       => $product['reward'],
+						'slot_prefix'  => $product['slot_prefix'],
 						'primary_type' => $product['primary_type']
 					);
 				}
@@ -385,13 +386,11 @@ class ControllerApiOrder extends Controller
 				$json['order_id'] = $this->model_checkout_order->addOrder($order_data);
 
 				// Set the order history
-				if (isset($this->request->post['order_status_id'])) {
-					$order_status_id = $this->request->post['order_status_id'];
-				} else {
-					$order_status_id = $this->config->get('config_order_status_id');
-				}
+				$this->model_checkout_order->addOrderHistory($json['order_id'], $this->config->get('config_order_status_id'), '', 0, 0, $this->request->post['user_id']);
 
-				$this->model_checkout_order->addOrderHistory($json['order_id'], $order_status_id, '', 0, 0, '', 0, $this->request->post['user_id']);
+				if (isset($this->request->post['order_status_id']) && $this->request->post['order_status_id'] != $this->config->get('config_order_status_id')) {
+					$this->model_checkout_order->addOrderHistory($json['order_id'], $this->request->post['order_status_id'], '', 0, 0, $this->request->post['user_id']);
+				}
 
 				$this->cart->clear();
 				unset($this->session->data['event']);
@@ -435,6 +434,11 @@ class ControllerApiOrder extends Controller
 			$order_info = $this->model_checkout_order->getOrder($order_id);
 
 			if ($order_info) {
+				# lock status update if current order status is complete
+				if ($this->config->get('config_lock_complete_order') && in_array($order_info['order_status_id'], $this->config->get('config_complete_status'))) {
+					$json['error'] = $this->language->get('error_status_complete');
+				}
+
 				// Customer
 				if (!isset($this->session->data['customer'])) {
 					$json['error'] = $this->language->get('error_customer');
@@ -467,38 +471,38 @@ class ControllerApiOrder extends Controller
 					$json['error'] = $this->language->get('error_payment_method');
 				}
 
-				// Shipping - Unused
-				if ($this->cart->hasShipping()) {
-					// Shipping Address
-					if (!isset($this->session->data['shipping_address'])) {
-						$json['error'] = $this->language->get('error_shipping_address');
-					}
+				// // Shipping - Unused
+				// if ($this->cart->hasShipping()) {
+				// 	// Shipping Address
+				// 	if (!isset($this->session->data['shipping_address'])) {
+				// 		$json['error'] = $this->language->get('error_shipping_address');
+				// 	}
 
-					// Shipping Method
-					if (!$json && !empty($this->request->post['shipping_method'])) {
-						if (empty($this->session->data['shipping_methods'])) {
-							$json['error'] = $this->language->get('error_no_shipping');
-						} else {
-							$shipping = explode('.', $this->request->post['shipping_method']);
+				// 	// Shipping Method
+				// 	if (!$json && !empty($this->request->post['shipping_method'])) {
+				// 		if (empty($this->session->data['shipping_methods'])) {
+				// 			$json['error'] = $this->language->get('error_no_shipping');
+				// 		} else {
+				// 			$shipping = explode('.', $this->request->post['shipping_method']);
 
-							if (!isset($shipping[0]) || !isset($shipping[1]) || !isset($this->session->data['shipping_methods'][$shipping[0]]['quote'][$shipping[1]])) {
-								$json['error'] = $this->language->get('error_shipping_method');
-							}
-						}
+				// 			if (!isset($shipping[0]) || !isset($shipping[1]) || !isset($this->session->data['shipping_methods'][$shipping[0]]['quote'][$shipping[1]])) {
+				// 				$json['error'] = $this->language->get('error_shipping_method');
+				// 			}
+				// 		}
 
-						if (!$json) {
-							$this->session->data['shipping_method'] = $this->session->data['shipping_methods'][$shipping[0]]['quote'][$shipping[1]];
-						}
-					}
+				// 		if (!$json) {
+				// 			$this->session->data['shipping_method'] = $this->session->data['shipping_methods'][$shipping[0]]['quote'][$shipping[1]];
+				// 		}
+				// 	}
 
-					if (!isset($this->session->data['shipping_method'])) {
-						$json['error'] = $this->language->get('error_shipping_method');
-					}
-				} else {
-					unset($this->session->data['shipping_address']);
-					unset($this->session->data['shipping_method']);
-					unset($this->session->data['shipping_methods']);
-				}
+				// 	if (!isset($this->session->data['shipping_method'])) {
+				// 		$json['error'] = $this->language->get('error_shipping_method');
+				// 	}
+				// } else {
+				// 	unset($this->session->data['shipping_address']);
+				// 	unset($this->session->data['shipping_method']);
+				// 	unset($this->session->data['shipping_methods']);
+				// }
 
 				// Cart
 				if ((!$this->cart->hasProducts() && empty($this->session->data['vouchers'])) || (!$this->cart->hasStock() && !$this->config->get('config_stock_checkout'))) {
@@ -593,49 +597,49 @@ class ControllerApiOrder extends Controller
 					}
 
 					// Shipping Details - Unused
-					if ($this->cart->hasShipping()) {
-						$order_data['shipping_firstname'] = $this->session->data['shipping_address']['firstname'];
-						$order_data['shipping_lastname'] = $this->session->data['shipping_address']['lastname'];
-						$order_data['shipping_company'] = $this->session->data['shipping_address']['company'];
-						$order_data['shipping_address_1'] = $this->session->data['shipping_address']['address_1'];
-						$order_data['shipping_address_2'] = $this->session->data['shipping_address']['address_2'];
-						$order_data['shipping_city'] = $this->session->data['shipping_address']['city'];
-						$order_data['shipping_postcode'] = $this->session->data['shipping_address']['postcode'];
-						$order_data['shipping_zone'] = $this->session->data['shipping_address']['zone'];
-						$order_data['shipping_zone_id'] = $this->session->data['shipping_address']['zone_id'];
-						$order_data['shipping_country'] = $this->session->data['shipping_address']['country'];
-						$order_data['shipping_country_id'] = $this->session->data['shipping_address']['country_id'];
-						$order_data['shipping_address_format'] = $this->session->data['shipping_address']['address_format'];
-						$order_data['shipping_custom_field'] = $this->session->data['shipping_address']['custom_field'];
+					// if ($this->cart->hasShipping()) {
+					// 	$order_data['shipping_firstname'] = $this->session->data['shipping_address']['firstname'];
+					// 	$order_data['shipping_lastname'] = $this->session->data['shipping_address']['lastname'];
+					// 	$order_data['shipping_company'] = $this->session->data['shipping_address']['company'];
+					// 	$order_data['shipping_address_1'] = $this->session->data['shipping_address']['address_1'];
+					// 	$order_data['shipping_address_2'] = $this->session->data['shipping_address']['address_2'];
+					// 	$order_data['shipping_city'] = $this->session->data['shipping_address']['city'];
+					// 	$order_data['shipping_postcode'] = $this->session->data['shipping_address']['postcode'];
+					// 	$order_data['shipping_zone'] = $this->session->data['shipping_address']['zone'];
+					// 	$order_data['shipping_zone_id'] = $this->session->data['shipping_address']['zone_id'];
+					// 	$order_data['shipping_country'] = $this->session->data['shipping_address']['country'];
+					// 	$order_data['shipping_country_id'] = $this->session->data['shipping_address']['country_id'];
+					// 	$order_data['shipping_address_format'] = $this->session->data['shipping_address']['address_format'];
+					// 	$order_data['shipping_custom_field'] = $this->session->data['shipping_address']['custom_field'];
 
-						if (isset($this->session->data['shipping_method']['title'])) {
-							$order_data['shipping_method'] = $this->session->data['shipping_method']['title'];
-						} else {
-							$order_data['shipping_method'] = '';
-						}
+					// 	if (isset($this->session->data['shipping_method']['title'])) {
+					// 		$order_data['shipping_method'] = $this->session->data['shipping_method']['title'];
+					// 	} else {
+					// 		$order_data['shipping_method'] = '';
+					// 	}
 
-						if (isset($this->session->data['shipping_method']['code'])) {
-							$order_data['shipping_code'] = $this->session->data['shipping_method']['code'];
-						} else {
-							$order_data['shipping_code'] = '';
-						}
-					} else {
-						$order_data['shipping_firstname'] = '';
-						$order_data['shipping_lastname'] = '';
-						$order_data['shipping_company'] = '';
-						$order_data['shipping_address_1'] = '';
-						$order_data['shipping_address_2'] = '';
-						$order_data['shipping_city'] = '';
-						$order_data['shipping_postcode'] = '';
-						$order_data['shipping_zone'] = '';
-						$order_data['shipping_zone_id'] = '';
-						$order_data['shipping_country'] = '';
-						$order_data['shipping_country_id'] = '';
-						$order_data['shipping_address_format'] = '';
-						$order_data['shipping_custom_field'] = array();
-						$order_data['shipping_method'] = '';
-						$order_data['shipping_code'] = '';
-					}
+					// 	if (isset($this->session->data['shipping_method']['code'])) {
+					// 		$order_data['shipping_code'] = $this->session->data['shipping_method']['code'];
+					// 	} else {
+					// 		$order_data['shipping_code'] = '';
+					// 	}
+					// } else {
+					$order_data['shipping_firstname'] = '';
+					$order_data['shipping_lastname'] = '';
+					$order_data['shipping_company'] = '';
+					$order_data['shipping_address_1'] = '';
+					$order_data['shipping_address_2'] = '';
+					$order_data['shipping_city'] = '';
+					$order_data['shipping_postcode'] = '';
+					$order_data['shipping_zone'] = '';
+					$order_data['shipping_zone_id'] = '';
+					$order_data['shipping_country'] = '';
+					$order_data['shipping_country_id'] = '';
+					$order_data['shipping_address_format'] = '';
+					$order_data['shipping_custom_field'] = array();
+					$order_data['shipping_method'] = '';
+					$order_data['shipping_code'] = '';
+					// }
 
 					// Products
 					$order_data['products'] = array();
@@ -670,6 +674,7 @@ class ControllerApiOrder extends Controller
 							'total'        => $product['total'],
 							'tax'          => $this->tax->getTax($product['price'], $product['tax_class_id']),
 							'reward'       => $product['reward'],
+							'slot_prefix'  => $product['slot_prefix'],
 							'primary_type' => $product['primary_type']
 						);
 					}
@@ -765,14 +770,12 @@ class ControllerApiOrder extends Controller
 					$this->model_checkout_order->editOrder($order_id, $order_data);
 
 					// Set the order history
-					if (isset($this->request->post['order_status_id'])) {
-						$order_status_id = $this->request->post['order_status_id'];
-					} else {
-						$order_status_id = $this->config->get('config_order_status_id');
+					$this->model_checkout_order->addOrderHistory($order_id, $this->config->get('config_order_status_id'), '', 0, 0, $this->request->post['user_id']);
+
+					if (isset($this->request->post['order_status_id']) && $this->request->post['order_status_id'] != $this->config->get('config_order_status_id')) {
+						$this->model_checkout_order->addOrderHistory($order_id, $this->request->post['order_status_id'], '', 0, 0, $this->request->post['user_id']);
 					}
-
-					$this->model_checkout_order->addOrderHistory($order_id, $order_status_id, '', 0, 0, '', 0, $this->request->post['user_id']);
-
+	
 					$this->cart->clear();
 					unset($this->session->data['event']);
 					unset($this->session->data['customer']);
@@ -821,11 +824,13 @@ class ControllerApiOrder extends Controller
 
 			if (!$order_info) {
 				$json['error'] = $this->language->get('error_not_found');
+			} elseif ($this->config->get('config_lock_complete_order') && in_array($order_info['order_status_id'], $this->config->get('config_complete_status'))) { # lock status update if current order status is complete
+				$json['error'] = $this->language->get('error_status_complete');
 			} elseif ($transactions) {
 				$json['error'] = $this->language->get('error_transaction');
 			} else {
 				$this->model_checkout_order->deleteOrder($order_id);
-				
+
 				$json['success'] = $this->language->get('text_success');
 			}
 		}
@@ -845,104 +850,115 @@ class ControllerApiOrder extends Controller
 	{
 		$this->load->language('api/order');
 
-		$json = array();
+		$json = [];
 
-		if (!isset($this->session->data['api_id'])) {
-			$json['error'] = $this->language->get('error_permission');
-		} elseif (isset($this->request->post['user_id'])) {
-			$this->load->model('user/user');
-			$user_group_id = $this->model_user_user->getUserGroupId($this->request->post['user_id']);
+		switch ($json) {
+			case false:
+				if (!isset($this->session->data['api_id'])) {
+					$json['error'] = $this->language->get('error_permission');
 
-			$this->load->model('localisation/order_status');
-			$order_status_info = $this->model_localisation_order_status->getOrderStatus($this->request->post['order_status_id']);
-
-			if (empty($order_status_info['user_group_modify']) || empty($user_group_id) || !in_array($user_group_id, json_decode($order_status_info['user_group_modify'], true))) {
-				$json['error'] = $this->language->get('error_user_permission');
-			}
-		} else {
-			$json['error'] = $this->language->get('error_user_not_found');
-		}
-
-		if (!$json) {
-			// Add keys for missing post vars
-			$keys = array(
-				'order_status_id',
-				'notify',
-				'override',
-				'comment',
-				'user_id'
-			);
-
-			foreach ($keys as $key) {
-				if (!isset($this->request->post[$key])) {
-					$this->request->post[$key] = '';
+					break;
 				}
-			}
 
-			$this->load->model('checkout/order');
+				$this->load->model('user/user');
+				$user_group_id = $this->model_user_user->getUserGroupId($this->request->post['user_id']);
 
-			if (isset($this->request->get['order_id'])) {
-				$order_id = $this->request->get['order_id'];
-			} else {
-				$order_id = 0;
-			}
-		}
+				if (empty($user_group_id)) {
+					$json['error'] = $this->language->get('error_user_not_found');
 
-		if (!$json) {
-			$order_info = $this->model_checkout_order->getOrder($order_id);
+					break;
+				}
 
-			if ($order_info) {
-				$asset_id = $this->config->get($order_info['payment_code'] . '_asset_id');
+				$this->load->model('localisation/order_status');
+				$order_status_info = $this->model_localisation_order_status->getOrderStatus($this->request->post['order_status_id']);
 
-				$this->load->model('accounting/account');
+				if (empty($order_status_info['user_group_modify']) || empty($user_group_id) || !in_array($user_group_id, json_decode($order_status_info['user_group_modify'], true))) {
+					$json['error'] = $this->language->get('error_user_permission');
 
-				$asset_info = $this->model_accounting_account->getAccount($asset_id);
+					break;
+				}
 
-				if (empty($asset_info)) {
-					$asset_replacement_id = $this->config->get('config_asset_account_id');
+				# Add keys for missing post vars
+				$keys = array(
+					'order_status_id',
+					'notify',
+					'override',
+					'comment',
+					'user_id'
+				);
 
-					$asset_replacement_info = $this->model_accounting_account->getAccount($asset_replacement_id);
-
-					if (empty($asset_replacement_info)) {
-						$json['error'] = $this->language->get('error_asset_not_found');
+				foreach ($keys as $key) {
+					if (!isset($this->request->post[$key])) {
+						$this->request->post[$key] = '';
 					}
 				}
 
-				$prepaid_account_id = $this->config->get('config_prepaid_account_id');
+				$this->load->model('checkout/order');
 
-				$prepaid_account_info = $this->model_accounting_account->getAccount($prepaid_account_id);
+				$order_id = isset($this->request->get['order_id']) ? $this->request->get['order_id'] : 0;
 
-				if (empty($prepaid_account_info)) {
-					$json['error'] = $this->language->get('error_liability_not_found');
+				$order_info = $this->model_checkout_order->getOrder($order_id);
+
+				if (!$order_info) {
+					$json['error'] = $this->language->get('error_not_found');
+
+					break;
 				}
-////////////
 
-				// If current order status is not complete but new status is complete then check for adjustment transaction
+				# lock status update if current order status is complete
+				if ($this->config->get('config_lock_complete_order') && in_array($order_info['order_status_id'], $this->config->get('config_complete_status'))) {
+					$json['error'] = $this->language->get('error_status_complete');
+
+					break;
+				}
+
+				$this->load->model('accounting/transaction');
+				$transaction_type_info = $this->model_accounting_transaction->getTransactionType($order_status_info['transaction_type_id']);
+
+				if (!$transaction_type_info) {
+					break; //Tidak ada transaksi utk dijalankan
+				}
+
+				$transaction_info = $this->model_accounting_transaction->getTransactionByTransactionTypeId($order_status_info['transaction_type_id'], ['order_id' => $order_id]);
+
+				if ($transaction_info) {
+					$json['error'] = $this->language->get('error_transaction_exist');
+
+					break;
+				}
+
+				# If current order status is not complete but new status is complete then check for transaction
 				if (!in_array($order_info['order_status_id'], $this->config->get('config_complete_status')) && in_array($this->request->post['order_status_id'], $this->config->get('config_complete_status'))) {
-					$this->load->model('accounting/transaction');
-
 					$filter_data = array(
-						'account_from_id' => $this->config->get('config_adjustment_account_id'),
+						// 'client_label' 		=> $transaction_type_info['client_label'],
+						'category_label' 	=> $transaction_type_info['category_label']
 					);
 
-					if ($this->model_accounting_transaction->getTransactionsTotalSummary($order_id, $filter_data)) {
-						$json['error'] = $this->language->get('error_adjustment');
-					}
+					$transactions_summary = $this->model_accounting_transaction->getTransactionsTotalSummary($order_id, $filter_data);
 
-					$filter_data = array(
-						'account_from_id' 	=> $this->config->get('config_prepaid_account_id'),
-						'label'	 	 	 	=> 'customer',
-						'category_label'	=> 'order'
-					);
-					// print_r($this->model_accounting_transaction->getTransactionsTotalSummary($order_id, $filter_data));//die('---breakpoint---');
+					switch ($transaction_type_info['transaction_label']) {
+						case 'complete':
+							if (empty($transactions_summary['initial'])) {
+								$json['error'] = $this->language->get('error_amount_initial');
 
-					if ($order_info['total'] != $this->model_accounting_transaction->getTransactionsTotalSummary($order_id, $filter_data)) {
-						$json['error'] = $this->language->get('error_adjustment_amount');
+								break;
+							}
+
+							if ($transactions_summary['initial'] <> $transactions_summary['cashin'] - $transactions_summary['cashout']) {
+								$json['error'] = $this->language->get('error_amount_balance');
+
+								break;
+							}
+
+							// Tambah validasi: total trx vendor harus 0.
+
+						default:
+							break;
 					}
 				}
-			} else {
-				$json['error'] = $this->language->get('error_not_found');
-			}
+
+			default:
+				break;
 		}
 
 		if (!$json) {
@@ -1036,7 +1052,8 @@ class ControllerApiOrder extends Controller
 				}
 			}
 
-			$this->model_checkout_order->addOrderHistory($order_id, $this->request->post['order_status_id'], $this->request->post['comment'], $this->request->post['notify'], $this->request->post['override'], $this->request->post['date'], $this->request->post['amount'], $this->request->post['user_id'], $this->request->post['payment_method']);
+			$this->model_checkout_order->addOrderHistory($order_id, $this->request->post['order_status_id'], $this->request->post['comment'], $this->request->post['notify'], $this->request->post['override'], $this->request->post['user_id']);
+			// $this->model_checkout_order->addOrderHistory($order_id, $this->request->post['order_status_id'], $this->request->post['comment'], $this->request->post['notify'], $this->request->post['override'], $this->request->post['date'], $this->request->post['amount'], $this->request->post['user_id'], $this->request->post['payment_method']);
 
 			$json['success'] = $this->language->get('text_success');
 		}

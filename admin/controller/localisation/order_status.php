@@ -173,11 +173,12 @@ class ControllerLocalisationOrderStatus extends Controller {
 
 		foreach ($results as $result) {
 			$data['order_statuses'][] = array(
-				'order_status_id' => $result['order_status_id'],
-				'name'            => $result['name'] . (($result['order_status_id'] == $this->config->get('config_order_status_id')) ? $this->language->get('text_default') : null),
-				'class'           => $result['class'],
-				'sort_order'      => $result['sort_order'],
-				'edit'            => $this->url->link('localisation/order_status/edit', 'token=' . $this->session->data['token'] . '&order_status_id=' . $result['order_status_id'] . $url, true)
+				'order_status_id' 	=> $result['order_status_id'],
+				'name'            	=> $result['name'] . (($result['order_status_id'] == $this->config->get('config_order_status_id')) ? $this->language->get('text_default') : null),
+				'class'           	=> $result['class'],
+				'transaction_type'	=> $result['transaction_type_id'] ? $result['transaction_type'] : $this->language->get('text_none'),
+				'sort_order'      	=> $result['sort_order'],
+				'edit'            	=> $this->url->link('localisation/order_status/edit', 'token=' . $this->session->data['token'] . '&order_status_id=' . $result['order_status_id'] . $url, true)
 			);
 		}
 
@@ -189,6 +190,7 @@ class ControllerLocalisationOrderStatus extends Controller {
 
 		$data['column_name'] = $this->language->get('column_name');
 		$data['column_class'] = $this->language->get('column_class');
+		$data['column_transaction_type'] = $this->language->get('column_transaction_type');
 		$data['column_sort_order'] = $this->language->get('column_sort_order');
 		$data['column_action'] = $this->language->get('column_action');
 
@@ -228,8 +230,8 @@ class ControllerLocalisationOrderStatus extends Controller {
 			$url .= '&page=' . $this->request->get['page'];
 		}
 
-		$data['sort_name'] = $this->url->link('localisation/order_status', 'token=' . $this->session->data['token'] . '&sort=name' . $url, true);
-		$data['sort_sort_order'] = $this->url->link('localisation/order_status', 'token=' . $this->session->data['token'] . '&sort=sort_order' . $url, true);
+		$data['sort_name'] = $this->url->link('localisation/order_status', 'token=' . $this->session->data['token'] . '&sort=os.name' . $url, true);
+		$data['sort_sort_order'] = $this->url->link('localisation/order_status', 'token=' . $this->session->data['token'] . '&sort=os.sort_order' . $url, true);
 
 		$url = '';
 
@@ -266,11 +268,13 @@ class ControllerLocalisationOrderStatus extends Controller {
 
 		$language_items = array(
 			'heading_title',
+			'text_none',
 			'entry_name',
 			'entry_class',
 			'entry_parent_status',
 			'entry_user_group',
 			'entry_sort_order',
+			'entry_transaction_type',
 			'button_save',
 			'button_cancel'
 		);
@@ -360,6 +364,14 @@ class ControllerLocalisationOrderStatus extends Controller {
 			$data['user_group_modify'] = array();
 		}
 
+		if (isset($this->request->post['transaction_type_id'])) {
+			$data['transaction_type_id'] = $this->request->post['transaction_type_id'];
+		} elseif (!empty($order_status_info)) {
+			$data['transaction_type_id'] = $order_status_info['transaction_type_id'];
+		} else {
+			$data['transaction_type_id'] = 0;
+		}
+
 		if (isset($this->request->post['sort_order'])) {
 			$data['sort_order'] = $this->request->post['sort_order'];
 		} elseif (!empty($order_status_info)) {
@@ -376,6 +388,8 @@ class ControllerLocalisationOrderStatus extends Controller {
 		$this->load->model('user/user_group');
 		$data['user_groups'] = $this->model_user_user_group->getUserGroups();
 
+		$this->load->model('accounting/transaction_type');
+		$data['transaction_types'] = $this->model_accounting_transaction_type->getTransactionTypesMenu(['manual_select' => '*']);
 		
 		$data['header'] = $this->load->controller('common/header');
 		$data['column_left'] = $this->load->controller('common/column_left');

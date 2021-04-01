@@ -41,6 +41,7 @@
                     <a href="<?php echo $sort_name; ?>"><?php echo $column_name; ?></a>
                     <?php } ?></td>
                   <td class="text-left"><?php echo $column_class; ?></td>
+                  <td class="text-left"><?php echo $column_transaction_type; ?></td>
                   <td class="text-left"><?php if ($sort == 'sort_order') { ?>
                     <a href="<?php echo $sort_sort_order; ?>" class="<?php echo strtolower($order); ?>"><?php echo $column_sort_order; ?></a>
                     <?php } else { ?>
@@ -60,13 +61,14 @@
                     <?php } ?></td>
                   <td class="text-left"><?php echo $order_status['name']; ?></td>
                   <td class="text-left"><?php echo $order_status['class']; ?></td>
+                  <td class="text-left"><?php echo $order_status['transaction_type']; ?></td>
                   <td class="text-right"><?php echo $order_status['sort_order']; ?></td>
                   <td class="text-right"><a href="<?php echo $order_status['edit']; ?>" data-toggle="tooltip" title="<?php echo $button_edit; ?>" class="btn btn-primary"><i class="fa fa-pencil"></i></a></td>
                 </tr>
                 <?php } ?>
                 <?php } else { ?>
                 <tr>
-                  <td class="text-center" colspan="5"><?php echo $text_no_results; ?></td>
+                  <td class="text-center" colspan="6"><?php echo $text_no_results; ?></td>
                 </tr>
                 <?php } ?>
               </tbody>

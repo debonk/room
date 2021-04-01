@@ -843,6 +843,10 @@ class ControllerSaleOrder extends Controller
 				if ($start && $end) {
 					$data[$order_total['code']] = substr($order_total['title'], $start, $end - $start);
 				}
+
+				if ($order_total['code'] == 'marketing_budget') {
+					$data[$order_total['code']] = abs($order_total['value']);
+				}
 			}
 
 			$data['order_status_id'] = $order_info['order_status_id'];
@@ -1767,9 +1771,9 @@ class ControllerSaleOrder extends Controller
 		$processing_statuses = array_merge($this->config->get('config_processing_status'), $this->config->get('config_complete_status'));
 
 		foreach ($results as $result) {
-			// $slot_idx = strtolower(substr($result['model'], -2, 2) . $result['slot_code']);
-			$session_slot = explode(': ', $result['session_slot']);
-			$slot_idx = strtolower($session_slot[0]);
+			// $session_slot = explode(': ', $result['session_slot']);
+			// $slot_idx = strtolower($session_slot[0]);
+			$slot_idx = strtolower((empty($result['slot_prefix']) ? $result['model'] : $result['slot_prefix']) . $result['slot_code']);
 
 			if (in_array($result['order_status_id'], $processing_statuses)) {
 				$slot_remove = $this->model_sale_order->getSlotUsed($slot_idx);
@@ -1792,7 +1796,7 @@ class ControllerSaleOrder extends Controller
 
 				$json['orders'][] = array(
 					'slot_idx'        		=> $slot_idx,
-					'slot_name'        		=> $result['model'],
+					'slot_name'        		=> $slot_idx,
 					'event_date'      		=> $result['event_date'],
 					'slot_remove'     		=> $slot_remove,
 					'order_summary'   		=> $order_summary,

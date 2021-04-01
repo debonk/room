@@ -121,7 +121,7 @@
 			e.preventDefault();
 
 			$('#report').load(this.href);
-			$('html').animate({ scrollTop: 150 }, 500);
+			$('html, body').animate({ scrollTop: 150 }, 500);
 		});
 
 		var filter_account_id = encodeURIComponent($('select[name=\'filter[account_id]\']').val());

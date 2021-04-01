@@ -1213,7 +1213,7 @@ function addVendor() {
   html  = '<tr id="vendor-row' + vendor_row + '" value="' + vendor_row + '">';
   html += '  <td><input type="text" name="product_vendor[' + vendor_row + '][name]" value="" placeholder="<?php echo $entry_vendor; ?>" class="form-control" />';
   html += '  <input type="hidden" name="product_vendor[' + vendor_row + '][vendor_id]" value="0" /></td>';
-  html += '  <td><input type="text" name="product_vendor[' + vendor_row + '][price]" value="" class="form-control" placeholder="<?php echo $entry_purchase_price; ?>" /></td>';
+  html += '  <td><input type="text" name="product_vendor[' + vendor_row + '][purchase_price]" value="" class="form-control" placeholder="<?php echo $entry_purchase_price; ?>" /></td>';
   html += '  <td class="text-right"><button type="button" onclick="$(\'#vendor-row' + vendor_row + '\').remove();" data-toggle="tooltip" title="<?php echo $button_remove; ?>" class="btn btn-danger btn-remove"><i class="fa fa-minus-circle"></i></button></td>';
   html += '</tr>';
 

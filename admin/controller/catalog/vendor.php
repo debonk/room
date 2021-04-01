@@ -1,8 +1,10 @@
 <?php
-class ControllerCatalogVendor extends Controller {
+class ControllerCatalogVendor extends Controller
+{
 	private $error = array();
 
-	public function index() {
+	public function index()
+	{
 		$this->load->language('catalog/vendor');
 
 		$this->document->setTitle($this->language->get('heading_title'));
@@ -12,7 +14,8 @@ class ControllerCatalogVendor extends Controller {
 		$this->getList();
 	}
 
-	public function add() {
+	public function add()
+	{
 		$this->load->language('catalog/vendor');
 
 		$this->document->setTitle($this->language->get('heading_title'));
@@ -44,7 +47,8 @@ class ControllerCatalogVendor extends Controller {
 		$this->getForm();
 	}
 
-	public function edit() {
+	public function edit()
+	{
 		$this->load->language('catalog/vendor');
 
 		$this->document->setTitle($this->language->get('heading_title'));
@@ -76,7 +80,8 @@ class ControllerCatalogVendor extends Controller {
 		$this->getForm();
 	}
 
-	public function delete() {
+	public function delete()
+	{
 		$this->load->language('catalog/vendor');
 
 		$this->document->setTitle($this->language->get('heading_title'));
@@ -110,7 +115,8 @@ class ControllerCatalogVendor extends Controller {
 		$this->getList();
 	}
 
-	protected function getList() {
+	protected function getList()
+	{
 		if (isset($this->request->get['filter_vendor_name'])) {
 			$filter_vendor_name = $this->request->get['filter_vendor_name'];
 		} else {
@@ -205,9 +211,9 @@ class ControllerCatalogVendor extends Controller {
 		$results = $this->model_catalog_vendor->getVendors($filter_data);
 
 		$this->load->model('accounting/transaction');
-		
+
 		foreach ($results as $result) {
-			$balance = $this->model_accounting_transaction->getTransactionsTotalByLabel('vendor', $result['vendor_id']);
+			$balance = $this->model_accounting_transaction->getTransactionsTotalByClientLabel('vendor', $result['vendor_id']);
 
 			$data['vendors'][] = array(
 				'vendor_id'    => $result['vendor_id'],
@@ -352,7 +358,8 @@ class ControllerCatalogVendor extends Controller {
 		$this->response->setOutput($this->load->view('catalog/vendor_list', $data));
 	}
 
-	protected function getForm() {
+	protected function getForm()
+	{
 		$data['text_form'] = !isset($this->request->get['vendor_id']) ? $this->language->get('text_add') : $this->language->get('text_edit');
 
 		$language_items = array(
@@ -524,7 +531,8 @@ class ControllerCatalogVendor extends Controller {
 		$this->response->setOutput($this->load->view('catalog/vendor_form', $data));
 	}
 
-	protected function validateForm() {
+	protected function validateForm()
+	{
 		if (!$this->user->hasPermission('modify', 'catalog/vendor')) {
 			$this->error['warning'] = $this->language->get('error_permission');
 		}
@@ -538,7 +546,7 @@ class ControllerCatalogVendor extends Controller {
 		}
 
 		if ($this->request->post['email']) {
-			if ((utf8_strlen($this->request->post['email'] ) > 96) || (!filter_var($this->request->post['email'], FILTER_VALIDATE_EMAIL))) {
+			if ((utf8_strlen($this->request->post['email']) > 96) || (!filter_var($this->request->post['email'], FILTER_VALIDATE_EMAIL))) {
 				$this->error['email'] = $this->language->get('error_email');
 			}
 
@@ -566,7 +574,8 @@ class ControllerCatalogVendor extends Controller {
 		return !$this->error;
 	}
 
-	protected function validateDelete() {
+	protected function validateDelete()
+	{
 		if (!$this->user->hasPermission('modify', 'catalog/vendor')) {
 			$this->error['warning'] = $this->language->get('error_permission');
 		}
@@ -580,7 +589,7 @@ class ControllerCatalogVendor extends Controller {
 			if ($order_count) {
 				$this->error['warning'] = sprintf($this->language->get('error_order'), $order_count);
 			}
-			
+
 			$transaction_count = $this->model_accounting_transaction->getTransactionsCountByVendorId($vendor_id);
 
 			if ($transaction_count) {
@@ -591,7 +600,8 @@ class ControllerCatalogVendor extends Controller {
 		return !$this->error;
 	}
 
-	public function transaction() {
+	public function transaction()
+	{
 		$this->load->language('catalog/vendor');
 
 		$this->load->model('accounting/transaction');
@@ -615,34 +625,45 @@ class ControllerCatalogVendor extends Controller {
 		} else {
 			$page = 1;
 		}
-		
+
 		$limit = 10;
 
 		$data['transactions'] = array();
 
-		$results = $this->model_accounting_transaction->getTransactionsByLabel('vendor', $this->request->get['vendor_id'], ($page - 1) * $limit, $limit);
+		$filter_data = [
+			'filter'	=> [
+				'client_label'	=> 'vendor',
+				'client_id'		=> $this->request->get['vendor_id']
+			],
+			'start'	=> ($page - 1) * $limit,
+			'limit'	=> $limit
+		];
+
+		$results = $this->model_accounting_transaction->getTransactions($filter_data);
 
 		foreach ($results as $result) {
 			if (!empty($result['order_id'])) {
-				$invoice_no = '#' . $result['order_id'] . ($result['invoice_no'] ? ': ' . $result['invoice_prefix'] . str_pad($result['invoice_no'],4,0,STR_PAD_LEFT) : '');
+				$invoice_no = '#' . $result['order_id'] . ($result['invoice_no'] ? ': ' . $result['invoice_prefix'] . str_pad($result['invoice_no'], 4, 0, STR_PAD_LEFT) : '');
 			} else {
 				$invoice_no = '';
 			}
-			
+
+			$amount = ($result['transaction_label'] == 'cashin' ? 1 : -1) * $result['amount'];
+
 			$data['transactions'][] = array(
 				'date'	 		=> date($this->language->get('date_format_short'), strtotime($result['date'])),
-				'payment_method'=> $result['payment_method'],
+				'payment_method' => $result['payment_method'],
 				'description'	=> $result['description'],
 				'invoice_no'   	=> $invoice_no,
-				'amount'      	=> $this->currency->format($result['amount'], $this->config->get('config_currency')),
+				'amount'      	=> $this->currency->format($amount, $this->config->get('config_currency')),
 				'username'      => $result['username'],
 				'order_url'     => $this->url->link('sale/order/info', 'token=' . $this->session->data['token'] . '&order_id=' . $result['order_id'], true),
 			);
 		}
 
-		$data['balance'] = $this->currency->format($this->model_accounting_transaction->getTransactionsTotalByLabel('vendor', $this->request->get['vendor_id']), $this->config->get('config_currency'));
+		$data['balance'] = $this->currency->format($this->model_accounting_transaction->getTransactionsTotalByClientLabel('vendor', $this->request->get['vendor_id']), $this->config->get('config_currency'));
 
-		$transaction_total = $this->model_accounting_transaction->getTransactionsCountByLabel('vendor', $this->request->get['vendor_id']);
+		$transaction_total = $this->model_accounting_transaction->getTransactionsCount($filter_data);
 
 		$pagination = new Pagination();
 		$pagination->total = $transaction_total;

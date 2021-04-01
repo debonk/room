@@ -3,9 +3,9 @@ class ModelLocalisationOrderStatus extends Model {
 	public function addOrderStatus($data) {
 		foreach ($data['order_status'] as $language_id => $value) {
 			if (isset($order_status_id)) {
-				$this->db->query("INSERT INTO " . DB_PREFIX . "order_status SET order_status_id = '" . (int)$order_status_id . "', language_id = '" . (int)$language_id . "', name = '" . $this->db->escape($value['name']) . "', class = '" . $this->db->escape($data['class']) . "', parent_status = '" . (isset($data['parent_status']) ? $this->db->escape(json_encode($data['parent_status'])) : '') . "', user_group_modify = '" . (isset($data['user_group_modify']) ? $this->db->escape(json_encode($data['user_group_modify'])) : '') . "', sort_order = '" . (int)$data['sort_order'] . "'");
+				$this->db->query("INSERT INTO " . DB_PREFIX . "order_status SET order_status_id = '" . (int)$order_status_id . "', language_id = '" . (int)$language_id . "', name = '" . $this->db->escape($value['name']) . "', class = '" . $this->db->escape($data['class']) . "', parent_status = '" . (isset($data['parent_status']) ? $this->db->escape(json_encode($data['parent_status'])) : '') . "', user_group_modify = '" . (isset($data['user_group_modify']) ? $this->db->escape(json_encode($data['user_group_modify'])) : '') . "', transaction_type_id = '" . (int)$data['transaction_type_id'] . "', sort_order = '" . (int)$data['sort_order'] . "'");
 			} else {
-				$this->db->query("INSERT INTO " . DB_PREFIX . "order_status SET language_id = '" . (int)$language_id . "', name = '" . $this->db->escape($value['name']) . "', class = '" . $this->db->escape($data['class']) . "', parent_status = '" . (isset($data['parent_status']) ? $this->db->escape(json_encode($data['parent_status'])) : '') . "', user_group_modify = '" . (isset($data['user_group_modify']) ? $this->db->escape(json_encode($data['user_group_modify'])) : '') . "', sort_order = '" . (int)$data['sort_order'] . "'");
+				$this->db->query("INSERT INTO " . DB_PREFIX . "order_status SET language_id = '" . (int)$language_id . "', name = '" . $this->db->escape($value['name']) . "', class = '" . $this->db->escape($data['class']) . "', parent_status = '" . (isset($data['parent_status']) ? $this->db->escape(json_encode($data['parent_status'])) : '') . "', user_group_modify = '" . (isset($data['user_group_modify']) ? $this->db->escape(json_encode($data['user_group_modify'])) : '') . "', transaction_type_id = '" . (int)$data['transaction_type_id'] . "', sort_order = '" . (int)$data['sort_order'] . "'");
 
 				$order_status_id = $this->db->getLastId();
 			}
@@ -20,8 +20,7 @@ class ModelLocalisationOrderStatus extends Model {
 		$this->db->query("DELETE FROM " . DB_PREFIX . "order_status WHERE order_status_id = '" . (int)$order_status_id . "'");
 
 		foreach ($data['order_status'] as $language_id => $value) {
-			// $this->db->query("INSERT INTO " . DB_PREFIX . "order_status SET order_status_id = '" . (int)$order_status_id . "', language_id = '" . (int)$language_id . "', name = '" . $this->db->escape($value['name']) . "', class = '" . $this->db->escape($data['class']) . "', parent_status = '" . $this->db->escape(json_encode($data['parent_status'], true)) . "', user_group_modify = '" . $this->db->escape(json_encode($data['user_group_modify'], true)) . "', sort_order = '" . (int)$data['sort_order'] . "'");
-			$this->db->query("INSERT INTO " . DB_PREFIX . "order_status SET order_status_id = '" . (int)$order_status_id . "', language_id = '" . (int)$language_id . "', name = '" . $this->db->escape($value['name']) . "', class = '" . $this->db->escape($data['class']) . "', parent_status = '" . (isset($data['parent_status']) ? $this->db->escape(json_encode($data['parent_status'])) : '') . "', user_group_modify = '" . (isset($data['user_group_modify']) ? $this->db->escape(json_encode($data['user_group_modify'])) : '') . "', sort_order = '" . (int)$data['sort_order'] . "'");
+			$this->db->query("INSERT INTO " . DB_PREFIX . "order_status SET order_status_id = '" . (int)$order_status_id . "', language_id = '" . (int)$language_id . "', name = '" . $this->db->escape($value['name']) . "', class = '" . $this->db->escape($data['class']) . "', parent_status = '" . (isset($data['parent_status']) ? $this->db->escape(json_encode($data['parent_status'])) : '') . "', user_group_modify = '" . (isset($data['user_group_modify']) ? $this->db->escape(json_encode($data['user_group_modify'])) : '') . "', transaction_type_id = '" . (int)$data['transaction_type_id'] . "', sort_order = '" . (int)$data['sort_order'] . "'");
 		}
 
 		$this->cache->delete('order_status');
@@ -41,21 +40,21 @@ class ModelLocalisationOrderStatus extends Model {
 
 	public function getOrderStatuses($data = array()) {
 		if ($data) {
-			$sql = "SELECT * FROM " . DB_PREFIX . "order_status WHERE language_id = '" . (int)$this->config->get('config_language_id') . "'";
+			$sql = "SELECT os.*, tt.name AS transaction_type FROM " . DB_PREFIX . "order_status os LEFT JOIN " . DB_PREFIX . "transaction_type tt ON (tt.transaction_type_id = os.transaction_type_id) WHERE language_id = '" . (int)$this->config->get('config_language_id') . "'";
 
 			if (isset($data['parent_status_id'])) {
-				$sql .= " AND parent_status LIKE '%\"" . (int)$data['parent_status_id'] . "\"%'";
+				$sql .= " AND os.parent_status LIKE '%\"" . (int)$data['parent_status_id'] . "\"%'";
 			}
 			
 			$sort_data = array(
-				'name',
-				'sort_order'
+				'os.name',
+				'os.sort_order'
 			);
 
 			if (isset($data['sort']) && in_array($data['sort'], $sort_data)) {
 				$sql .= " ORDER BY " . $data['sort'];
 			} else {
-				$sql .= " ORDER BY sort_order";
+				$sql .= " ORDER BY os.sort_order";
 			}
 
 			if (isset($data['order']) && ($data['order'] == 'DESC')) {

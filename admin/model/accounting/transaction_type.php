@@ -3,7 +3,7 @@ class ModelAccountingTransactionType extends Model
 {
 	private $client_data = ['system', 'customer', 'vendor', 'supplier', 'finance'];
 	private $category_data = ['order', 'deposit', 'purchase', 'expense', 'asset'];
-	private $transaction_data = ['initial', 'discount', 'cashin', 'cashout', 'complete'];
+	private $transaction_data = ['initial', 'discount', 'cashin', 'cashout', 'complete', 'canceled', 'charged'];
 
 	public function addTransactionType($data)
 	{
@@ -87,7 +87,8 @@ class ModelAccountingTransactionType extends Model
 		return $query->row['total'];
 	}
 
-	public function getTransactionTypeAccounts($transaction_type_id) {
+	public function getTransactionTypeAccounts($transaction_type_id)
+	{
 		$query = $this->db->query("SELECT tta.*, a1.name AS account_debit, a2.name AS account_credit FROM " . DB_PREFIX . "transaction_type_account tta LEFT JOIN " . DB_PREFIX . "account a1 ON (a1.account_id = tta.account_debit_id) LEFT JOIN " . DB_PREFIX . "account a2 ON (a2.account_id = tta.account_credit_id) WHERE transaction_type_id = '" . (int)$transaction_type_id . "'");
 
 		return $query->rows;
@@ -107,8 +108,10 @@ class ModelAccountingTransactionType extends Model
 			$implode[] = "category_label = '" . $this->db->escape($data['category_label']) . "'";
 		}
 
-		if (isset($data['manual_select']) && !is_null($data['manual_select'])) {
-			$implode[] = "manual_select = '" . $this->db->escape($data['manual_select']) . "'";
+		if (isset($data['manual_select'])) {
+			if ($data['manual_select'] != '*' && !is_null($data['manual_select'])) {
+				$implode[] = "manual_select = '" . $this->db->escape($data['manual_select']) . "'";
+			}
 		} else {
 			$implode[] = "manual_select = 1";
 		}

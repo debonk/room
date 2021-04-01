@@ -67,6 +67,9 @@ class ControllerSaleCustomer extends Controller
 			unset($customer_transaction_summary[$key]);
 		}
 
+		if (!isset($customer_transaction_summary['order'])) {
+			$customer_transaction_summary['order'] = [];
+		}
 		if ($this->config->get('config_customer_deposit') && !isset($customer_transaction_summary['deposit'])) {
 			$customer_transaction_summary['deposit'] = [];
 		}
@@ -103,10 +106,10 @@ class ControllerSaleCustomer extends Controller
 		$results = $this->model_accounting_transaction->getTransactions($filter_data);
 
 		foreach ($results as $result) {
-			if ($result['transaction_label'] == 'cashin') {
-				$amount = $result['amount'];
-			} elseif ($result['transaction_label'] == 'cashout') {
+			if ($result['transaction_label'] == 'cashout') {
 				$amount = -$result['amount'];
+			} else {
+				$amount = $result['amount'];
 			}
 
 			$data['customer_transactions'][] = array(

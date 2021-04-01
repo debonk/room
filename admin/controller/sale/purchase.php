@@ -418,7 +418,12 @@ class ControllerSalePurchase extends Controller
 
 				$this->load->model('accounting/transaction');
 
-				$transaction_purchase_info = $this->model_accounting_transaction->getTransactionByTransactionTypeId($transaction_type_info['transaction_type_id']);
+				$filter_data = [
+					'client_id'	=> $vendor_id,
+					'order_id'	=> $order_id
+				];
+
+				$transaction_purchase_info = $this->model_accounting_transaction->getTransactionByTransactionTypeId($transaction_type_info['transaction_type_id'], $filter_data);
 
 				if ($transaction_purchase_info) {
 					$json['error'] = $this->language->get('error_transaction');
