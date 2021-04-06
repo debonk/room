@@ -413,27 +413,9 @@ class ControllerSaleOrder extends Controller
 		$processing_statuses = $this->config->get('config_processing_status');
 
 		foreach ($results as $result) {
-			$summary_data = [
-				'group'		=> 't.client_label'
-			];
+			$transaction_total['customer'] = $this->model_accounting_transaction->getTransactionsTotalByOrderId($result['order_id'], ['client_label' => 'customer']);
 
-			$transaction_total = [
-				'customer'	=> 0,
-				'vendor'	=> 0
-			];
-
-			$transactions_summary = $this->model_accounting_transaction->getTransactionsSummary($result['order_id'], $summary_data);
-			foreach ($transactions_summary as $key => $transaction_summary) {
-				$transactions_summary[$transaction_summary['client_label']][$transaction_summary['transaction_label']] = $transaction_summary;
-				unset($transactions_summary[$key]);
-			}
-
-			foreach ($transactions_summary as $key => $transaction_summary) {
-				$debit = isset($transaction_summary['cashin']) ? $transaction_summary['cashin']['total'] : 0;
-				$credit = isset($transaction_summary['cashout']) ? $transaction_summary['cashout']['total'] : 0;
-
-				$transaction_total[$key] = $debit - $credit;
-			}
+			$transaction_total['vendor'] = $this->model_accounting_transaction->getTransactionsTotalByOrderId($result['order_id'], ['client_label' => 'vendor']);
 
 			$payment_status = '';
 
@@ -1406,7 +1388,7 @@ class ControllerSaleOrder extends Controller
 				'category_label'	=> 'order'
 			];
 	
-			$transaction_total = $this->model_accounting_transaction->getTransactionsTotalSummary($order_id, $summary_data);
+			$transaction_total = $this->model_accounting_transaction->getTransactionsTotalByOrderId($order_id, $summary_data);
 
 			foreach ($totals as $total) {
 				$data['totals'][] = array(
@@ -1934,7 +1916,7 @@ class ControllerSaleOrder extends Controller
 				'client_id'		=> $this->request->post['vendor_id']
 			);
 
-			$transaction_total = $this->model_accounting_transaction->getTransactionsTotalSummary($order_id, $filter_data);
+			$transaction_total = $this->model_accounting_transaction->getTransactionsTotalByOrderId($order_id, $filter_data);
 
 			if ($order_info && ($transaction_total == 0)) {
 				$this->model_sale_order->deleteOrderVendor($order_id, $this->request->post['vendor_id']);
@@ -2422,14 +2404,14 @@ class ControllerSaleOrder extends Controller
 				'category_label'	=> 'order'
 			);
 
-			$transactions_total['order'] = $this->model_accounting_transaction->getTransactionsTotalSummary($order_id, $filter_data);
+			$transactions_total['order'] = $this->model_accounting_transaction->getTransactionsTotalByOrderId($order_id, $filter_data);
 
 			$filter_data = array(
 				'client_label'		=> 'customer',
 				'category_label'	=> 'deposit'
 			);
 
-			$transactions_total['deposit'] = $this->model_accounting_transaction->getTransactionsTotalSummary($order_id, $filter_data);
+			$transactions_total['deposit'] = $this->model_accounting_transaction->getTransactionsTotalByOrderId($order_id, $filter_data);
 
 			foreach ($transactions_total as $category => $total) {
 				if ($total) {

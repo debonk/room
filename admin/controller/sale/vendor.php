@@ -16,13 +16,13 @@ class ControllerSaleVendor extends Controller
 			'column_action',
 			'column_amount',
 			'column_asset',
-			'column_debit',
 			'column_balance',
 			'column_date_added',
 			'column_date',
 			'column_description',
-			'column_credit',
+			'column_initial',
 			'column_reference',
+			'column_total_payment',
 			'column_transaction_type',
 			'column_username',
 			'column_vendor',
@@ -80,49 +80,56 @@ class ControllerSaleVendor extends Controller
 		# End Maintain
 
 		foreach ($order_vendors as $order_vendor) {
-			# Maintain Version 1
-			if (empty($order_vendor['vendor_name'])) {
-				$vendor_info = $this->model_catalog_vendor->getVendor($order_vendor['vendor_id']);
-				$order_vendor['vendor_name'] = $vendor_info['vendor_name'];
-				$order_vendor['vendor_type'] = $vendor_info['vendor_type'];
-			}
-			# End Maintain
-
-			$summary_data = [
-				'client_label'	=> 'vendor',
-				'client_id'		=> $order_vendor['vendor_id'],
-				// 'group'			=> 'tt.category_label'
-			];
+			$order_vendor_info = $this->model_sale_order->getOrderVendor($order_id, $order_vendor['vendor_id']);
 
 			$transaction_summary_data = [];
 
-			$transactions_summary = $this->model_accounting_transaction->getTransactionsSummary($order_id, $summary_data);
+			$filter_system_data = [
+				'client_label'	=> 'system',
+				'client_id'		=> $order_vendor['vendor_id'],
+			];
 
+			$transactions_system_summary = $this->model_accounting_transaction->getTransactionsTotalSummary($order_id, $filter_system_data);
+
+			$filter_vendor_data = [
+				'client_label'	=> 'vendor',
+				'client_id'		=> $order_vendor['vendor_id'],
+			];
+			
+			$transactions_summary = $this->model_accounting_transaction->getTransactionsTotalSummary($order_id, $filter_vendor_data);
+
+			if (isset($transactions_system_summary['purchase']) && !isset($transactions_summary['purchase'])) {
+				$transactions_summary['purchase'] = [];
+			}
+			if ($order_vendor_info['deposit'] && !isset($transactions_summary['deposit'])) {
+				$transactions_summary['deposit'] = [];
+			}
+	
 			foreach ($transactions_summary as $key => $transaction_summary) {
-				$transactions_summary[$transaction_summary['category_label']][$transaction_summary['transaction_label']] = $transaction_summary;
-				unset($transactions_summary[$key]);
+				if ($key == 'deposit') {
+					$initial = $this->config->get('config_customer_deposit');
+				} elseif ($key == 'purchase') {
+					$initial = isset($transactions_system_summary['purchase']) ? $transactions_system_summary['purchase']['initial'] : 0;
+				}
+	
+				$cashin = isset($transaction_summary['cashin']) ? $transaction_summary['cashin'] : 0;
+				$cashout = isset($transaction_summary['cashout']) ? $transaction_summary['cashout'] : 0;
+				$total_payment = abs($cashin - $cashout);
+
+				$transaction_summary_data[$key] = [
+					'transaction_type' 	=> $key ? $this->language->get('text_category_' . $key) : '',
+					'initial'			=> $this->currency->format($initial, $order_info['currency_code'], $order_info['currency_value']),
+					'total_payment'		=> $this->currency->format($total_payment, $order_info['currency_code'], $order_info['currency_value']),
+					'balance'			=> $this->currency->format($initial - $total_payment, $order_info['currency_code'], $order_info['currency_value']),
+					'balance_value'		=> $total_payment
+				];
 			}
 
 			$admission_status = $order_admission_status;
 
-			foreach ($transactions_summary as $key => $transaction_summary) {
-				$cashin = isset($transaction_summary['cashin']) ? $transaction_summary['cashin']['total'] : 0;
-				$cashout = isset($transaction_summary['cashout']) ? $transaction_summary['cashout']['total'] : 0;
-				$total = $cashin - $cashout;
-
-				$transaction_summary_data[$key] = [
-					'transaction_type' 	=> $key ? $this->language->get('text_category_' . $key) : '',
-					'debit'				=> $this->currency->format($cashin, $order_info['currency_code'], $order_info['currency_value']),
-					'credit'			=> $this->currency->format($cashout, $order_info['currency_code'], $order_info['currency_value']),
-					'balance'			=> $this->currency->format($total, $order_info['currency_code'], $order_info['currency_value']),
-					'balance_value'		=> $total
-				];
-			}
-
 			# Cek vendor udah bayar deposit
 			if ($order_admission_status) {
-				$order_vendor_info = $this->model_sale_order->getOrderVendor($order_id, $order_vendor['vendor_id']);
-
+				var_dump($order_vendor_info);die('---breakpoint---');
 				if ($order_vendor_info['deposit']) {
 					if (!isset($transaction_summary_data['deposit']) || $order_vendor_info['deposit'] < $transaction_summary_data['deposit']['balance_value']) {
 						$admission_status = false;
@@ -164,7 +171,7 @@ class ControllerSaleVendor extends Controller
 			}
 
 			$data['vendor_transaction_summary'][$order_vendor['vendor_id']] = [
-				'title' 	=> $order_vendor['vendor_name'] . ' - ' . $order_vendor['vendor_type'],
+				'title' 	=> $order_vendor_info['vendor_name'] . ' - ' . $order_vendor_info['vendor_type'],
 				'href'		=> $this->url->link('catalog/vendor/edit', 'token=' . $this->session->data['token'] . '&vendor_id=' . $order_vendor['vendor_id'], true),
 				'document'	=> $documents_data,
 				'summary'	=> $transaction_summary_data
@@ -213,7 +220,7 @@ class ControllerSaleVendor extends Controller
 					break;
 			}
 
-			if ($result['transaction_label'] == 'cashin') {
+			if ($result['transaction_label'] == 'cashin' || $result['transaction_label'] == 'initial') {
 				$amount = $result['amount'];
 			} elseif ($result['transaction_label'] == 'cashout') {
 				$amount = -$result['amount'];
@@ -331,6 +338,13 @@ class ControllerSaleVendor extends Controller
 					break;
 				}
 
+				# lock transaction if current order status is complete
+				if ($this->config->get('config_lock_complete_order') && in_array($order_info['order_status_id'], $this->config->get('config_complete_status'))) {
+					$json['error']['warning'] = $this->language->get('error_status_complete');
+
+					break;
+				}
+
 				$order_vendors = $this->model_sale_order->getOrderVendors($order_id);
 
 				if (!in_array($this->request->post['vendor_transaction_vendor_id'], array_column($order_vendors, 'vendor_id'))) {
@@ -368,8 +382,8 @@ class ControllerSaleVendor extends Controller
 
 				$this->load->model('accounting/transaction');
 
-				# Cek Pemesanan Sewa Vendor
-				if ($transaction_type_info['client_label'] . '-' . $transaction_type_info['category_label'] == 'vendor-purchase') {
+				# Cek Pemesanan Jasa Vendor
+				if ($transaction_type_info['category_label'] == 'purchase') {
 					$transaction_purchase_info = $this->model_accounting_transaction_type->getTransactionType($this->config->get('config_vendor_purchase_initial_id'));
 
 					if (empty($transaction_purchase_info)) {
@@ -387,7 +401,7 @@ class ControllerSaleVendor extends Controller
 
 					$transaction_total = $this->model_accounting_transaction->getTransactionsTotalSummary($order_id, $summary_data);
 
-					if (!$transaction_total) {
+					if (!$transaction_total['purchase']['initial']) {
 						$json['error']['warning'] = $this->language->get('error_purchase_not_found');
 
 						break;
@@ -636,7 +650,7 @@ class ControllerSaleVendor extends Controller
 				'group'				=> 'tt.category_label'
 			];
 
-			$transaction_total = $this->model_accounting_transaction->getTransactionsTotalSummary($order_id, $summary_data);
+			$transaction_total = $this->model_accounting_transaction->getTransactionsTotalByOrderId($order_id, $summary_data);
 
 			if ($order_vendor_info['deposit'] > $transaction_total) {
 				$admission_status = false;

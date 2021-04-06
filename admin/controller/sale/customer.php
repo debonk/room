@@ -20,8 +20,9 @@ class ControllerSaleCustomer extends Controller
 			'column_date',
 			'column_date_added',
 			'column_description',
+			'column_initial',
 			'column_reference',
-			'column_total',
+			'column_total_payment',
 			'column_transaction_type',
 			'column_username',
 			'entry_amount',
@@ -60,36 +61,36 @@ class ControllerSaleCustomer extends Controller
 
 		$data['customers_transaction_summary'] = [];
 
-		$customer_transaction_summary = $this->model_accounting_transaction->getTransactionsSummary($order_id, ['client_label'	=> 'customer']);
+		$filter_vendor_data = [
+			'client_label'	=> 'customer',
+			'client_id'		=> $order_info['customer_id'],
+		];
 
-		foreach ($customer_transaction_summary as $key => $transaction_summary) {
-			$customer_transaction_summary[$transaction_summary['category_label']][$transaction_summary['transaction_label']] = $transaction_summary;
-			unset($customer_transaction_summary[$key]);
+		$transactions_summary = $this->model_accounting_transaction->getTransactionsTotalSummary($order_id, $filter_vendor_data);
+
+		if (!isset($transactions_summary['order'])) {
+			$transactions_summary['order'] = [];
+		}
+		if ($this->config->get('config_customer_deposit') && !isset($transactions_summary['deposit'])) {
+			$transactions_summary['deposit'] = [];
 		}
 
-		if (!isset($customer_transaction_summary['order'])) {
-			$customer_transaction_summary['order'] = [];
-		}
-		if ($this->config->get('config_customer_deposit') && !isset($customer_transaction_summary['deposit'])) {
-			$customer_transaction_summary['deposit'] = [];
-		}
-
-		foreach ($customer_transaction_summary as $key => $transaction_summary) {
+		foreach ($transactions_summary as $key => $transaction_summary) {
 			if ($key == 'deposit') {
-				$amount = $this->config->get('config_customer_deposit');
-			} elseif ($key == 'order' || !isset($customer_transaction_summary['order'])) {
-				$amount = $order_info['total'];
+				$initial = $this->config->get('config_customer_deposit');
+			} elseif ($key == 'order') {
+				$initial = $order_info['total'];
 			}
 
-			$cashin = isset($transaction_summary['cashin']) ? $transaction_summary['cashin']['total'] : 0;
-			$cashout = isset($transaction_summary['cashout']) ? $transaction_summary['cashout']['total'] : 0;
-			$total = $cashin - $cashout;
+			$cashin = isset($transaction_summary['cashin']) ? $transaction_summary['cashin'] : 0;
+			$cashout = isset($transaction_summary['cashout']) ? $transaction_summary['cashout'] : 0;
+			$total_payment = $cashin - $cashout;
 
 			$data['customers_transaction_summary'][] = [
 				'transaction_type' 	=> $this->language->get('text_category_' . $key),
-				'amount'			=> $this->currency->format($amount, $order_info['currency_code'], $order_info['currency_value']),
-				'total'				=> $this->currency->format($total, $order_info['currency_code'], $order_info['currency_value']),
-				'balance'			=> $this->currency->format($amount - $total, $order_info['currency_code'], $order_info['currency_value'])
+				'initial'			=> $this->currency->format($initial, $order_info['currency_code'], $order_info['currency_value']),
+				'total_payment'		=> $this->currency->format($total_payment, $order_info['currency_code'], $order_info['currency_value']),
+				'balance'			=> $this->currency->format($initial - $total_payment, $order_info['currency_code'], $order_info['currency_value'])
 			];
 		}
 
@@ -207,6 +208,13 @@ class ControllerSaleCustomer extends Controller
 					break;
 				}
 
+				# lock transaction if current order status is complete
+				if ($this->config->get('config_lock_complete_order') && in_array($order_info['order_status_id'], $this->config->get('config_complete_status'))) {
+					$json['error']['warning'] = $this->language->get('error_status_complete');
+
+					break;
+				}
+
 				if (!in_array($order_info['order_status_id'], $this->config->get('config_status_with_payment'))) {
 					$json['error']['warning'] = $this->language->get('error_order_status');
 
@@ -229,6 +237,25 @@ class ControllerSaleCustomer extends Controller
 					$json['error']['warning'] = $this->language->get('error_type_not_found');
 
 					break;
+				}
+
+				$this->load->model('accounting/transaction');
+
+				# Cek Pemesanan Sewa Ballroom
+				if ($transaction_type_info['category_label'] == 'order') {
+					$summary_data = [
+						'category_label'	=> 'order',
+						'transaction_label'	=> 'initial',
+						'client_id'			=> $order_info['customer_id']
+					];
+
+					$transaction_total = $this->model_accounting_transaction->getTransactionsTotalSummary($order_id, $summary_data);
+
+					if (empty($transaction_total['order']['initial'])) {
+						$json['error']['warning'] = $this->language->get('error_order_not_found');
+
+						break;
+					}
 				}
 
 			default:
@@ -282,7 +309,7 @@ class ControllerSaleCustomer extends Controller
 				'reference_no'			=> $reference_no,
 				'transaction_account' 	=> $transaction_account
 			);
-	
+
 			$this->model_accounting_transaction->addTransaction($transaction_data);
 
 			if ($transaction_type_info['category_label'] == 'order') {

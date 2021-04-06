@@ -592,7 +592,7 @@ class ControllerAccountingTransaction extends Controller
 					}
 
 					# Aktifkan jika edit transaksi tidak diijinkan setelah status complete
-/* 					if ($transaction_info['order_id']) {
+					/* 					if ($transaction_info['order_id']) {
 						$this->load->model('sale/order');
 						$order_status_id = $this->model_sale_order->getOrderStatusId($transaction_info['order_id']);
 
@@ -631,7 +631,7 @@ class ControllerAccountingTransaction extends Controller
 			if ($transaction_info['order_id']) {
 				$order_status_id = $this->model_sale_order->getOrderStatusId($transaction_info['order_id']);
 
-				if (in_array($order_status_id, $this->config->get('config_complete_status'))) {
+				if ($this->config->get('config_lock_complete_order') && in_array($order_status_id, $this->config->get('config_complete_status'))) {
 					$this->error['warning'] = $this->language->get('error_order_status');
 
 					break;

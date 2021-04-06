@@ -37,7 +37,7 @@ $_['entry_comment']				= 'Catatan:';
 $_['entry_vendor_reference']	= 'Invoice Vendor:';
 
 // Error
-$_['error_development']			= 'Warning: Reverse for development. Vendor ini tidak memerlukan PO!';
+$_['error_development']			= 'Warning: Reserve for development. Vendor ini tidak memerlukan PO!';
 $_['error_initial_payment']		= 'Warning: Tanda Jadi harus dibayar terlebih dahulu!';
 $_['error_order_purchase']		= 'Warning: Purchase order yang telah selesai tidak bisa diedit!';
 $_['error_order']				= 'Warning: Order tidak ditemukan!';

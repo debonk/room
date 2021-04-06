@@ -9,10 +9,10 @@
 					<?= $column_transaction_type; ?>
 				</td>
 				<td class="text-right">
-					<?= $column_amount; ?>
+					<?= $column_initial; ?>
 				</td>
 				<td class="text-right">
-					<?= $column_total; ?>
+					<?= $column_total_payment; ?>
 				</td>
 				<td class="text-right">
 					<?= $column_balance; ?>
@@ -27,10 +27,10 @@
 					<?= $transaction_summary['transaction_type']; ?>
 				</td>
 				<td class="text-right">
-					<?= $transaction_summary['amount']; ?>
+					<?= $transaction_summary['initial']; ?>
 				</td>
 				<td class="text-right">
-					<?= $transaction_summary['total']; ?>
+					<?= $transaction_summary['total_payment']; ?>
 				</td>
 				<td class="text-right">
 					<?= $transaction_summary['balance']; ?>
@@ -234,6 +234,8 @@
 	</button>
 </div>
 <script type="text/javascript">
+	let warning_pos = $('#order-customer').position();
+
 	$('#customer-transaction button[id^=\'button-print\']').on('click', function (e) {
 		const transaction_id = this.value;
 
@@ -269,6 +271,7 @@
 				if (json['error']) {
 					if (json['error']['warning']) {
 						$('#order-customer').before('<div class="alert alert-danger"><i class="fa fa-exclamation-circle"></i> ' + json['error']['warning'] + ' <button type="button" class="close" data-dismiss="alert">&times;</button></div>');
+						$('html, body').animate({ scrollTop: warning_pos.top - 70 }, 500);
 					}
 
 					if (json['error_customer_transaction']) {
@@ -291,9 +294,9 @@
 					$('#order-customer').load('index.php?route=sale/customer&token=<?= $token; ?>&order_id=<?= $order_id; ?>');
 
 					$('#order-customer').before('<div class="alert alert-success"><i class="fa fa-check-circle"></i> ' + json['success'] + ' <button type="button" class="close" data-dismiss="alert">&times;</button></div>');
+					$('html, body').animate({ scrollTop: warning_pos.top - 70 }, 500);
 
 					$('input[name^=\'customer_transaction\']').val('');
-
 				}
 			},
 			error: function (xhr, ajaxOptions, thrownError) {

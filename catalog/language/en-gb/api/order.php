@@ -5,8 +5,8 @@ $_['text_success']           = 'Success: You have modified orders!';
 // Error
 // $_['error_adjustment']          = 'Warning: Transaksi penyesuaian sudah ada sebelumnya. Hubungi Audit untuk pengecekan!';
 // $_['error_adjustment_amount']   = 'Warning: Order Total tidak sesuai dengan transaksi pembayaran. Hubungi Audit untuk pengecekan!';
-$_['error_amount_balance']   	= 'Warning: Transaksi pembayaran tidak sesuai!';
-$_['error_amount_initial']   	= 'Warning: Transaksi pemesanan awal tidak ditemukan!';
+$_['error_amount_balance']   	= 'Warning: Transaksi pembayaran "%s" tidak sesuai!';
+$_['error_amount_initial']   	= 'Warning: Transaksi pemesanan awal "%s" tidak ditemukan!';
 $_['error_action']              = 'Warning: Could not complete this action!';
 $_['error_asset_not_found']     = 'Warning: Akun Aset tidak ditemukan. Silahkan set Akun Aset di modul Payment atau Setting!';
 $_['error_customer']            = 'Warning: Customer details needs to be set!';

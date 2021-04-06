@@ -550,26 +550,26 @@ class ModelSaleOrder extends Model {
 		
 		$payment_phase_data['initial_payment'] = array(
 			'order_status_id'	=> $this->config->get('config_initial_payment_status_id'),
-			'title'			=> $this->model_localisation_order_status->getOrderStatus($this->config->get('config_initial_payment_status_id'))['name'],
-			'amount'		=> $this->config->get('config_initial_payment_amount'),
-			'limit_stamp'	=> strtotime('+' . $this->config->get('config_initial_payment_limit') . ' days', strtotime($order_info['date_added'])),
-			'auto_expired'	=> true
+			'title'				=> $this->model_localisation_order_status->getOrderStatus($this->config->get('config_initial_payment_status_id'))['name'],
+			'amount'			=> $this->config->get('config_initial_payment_amount'),
+			'limit_stamp'		=> strtotime('+' . $this->config->get('config_initial_payment_limit') . ' days', strtotime($order_info['date_added'])),
+			'auto_expired'		=> true
 		);
 
 		$payment_phase_data['down_payment'] = array(
 			'order_status_id'	=> $this->config->get('config_down_payment_status_id'),
-			'title'			=> $this->model_localisation_order_status->getOrderStatus($this->config->get('config_down_payment_status_id'))['name'],
-			'amount'		=> round($order_info['total'] * $this->config->get('config_down_payment_amount') / 100000, 0) * 1000 - $payment_phase_data['initial_payment']['amount'],
-			'limit_stamp'	=> min(strtotime('+' . $this->config->get('config_down_payment_limit') . ' days', $payment_phase_data['initial_payment']['limit_stamp']), strtotime('-2 days', strtotime($order_info['event_date']))),
-			'auto_expired'	=> false
+			'title'				=> $this->model_localisation_order_status->getOrderStatus($this->config->get('config_down_payment_status_id'))['name'],
+			'amount'			=> round($order_info['total'] * $this->config->get('config_down_payment_amount') / 100000, 0) * 1000 - $payment_phase_data['initial_payment']['amount'],
+			'limit_stamp'		=> min(strtotime('+' . $this->config->get('config_down_payment_limit') . ' days', $payment_phase_data['initial_payment']['limit_stamp']), strtotime('-2 days', strtotime($order_info['event_date']))),
+			'auto_expired'		=> false
 		);
 
 		$payment_phase_data['full_payment'] = array(
 			'order_status_id'	=> $this->config->get('config_full_payment_status_id'),
-			'title'			=> $this->model_localisation_order_status->getOrderStatus($this->config->get('config_full_payment_status_id'))['name'],
-			'amount'		=> $order_info['total'] - $payment_phase_data['down_payment']['amount'] - $payment_phase_data['initial_payment']['amount'],
-			'limit_stamp'	=> max(strtotime('-' . $this->config->get('config_full_payment_limit') . ' days', strtotime($order_info['event_date'])), strtotime('+1 day', $payment_phase_data['down_payment']['limit_stamp'])),
-			'auto_expired'	=> false
+			'title'				=> $this->model_localisation_order_status->getOrderStatus($this->config->get('config_full_payment_status_id'))['name'],
+			'amount'			=> $order_info['total'] - $payment_phase_data['down_payment']['amount'] - $payment_phase_data['initial_payment']['amount'],
+			'limit_stamp'		=> max(strtotime('-' . $this->config->get('config_full_payment_limit') . ' days', strtotime($order_info['event_date'])), strtotime('+1 day', $payment_phase_data['down_payment']['limit_stamp'])),
+			'auto_expired'		=> false
 		);
 		
 		$this->load->model('accounting/transaction');
@@ -579,7 +579,7 @@ class ModelSaleOrder extends Model {
 			'category_label'	=> 'order'
 		];
 
-		$transaction_total = $this->model_accounting_transaction->getTransactionsTotalSummary($order_id, $summary_data);
+		$transaction_total = $this->model_accounting_transaction->getTransactionsTotalByOrderId($order_id, $summary_data);
 
 		foreach ($payment_phase_data as $key => $payment_phase) {
 			// Cek Pembayaran belum lunas
@@ -656,26 +656,27 @@ class ModelSaleOrder extends Model {
 				}
 			}
 
-			# Update the DB with the new statuses
-			$this->db->query("UPDATE `" . DB_PREFIX . "order` SET order_status_id = '" . (int)$order_status_id . "', date_modified = NOW() WHERE order_id = '" . (int)$order_id . "'");
+			$transaction_initial_status = false;
+			$transaction_complete_status = false;
 
-			# If current order status is not complete but new status is complete then commence adjustment transaction
+			# If current order status is not processing/complete but new status is processing/complete
+			if (!in_array($order_info['order_status_id'], array_merge($this->config->get('config_processing_status'), $this->config->get('config_complete_status'))) && in_array($order_status_id, array_merge($this->config->get('config_processing_status'), $this->config->get('config_complete_status')))) {
+				$transaction_initial_status = true;
+			}
+
+			# If current order status is not complete but new status is complete then commence completion transaction
 			if (!in_array($order_info['order_status_id'], $this->config->get('config_complete_status')) && in_array($order_status_id, $this->config->get('config_complete_status'))) {
+				$transaction_complete_status = true;
+			}
+
+			if ($transaction_initial_status || $transaction_complete_status) {
+				$this->load->model('localisation/order_status');
 				$order_status_info = $this->model_localisation_order_status->getOrderStatus($order_status_id);
 
 				$this->load->model('accounting/transaction');
 				$transaction_type_info = $this->model_accounting_transaction->getTransactionType($order_status_info['transaction_type_id']);
 
 				if ($transaction_type_info) {
-					$filter_data = array(
-						'client_label' 		=> $transaction_type_info['client_label'],
-						'category_label' 	=> $transaction_type_info['category_label']
-					);
-
-					$transactions_summary = $this->model_accounting_transaction->getTransactionsTotalSummary($order_id, $filter_data);
-
-					$amount = $transactions_summary['initial'] - $transactions_summary['cashin'] + $transactions_summary['cashout'];
-
 					$accounts = [];
 					$transaction_account = [];
 
@@ -689,33 +690,88 @@ class ModelSaleOrder extends Model {
 						}
 					}
 
-					switch ($transaction_type_info['transaction_label']) {
-						case 'complete':
-							foreach ($transaction_type_accounts as $value) {
-								$accounts[$value['account_debit_id']] += $transactions_summary['initial'];
-								$accounts[$value['account_credit_id']] -= $transactions_summary['initial'];
+					# If current order status is not processing but new status is processing then commence initial transaction
+					if ($transaction_initial_status) {
+						$amount = $order_info['total'];
+
+						$amount_data = [
+							'initial'	=> 0,
+							'discount'	=> 0,
+							'charged'	=> 0
+						];
+
+						foreach ($order_total_query->rows as $order_total) {
+							if ($order_total['code'] == 'sub_total') {
+								$amount_data['initial'] = $order_total['value'];
+							} elseif ($order_total['code'] == 'marketing_budget' || $order_total['code'] == 'coupon') {
+								$amount_data['discount'] -= $order_total['value'];
+							} elseif ($order_total['code'] == 'low_order_fee') {
+								$amount_data['charged'] = $order_total['value'];
 							}
+						}
 
-							break;
+						foreach ($transaction_type_accounts as $value) {
+							if ($value['transaction_label'] == 'initial') {
+								$accounts[$value['account_debit_id']] += $amount_data['initial'];
+								$accounts[$value['account_credit_id']] -= $amount_data['initial'];
+							} elseif ($value['transaction_label'] == 'discount') {
+								$accounts[$value['account_debit_id']] += $amount_data['discount'];
+								$accounts[$value['account_credit_id']] -= $amount_data['discount'];
+							} elseif ($value['transaction_label'] == 'charged') {
+								$accounts[$value['account_debit_id']] += $amount_data['charged'];
+								$accounts[$value['account_credit_id']] -= $amount_data['charged'];
+							}
+						}
 
-						case 'canceled':
-							$charged_amount = $transactions_summary['cashin'] - $transactions_summary['cashout'];
-							$canceled_amount = $transactions_summary['initial'] - $charged_amount;
+						$reference_prefix = 'S' . date('ym');
+						$reference_no = $this->model_accounting_transaction->getLastReferenceNo($reference_prefix) + 1;
 
-							foreach ($transaction_type_accounts as $value) {
-								if ($value['transaction_label'] == 'charged') {
-									$accounts[$value['account_debit_id']] += $charged_amount;
-									$accounts[$value['account_credit_id']] -= $charged_amount;
-								} elseif ($value['transaction_label'] == 'canceled') {
-									$accounts[$value['account_debit_id']] += $canceled_amount;
-									$accounts[$value['account_credit_id']] -= $canceled_amount;
+						$description = 'Initial Transaction of Order #' . $order_id . ': ' . $order_info['firstname'] . ' ' . $order_info['lastname'];
+					}
+
+					# If current order status is not complete but new status is complete then commence completion transaction
+					if ($transaction_complete_status) {
+						$filter_data = array(
+							'category_label' 	=> $transaction_type_info['category_label']
+						);
+
+						$transactions_summary = $this->model_accounting_transaction->getTransactionsTotalSummary($order_id, $filter_data);
+
+						$amount = $transactions_summary[$transaction_type_info['category_label']]['initial'] - $transactions_summary[$transaction_type_info['category_label']]['cashin'] + $transactions_summary[$transaction_type_info['category_label']]['cashout'];
+
+						switch ($transaction_type_info['transaction_label']) {
+							case 'complete':
+								foreach ($transaction_type_accounts as $value) {
+									$accounts[$value['account_debit_id']] += $transactions_summary[$transaction_type_info['category_label']]['initial'];
+									$accounts[$value['account_credit_id']] -= $transactions_summary[$transaction_type_info['category_label']]['initial'];
 								}
-							}
 
-							break;
+								break;
 
-						default:
-							break;
+							case 'canceled':
+								$charged_amount = $transactions_summary[$transaction_type_info['category_label']]['cashin'] - $transactions_summary[$transaction_type_info['category_label']]['cashout'];
+								$canceled_amount = $transactions_summary[$transaction_type_info['category_label']]['initial'] - $charged_amount;
+
+								foreach ($transaction_type_accounts as $value) {
+									if ($value['transaction_label'] == 'charged') {
+										$accounts[$value['account_debit_id']] += $charged_amount;
+										$accounts[$value['account_credit_id']] -= $charged_amount;
+									} elseif ($value['transaction_label'] == 'canceled') {
+										$accounts[$value['account_debit_id']] += $canceled_amount;
+										$accounts[$value['account_credit_id']] -= $canceled_amount;
+									}
+								}
+
+								break;
+
+							default:
+								break;
+						}
+
+						$reference_prefix = 'S' . date('ym');
+						$reference_no = $this->model_accounting_transaction->getLastReferenceNo($reference_prefix) + 1;
+
+						$description = 'Completion Transaction of Order #' . $order_id . ': ' . $order_info['firstname'] . ' ' . $order_info['lastname'];
 					}
 
 					foreach ($accounts as $account_id => $value) {
@@ -734,17 +790,15 @@ class ModelSaleOrder extends Model {
 						}
 					}
 
-					$reference_prefix = 'R' . date('ym');
-					$reference_no = $this->model_accounting_transaction->getLastReferenceNo($reference_prefix) + 1;
-
 					$transaction_data = array(
 						'transaction_type_id'	=> $transaction_type_info['transaction_type_id'],
 						'order_id'				=> $order_id,
+						'client_id'				=> $order_info['customer_id'],
 						'reference_prefix'		=> $reference_prefix,
 						'reference_no' 			=> $reference_no,
 						'date' 					=> date('Y-m-d'),
 						'payment_method'		=> '',
-						'description' 			=> 'Adjustment Transaction from Order #' . $order_id . ': ' . $order_info['firstname'] . ' ' . $order_info['lastname'],
+						'description' 			=> $description,
 						'amount' 				=> $amount,
 						'customer_name' 		=> 'system',
 						'transaction_account' 	=> $transaction_account
@@ -754,14 +808,21 @@ class ModelSaleOrder extends Model {
 				}
 			}
 
+			# Update the DB with the new statuses
+			$this->db->query("UPDATE `" . DB_PREFIX . "order` SET order_status_id = '" . (int)$order_status_id . "', date_modified = NOW() WHERE order_id = '" . (int)$order_id . "'");
+
+			# Add the order history
 			$this->db->query("INSERT INTO " . DB_PREFIX . "order_history SET order_id = '" . (int)$order_id . "', order_status_id = '" . (int)$order_status_id . "', notify = '" . (int)$notify . "', comment = '" . $this->db->escape($comment) . "', date_added = NOW(), user_id = '" . $this->user->getId() . "'");
 
 			# If old order status is the processing or complete status but new status is not then commence restock, and remove coupon, voucher and reward history
 			if (in_array($order_info['order_status_id'], array_merge($this->config->get('config_processing_status'), $this->config->get('config_complete_status'))) && !in_array($order_status_id, array_merge($this->config->get('config_processing_status'), $this->config->get('config_complete_status')))) {
-				# Restock
+				# Delete system transaction
+				$this->db->query("DELETE t, ta FROM " . DB_PREFIX . "transaction t, " . DB_PREFIX . "transaction_account ta  WHERE client_label = 'system' AND category_label = 'order' AND order_id = '" . (int)$order_id . "' AND client_id = '" . (int)$order_info['customer_id'] . "' AND ta.transaction_id = t.transaction_id");
+
+				// Restock
 				$product_query = $this->db->query("SELECT * FROM " . DB_PREFIX . "order_product WHERE order_id = '" . (int)$order_id . "'");
 
-				foreach($product_query->rows as $product) {
+				foreach ($product_query->rows as $product) {
 					$this->db->query("UPDATE `" . DB_PREFIX . "product` SET quantity = (quantity + " . (int)$product['quantity'] . ") WHERE product_id = '" . (int)$product['product_id'] . "' AND subtract = '1'");
 
 					$option_query = $this->db->query("SELECT * FROM " . DB_PREFIX . "order_option WHERE order_id = '" . (int)$order_id . "' AND order_product_id = '" . (int)$product['order_product_id'] . "'");
@@ -771,7 +832,7 @@ class ModelSaleOrder extends Model {
 					}
 				}
 
-				# Remove coupon, vouchers and reward points history
+				// Remove coupon, vouchers and reward points history
 				$this->load->model('account/order');
 
 				$order_total_query = $this->db->query("SELECT * FROM `" . DB_PREFIX . "order_total` WHERE order_id = '" . (int)$order_id . "' ORDER BY sort_order ASC");
@@ -784,7 +845,7 @@ class ModelSaleOrder extends Model {
 					}
 				}
 
-				# Remove commission if sale is linked to affiliate referral.
+				// Remove commission if sale is linked to affiliate referral.
 				if ($order_info['affiliate_id']) {
 					$this->load->model('affiliate/affiliate');
 
@@ -793,477 +854,7 @@ class ModelSaleOrder extends Model {
 			}
 
 			$this->cache->delete('product');
-			
-			# If order status is 0 then becomes greater than 0 send main html email
-/* 			if (!$order_info['order_status_id'] && $order_status_id) {
-				# Check for any downloadable products
-				$download_status = false;
-	
-				$order_product_query = $this->db->query("SELECT * FROM " . DB_PREFIX . "order_product WHERE order_id = '" . (int)$order_id . "'");
-	
-				foreach ($order_product_query->rows as $order_product) {
-					# Check if there are any linked downloads
-					$product_download_query = $this->db->query("SELECT COUNT(*) AS total FROM `" . DB_PREFIX . "product_to_download` WHERE product_id = '" . (int)$order_product['product_id'] . "'");
-	
-					if ($product_download_query->row['total']) {
-						$download_status = true;
-					}
-				}
-	
-				# Load the language for any mails that might be required to be sent out
-				$language = new Language($order_info['language_code']);
-				$language->load($order_info['language_code']);
-				$language->load('mail/order');
-	
-				$order_status_query = $this->db->query("SELECT * FROM " . DB_PREFIX . "order_status WHERE order_status_id = '" . (int)$order_status_id . "' AND language_id = '" . (int)$order_info['language_id'] . "'");
-	
-				if ($order_status_query->num_rows) {
-					$order_status = $order_status_query->row['name'];
-				} else {
-					$order_status = '';
-				}
-	
-				$subject = sprintf($language->get('text_new_subject'), html_entity_decode($order_info['store_name'], ENT_QUOTES, 'UTF-8'), $order_id);
-	
-				# HTML Mail
-				$data = array();
-	
-				$data['title'] = sprintf($language->get('text_new_subject'), $order_info['store_name'], $order_id);
-	
-				$data['text_greeting'] = sprintf($language->get('text_new_greeting'), $order_info['store_name']);
-				$data['text_link'] = $language->get('text_new_link');
-				$data['text_download'] = $language->get('text_new_download');
-				$data['text_order_detail'] = $language->get('text_new_order_detail');
-				$data['text_instruction'] = $language->get('text_new_instruction');
-				$data['text_order_id'] = $language->get('text_new_order_id');
-				$data['text_title'] = $language->get('text_new_title');
-				$data['text_event_date'] = $language->get('text_new_event_date');
-				$data['text_slot'] = $language->get('text_new_slot');
-				// $data['text_ceremony'] = $language->get('text_new_ceremony');
-				$data['text_payment_method'] = $language->get('text_new_payment_method');
-				$data['text_date_added'] = $language->get('text_new_date_added');
-				// $data['text_shipping_method'] = $language->get('text_new_shipping_method');
-				$data['text_customer'] = $language->get('text_new_customer');
-				$data['text_id_no'] = $language->get('text_new_id_no');
-				$data['text_email'] = $language->get('text_new_email');
-				$data['text_telephone'] = $language->get('text_new_telephone');
-				$data['text_ip'] = $language->get('text_new_ip');
-				$data['text_order_status'] = $language->get('text_new_order_status');
-				$data['text_customer_detail'] = $language->get('text_new_customer_detail');
-				$data['text_payment_address'] = $language->get('text_new_payment_address');
-				// $data['text_shipping_address'] = $language->get('text_new_shipping_address');
-				$data['text_primary_type'] = $language->get('text_primary_type');
-				$data['text_secondary_type'] = $language->get('text_secondary_type');
-				$data['text_product_type'] = $language->get('text_new_product_type');
-				$data['text_product'] = $language->get('text_new_product');
-				$data['text_model'] = $language->get('text_new_model');
-				$data['text_quantity'] = $language->get('text_new_quantity');
-				$data['text_price'] = $language->get('text_new_price');
-				$data['text_total'] = $language->get('text_new_total');
-				$data['text_footer'] = $language->get('text_new_footer');
-	
-				$data['logo'] = $this->config->get('config_url') . 'image/' . $this->config->get('config_logo');
-				$data['store_name'] = $order_info['store_name'];
-				$data['store_url'] = $order_info['store_url'];
-				$data['customer_id'] = $order_info['customer_id'];
-				$data['link'] = $order_info['store_url'] . 'index.php?route=account/order/info&order_id=' . $order_id;
-	
-				if ($download_status) {
-					$data['download'] = $order_info['store_url'] . 'index.php?route=account/download';
-				} else {
-					$data['download'] = '';
-				}
-	
-				$data['order_id'] = $order_id;
-				$data['title'] = $order_info['title'];
-				$data['event_date'] = date($language->get('date_format_short'), strtotime($order_info['event_date']));
-				$data['slot'] = $order_info['slot'];
-				// $data['ceremony'] = $order_info['ceremony'];
-				$data['payment_method'] = $order_info['payment_method'];
-				$data['date_added'] = date($language->get('date_format_short'), strtotime($order_info['date_added']));
-				// $data['shipping_method'] = $order_info['shipping_method'];
-				$data['customer'] = $order_info['customer'];
-				$data['id_no'] = $order_info['id_no'];
-				$data['email'] = $order_info['email'];
-				$data['telephone'] = $order_info['telephone'];
-				$data['ip'] = $order_info['ip'];
-				$data['order_status'] = $order_status;
-	
-				if ($comment && $notify) {
-					$data['comment'] = nl2br($comment);
-				} else {
-					$data['comment'] = '';
-				}
-	
-				if ($order_info['payment_address_format']) {
-					$format = $order_info['payment_address_format'];
-				} else {
-					$format = '{firstname} {lastname}' . "\n" . '{company}{profession}{position}' . "\n" . '{address_1}' . "\n" . '{address_2}' . "\n" . '{city} {postcode}' . "\n" . '{zone}, {country}';
-				}
-	
-				$find = array(
-					'{firstname}',
-					'{lastname}',
-					'{company}',
-					'{profession}',
-					'{position}',
-					'{address_1}',
-					'{address_2}',
-					'{city}',
-					'{postcode}',
-					'{zone}',
-					'{zone_code}',
-					'{country}'
-				);
-	
-				$replace = array(
-					'firstname' => $order_info['payment_firstname'],
-					'lastname'  => $order_info['payment_lastname'],
-					'company'   => $order_info['payment_company'],
-					'profession'=> $order_info['payment_profession'] ? ', ' . $order_info['payment_profession'] : '',
-					'position'  => $order_info['payment_position'] ? ', ' . $order_info['payment_position'] : '',
-					'address_1' => $order_info['payment_address_1'],
-					'address_2' => $order_info['payment_address_2'],
-					'city'      => $order_info['payment_city'],
-					'postcode'  => $order_info['payment_postcode'],
-					'zone'      => $order_info['payment_zone'],
-					'zone_code' => $order_info['payment_zone_code'],
-					'country'   => $order_info['payment_country']
-				);
-	
-				$data['payment_address'] = str_replace(array("\r\n", "\r", "\n"), '<br />', preg_replace(array("/\s\s+/", "/\r\r+/", "/\n\n+/"), '<br />', trim(str_replace($find, $replace, $format))));
- */
-
-/* 				$this->load->model('tool/upload');
-	
-				// Products
-				$data['products'] = array();
-	
-				foreach ($order_product_query->rows as $product) {
-					$option_data = array();
-	
-					$order_option_query = $this->db->query("SELECT * FROM " . DB_PREFIX . "order_option WHERE order_id = '" . (int)$order_id . "' AND order_product_id = '" . (int)$product['order_product_id'] . "'");
-	
-					foreach ($order_option_query->rows as $option) {
-						if ($option['type'] != 'file') {
-							$value = $option['value'];
-						} else {
-							$upload_info = $this->model_tool_upload->getUploadByCode($option['value']);
-	
-							if ($upload_info) {
-								$value = $upload_info['name'];
-							} else {
-								$value = '';
-							}
-						}
-	
-						$option_data[] = array(
-							'name'  => $option['name'],
-							'value' => (utf8_strlen($value) > 20 ? utf8_substr($value, 0, 20) . '..' : $value)
-						);
-					}
-	
-					//Category
-					$category_data = array();
-					
-					$this->load->model('catalog/product');
-					$this->load->model('catalog/category');
-					
-					$categories = $this->model_catalog_product->getCategories($product['product_id']);
-					
-					foreach ($categories as $category) {
-						$category_data[] = $this->model_catalog_category->getCategory($category['category_id'])['name'];
-					}
-					
-					$data['products'][] = array(
-						'name'     		=> $product['name'],
-						'model'    		=> $product['model'],
-						'primary_type'	=> $product['primary_type'],
-						'category'		=> $category_data,
-						'option'   		=> $option_data,
-						'quantity' 		=> $product['quantity'],
-						'price'    		=> $this->currency->format($product['price'] + ($this->config->get('config_tax') ? $product['tax'] : 0), $order_info['currency_code'], $order_info['currency_value']),
-						'total'    		=> $this->currency->format($product['total'] + ($this->config->get('config_tax') ? ($product['tax'] * $product['quantity']) : 0), $order_info['currency_code'], $order_info['currency_value'])
-					);
-				}
-	
-				array_multisort(array_column($data['products'], 'primary_type'), SORT_DESC, $data['products']);			
- */
-				// Vouchers - Unused
-/* 				$data['vouchers'] = array();
-	
-				$order_voucher_query = $this->db->query("SELECT * FROM " . DB_PREFIX . "order_voucher WHERE order_id = '" . (int)$order_id . "'");
-	
-				foreach ($order_voucher_query->rows as $voucher) {
-					$data['vouchers'][] = array(
-						'description' => $voucher['description'],
-						'amount'      => $this->currency->format($voucher['amount'], $order_info['currency_code'], $order_info['currency_value']),
-					);
-				}
- */	
-				// Order Totals
-/* 				$data['totals'] = array();
-				
-				$order_total_query = $this->db->query("SELECT * FROM `" . DB_PREFIX . "order_total` WHERE order_id = '" . (int)$order_id . "' ORDER BY sort_order ASC");
-	
-				foreach ($order_total_query->rows as $total) {
-					$data['totals'][] = array(
-						'title' => $total['title'],
-						'text'  => $this->currency->format($total['value'], $order_info['currency_code'], $order_info['currency_value']),
-					);
-				}
- */	
-				// Text Mail
-/* 				$text  = sprintf($language->get('text_new_greeting'), html_entity_decode($order_info['store_name'], ENT_QUOTES, 'UTF-8')) . "\n\n";
-				$text .= $data['text_order_detail'] . "\n";
-				$text .= '---------------------------------------' . "\n";
-				$text .= $language->get('text_new_order_id') . ' ' . $order_id . "\n";
-				$text .= $data['text_title'] . ' ' . $data['title'] . "\n";
-				$text .= $data['text_event_date'] . ' ' . $data['event_date'] . "\n";
-				$text .= $data['text_slot'] . ' ' . $data['slot'] . "\n";
-				// $text .= $data['text_ceremony'] . ' ' . $data['ceremony'] . "\n";
-				$text .= $data['text_payment_method'] . ' ' . $data['payment_method'] . "\n";
-				$text .= $language->get('text_new_date_added') . ' ' . date($language->get('date_format_short'), strtotime($order_info['date_added'])) . "\n";
-				$text .= $language->get('text_new_order_status') . ' ' . $order_status . "\n\n";
-	
-				if ($comment && $notify) {
-					$text .= $language->get('text_new_instruction') . "\n\n";
-					$text .= $comment . "\n\n";
-				}
-	
-				// Products
-				$text .= $language->get('text_new_products') . "\n";
-	
-				foreach ($order_product_query->rows as $product) {
-					$text .= $product['quantity'] . 'x ' . $product['name'] . ' (' . $product['model'] . ') ' . html_entity_decode($this->currency->format($product['total'] + ($this->config->get('config_tax') ? ($product['tax'] * $product['quantity']) : 0), $order_info['currency_code'], $order_info['currency_value']), ENT_NOQUOTES, 'UTF-8') . "\n";
-	
-					$order_option_query = $this->db->query("SELECT * FROM " . DB_PREFIX . "order_option WHERE order_id = '" . (int)$order_id . "' AND order_product_id = '" . $product['order_product_id'] . "'");
-	
-					foreach ($order_option_query->rows as $option) {
-						if ($option['type'] != 'file') {
-							$value = $option['value'];
-						} else {
-							$upload_info = $this->model_tool_upload->getUploadByCode($option['value']);
-	
-							if ($upload_info) {
-								$value = $upload_info['name'];
-							} else {
-								$value = '';
-							}
-						}
-	
-						$text .= chr(9) . '-' . $option['name'] . ' ' . (utf8_strlen($value) > 20 ? utf8_substr($value, 0, 20) . '..' : $value) . "\n";
-					}
-				}
-	
-				foreach ($order_voucher_query->rows as $voucher) {
-					$text .= '1x ' . $voucher['description'] . ' ' . $this->currency->format($voucher['amount'], $order_info['currency_code'], $order_info['currency_value']);
-				}
-	
-				$text .= "\n";
-	
-				$text .= $language->get('text_new_order_total') . "\n";
-	
-				foreach ($order_total_query->rows as $total) {
-					$text .= $total['title'] . ': ' . html_entity_decode($this->currency->format($total['value'], $order_info['currency_code'], $order_info['currency_value']), ENT_NOQUOTES, 'UTF-8') . "\n";
-				}
-	
-				$text .= "\n";
-	
-				if ($order_info['customer_id']) {
-					$text .= $language->get('text_new_link') . "\n";
-					$text .= $order_info['store_url'] . 'index.php?route=account/order/info&order_id=' . $order_id . "\n\n";
-				}
-	
-				if ($download_status) {
-					$text .= $language->get('text_new_download') . "\n";
-					$text .= $order_info['store_url'] . 'index.php?route=account/download' . "\n\n";
-				}
-	
-				// Comment
-				if ($order_info['comment']) {
-					$text .= $language->get('text_new_comment') . "\n\n";
-					$text .= $order_info['comment'] . "\n\n";
-				}
-	
-				$text .= '---------------------------------------' . "\n";
-				$text .= $language->get('text_new_footer') . "\n\n";
- */
-				//Customer Alert Mail
-/* 				$mail = new Mail();
-				$mail->protocol = $this->config->get('config_mail_protocol');
-				$mail->parameter = $this->config->get('config_mail_parameter');
-				$mail->smtp_hostname = $this->config->get('config_mail_smtp_hostname');
-				$mail->smtp_username = $this->config->get('config_mail_smtp_username');
-				$mail->smtp_password = html_entity_decode($this->config->get('config_mail_smtp_password'), ENT_QUOTES, 'UTF-8');
-				$mail->smtp_port = $this->config->get('config_mail_smtp_port');
-				$mail->smtp_timeout = $this->config->get('config_mail_smtp_timeout');
-	
-				$mail->setTo($order_info['email']);
-				$mail->setFrom($this->config->get('config_email'));
-				$mail->setSender(html_entity_decode($order_info['store_name'], ENT_QUOTES, 'UTF-8'));
-				$mail->setSubject(html_entity_decode($subject, ENT_QUOTES, 'UTF-8'));
-				$mail->setHtml($this->load->view('mail/order', $data));
-				$mail->setText($text);
-				$mail->send();
- */	
-				// Admin Alert Mail
-/* 				if ($this->config->get('config_order_mail')) {
-					$subject = sprintf($language->get('text_new_subject'), html_entity_decode($this->config->get('config_name'), ENT_QUOTES, 'UTF-8'), $order_id);
-	
-					// HTML Mail
-					$data['text_greeting'] = $language->get('text_new_received');
-	
-					if ($comment) {
-						if ($order_info['comment']) {
-							$data['comment'] = nl2br($comment) . '<br/><br/>' . $order_info['comment'];
-						} else {
-							$data['comment'] = nl2br($comment);
-						}
-					} else {
-						if ($order_info['comment']) {
-							$data['comment'] = $order_info['comment'];
-						} else {
-							$data['comment'] = '';
-						}
-					}
-	
-					$data['text_download'] = '';
-	
-					$data['text_footer'] = '';
-	
-					$data['text_link'] = '';
-					$data['link'] = '';
-					$data['download'] = '';
-	
-					// Text
-					$text  = $language->get('text_new_received') . "\n\n";
-					$text .= $data['text_order_detail'] . "\n";
-					$text .= '---------------------------------------' . "\n";
-					$text .= $language->get('text_new_order_id') . ' ' . $order_id . "\n";
-					$text .= $data['text_title'] . ' ' . $data['title'] . "\n";
-					$text .= $data['text_event_date'] . ' ' . $data['event_date'] . "\n";
-					$text .= $data['text_slot'] . ' ' . $data['slot'] . "\n";
-					// $text .= $data['text_ceremony'] . ' ' . $data['ceremony'] . "\n";
-					$text .= $data['text_payment_method'] . ' ' . $data['payment_method'] . "\n";
-					$text .= $language->get('text_new_date_added') . ' ' . date($language->get('date_format_short'), strtotime($order_info['date_added'])) . "\n";
-					$text .= $language->get('text_new_order_status') . ' ' . $order_status . "\n\n";
-	
-					foreach ($order_product_query->rows as $product) {
-						$text .= $product['quantity'] . 'x ' . $product['name'] . ' (' . $product['model'] . ') ' . html_entity_decode($this->currency->format($product['total'] + ($this->config->get('config_tax') ? ($product['tax'] * $product['quantity']) : 0), $order_info['currency_code'], $order_info['currency_value']), ENT_NOQUOTES, 'UTF-8') . "\n";
-	
-						$order_option_query = $this->db->query("SELECT * FROM " . DB_PREFIX . "order_option WHERE order_id = '" . (int)$order_id . "' AND order_product_id = '" . $product['order_product_id'] . "'");
-	
-						foreach ($order_option_query->rows as $option) {
-							if ($option['type'] != 'file') {
-								$value = $option['value'];
-							} else {
-								$value = utf8_substr($option['value'], 0, utf8_strrpos($option['value'], '.'));
-							}
-	
-							$text .= chr(9) . '-' . $option['name'] . ' ' . (utf8_strlen($value) > 20 ? utf8_substr($value, 0, 20) . '..' : $value) . "\n";
-						}
-					}
-	
-					foreach ($order_voucher_query->rows as $voucher) {
-						$text .= '1x ' . $voucher['description'] . ' ' . $this->currency->format($voucher['amount'], $order_info['currency_code'], $order_info['currency_value']);
-					}
-	
-					$text .= "\n";
-	
-					$text .= $language->get('text_new_order_total') . "\n";
-	
-					foreach ($order_total_query->rows as $total) {
-						$text .= $total['title'] . ': ' . html_entity_decode($this->currency->format($total['value'], $order_info['currency_code'], $order_info['currency_value']), ENT_NOQUOTES, 'UTF-8') . "\n";
-					}
-	
-					$text .= "\n";
-	
-					if ($order_info['comment']) {
-						$text .= $language->get('text_new_comment') . "\n\n";
-						$text .= $order_info['comment'] . "\n\n";
-					}
-					
-					$text .= '---------------------------------------' . "\n";
-	
-					$mail = new Mail();
-					$mail->protocol = $this->config->get('config_mail_protocol');
-					$mail->parameter = $this->config->get('config_mail_parameter');
-					$mail->smtp_hostname = $this->config->get('config_mail_smtp_hostname');
-					$mail->smtp_username = $this->config->get('config_mail_smtp_username');
-					$mail->smtp_password = html_entity_decode($this->config->get('config_mail_smtp_password'), ENT_QUOTES, 'UTF-8');
-					$mail->smtp_port = $this->config->get('config_mail_smtp_port');
-					$mail->smtp_timeout = $this->config->get('config_mail_smtp_timeout');
-	
-					$mail->setTo($this->config->get('config_email'));
-					$mail->setFrom($this->config->get('config_email'));
-					$mail->setSender(html_entity_decode($order_info['store_name'], ENT_QUOTES, 'UTF-8'));
-					$mail->setSubject(html_entity_decode($subject, ENT_QUOTES, 'UTF-8'));
-					$mail->setHtml($this->load->view('mail/order', $data));
-					$mail->setText($text);
-					$mail->send();
-					
-	
-					//Send to additional alert emails
-					$emails = explode(',', $this->config->get('config_mail_alert'));
-	
-					foreach ($emails as $email) {
-						if ($email && filter_var($email, FILTER_VALIDATE_EMAIL)) {
-							$mail->setTo($email);
-							$mail->send();
-						}
-					}
-				}
-			}
- */
-	
-			// If order status is not 0 then send update text email
-/* 			if ($order_info['order_status_id'] && $order_status_id && $notify) {
-				$language = new Language($order_info['language_code']);
-				$language->load($order_info['language_code']);
-				$language->load('mail/order');
-	
-				$subject = sprintf($language->get('text_update_subject'), html_entity_decode($order_info['store_name'], ENT_QUOTES, 'UTF-8'), $order_id);
-	
-				$message  = $language->get('text_update_order') . ' ' . $order_id . "\n";
-				$message .= $language->get('text_update_date_added') . ' ' . date($language->get('date_format_short'), strtotime($order_info['date_added'])) . "\n\n";
-	
-				$order_status_query = $this->db->query("SELECT * FROM " . DB_PREFIX . "order_status WHERE order_status_id = '" . (int)$order_status_id . "' AND language_id = '" . (int)$order_info['language_id'] . "'");
-	
-				if ($order_status_query->num_rows) {
-					$message .= $language->get('text_update_order_status') . "\n\n";
-					$message .= $order_status_query->row['name'] . "\n\n";
-				}
-	
-				if ($order_info['customer_id']) {
-					$message .= $language->get('text_update_link') . "\n";
-					$message .= $order_info['store_url'] . 'index.php?route=account/order/info&order_id=' . $order_id . "\n\n";
-				}
-	
-				if ($comment) {
-					$message .= $language->get('text_update_comment') . "\n\n";
-					$message .= strip_tags($comment) . "\n\n";
-				}
-	
-				$message .= $language->get('text_update_footer');
-	
-				$mail = new Mail();
-				$mail->protocol = $this->config->get('config_mail_protocol');
-				$mail->parameter = $this->config->get('config_mail_parameter');
-				$mail->smtp_hostname = $this->config->get('config_mail_smtp_hostname');
-				$mail->smtp_username = $this->config->get('config_mail_smtp_username');
-				$mail->smtp_password = html_entity_decode($this->config->get('config_mail_smtp_password'), ENT_QUOTES, 'UTF-8');
-				$mail->smtp_port = $this->config->get('config_mail_smtp_port');
-				$mail->smtp_timeout = $this->config->get('config_mail_smtp_timeout');
-	
-				$mail->setTo($order_info['email']);
-				$mail->setFrom($this->config->get('config_email'));
-				$mail->setSender(html_entity_decode($order_info['store_name'], ENT_QUOTES, 'UTF-8'));
-				$mail->setSubject(html_entity_decode($subject, ENT_QUOTES, 'UTF-8'));
-				$mail->setText($message);
-				$mail->send();
-			}
- */		}
+		}
 	}
 
 	public function getOrderHistories($order_id, $start = 0, $limit = 10) {
@@ -1275,7 +866,7 @@ class ModelSaleOrder extends Model {
 			$limit = 10;
 		}
 
-		$query = $this->db->query("SELECT oh.date_added, os.name AS status, oh.comment, oh.notify, u.username FROM " . DB_PREFIX . "order_history oh LEFT JOIN " . DB_PREFIX . "order_status os ON (oh.order_status_id = os.order_status_id) LEFT JOIN " . DB_PREFIX . "user u ON (u.user_id = oh.user_id) WHERE oh.order_id = '" . (int)$order_id . "' AND os.language_id = '" . (int)$this->config->get('config_language_id') . "' ORDER BY oh.date_added DESC LIMIT " . (int)$start . "," . (int)$limit);
+		$query = $this->db->query("SELECT oh.date_added, os.name AS status, oh.comment, oh.notify, u.username FROM " . DB_PREFIX . "order_history oh LEFT JOIN " . DB_PREFIX . "order_status os ON (oh.order_status_id = os.order_status_id) LEFT JOIN " . DB_PREFIX . "user u ON (u.user_id = oh.user_id) WHERE oh.order_id = '" . (int)$order_id . "' AND os.language_id = '" . (int)$this->config->get('config_language_id') . "' ORDER BY oh.date_added DESC, oh.order_history_id DESC LIMIT " . (int)$start . "," . (int)$limit);
 
 		return $query->rows;
 	}

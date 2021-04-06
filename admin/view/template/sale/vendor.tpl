@@ -9,10 +9,10 @@
 					<?php echo $column_vendor; ?>
 				</td>
 				<td class="text-right">
-					<?php echo $column_debit; ?>
+					<?php echo $column_initial; ?>
 				</td>
 				<td class="text-right">
-					<?php echo $column_credit; ?>
+					<?php echo $column_total_payment; ?>
 				</td>
 				<td class="text-right">
 					<?php echo $column_balance; ?>
@@ -30,7 +30,8 @@
 						<?php foreach ($transaction_summary['document'] as $type => $document) { ?>
 						<div class="btn-group">
 							<button type="button" data-toggle="dropdown" class="btn btn-info dropdown-toggle btn-sm"
-								id="button-<?php echo $type . $vendor_id; ?>" <?php echo $document['status'] ? '' : 'disabled' ; ?> ><i class="fa fa-file-text-o"></i>
+								id="button-<?php echo $type . $vendor_id; ?>" <?php echo $document['status'] ? '' : 'disabled' ; ?> ><i
+									class="fa fa-file-text-o"></i>
 								<?php echo $document['button_text']; ?>
 							</button>
 							<ul class="dropdown-menu dropdown-menu-right">
@@ -55,10 +56,10 @@
 					<?php echo '&nbsp;&nbsp;- ' . $summary['transaction_type']; ?>
 				</td>
 				<td class="text-right">
-					<?php echo $summary['debit']; ?>
+					<?php echo $summary['initial']; ?>
 				</td>
 				<td class="text-right">
-					<?php echo $summary['credit']; ?>
+					<?php echo $summary['total_payment']; ?>
 				</td>
 				<td class="text-right">
 					<?php echo $summary['balance']; ?>
@@ -287,6 +288,8 @@
 	</button>
 </div>
 <script type="text/javascript">
+	let warning_pos = $('#order-vendor').position();
+
 	$('#vendor-transaction button[id^=\'button-print\']').on('click', function (e) {
 		const transaction_id = this.value;
 
@@ -332,6 +335,7 @@
 				if (json['error']) {
 					if (json['error']['warning']) {
 						$('#order-vendor').before('<div class="alert alert-danger"><i class="fa fa-exclamation-circle"></i> ' + json['error']['warning'] + ' <button type="button" class="close" data-dismiss="alert">&times;</button></div>');
+						$('html, body').animate({ scrollTop: warning_pos.top - 70 }, 500);
 					}
 
 					if (json['error_vendor_transaction']) {
@@ -354,6 +358,7 @@
 					$('#order-vendor').load('index.php?route=sale/vendor&token=<?= $token; ?>&order_id=<?= $order_id; ?>');
 
 					$('#order-vendor').before('<div class="alert alert-success"><i class="fa fa-check-circle"></i> ' + json['success'] + ' <button type="button" class="close" data-dismiss="alert">&times;</button></div>');
+					$('html, body').animate({ scrollTop: warning_pos.top - 70 }, 500);
 
 					$('input[name^=\'vendor_transaction\']').val('');
 				}

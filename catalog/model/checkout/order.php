@@ -304,36 +304,40 @@ class ModelCheckoutOrder extends Model
 		$order_info = $this->getOrder($order_id);
 
 		$payment_phase_data['initial_payment'] = array(
-			'title'			=> $this->model_localisation_order_status->getOrderStatus($this->config->get('config_initial_payment_status_id'))['name'],
-			'amount'		=> $this->config->get('config_initial_payment_amount'),
-			'limit_stamp'	=> strtotime('+' . $this->config->get('config_initial_payment_limit') . ' days', strtotime($order_info['date_added'])),
-			'auto_expired'	=> true
+			'order_status_id'	=> $this->config->get('config_initial_payment_status_id'),
+			'title'				=> $this->model_localisation_order_status->getOrderStatus($this->config->get('config_initial_payment_status_id'))['name'],
+			'amount'			=> $this->config->get('config_initial_payment_amount'),
+			'limit_stamp'		=> strtotime('+' . $this->config->get('config_initial_payment_limit') . ' days', strtotime($order_info['date_added'])),
+			'auto_expired'		=> true
 		);
 
 		$payment_phase_data['down_payment'] = array(
-			'title'			=> $this->model_localisation_order_status->getOrderStatus($this->config->get('config_down_payment_status_id'))['name'],
-			'amount'		=> round($order_info['total'] * $this->config->get('config_down_payment_amount') / 100000, 0) * 1000 - $payment_phase_data['initial_payment']['amount'],
-			'limit_stamp'	=> min(strtotime('+' . $this->config->get('config_down_payment_limit') . ' days', $payment_phase_data['initial_payment']['limit_stamp']), strtotime('-2 days', strtotime($order_info['event_date']))),
-			'auto_expired'	=> false
+			'order_status_id'	=> $this->config->get('config_down_payment_status_id'),
+			'title'				=> $this->model_localisation_order_status->getOrderStatus($this->config->get('config_down_payment_status_id'))['name'],
+			'amount'			=> round($order_info['total'] * $this->config->get('config_down_payment_amount') / 100000, 0) * 1000 - $payment_phase_data['initial_payment']['amount'],
+			'limit_stamp'		=> min(strtotime('+' . $this->config->get('config_down_payment_limit') . ' days', $payment_phase_data['initial_payment']['limit_stamp']), strtotime('-2 days', strtotime($order_info['event_date']))),
+			'auto_expired'		=> false
 		);
 
 		$payment_phase_data['full_payment'] = array(
-			'title'			=> $this->model_localisation_order_status->getOrderStatus($this->config->get('config_full_payment_status_id'))['name'],
-			'amount'		=> $order_info['total'] - $payment_phase_data['down_payment']['amount'] - $payment_phase_data['initial_payment']['amount'],
-			'limit_stamp'	=> max(strtotime('-' . $this->config->get('config_full_payment_limit') . ' days', strtotime($order_info['event_date'])), strtotime('+1 day', $payment_phase_data['down_payment']['limit_stamp'])),
-			'auto_expired'	=> false
+			'order_status_id'	=> $this->config->get('config_full_payment_status_id'),
+			'title'				=> $this->model_localisation_order_status->getOrderStatus($this->config->get('config_full_payment_status_id'))['name'],
+			'amount'			=> $order_info['total'] - $payment_phase_data['down_payment']['amount'] - $payment_phase_data['initial_payment']['amount'],
+			'limit_stamp'		=> max(strtotime('-' . $this->config->get('config_full_payment_limit') . ' days', strtotime($order_info['event_date'])), strtotime('+1 day', $payment_phase_data['down_payment']['limit_stamp'])),
+			'auto_expired'		=> false
 		);
 
 		$this->load->model('accounting/transaction');
 
-		$transactions_total = $this->model_accounting_transaction->getTransactionsTotalByOrderId($order_id);
+		$transaction_total = $this->model_accounting_transaction->getTransactionsTotalByOrderId($order_id, ['client_label' => 'customer']);
 
 		foreach ($payment_phase_data as $key => $payment_phase) {
 			// Cek Pembayaran belum lunas
-			if ($transactions_total < $payment_phase['amount']) {
+			if ($transaction_total < $payment_phase['amount']) {
 				$paid_status = false;
 			} else {
 				$paid_status = true;
+				$transaction_total -= $payment_phase['amount'];
 			}
 
 			$limit_status = '';
@@ -389,7 +393,7 @@ class ModelCheckoutOrder extends Model
 				}
 			}
 
-			// If current order status is not processing or complete but new status is processing or complete then commence completing the order
+			# If current order status is not processing or complete but new status is processing or complete then commence completing the order
 			if (!in_array($order_info['order_status_id'], array_merge($this->config->get('config_processing_status'), $this->config->get('config_complete_status'))) && in_array($order_status_id, array_merge($this->config->get('config_processing_status'), $this->config->get('config_complete_status')))) {
 				// Redeem coupon, vouchers and reward points
 				$order_total_query = $this->db->query("SELECT * FROM `" . DB_PREFIX . "order_total` WHERE order_id = '" . (int)$order_id . "' ORDER BY sort_order ASC");
@@ -505,27 +509,26 @@ class ModelCheckoutOrder extends Model
 					# If current order status is not complete but new status is complete then commence completion transaction
 					if ($transaction_complete_status) {
 						$filter_data = array(
-							'client_label' 		=> $transaction_type_info['client_label'],
 							'category_label' 	=> $transaction_type_info['category_label']
 						);
 
 						$transactions_summary = $this->model_accounting_transaction->getTransactionsTotalSummary($order_id, $filter_data);
-
-						$amount = $transactions_summary['initial'] - $transactions_summary['cashin'] + $transactions_summary['cashout'];
+						
+						$amount = $transactions_summary[$transaction_type_info['category_label']]['initial'] - ($transactions_summary[$transaction_type_info['category_label']]['cashin'] - $transactions_summary[$transaction_type_info['category_label']]['cashout']);
 
 						switch ($transaction_type_info['transaction_label']) {
 							case 'complete':
 								foreach ($transaction_type_accounts as $value) {
-									$accounts[$value['account_debit_id']] += $transactions_summary['initial'];
-									$accounts[$value['account_credit_id']] -= $transactions_summary['initial'];
+									$accounts[$value['account_debit_id']] += $transactions_summary[$transaction_type_info['category_label']]['initial'];
+									$accounts[$value['account_credit_id']] -= $transactions_summary[$transaction_type_info['category_label']]['initial'];
 								}
 
 								break;
 
 							case 'canceled':
-								$charged_amount = $transactions_summary['cashin'] - $transactions_summary['cashout'];
-								$canceled_amount = $transactions_summary['initial'] - $charged_amount;
-
+								$charged_amount = $transactions_summary[$transaction_type_info['category_label']]['cashin'] - $transactions_summary[$transaction_type_info['category_label']]['cashout'];
+								$canceled_amount = $transactions_summary[$transaction_type_info['category_label']]['initial'] - $charged_amount;
+								
 								foreach ($transaction_type_accounts as $value) {
 									if ($value['transaction_label'] == 'charged') {
 										$accounts[$value['account_debit_id']] += $charged_amount;

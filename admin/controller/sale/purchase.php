@@ -57,11 +57,11 @@ class ControllerSalePurchase extends Controller
 
 		$this->load->model('sale/order');
 		$this->load->model('catalog/product');
+		$this->load->model('accounting/transaction');
 
 		$data['order_purchases'] = [];
 
 		$order_purchases = $this->model_sale_purchase->getOrderPurchases($order_id);
-		// var_dump($order_purchases);die('---breakpoint---');
 
 		foreach ($order_purchases as $order_purchase) {
 			$order_purchase_products_data = [];
@@ -77,6 +77,17 @@ class ControllerSalePurchase extends Controller
 				];
 
 				$subtotal += $order_purchase_product['total'];
+			}
+
+			$filter_data = [
+				'client_id'	=> $order_purchase['vendor_id'],
+				'order_id'	=> $order_id
+			];
+
+			$transaction_purchase_info = $this->model_accounting_transaction->getTransactionByTransactionTypeId($this->config->get('config_vendor_purchase_initial_id'), $filter_data);
+			
+			if (!$transaction_purchase_info) {
+				$order_purchase['completed'] = 0;
 			}
 
 			if ($order_purchase['completed']) {
@@ -411,7 +422,7 @@ class ControllerSalePurchase extends Controller
 				$transaction_type_info = $this->model_accounting_transaction_type->getTransactionType($this->config->get('config_vendor_purchase_initial_id'));
 
 				if (empty($transaction_type_info)) {
-					$json['error'] = sprintf($this->language->get('error_transaction_type'), 'vendor-purchase-initial');
+					$json['error'] = sprintf($this->language->get('error_transaction_type'), 'system-purchase-initial');
 
 					break;
 				}

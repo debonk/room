@@ -260,6 +260,8 @@
 	$('input.currency').trigger('keyup');
 </script>
 <script type="text/javascript">
+	let warning_pos = $('#order-purchase #purchase-order').position();
+
 	$('#button-purchase').on('click', function () {
 		let data = $('#order-products input[name^=\'purchase\']');
 
@@ -319,6 +321,7 @@
 
 					if (json['error']) {
 						$('#order-purchase #purchase-order').before('<div class="alert alert-danger"><i class="fa fa-exclamation-circle"></i> ' + json['error'] + ' <button type="button" class="close" data-dismiss="alert">&times;</button></div>');
+						$('html, body').animate({ scrollTop: warning_pos.top - 70 }, 500);
 					}
 
 					if (json['error_vendor_reference']) {
@@ -329,6 +332,7 @@
 						$('#order-purchase').load('index.php?route=sale/purchase/orderPurchase&token=<?= $token; ?>&order_id=<?= $order_id; ?>');
 
 						$('#order-purchase').before('<div class="alert alert-success"><i class="fa fa-check-circle"></i> ' + json['success'] + ' <button type="button" class="close" data-dismiss="alert">&times;</button></div>');
+						$('html, body').animate({ scrollTop: warning_pos.top - 70 }, 500);
 					}
 				},
 				error: function (xhr, ajaxOptions, thrownError) {
