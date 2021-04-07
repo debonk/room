@@ -121,7 +121,7 @@
       </div>
     </div>
   </div>
-  <script type="text/javascript"><!--
+  <script type="text/javascript">
 $('#transaction').delegate('.pagination a', 'click', function(e) {
 	e.preventDefault();
 
@@ -129,5 +129,6 @@ $('#transaction').delegate('.pagination a', 'click', function(e) {
 });
 
 $('#transaction').load('index.php?route=catalog/vendor/transaction&token=<?php echo $token; ?>&vendor_id=<?php echo $vendor_id; ?>');
-//--></script></div>
+</script>
+</div>
 <?php echo $footer; ?>

@@ -21,6 +21,7 @@ class ControllerAccountingTransactionType extends Controller
 		$this->document->setTitle($this->language->get('heading_title'));
 
 		$this->load->model('accounting/transaction_type');
+		var_dump($this->request->post);//die('---breakpoint---');
 
 		if (($this->request->server['REQUEST_METHOD'] == 'POST') && $this->validateForm()) {
 			$this->model_accounting_transaction_type->addTransactionType($this->request->post);
@@ -205,9 +206,9 @@ class ControllerAccountingTransactionType extends Controller
 			
 			foreach ($transaction_type_accounts as $value) {
 				$transaction_type_account_data[] = [
-					'transaction_label'		=> $value['transaction_label'],
-					'account_debit'			=> $value['account_debit_id'] ? $value['account_debit_id'] . '-' . $value['account_debit'] : '-',
-					'account_credit'		=> $value['account_credit_id'] ? $value['account_credit_id'] . '-' . $value['account_credit'] : '-'
+					'account_label'		=> $value['account_label'],
+					'account_debit'		=> $value['account_debit_id'] ? $value['account_debit_id'] . '-' . $value['account_debit'] : '-',
+					'account_credit'	=> $value['account_credit_id'] ? $value['account_credit_id'] . '-' . $value['account_credit'] : '-'
 				];
 			}
 
@@ -300,14 +301,18 @@ class ControllerAccountingTransactionType extends Controller
 			'text_account',
 			'text_none',
 			'text_select',
+			'text_enabled',
+			'text_disabled',
 			'entry_account_credit',
 			'entry_account_debit',
-			// 'entry_account_type',
+			'entry_account_label',
+			'entry_account_type',
 			'entry_client_label',
 			'entry_category_label',
 			'entry_manual_select',
 			'entry_name',
 			'entry_sort_order',
+			'entry_status',
 			'entry_transaction_label',
 			'column_action',
 			'button_account_add',
@@ -325,6 +330,8 @@ class ControllerAccountingTransactionType extends Controller
 			'client_label',
 			'category_label',
 			'transaction_label',
+			'account_label',
+			'account_type',
 			'name'
 		);
 		foreach ($error_items as $error_item) {
@@ -383,11 +390,10 @@ class ControllerAccountingTransactionType extends Controller
 			'client_label',
 			'category_label',
 			'transaction_label',
-			// 'account_type',
-			// 'account_debit_id',
-			// 'account_credit_id',
+			'account_type',
 			'manual_select',
-			'sort_order'
+			'sort_order',
+			'status'
 		);
 		foreach ($input_items as $input_item) {
 			if (isset($this->request->post[$input_item])) {
@@ -412,6 +418,7 @@ class ControllerAccountingTransactionType extends Controller
 		$data['clients_label'] = $this->model_accounting_transaction_type->getClientsLabel();
 		$data['categories_label'] = $this->model_accounting_transaction_type->getCategoriesLabel();
 		$data['transactions_label'] = $this->model_accounting_transaction_type->getTransactionsLabel();
+		$data['accounts_type'] = $this->model_accounting_transaction_type->getAccountsType();
 
 		$this->load->model('accounting/account');
 		$data['accounts'] = $this->model_accounting_account->getAccountsMenuByComponent();
@@ -441,6 +448,10 @@ class ControllerAccountingTransactionType extends Controller
 			$this->error['transaction_label'] = $this->language->get('error_transaction_label');
 		}
 
+		if (empty($this->request->post['account_type'])) {
+			$this->error['account_type'] = $this->language->get('error_account_type');
+		}
+
 		if ((utf8_strlen(trim($this->request->post['name'])) < 3) || (utf8_strlen(trim($this->request->post['name'])) > 64)) {
 			$this->error['name'] = $this->language->get('error_name');
 		}
@@ -449,8 +460,8 @@ class ControllerAccountingTransactionType extends Controller
 			$this->error['warning'] = $this->language->get('error_account');
 		} else {
 			foreach ($this->request->post['transaction_type_account'] as $transaction_type_account) {
-				if (!$transaction_type_account['transaction_label']) {
-					$this->error['warning'] = $this->language->get('error_transaction_label');
+				if (!$transaction_type_account['account_label']) {
+					$this->error['warning'] = $this->language->get('error_account_label');
 				}
 			}
 		}

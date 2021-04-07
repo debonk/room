@@ -135,6 +135,34 @@
 							<?php } ?>
 						</div>
 					</div>
+					<div class="form-group required">
+						<label class="col-sm-2 control-label" for="input-account-type">
+							<?php echo $entry_account_type; ?>
+						</label>
+						<div class="col-sm-10">
+							<select name="account_type" class="form-control">
+								<option value="">
+									<?php echo $text_select; ?>
+								</option>
+								<?php foreach ($accounts_type as $type) { ?>
+								<?php if ($type['value'] == $account_type) { ?>
+								<option value="<?php echo $type['value']; ?>" selected="selected">
+									<?php echo $type['text']; ?>
+								</option>
+								<?php } else { ?>
+								<option value="<?php echo $type['value']; ?>">
+									<?php echo $type['text']; ?>
+								</option>
+								<?php } ?>
+								<?php } ?>
+							</select>
+							<?php if ($error_account_type) { ?>
+							<div class="text-danger">
+								<?php echo $error_account_type; ?>
+							</div>
+							<?php } ?>
+						</div>
+					</div>
 					<div class="form-group">
 						<label class="col-sm-2 control-label" for="input-manual-select"><span data-toggle="tooltip"
 								title="<?php echo $help_manual_select; ?>">
@@ -158,6 +186,20 @@
 								placeholder="<?php echo $entry_sort_order; ?>" id="input-sort-order" class="form-control" />
 						</div>
 					</div>
+          <div class="form-group">
+            <label class="col-sm-2 control-label" for="input-status"><?php echo $entry_status; ?></label>
+            <div class="col-sm-10">
+              <select name="status" id="input-status" class="form-control">
+                <?php if ($status) { ?>
+                <option value="1" selected="selected"><?php echo $text_enabled; ?></option>
+                <option value="0"><?php echo $text_disabled; ?></option>
+                <?php } else { ?>
+                <option value="1"><?php echo $text_enabled; ?></option>
+                <option value="0" selected="selected"><?php echo $text_disabled; ?></option>
+                <?php } ?>
+              </select>
+            </div>
+          </div>
 					<div class="form-group"></div>
 					<legend>
 						<?php echo $text_account; ?>
@@ -166,7 +208,7 @@
 						<thead>
 							<tr>
 								<td class="text-left">
-									<?php echo $entry_transaction_label; ?>
+									<?php echo $entry_account_label; ?>
 								</td>
 								<td class="text-left">
 									<?php echo $entry_account_debit; ?>
@@ -183,12 +225,12 @@
 							<?php foreach ($transaction_type_accounts as $row => $transaction_type_account) { ?>
 							<tr id="transaction-type-account-row<?php echo $row; ?>">
 								<td class="text-left">
-									<select name="transaction_type_account[<?php echo $row; ?>][transaction_label]" class="form-control">
+									<select name="transaction_type_account[<?php echo $row; ?>][account_label]" class="form-control">
 										<option value="">
 											<?php echo $text_select; ?>
 										</option>
 										<?php foreach ($transactions_label as $label) { ?>
-										<?php if ($label['value'] == $transaction_type_account['transaction_label']) { ?>
+										<?php if ($label['value'] == $transaction_type_account['account_label']) { ?>
 										<option value="<?php echo $label['value']; ?>" selected="selected">
 											<?php echo $label['text']; ?>
 										</option>
@@ -273,7 +315,7 @@
 		function addTransactionTypeAccount() {
 			html = '<tr id="transaction-type-account-row' + row + '" value="' + row + '">';
 			html += '  <td class="text-left">';
-			html += `  <select name="transaction_type_account[` + row + `][transaction_label]" class="form-control">
+			html += `  <select name="transaction_type_account[` + row + `][account_label]" class="form-control">
 									<option value=""><?php echo $text_select; ?></option>
 									<?php foreach ($transactions_label as $label) { ?>
 									<option value="<?php echo $label['value']; ?>"><?php echo $label['text']; ?></option>

@@ -3,27 +3,28 @@ class ModelAccountingTransactionType extends Model
 {
 	private $client_data = ['system', 'customer', 'vendor', 'supplier', 'finance'];
 	private $category_data = ['order', 'deposit', 'purchase', 'expense', 'asset'];
-	private $transaction_data = ['initial', 'discount', 'cashin', 'cashout', 'complete', 'canceled', 'charged'];
+	private $transaction_data = ['initial', 'discount', 'cash', 'cashout', 'complete', 'canceled', 'charged'];
+	private $type_data = ['D', 'C'];
 
 	public function addTransactionType($data)
 	{
-		$this->db->query("INSERT INTO " . DB_PREFIX . "transaction_type SET client_label = '" . $this->db->escape($data['client_label']) . "', category_label = '" . $this->db->escape($data['category_label']) . "', transaction_label = '" . $this->db->escape($data['transaction_label']) . "', name = '" . $this->db->escape($data['name']) . "', manual_select = '" . (int)$data['manual_select'] . "', sort_order = '" . (int)$data['sort_order'] . "'");
+		$this->db->query("INSERT INTO " . DB_PREFIX . "transaction_type SET client_label = '" . $this->db->escape($data['client_label']) . "', category_label = '" . $this->db->escape($data['category_label']) . "', transaction_label = '" . $this->db->escape($data['transaction_label']) . "', account_type = '" . $this->db->escape($data['account_type']) . "', name = '" . $this->db->escape($data['name']) . "', manual_select = '" . (int)$data['manual_select'] . "', sort_order = '" . (int)$data['sort_order'] . "', status = '" . (int)$data['status'] . "'");
 
 		$transaction_type_id = $this->db->getLastId();
 
 		foreach ($data['transaction_type_account'] as $transaction_type_account) {
-			$this->db->query("INSERT INTO " . DB_PREFIX . "transaction_type_account SET transaction_type_id = '" . (int)$transaction_type_id . "', transaction_label = '" . $this->db->escape($transaction_type_account['transaction_label']) . "', account_debit_id = '" . (int)$transaction_type_account['account_debit_id'] . "', account_credit_id = '" . (int)$transaction_type_account['account_credit_id'] . "'");
+			$this->db->query("INSERT INTO " . DB_PREFIX . "transaction_type_account SET transaction_type_id = '" . (int)$transaction_type_id . "', account_label = '" . $this->db->escape($transaction_type_account['account_label']) . "', account_debit_id = '" . (int)$transaction_type_account['account_debit_id'] . "', account_credit_id = '" . (int)$transaction_type_account['account_credit_id'] . "'");
 		}
 	}
 
 	public function editTransactionType($transaction_type_id, $data)
 	{
-		$this->db->query("UPDATE " . DB_PREFIX . "transaction_type SET client_label = '" . $this->db->escape($data['client_label']) . "', category_label = '" . $this->db->escape($data['category_label']) . "', transaction_label = '" . $this->db->escape($data['transaction_label']) . "', name = '" . $this->db->escape($data['name']) . "', manual_select = '" . (int)$data['manual_select'] . "', sort_order = '" . (int)$data['sort_order'] . "' WHERE transaction_type_id = '" . (int)$transaction_type_id . "'");
+		$this->db->query("UPDATE " . DB_PREFIX . "transaction_type SET client_label = '" . $this->db->escape($data['client_label']) . "', category_label = '" . $this->db->escape($data['category_label']) . "', transaction_label = '" . $this->db->escape($data['transaction_label']) . "', account_type = '" . $this->db->escape($data['account_type']) . "', name = '" . $this->db->escape($data['name']) . "', manual_select = '" . (int)$data['manual_select'] . "', sort_order = '" . (int)$data['sort_order'] . "', status = '" . (int)$data['status'] . "' WHERE transaction_type_id = '" . (int)$transaction_type_id . "'");
 
 		$this->db->query("DELETE FROM " . DB_PREFIX . "transaction_type_account WHERE transaction_type_id = '" . (int)$transaction_type_id . "'");
 
 		foreach ($data['transaction_type_account'] as $transaction_type_account) {
-			$this->db->query("INSERT INTO " . DB_PREFIX . "transaction_type_account SET transaction_type_id = '" . (int)$transaction_type_id . "', transaction_label = '" . $this->db->escape($transaction_type_account['transaction_label']) . "', account_debit_id = '" . (int)$transaction_type_account['account_debit_id'] . "', account_credit_id = '" . (int)$transaction_type_account['account_credit_id'] . "'");
+			$this->db->query("INSERT INTO " . DB_PREFIX . "transaction_type_account SET transaction_type_id = '" . (int)$transaction_type_id . "', account_label = '" . $this->db->escape($transaction_type_account['account_label']) . "', account_debit_id = '" . (int)$transaction_type_account['account_debit_id'] . "', account_credit_id = '" . (int)$transaction_type_account['account_credit_id'] . "'");
 		}
 	}
 
@@ -96,7 +97,7 @@ class ModelAccountingTransactionType extends Model
 
 	public function getTransactionTypesMenu($data = [])
 	{
-		$sql = "SELECT transaction_type_id, name FROM " . DB_PREFIX . "transaction_type";
+		$sql = "SELECT transaction_type_id, name FROM " . DB_PREFIX . "transaction_type WHERE status = 1";
 
 		$implode = array();
 
@@ -117,7 +118,7 @@ class ModelAccountingTransactionType extends Model
 		}
 
 		if ($implode) {
-			$sql .= " WHERE " . implode(" AND ", $implode);
+			$sql .= " AND " . implode(" AND ", $implode);
 		}
 
 		$sql .= " ORDER BY sort_order ASC";
@@ -209,5 +210,19 @@ class ModelAccountingTransactionType extends Model
 		}
 
 		return $transaction_label_data;
+	}
+
+	public function getAccountsType()
+	{
+		$type_data = [];
+
+		foreach ($this->type_data as $type_data) {
+			$account_type_data[] = [
+				'value'	=> $type_data,
+				'text'	=> ucfirst($type_data)
+			];
+		}
+
+		return $account_type_data;
 	}
 }
