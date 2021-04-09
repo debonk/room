@@ -576,7 +576,8 @@ class ModelSaleOrder extends Model {
 		
 		$summary_data = [
 			'client_label'		=> 'customer',
-			'category_label'	=> 'order'
+			'category_label'	=> 'order',
+			'transaction_label'	=> 'cash'
 		];
 
 		$transaction_total = $this->model_accounting_transaction->getTransactionsTotalByOrderId($order_id, $summary_data);
@@ -711,13 +712,13 @@ class ModelSaleOrder extends Model {
 						}
 
 						foreach ($transaction_type_accounts as $value) {
-							if ($value['transaction_label'] == 'initial') {
+							if ($value['account_label'] == 'initial') {
 								$accounts[$value['account_debit_id']] += $amount_data['initial'];
 								$accounts[$value['account_credit_id']] -= $amount_data['initial'];
-							} elseif ($value['transaction_label'] == 'discount') {
+							} elseif ($value['account_label'] == 'discount') {
 								$accounts[$value['account_debit_id']] += $amount_data['discount'];
 								$accounts[$value['account_credit_id']] -= $amount_data['discount'];
-							} elseif ($value['transaction_label'] == 'charged') {
+							} elseif ($value['account_label'] == 'charged') {
 								$accounts[$value['account_debit_id']] += $amount_data['charged'];
 								$accounts[$value['account_credit_id']] -= $amount_data['charged'];
 							}
@@ -731,36 +732,46 @@ class ModelSaleOrder extends Model {
 
 					# If current order status is not complete but new status is complete then commence completion transaction
 					if ($transaction_complete_status) {
-						$filter_data = array(
-							'category_label' 	=> $transaction_type_info['category_label']
-						);
+						$filter_transaction_label = ['initial', 'cash'];
 
-						$transactions_summary = $this->model_accounting_transaction->getTransactionsTotalSummary($order_id, $filter_data);
+						foreach ($filter_transaction_label as $transaction_label) {
+							$filter_summary_data = [
+								'category_label'	=> $transaction_type_info['category_label'],
+								'transaction_label'	=> $transaction_label,
+								'group'				=> 'transaction_label'
+							];
 
-						$amount = $transactions_summary[$transaction_type_info['category_label']]['initial'] - $transactions_summary[$transaction_type_info['category_label']]['cashin'] + $transactions_summary[$transaction_type_info['category_label']]['cashout'];
+							$total[$transaction_label] = abs($this->model_accounting_transaction->getTransactionsTotalByOrderId($order_id, $filter_summary_data));
+						}
+
+						$amount = $total['initial'] - $total['cash'];
 
 						switch ($transaction_type_info['transaction_label']) {
 							case 'complete':
 								foreach ($transaction_type_accounts as $value) {
-									$accounts[$value['account_debit_id']] += $transactions_summary[$transaction_type_info['category_label']]['initial'];
-									$accounts[$value['account_credit_id']] -= $transactions_summary[$transaction_type_info['category_label']]['initial'];
+									$accounts[$value['account_debit_id']] += $total['initial'];
+									$accounts[$value['account_credit_id']] -= $total['initial'];
 								}
+
+								$description = 'Completion Transaction of Order #' . $order_id . ': ' . $order_info['firstname'] . ' ' . $order_info['lastname'];
 
 								break;
 
 							case 'canceled':
-								$charged_amount = $transactions_summary[$transaction_type_info['category_label']]['cashin'] - $transactions_summary[$transaction_type_info['category_label']]['cashout'];
-								$canceled_amount = $transactions_summary[$transaction_type_info['category_label']]['initial'] - $charged_amount;
+								$charged_amount = $total['cash'];
+								$canceled_amount = $total['initial'];
 
 								foreach ($transaction_type_accounts as $value) {
-									if ($value['transaction_label'] == 'charged') {
+									if ($value['account_label'] == 'charged') {
 										$accounts[$value['account_debit_id']] += $charged_amount;
 										$accounts[$value['account_credit_id']] -= $charged_amount;
-									} elseif ($value['transaction_label'] == 'canceled') {
+									} elseif ($value['account_label'] == 'canceled') {
 										$accounts[$value['account_debit_id']] += $canceled_amount;
 										$accounts[$value['account_credit_id']] -= $canceled_amount;
 									}
 								}
+
+								$description = 'Cancelation Transaction of Order #' . $order_id . ': ' . $order_info['firstname'] . ' ' . $order_info['lastname'];
 
 								break;
 
@@ -770,8 +781,6 @@ class ModelSaleOrder extends Model {
 
 						$reference_prefix = 'S' . date('ym');
 						$reference_no = $this->model_accounting_transaction->getLastReferenceNo($reference_prefix) + 1;
-
-						$description = 'Completion Transaction of Order #' . $order_id . ': ' . $order_info['firstname'] . ' ' . $order_info['lastname'];
 					}
 
 					foreach ($accounts as $account_id => $value) {
@@ -817,7 +826,7 @@ class ModelSaleOrder extends Model {
 			# If old order status is the processing or complete status but new status is not then commence restock, and remove coupon, voucher and reward history
 			if (in_array($order_info['order_status_id'], array_merge($this->config->get('config_processing_status'), $this->config->get('config_complete_status'))) && !in_array($order_status_id, array_merge($this->config->get('config_processing_status'), $this->config->get('config_complete_status')))) {
 				# Delete system transaction
-				$this->db->query("DELETE t, ta FROM " . DB_PREFIX . "transaction t, " . DB_PREFIX . "transaction_account ta  WHERE client_label = 'system' AND category_label = 'order' AND order_id = '" . (int)$order_id . "' AND client_id = '" . (int)$order_info['customer_id'] . "' AND ta.transaction_id = t.transaction_id");
+				$this->db->query("DELETE t, ta FROM " . DB_PREFIX . "transaction t, " . DB_PREFIX . "transaction_account ta  WHERE client_label = 'customer' AND category_label = 'order' AND manual_select = 0 AND order_id = '" . (int)$order_id . "' AND client_id = '" . (int)$order_info['customer_id'] . "' AND ta.transaction_id = t.transaction_id");
 
 				// Restock
 				$product_query = $this->db->query("SELECT * FROM " . DB_PREFIX . "order_product WHERE order_id = '" . (int)$order_id . "'");

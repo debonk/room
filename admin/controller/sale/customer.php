@@ -17,12 +17,12 @@ class ControllerSaleCustomer extends Controller
 			'column_asset',
 			'column_amount',
 			'column_balance',
+			'column_credit',
 			'column_date',
 			'column_date_added',
+			'column_debit',
 			'column_description',
-			'column_initial',
 			'column_reference',
-			'column_total_payment',
 			'column_transaction_type',
 			'column_username',
 			'entry_amount',
@@ -64,33 +64,33 @@ class ControllerSaleCustomer extends Controller
 		$filter_vendor_data = [
 			'client_label'	=> 'customer',
 			'client_id'		=> $order_info['customer_id'],
+			'group'			=> 'category_label'
 		];
 
-		$transactions_summary = $this->model_accounting_transaction->getTransactionsTotalSummary($order_id, $filter_vendor_data);
+		$transactions_summary = $this->model_accounting_transaction->getTransactionsSummaryGroupByLabel($order_id, $filter_vendor_data);
 
-		if (!isset($transactions_summary['order'])) {
-			$transactions_summary['order'] = [];
-		}
 		if ($this->config->get('config_customer_deposit') && !isset($transactions_summary['deposit'])) {
 			$transactions_summary['deposit'] = [];
 		}
 
 		foreach ($transactions_summary as $key => $transaction_summary) {
+			$text_category = $this->language->get('text_category_' . $key);
+			
 			if ($key == 'deposit') {
-				$initial = $this->config->get('config_customer_deposit');
+				$text_category .= ' (' . $this->currency->format($this->config->get('config_customer_deposit'), $order_info['currency_code'], $order_info['currency_value']) . ')';
 			} elseif ($key == 'order') {
-				$initial = $order_info['total'];
+				$text_category .= ' (' . $this->currency->format($order_info['total'], $order_info['currency_code'], $order_info['currency_value']) . ')';
 			}
 
-			$cashin = isset($transaction_summary['cashin']) ? $transaction_summary['cashin'] : 0;
-			$cashout = isset($transaction_summary['cashout']) ? $transaction_summary['cashout'] : 0;
-			$total_payment = $cashin - $cashout;
+			$debit = isset($transaction_summary['D']) ? $transaction_summary['D'] : 0;
+			$credit = isset($transaction_summary['C']) ? $transaction_summary['C'] : 0;
+			$balance = $debit - $credit;
 
 			$data['customers_transaction_summary'][] = [
-				'transaction_type' 	=> $this->language->get('text_category_' . $key),
-				'initial'			=> $this->currency->format($initial, $order_info['currency_code'], $order_info['currency_value']),
-				'total_payment'		=> $this->currency->format($total_payment, $order_info['currency_code'], $order_info['currency_value']),
-				'balance'			=> $this->currency->format($initial - $total_payment, $order_info['currency_code'], $order_info['currency_value'])
+				'transaction_type' 	=> $text_category,
+				'debit'				=> $this->currency->format($debit, $order_info['currency_code'], $order_info['currency_value']),
+				'credit'			=> $this->currency->format($credit, $order_info['currency_code'], $order_info['currency_value']),
+				'balance'			=> $this->currency->format($balance, $order_info['currency_code'], $order_info['currency_value'])
 			];
 		}
 
@@ -107,10 +107,27 @@ class ControllerSaleCustomer extends Controller
 		$results = $this->model_accounting_transaction->getTransactions($filter_data);
 
 		foreach ($results as $result) {
-			if ($result['transaction_label'] == 'cashout') {
-				$amount = -$result['amount'];
-			} else {
+			switch ($result['transaction_label']) {
+				case 'cash':
+					$href = $this->url->link('sale/order/receipt', 'token=' . $this->session->data['token'] . '&transaction_id=' . $result['transaction_id'], true);
+
+					break;
+
+				case 'initial':
+					$href = $this->url->link('sale/order/agreement', 'token=' . $this->session->data['token'] . '&order_id=' . $result['order_id'] . '&vendor_id=' . $result['client_id'], true);
+
+					break;
+
+				default:
+					$href = '';
+
+					break;
+			}
+
+			if ($result['account_type'] == 'D') {
 				$amount = $result['amount'];
+			} else {
+				$amount = -$result['amount'];
 			}
 
 			$data['customer_transactions'][] = array(
@@ -124,7 +141,7 @@ class ControllerSaleCustomer extends Controller
 				'amount'			=> $this->currency->format($amount, $order_info['currency_code'], $order_info['currency_value']),
 				'date_added'		=> date($this->language->get('date_format_short'), strtotime($result['date_added'])),
 				'username'			=> $result['username'],
-				'receipt'	 		=> $this->url->link('sale/order/receipt', 'token=' . $this->session->data['token'] . '&transaction_id=' . (int)$result['transaction_id'], true),
+				'receipt'	 		=> $href,
 				'print'				=> $result['printed']
 			);
 		}
@@ -246,12 +263,13 @@ class ControllerSaleCustomer extends Controller
 					$summary_data = [
 						'category_label'	=> 'order',
 						'transaction_label'	=> 'initial',
-						'client_id'			=> $order_info['customer_id']
+						'client_id'			=> $order_info['customer_id'],
+						'group'				=> 'transaction_label'
 					];
 
-					$transaction_total = $this->model_accounting_transaction->getTransactionsTotalSummary($order_id, $summary_data);
+					$transaction_summary = $this->model_accounting_transaction->getTransactionsSummaryGroupByLabel($order_id, $summary_data);
 
-					if (empty($transaction_total['order']['initial'])) {
+					if (empty($transaction_summary['initial'])) {
 						$json['error']['warning'] = $this->language->get('error_order_not_found');
 
 						break;

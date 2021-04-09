@@ -1385,7 +1385,8 @@ class ControllerSaleOrder extends Controller
 
 			$summary_data = [
 				'client_label'		=> 'customer',
-				'category_label'	=> 'order'
+				'category_label'	=> 'order',
+				'transaction_label'	=> 'cash',
 			];
 	
 			$transaction_total = $this->model_accounting_transaction->getTransactionsTotalByOrderId($order_id, $summary_data);
@@ -1459,7 +1460,7 @@ class ControllerSaleOrder extends Controller
 			# Payment Phase
 			$this->load->model('localisation/order_status');
 
-			$data['payment_phases'] = array();
+			$data['payment_phases'] = [];
 			$data['information'] = '';
 			$data['auto_expired'] = false;
 			// $expired = false;

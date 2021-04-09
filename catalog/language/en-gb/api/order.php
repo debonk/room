@@ -1,6 +1,9 @@
 <?php
 // Text
-$_['text_success']           = 'Success: You have modified orders!';
+$_['text_success']          	= 'Success: You have modified orders!';
+$_['text_category_deposit']		= 'Jaminan';
+$_['text_category_order']		= 'Persewaan';
+$_['text_category_purchase']	= 'Jasa Vendor';
 
 // Error
 // $_['error_adjustment']          = 'Warning: Transaksi penyesuaian sudah ada sebelumnya. Hubungi Audit untuk pengecekan!';

@@ -13,13 +13,13 @@ $_['column_action']				= 'Action';
 $_['column_amount']				= 'Jumlah';
 $_['column_asset']				= 'Rekening Kas/Bank';
 $_['column_balance']			= 'Saldo';
+$_['column_credit']				= 'Kredit';
 $_['column_date']				= 'Tanggal';
 $_['column_date_added']			= 'Tanggal Entry';
+$_['column_debit']				= 'Debit';
 $_['column_description']		= 'Keterangan';
-$_['column_initial']			= 'Ketentuan';
 $_['column_reference']			= 'No Referensi';
 $_['column_username']			= 'Username';
-$_['column_total_payment']		= 'Total Penerimaan';
 $_['column_transaction_type']	= 'Jenis Transaksi';
 
 // Entry

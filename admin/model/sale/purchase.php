@@ -3,21 +3,6 @@ class ModelSalePurchase extends Model
 {
     public function addOrderPurchase($data)
     {
-        // $var_data = [
-        //     'order_document_id',
-        //     'adjustment',
-        //     'comment',
-        //     'vendor_reference',
-        //     'completed',
-        // ];
-        // foreach ($var_data as $var) {
-        //     if (!isset($data[$var])) {
-        //         $data[$var] = '';
-        //     }
-        // }
-
-        // $this->db->query("INSERT INTO " . DB_PREFIX . "order_purchase SET order_document_id = '" . (int)$data['order_document_id'] . "', order_vendor_id = '" . (int)$data['order_vendor_id'] . "', order_id = '" . (int)$data['order_id'] . "', vendor_id = '" . (int)$data['vendor_id'] . "', adjustment = '" . (float)$data['adjustment'] . "', comment = '" . $this->db->escape($data['comment']) . "', vendor_reference = '" . $this->db->escape($data['vendor_reference']) . "', completed = '" . (int)$data['completed'] . "', date_added = NOW(), date_completed = NULL, user_id = '" . $this->user->getId() . "', user_completed_id = '0'");
-
         $this->db->query("INSERT INTO " . DB_PREFIX . "order_purchase SET order_document_id = 0, order_vendor_id = '" . (int)$data['order_vendor_id'] . "', order_id = '" . (int)$data['order_id'] . "', vendor_id = '" . (int)$data['vendor_id'] . "', adjustment = 0, comment = '', vendor_reference = '', completed = 0, date_added = NOW(), date_completed = NULL, user_id = '" . $this->user->getId() . "', user_completed_id = 0");
 
         $order_purchase_id = $this->db->getLastId();
@@ -35,7 +20,7 @@ class ModelSalePurchase extends Model
 
     public function editOrderPurchase($order_purchase_id, $data)
     {
-        if (isset($data['completed']) && $data['completed'] === 1) {
+        if (isset($data['completed']) && !is_null($data['completed'])) {
             $this->db->query("UPDATE " . DB_PREFIX . "order_purchase SET adjustment = '" . (float)$data['adjustment'] . "', comment = '" . $this->db->escape($data['comment']) . "', vendor_reference = '" . $this->db->escape($data['vendor_reference']) . "', completed = '" . (int)$data['completed'] . "', date_completed = NOW(), user_completed_id = '" . $this->user->getId() . "' WHERE order_purchase_id = '" . (int)$order_purchase_id . "'");
         } else {
             $this->db->query("UPDATE " . DB_PREFIX . "order_purchase SET comment = '" . $this->db->escape($data['comment']) . "', date_added = NOW(), user_id = '" . $this->user->getId() . "' WHERE order_purchase_id = '" . (int)$order_purchase_id . "'");
@@ -47,7 +32,6 @@ class ModelSalePurchase extends Model
         $order_purchases = $this->getOrderPurchases($order_id);
 
         foreach ($order_purchases as $order_purchase) {
-
             if (isset($completed)) {
                 if ($order_purchase['completed'] == $completed) {
                     $this->db->query("DELETE FROM " . DB_PREFIX . "order_purchase_product WHERE order_purchase_id = '" . (int)$order_purchase['order_purchase_id'] . "'");
@@ -71,7 +55,7 @@ class ModelSalePurchase extends Model
     public function getOrderPurchases($order_id)
     {
         // $query = $this->db->query("SELECT op.*, od.*, CONCAT(od.reference_prefix, LPAD(od.reference_no, 4, '0')) AS reference, SUM(opp.total) AS total, ov.* FROM " . DB_PREFIX . "order_purchase op LEFT JOIN " . DB_PREFIX . "order_document od ON (od.order_document_id = op.order_document_id) LEFT JOIN " . DB_PREFIX . "order_purchase_product opp ON (opp.order_purchase_id = op.order_purchase_id) LEFT JOIN " . DB_PREFIX . "order_vendor ov ON (ov.order_vendor_id = op.order_vendor_id) WHERE op.order_id = '" . (int)$order_id . "' ORDER BY od.date ASC");
-        $query = $this->db->query("SELECT op.*, od.*, CONCAT(od.reference_prefix, LPAD(od.reference_no, 4, '0')) AS reference, ov.* FROM " . DB_PREFIX . "order_purchase op LEFT JOIN " . DB_PREFIX . "order_document od ON (od.order_document_id = op.order_document_id) LEFT JOIN " . DB_PREFIX . "order_vendor ov ON (ov.order_vendor_id = op.order_vendor_id) WHERE op.order_id = '" . (int)$order_id . "' ORDER BY od.date ASC");
+        $query = $this->db->query("SELECT op.*, od.*, CONCAT(od.reference_prefix, LPAD(od.reference_no, 4, '0')) AS reference, ov.* FROM " . DB_PREFIX . "order_purchase op LEFT JOIN " . DB_PREFIX . "order_document od ON (od.order_document_id = op.order_document_id) LEFT JOIN " . DB_PREFIX . "order_vendor ov ON (ov.order_vendor_id = op.order_vendor_id) WHERE op.order_id = '" . (int)$order_id . "' ORDER BY op.order_purchase_id ASC");
 
         return $query->rows;
     }

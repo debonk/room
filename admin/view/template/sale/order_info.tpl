@@ -687,7 +687,7 @@
 		$('.nav-tabs a[href="#tab-purchase"]').on('click', function () {
 			$('.alert, .text-danger').remove();
 			
-			$('#order-purchase').load('index.php?route=sale/purchase/orderPurchase&token=<?php echo $token; ?>&order_id=<?php echo $order_id; ?>');
+			$('#order-purchase').load('index.php?route=sale/purchase&token=<?php echo $token; ?>&order_id=<?php echo $order_id; ?>');
 		});
 
 		$('.nav-tabs a[href="#tab-customer"]').on('click', function () {
@@ -741,7 +741,7 @@
 
 						$(node).closest('li').remove();
 
-						$('#order-purchase').load('index.php?route=sale/purchase/orderPurchase&token=<?php echo $token; ?>&order_id=<?php echo $order_id; ?>');
+						$('#order-purchase').load('index.php?route=sale/purchase&token=<?php echo $token; ?>&order_id=<?php echo $order_id; ?>');
 						$('#order-vendor').load('index.php?route=sale/vendor&token=<?php echo $token; ?>&order_id=<?php echo $order_id; ?>');
 
 						$('#content > .container-fluid').prepend('<div class="alert alert-success"><i class="fa fa-check-circle"></i> ' + json['success'] + ' <button type="button" class="close" data-dismiss="alert">&times;</button></div>');
@@ -779,7 +779,7 @@
 
 							$(node).closest('tr').remove();
 
-							$('#order-purchase').load('index.php?route=sale/purchase/orderPurchase&token=<?php echo $token; ?>&order_id=<?php echo $order_id; ?>');
+							$('#order-purchase').load('index.php?route=sale/purchase&token=<?php echo $token; ?>&order_id=<?php echo $order_id; ?>');
 							$('#order-vendor').load('index.php?route=sale/vendor&token=<?php echo $token; ?>&order_id=<?php echo $order_id; ?>');
 
 							$('#content > .container-fluid').prepend('<div class="alert alert-success"><i class="fa fa-check-circle"></i> ' + json['success'] + ' <button type="button" class="close" data-dismiss="alert">&times;</button></div>');

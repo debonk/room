@@ -19,9 +19,10 @@ $_['column_date_added']         = 'Date Added';
 $_['column_balance']            = 'Balance';
 $_['column_action']             = 'Action';
 $_['column_date'] 				= 'Tanggal';
+$_['column_transaction_type']	= 'Jenis Transaksi';
 $_['column_payment_method']		= 'Rekening';
 $_['column_description']		= 'Keterangan';
-$_['column_invoice_no']			= 'No Invoice';
+$_['column_reference']			= 'No Referensi';
 $_['column_amount']				= 'Jumlah';
 $_['column_username']			= 'User';
 

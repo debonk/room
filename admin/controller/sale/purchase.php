@@ -1,7 +1,7 @@
 <?php
 class ControllerSalePurchase extends Controller
 {
-	public function orderPurchase()
+	public function index()
 	{
 		$this->load->language('sale/purchase');
 
@@ -85,8 +85,17 @@ class ControllerSalePurchase extends Controller
 			];
 
 			$transaction_purchase_info = $this->model_accounting_transaction->getTransactionByTransactionTypeId($this->config->get('config_vendor_purchase_initial_id'), $filter_data);
-			
+
 			if (!$transaction_purchase_info) {
+				$order_purchase_data = [
+					'adjustment'		=> $order_purchase['adjustment'],
+					'comment'			=> $order_purchase['comment'],
+					'vendor_reference'	=> $order_purchase['vendor_reference'],
+					'completed'			=> 0
+				];
+	
+				$this->model_sale_purchase->editOrderPurchase($order_purchase['order_purchase_id'], $order_purchase_data);
+				
 				$order_purchase['completed'] = 0;
 			}
 
@@ -422,7 +431,7 @@ class ControllerSalePurchase extends Controller
 				$transaction_type_info = $this->model_accounting_transaction_type->getTransactionType($this->config->get('config_vendor_purchase_initial_id'));
 
 				if (empty($transaction_type_info)) {
-					$json['error'] = sprintf($this->language->get('error_transaction_type'), 'system-purchase-initial');
+					$json['error'] = sprintf($this->language->get('error_transaction_type'), 'vendor-purchase-initial');
 
 					break;
 				}
@@ -465,7 +474,7 @@ class ControllerSalePurchase extends Controller
 			$transaction_type_accounts = $this->model_accounting_transaction_type->getTransactionTypeAccounts($transaction_type_info['transaction_type_id']);
 
 			foreach ($transaction_type_accounts as $key => $transaction_type_account) {
-				$transaction_type_accounts[$transaction_type_account['transaction_label']] = $transaction_type_account;
+				$transaction_type_accounts[$transaction_type_account['account_label']] = $transaction_type_account;
 				unset($transaction_type_accounts[$key]);
 			}
 
@@ -777,7 +786,6 @@ class ControllerSalePurchase extends Controller
 			}
 
 			$this->response->setOutput($this->load->view('sale/purchase_order', $data));
-			// $this->response->setOutput($this->load->view('sale/purchase_order_v2', $data)); //Layout template versi awal
 		} else {
 			return false;
 		}

@@ -9,10 +9,10 @@
 					<?= $column_transaction_type; ?>
 				</td>
 				<td class="text-right">
-					<?= $column_initial; ?>
+					<?= $column_debit; ?>
 				</td>
 				<td class="text-right">
-					<?= $column_total_payment; ?>
+					<?= $column_credit; ?>
 				</td>
 				<td class="text-right">
 					<?= $column_balance; ?>
@@ -27,10 +27,10 @@
 					<?= $transaction_summary['transaction_type']; ?>
 				</td>
 				<td class="text-right">
-					<?= $transaction_summary['initial']; ?>
+					<?= $transaction_summary['debit']; ?>
 				</td>
 				<td class="text-right">
-					<?= $transaction_summary['total_payment']; ?>
+					<?= $transaction_summary['credit']; ?>
 				</td>
 				<td class="text-right">
 					<?= $transaction_summary['balance']; ?>
@@ -113,6 +113,7 @@
 					<?= $customer_transaction['username']; ?>
 				</td>
 				<td class="text-right nowrap">
+					<?php if ($customer_transaction['receipt']) { ?>
 					<a href="<?= $customer_transaction['receipt']; ?>" target="_blank" class="btn btn-info btn-sm" data-toggle="tooltip" title="<?= $button_view; ?>"><i
 							class="fa fa-eye"></i>
 					</a>
@@ -123,6 +124,7 @@
 						id="button-print<?= $customer_transaction['transaction_id']; ?>" data-loading-text="<?= $text_loading; ?>"
 						data-toggle="tooltip" data-print="print" title="<?= $button_print; ?>" class="btn btn-success btn-sm"><i
 							class="fa fa-print"></i></button>
+					<?php } ?>
 					<?php } ?>
 				</td>
 			</tr>

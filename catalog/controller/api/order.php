@@ -536,15 +536,22 @@ class ControllerApiOrder extends Controller
 					$transaction_type_info = $this->model_accounting_transaction->getTransactionType($order_status_info['transaction_type_id']);
 
 					if ($transaction_type_info && $transaction_type_info['transaction_label'] == 'complete') {
-						$filter_category_label = ['order', 'purchase'];
-
-						foreach ($filter_category_label as $category_label) {
-							$transactions_summary = $this->model_accounting_transaction->getTransactionsTotalSummary($order_id, ['category_label' => $category_label]);
-
-							if ($transactions_summary[$category_label]['initial'] <> abs($transactions_summary[$category_label]['cashin'] - $transactions_summary[$category_label]['cashout'])) {
-								$json['error'] = $this->language->get('error_amount_balance');
-
-								break;
+						if ($transaction_type_info['transaction_label'] == 'complete') {
+							$filter_category_label = ['order', 'purchase', 'deposit'];
+	
+							foreach ($filter_category_label as $category_label) {
+								$filter_summary_data = [
+									'category_label'	=> $category_label,
+									'group'				=> 'client_id'
+								];
+			
+								$transactions_total = $this->model_accounting_transaction->getTransactionsTotalByOrderId($order_id, $filter_summary_data);
+	
+								if (!empty($transactions_total)) {
+									$json['error'] = sprintf($this->language->get('error_amount_balance'), $this->language->get('text_category_' . $category_label));
+	
+									break;
+								}
 							}
 						}
 					}
@@ -954,19 +961,18 @@ class ControllerApiOrder extends Controller
 				# If current order status is not complete but new status is complete then check for transaction
 				if (!in_array($order_info['order_status_id'], $this->config->get('config_complete_status')) && in_array($this->request->post['order_status_id'], $this->config->get('config_complete_status'))) {
 					if ($transaction_type_info['transaction_label'] == 'complete') {
-						$filter_category_label = ['order', 'purchase'];
+						$filter_category_label = ['order', 'purchase', 'deposit'];
 
 						foreach ($filter_category_label as $category_label) {
-							$transactions_summary = $this->model_accounting_transaction->getTransactionsTotalSummary($order_id, ['category_label' => $category_label]);
+							$filter_summary_data = [
+								'category_label'	=> $category_label,
+								'group'				=> 'client_id'
+							];
+		
+							$transactions_total = $this->model_accounting_transaction->getTransactionsTotalByOrderId($order_id, $filter_summary_data);
 
-							if (empty($transactions_summary[$category_label]['initial'])) {
-								$json['error'] = sprintf($this->language->get('error_amount_initial'), $category_label);
-
-								break;
-							}
-
-							if ($transactions_summary[$category_label]['initial'] <> abs($transactions_summary[$category_label]['cashin'] - $transactions_summary[$category_label]['cashout'])) {
-								$json['error'] = sprintf($this->language->get('error_amount_balance'), $category_label);
+							if (!empty($transactions_total)) {
+								$json['error'] = sprintf($this->language->get('error_amount_balance'), $this->language->get('text_category_' . $category_label));
 
 								break;
 							}

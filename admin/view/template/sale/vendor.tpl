@@ -9,10 +9,10 @@
 					<?php echo $column_vendor; ?>
 				</td>
 				<td class="text-right">
-					<?php echo $column_initial; ?>
+					<?php echo $column_debit; ?>
 				</td>
 				<td class="text-right">
-					<?php echo $column_total_payment; ?>
+					<?php echo $column_credit; ?>
 				</td>
 				<td class="text-right">
 					<?php echo $column_balance; ?>
@@ -53,13 +53,13 @@
 			<?php foreach ($transaction_summary['summary'] as $summary) { ?>
 			<tr>
 				<td class="text-left">
-					<?php echo '&nbsp;&nbsp;- ' . $summary['transaction_type']; ?>
+					<?php echo '&nbsp;&nbsp;- ' . $summary['text_category']; ?>
 				</td>
 				<td class="text-right">
-					<?php echo $summary['initial']; ?>
+					<?php echo $summary['debit']; ?>
 				</td>
 				<td class="text-right">
-					<?php echo $summary['total_payment']; ?>
+					<?php echo $summary['credit']; ?>
 				</td>
 				<td class="text-right">
 					<?php echo $summary['balance']; ?>
@@ -149,6 +149,7 @@
 					<?php echo $vendor_transaction['username']; ?>
 				</td>
 				<td class="text-right nowrap">
+					<?php if ($vendor_transaction['receipt']) { ?>
 					<a href="<?= $vendor_transaction['receipt']; ?>" target="_blank" class="btn btn-info btn-sm"
 						data-toggle="tooltip" title="<?= $button_view; ?>"><i class="fa fa-eye"></i>
 					</a>
@@ -159,6 +160,7 @@
 						id="button-print<?= $vendor_transaction['transaction_id']; ?>" data-loading-text="<?= $text_loading; ?>"
 						data-toggle="tooltip" title="<?= $button_print; ?>" class="btn btn-success btn-sm"><i
 							class="fa fa-print"></i></button>
+					<?php } ?>
 					<?php } ?>
 				</td>
 			</tr>

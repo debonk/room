@@ -284,7 +284,7 @@
 				}
 
 				if (json['success']) {
-					$('#order-purchase').load('index.php?route=sale/purchase/orderPurchase&token=<?= $token; ?>&order_id=<?= $order_id; ?>');
+					$('#order-purchase').load('index.php?route=sale/purchase&token=<?= $token; ?>&order_id=<?= $order_id; ?>');
 
 					$('#order-purchase').before('<div class="alert alert-success"><i class="fa fa-check-circle"></i> ' + json['success'] + ' <button type="button" class="close" data-dismiss="alert">&times;</button></div>');
 				}
@@ -329,7 +329,7 @@
 					}
 
 					if (json['success']) {
-						$('#order-purchase').load('index.php?route=sale/purchase/orderPurchase&token=<?= $token; ?>&order_id=<?= $order_id; ?>');
+						$('#order-purchase').load('index.php?route=sale/purchase&token=<?= $token; ?>&order_id=<?= $order_id; ?>');
 
 						$('#order-purchase').before('<div class="alert alert-success"><i class="fa fa-check-circle"></i> ' + json['success'] + ' <button type="button" class="close" data-dismiss="alert">&times;</button></div>');
 						$('html, body').animate({ scrollTop: warning_pos.top - 70 }, 500);

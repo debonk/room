@@ -213,7 +213,14 @@ class ControllerCatalogVendor extends Controller
 		$this->load->model('accounting/transaction');
 
 		foreach ($results as $result) {
-			$balance = $this->model_accounting_transaction->getTransactionsTotalByClientLabel('vendor', $result['vendor_id']);
+			$filter_summary_data = [
+				'filter'	=> [
+					'client_label'	=> 'vendor',
+					'client_id'		=> $result['vendor_id']
+				]
+			];
+
+			$balance = $this->model_accounting_transaction->getTransactionsTotal($filter_summary_data);
 
 			$data['vendors'][] = array(
 				'vendor_id'    => $result['vendor_id'],
@@ -610,9 +617,10 @@ class ControllerCatalogVendor extends Controller
 			'text_no_results',
 			'text_balance',
 			'column_date',
+			'column_transaction_type',
 			'column_payment_method',
 			'column_description',
-			'column_invoice_no',
+			'column_reference',
 			'column_amount',
 			'column_username'
 		);
@@ -643,37 +651,38 @@ class ControllerCatalogVendor extends Controller
 
 		foreach ($results as $result) {
 			if (!empty($result['order_id'])) {
-				$invoice_no = '#' . $result['order_id'] . ($result['invoice_no'] ? ': ' . $result['invoice_prefix'] . str_pad($result['invoice_no'], 4, 0, STR_PAD_LEFT) : '');
+				$reference = '#' . $result['order_id'] . ': ' . $result['reference'];
 			} else {
-				$invoice_no = '';
+				$reference = $result['reference'];
 			}
 
-			$amount = ($result['transaction_label'] == 'cashin' ? 1 : -1) * $result['amount'];
+			$amount = ($result['account_type'] == 'D' ? 1 : -1) * $result['amount'];
 
 			$data['transactions'][] = array(
-				'date'	 		=> date($this->language->get('date_format_short'), strtotime($result['date'])),
-				'payment_method' => $result['payment_method'],
-				'description'	=> $result['description'],
-				'invoice_no'   	=> $invoice_no,
-				'amount'      	=> $this->currency->format($amount, $this->config->get('config_currency')),
-				'username'      => $result['username'],
-				'order_url'     => $this->url->link('sale/order/info', 'token=' . $this->session->data['token'] . '&order_id=' . $result['order_id'], true),
+				'date'	 			=> date($this->language->get('date_format_short'), strtotime($result['date'])),
+				'transaction_type'	=> $result['transaction_type'],
+				'reference'   		=> $reference,
+				'description'		=> $result['description'],
+				'payment_method' 	=> $result['payment_method'],
+				'amount'      		=> $this->currency->format($amount, $this->config->get('config_currency')),
+				'username'      	=> $result['username'],
+				'order_url'     	=> $this->url->link('sale/order/info', 'token=' . $this->session->data['token'] . '&order_id=' . $result['order_id'], true),
 			);
 		}
 
-		$data['balance'] = $this->currency->format($this->model_accounting_transaction->getTransactionsTotalByClientLabel('vendor', $this->request->get['vendor_id']), $this->config->get('config_currency'));
+		$data['balance'] = $this->currency->format($this->model_accounting_transaction->getTransactionsTotal($filter_data), $this->config->get('config_currency'));
 
-		$transaction_total = $this->model_accounting_transaction->getTransactionsCount($filter_data);
+		$transaction_count = $this->model_accounting_transaction->getTransactionsCount($filter_data);
 
 		$pagination = new Pagination();
-		$pagination->total = $transaction_total;
+		$pagination->total = $transaction_count;
 		$pagination->page = $page;
 		$pagination->limit = $limit;
 		$pagination->url = $this->url->link('catalog/vendor/transaction', 'token=' . $this->session->data['token'] . '&vendor_id=' . $this->request->get['vendor_id'] . '&page={page}', true);
 
 		$data['pagination'] = $pagination->render();
 
-		$data['results'] = sprintf($this->language->get('text_pagination'), ($transaction_total) ? (($page - 1) * 10) + 1 : 0, ((($page - 1) * 10) > ($transaction_total - 10)) ? $transaction_total : ((($page - 1) * 10) + 10), $transaction_total, ceil($transaction_total / 10));
+		$data['results'] = sprintf($this->language->get('text_pagination'), ($transaction_count) ? (($page - 1) * 10) + 1 : 0, ((($page - 1) * 10) > ($transaction_count - 10)) ? $transaction_count : ((($page - 1) * 10) + 10), $transaction_count, ceil($transaction_count / 10));
 
 		$this->response->setOutput($this->load->view('catalog/vendor_transaction', $data));
 	}
