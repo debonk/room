@@ -21,7 +21,6 @@ class ControllerAccountingTransactionType extends Controller
 		$this->document->setTitle($this->language->get('heading_title'));
 
 		$this->load->model('accounting/transaction_type');
-		var_dump($this->request->post);//die('---breakpoint---');
 
 		if (($this->request->server['REQUEST_METHOD'] == 'POST') && $this->validateForm()) {
 			$this->model_accounting_transaction_type->addTransactionType($this->request->post);

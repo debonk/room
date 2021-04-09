@@ -838,7 +838,9 @@ class ControllerApiOrder extends Controller
 
 		$json = array();
 
-		if (!isset($this->session->data['api_id'])) {
+		$delete_protection_status = true; #Tidak diijinkan menghapus order
+
+		if ($delete_protection_status || !isset($this->session->data['api_id'])) {
 			$json['error'] = $this->language->get('error_permission');
 		} else {
 			$this->load->model('checkout/order');

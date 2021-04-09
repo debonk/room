@@ -441,7 +441,7 @@ class ControllerSaleOrder extends Controller
 				'order_status'    => $result['order_status'],
 				'payment_status'  => $payment_status,
 				'total'           => $this->currency->format($result['total'], $result['currency_code'], $result['currency_value']),
-				'balance'         => $this->currency->format($result['total'] - $transaction_total['customer'], $result['currency_code'], $result['currency_value']),
+				'balance'         => $this->currency->format($transaction_total['customer'], $result['currency_code'], $result['currency_value']),
 				'vendor_balance'  => $this->currency->format($transaction_total['vendor'], $result['currency_code'], $result['currency_value']),
 				'date_added'      => date($this->language->get('date_format_short'), strtotime($result['date_added'])),
 				'username'        => $result['username'],

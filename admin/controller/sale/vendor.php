@@ -200,10 +200,8 @@ class ControllerSaleVendor extends Controller
 					break;
 			}
 
-			if ($result['account_type'] == 'D') {
-				$amount = $result['amount'];
-			} else {
-				$amount = -$result['amount'];
+			if ($result['account_type'] == 'C') {
+				$result['amount'] = -$result['amount'];
 			}
 
 			$data['vendor_transactions'][] = array(
@@ -214,7 +212,7 @@ class ControllerSaleVendor extends Controller
 				'reference'			=> $result['reference'],
 				'asset'				=> $result['payment_method'],
 				'description'		=> $result['description'],
-				'amount'			=> $this->currency->format($amount, $order_info['currency_code'], $order_info['currency_value']),
+				'amount'			=> $this->currency->format($result['amount'], $order_info['currency_code'], $order_info['currency_value']),
 				'date_added'		=> date($this->language->get('date_format_short'), strtotime($result['date_added'])),
 				'username'			=> $result['username'],
 				'receipt'	 		=> $href,
