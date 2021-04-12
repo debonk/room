@@ -3,7 +3,7 @@ class ModelAccountingTransaction extends Model
 {
 	private $client_data = ['system', 'customer', 'vendor', 'supplier', 'finance'];
 	private $category_data = ['order', 'deposit', 'purchase', 'expense', 'asset'];
-	private $transaction_data = ['initial', 'discount', 'cash', 'cashout', 'complete', 'canceled', 'charged'];
+	private $transaction_data = ['initial', 'discount', 'cash', 'complete', 'canceled', 'charged'];
 	private $type_data = ['D', 'C'];
 
 	public function addTransaction($data)

@@ -14,7 +14,6 @@ class ControllerSaleCustomer extends Controller
 			'text_print_confirm',
 			'text_select',
 			'column_action',
-			'column_asset',
 			'column_amount',
 			'column_balance',
 			'column_credit',
@@ -22,11 +21,13 @@ class ControllerSaleCustomer extends Controller
 			'column_date_added',
 			'column_debit',
 			'column_description',
+			'column_payment_method',
 			'column_reference',
 			'column_transaction_type',
 			'column_username',
+			'entry_account_credit',
+			'entry_account_debit',
 			'entry_amount',
-			'entry_asset',
 			'entry_date',
 			'entry_description',
 			'entry_transaction_type',
@@ -61,13 +62,13 @@ class ControllerSaleCustomer extends Controller
 
 		$data['customers_transaction_summary'] = [];
 
-		$filter_vendor_data = [
+		$filter_customer_data = [
 			'client_label'	=> 'customer',
 			'client_id'		=> $order_info['customer_id'],
 			'group'			=> 'category_label'
 		];
 
-		$transactions_summary = $this->model_accounting_transaction->getTransactionsSummaryGroupByLabel($order_id, $filter_vendor_data);
+		$transactions_summary = $this->model_accounting_transaction->getTransactionsSummaryGroupByLabel($order_id, $filter_customer_data);
 
 		if ($this->config->get('config_customer_deposit') && !isset($transactions_summary['deposit'])) {
 			$transactions_summary['deposit'] = [];
@@ -114,7 +115,7 @@ class ControllerSaleCustomer extends Controller
 					break;
 
 				case 'initial':
-					$href = $this->url->link('sale/order/agreement', 'token=' . $this->session->data['token'] . '&order_id=' . $result['order_id'] . '&vendor_id=' . $result['client_id'], true);
+					$href = $this->url->link('sale/order/agreement', 'token=' . $this->session->data['token'] . '&order_id=' . $result['order_id'], true);
 
 					break;
 
@@ -133,7 +134,7 @@ class ControllerSaleCustomer extends Controller
 				'date'				=> date($this->language->get('date_format_short'), strtotime($result['date'])),
 				'transaction_type'	=> $result['transaction_type'],
 				'customer_name'		=> $result['customer_name'],
-				'asset'				=> $result['payment_method'],
+				'payment_method'	=> $result['payment_method'],
 				'reference'			=> $result['reference'],
 				'description'		=> $result['description'],
 				'amount'			=> $this->currency->format($result['amount'], $order_info['currency_code'], $order_info['currency_value']),
@@ -160,11 +161,6 @@ class ControllerSaleCustomer extends Controller
 		$this->load->model('accounting/transaction_type');
 
 		$data['transaction_types'] = $this->model_accounting_transaction_type->getTransactionTypesMenu(['client_label' => 'customer']);
-
-		# Accounts
-		$this->load->model('accounting/account');
-
-		$data['assets'] = $this->model_accounting_account->getAccountsMenuByParentId([1111, 1112]);
 
 		$data['token'] = $this->session->data['token'];
 		$data['order_id'] = $order_id;
@@ -193,8 +189,12 @@ class ControllerSaleCustomer extends Controller
 						$json['error_customer_transaction']['type'] = $this->language->get('error_transaction_type');
 					}
 
-					if (empty($this->request->post['customer_transaction_asset_id'])) {
-						$json['error_customer_transaction']['asset'] = $this->language->get('error_transaction_asset');
+					if (empty($this->request->post['customer_transaction_account_debit_id'])) {
+						$json['error_customer_transaction']['account_debit'] = $this->language->get('error_transaction_account');
+					}
+
+					if (empty($this->request->post['customer_transaction_account_credit_id'])) {
+						$json['error_customer_transaction']['account_credit'] = $this->language->get('error_transaction_account');
 					}
 
 					if (utf8_strlen($this->request->post['customer_transaction_description']) > 256) {
@@ -237,10 +237,11 @@ class ControllerSaleCustomer extends Controller
 				}
 
 				$this->load->model('accounting/account');
-				$asset_info = $this->model_accounting_account->getAccount($this->request->post['customer_transaction_asset_id']);
+				$account_debit_info = $this->model_accounting_account->getAccount($this->request->post['customer_transaction_account_debit_id']);
+				$account_credit_info = $this->model_accounting_account->getAccount($this->request->post['customer_transaction_account_credit_id']);
 
-				if (!$asset_info) {
-					$json['error']['warning'] = $this->language->get('error_asset_not_found');
+				if (!$account_debit_info || !$account_credit_info) {
+					$json['error']['warning'] = $this->language->get('error_account_not_found');
 
 					break;
 				}
@@ -279,46 +280,66 @@ class ControllerSaleCustomer extends Controller
 		}
 
 		if (!$json) {
-			$this->load->model('accounting/transaction');
-
 			$transaction_account = [];
 
-			$reference_prefix = str_ireplace('{YEAR}', date('Y', strtotime($this->request->post['customer_transaction_date'])), $this->config->get('config_receipt_customer_prefix'));
+			switch ($transaction_type_info['transaction_label']) {
+				case 'cash':
+					$reference_prefix = str_ireplace('{YEAR}', date('Y', strtotime($this->request->post['customer_transaction_date'])), $this->config->get('config_receipt_customer_prefix'));
 
-			$last_reference_no = $this->model_accounting_transaction->getLastReferenceNo($reference_prefix);
+					$last_reference_no = $this->model_accounting_transaction->getLastReferenceNo($reference_prefix);
 
-			if ($last_reference_no) {
-				$reference_no = $last_reference_no + 1;
+					if ($last_reference_no) {
+						$reference_no = $last_reference_no + 1;
+					} else {
+						$reference_no = $this->config->get('config_reference_start') + 1;
+					}
+
+					break;
+
+				case 'charged':
+					$reference_prefix = 'C' . date('ym');
+
+					$last_reference_no = $this->model_accounting_transaction->getLastReferenceNo($reference_prefix);
+					$reference_no = $last_reference_no + 1;
+
+					break;
+
+				default:
+					break;
+			}
+
+			$this->load->model('accounting/account');
+
+			if ($transaction_type_info['transaction_label'] == 'cash') {
+				if ($transaction_type_info['account_type'] == 'D') {
+					$payment_method = $account_debit_info['account_id'] . ' - ' . $account_debit_info['name'];
+				} else {
+					$payment_method = $account_credit_info['account_id'] . ' - ' . $account_credit_info['name'];
+				}
+
 			} else {
-				$reference_no = $this->config->get('config_reference_start') + 1;
+				$payment_method = '';
 			}
 
-			$transaction_type_accounts = $this->model_accounting_transaction_type->getTransactionTypeAccounts($transaction_type_info['transaction_type_id']);
+			$transaction_account[] = [
+				'account_id'		=> $this->request->post['customer_transaction_account_debit_id'],
+				'debit'				=> $this->request->post['customer_transaction_amount'],
+				'credit'			=> 0
+			];
 
-			foreach ($transaction_type_accounts as $transaction_type_account) {
-				$account_debit_id = empty($transaction_type_account['account_debit_id']) ? $this->request->post['customer_transaction_asset_id'] : ($transaction_type_account['account_debit_id']);
-				$account_credit_id = empty($transaction_type_account['account_credit_id']) ? $this->request->post['customer_transaction_asset_id'] : ($transaction_type_account['account_credit_id']);
-
-				$transaction_account[] = [
-					'account_id'		=> $account_debit_id,
-					'debit'				=> $this->request->post['customer_transaction_amount'],
-					'credit'			=> 0
-				];
-
-				$transaction_account[] = [
-					'account_id'		=> $account_credit_id,
-					'debit'				=> 0,
-					'credit'			=> $this->request->post['customer_transaction_amount']
-				];
-			}
+			$transaction_account[] = [
+				'account_id'		=> $this->request->post['customer_transaction_account_credit_id'],
+				'debit'				=> 0,
+				'credit'			=> $this->request->post['customer_transaction_amount']
+			];
 
 			$transaction_data = array(
 				'order_id'				=> $order_id,
 				'transaction_type_id'	=> $this->request->post['customer_transaction_type_id'],
 				'client_id'				=> $order_info['customer_id'],
 				'date' 					=> $this->request->post['customer_transaction_date'],
+				'payment_method' 		=> $payment_method,
 				'description' 			=> $this->request->post['customer_transaction_description'],
-				'payment_method' 		=> $asset_info['name'],
 				'amount' 				=> $this->request->post['customer_transaction_amount'],
 				'customer_name' 		=> $order_info['customer'],
 				'reference_prefix' 		=> $reference_prefix,
@@ -342,6 +363,41 @@ class ControllerSaleCustomer extends Controller
 			}
 
 			$json['success'] = $this->language->get('text_customer_transaction_added');
+		}
+
+		$this->response->addHeader('Content-Type: application/json');
+		$this->response->setOutput(json_encode($json));
+	}
+
+	public function transactionTypeAccounts()
+	{
+		$json = [];
+
+		$this->load->model('accounting/transaction_type');
+		$this->load->model('accounting/account');
+		$transaction_type_accounts = $this->model_accounting_transaction_type->getTransactionTypeAccounts($this->request->get['transaction_type_id']);
+
+		$accounts_debit_id = array_column($transaction_type_accounts, 'account_debit_id');
+		$accounts_credit_id = array_column($transaction_type_accounts, 'account_credit_id');
+
+		$json['account_debit'] = array_values($this->model_accounting_account->getAccountsMenuByParentId($accounts_debit_id));
+		$json['account_credit'] = array_values($this->model_accounting_account->getAccountsMenuByParentId($accounts_credit_id));
+
+		$json['lock_debit'] = true;
+		$json['lock_credit'] = true;
+
+		if (count($accounts_debit_id) == 1) {
+			$accounts_debit_count = $this->model_accounting_account->getAccountsCount(['filter_parent_id' => $accounts_debit_id[0]]);
+			if ($accounts_debit_count != 1) {
+				$json['lock_debit'] = false;
+			}
+		}
+
+		if (count($accounts_credit_id) == 1) {
+			$accounts_credit_count = $this->model_accounting_account->getAccountsCount(['filter_parent_id' => $accounts_credit_id[0]]);
+			if ($accounts_credit_count != 1) {
+				$json['lock_credit'] = false;
+			}
 		}
 
 		$this->response->addHeader('Content-Type: application/json');

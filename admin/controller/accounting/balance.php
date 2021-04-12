@@ -301,6 +301,10 @@ class ControllerAccountingBalance extends Controller
 				$order_url = '';
 			}
 
+			if ($result['account_type'] == 'C') {
+				$result['amount'] = -$result['amount'];
+			}
+			
 			$account_data = [
 				'debit'		=> '',
 				'credit'	=> ''

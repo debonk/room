@@ -38,7 +38,6 @@ class ModelReportTransaction extends Model
 
 			$sql .= " LIMIT " . (int)$data['start'] . "," . (int)$data['limit'];
 		}
-		// var_dump($sql);die('---breakpoint---');
 
 		$query = $this->db->query($sql);
 

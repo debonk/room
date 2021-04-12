@@ -65,7 +65,7 @@
 					<?= $column_reference; ?>
 				</td>
 				<td class="text-left">
-					<?= $column_asset; ?>
+					<?= $column_payment_method; ?>
 				</td>
 				<td class="text-left">
 					<?= $column_description; ?>
@@ -98,7 +98,7 @@
 					<?= $customer_transaction['reference']; ?>
 				</td>
 				<td class="text-left">
-					<?= $customer_transaction['asset']; ?>
+					<?= $customer_transaction['payment_method']; ?>
 				</td>
 				<td class="text-left">
 					<?= $customer_transaction['description']; ?>
@@ -114,8 +114,8 @@
 				</td>
 				<td class="text-right nowrap">
 					<?php if ($customer_transaction['receipt']) { ?>
-					<a href="<?= $customer_transaction['receipt']; ?>" target="_blank" class="btn btn-info btn-sm" data-toggle="tooltip" title="<?= $button_view; ?>"><i
-							class="fa fa-eye"></i>
+					<a href="<?= $customer_transaction['receipt']; ?>" target="_blank" class="btn btn-info btn-sm"
+						data-toggle="tooltip" title="<?= $button_view; ?>"><i class="fa fa-eye"></i>
 					</a>
 					<?php if ($customer_transaction['print']) { ?>
 					<button type="button" class="btn btn-success btn-sm" disabled="disabled"><i class="fa fa-print"></i></button>
@@ -148,7 +148,7 @@
 	</div>
 </div>
 <br />
-<fieldset>
+<fieldset id="form-customer-transaction">
 	<legend>
 		<?= $text_customer_transaction_add; ?>
 	</legend>
@@ -184,26 +184,23 @@
 				</select>
 			</div>
 		</div>
-		<div class="form-group required">
-			<label class="col-sm-2 control-label" for="input-customer-transaction-asset">
-				<?php echo $entry_asset; ?>
+		<div class="form-group required" id="input-account-debit">
+			<label class="col-sm-2 control-label" for="input-customer-transaction-account-debit">
+				<?php echo $entry_account_debit; ?>
 			</label>
 			<div class="col-sm-10">
-				<select name="customer_transaction_asset_id" id="input-customer-transaction-asset" class="form-control">
-					<option value="">
-						<?php echo $text_select; ?>
-					</option>
-					<?php foreach ($assets as $account) { ?>
-					<optgroup label="<?php echo $account['text']; ?>">
-						<?php if ($account['child']) { ?>
-						<?php foreach ($account['child'] as $child) { ?>
-						<option value="<?php echo $child['account_id']; ?>">
-							<?php echo $child['text']; ?>
-						</option>
-						<?php } ?>
-						<?php } ?>
-					</optgroup>
-					<?php } ?>
+				<select name="customer_transaction_account_debit_id" id="input-customer-transaction-account-debit"
+					class="form-control">
+				</select>
+			</div>
+		</div>
+		<div class="form-group required" id="input-account-credit">
+			<label class="col-sm-2 control-label" for="input-customer-transaction-account-credit">
+				<?php echo $entry_account_credit; ?>
+			</label>
+			<div class="col-sm-10">
+				<select name="customer_transaction_account_credit_id" id="input-customer-transaction-account-credit"
+					class="form-control">
 				</select>
 			</div>
 		</div>
@@ -236,8 +233,82 @@
 	</button>
 </div>
 <script type="text/javascript">
-	let warning_pos = $('#order-customer').position();
+	$('select[name=\'customer_transaction_type_id\']').on('change', function () {
+		let account_debit, account_credit, child;
+		let transaction_type_id = $('select[name=\'customer_transaction_type_id\']').val();
 
+		$.ajax({
+			url: 'index.php?route=sale/customer/transactionTypeAccounts&token=<?php echo $token; ?>&transaction_type_id=' + transaction_type_id,
+			dataType: 'json',
+			beforeSend: function () {
+				$('#input-transaction-type label').append(' <i class="fa fa-circle-o-notch fa-spin"></i>');
+			},
+			complete: function () {
+				$('.fa-spin').remove();
+			},
+			success: function (json) {
+				if (json['lock_debit']) {
+					$('#form-customer-transaction #input-account-debit').slideUp('slow');
+					html = '';
+				} else {
+					$('#form-customer-transaction #input-account-debit').slideDown('slow');
+					html = '<option value=""><?php echo $text_select; ?></option>';
+				}
+
+				account_debit = json['account_debit'];
+
+				for (let i in account_debit) {
+					html += '	<optgroup label="' + account_debit[i]['text'] + '">';
+
+					if (account_debit[i]['child']) {
+						child = account_debit[i]['child'];
+
+						for (let j in child) {
+							html += '	  <option value="' + child[j]['account_id'] + '">' + child[j]['text'] + '</option>';
+						}
+					}
+
+					html += '	</optgroup>';
+				}
+
+				$('select[name=\'customer_transaction_account_debit_id\']').html(html);
+
+				if (json['lock_credit']) {
+					$('#form-customer-transaction #input-account-credit').slideUp('slow');
+					html = '';
+				} else {
+					$('#form-customer-transaction #input-account-credit').slideDown('slow');
+					html = '<option value=""><?php echo $text_select; ?></option>';
+				}
+
+				account_credit = json['account_credit'];
+				for (let i in account_credit) {
+					html += '	<optgroup label="' + account_credit[i]['text'] + '">';
+
+					if (account_credit[i]['child']) {
+						child = account_credit[i]['child'];
+
+						for (let j in child) {
+							html += '	  <option value="' + child[j]['account_id'] + '">' + child[j]['text'] + '</option>';
+						}
+					}
+
+					html += '	</optgroup>';
+				}
+
+				$('select[name=\'customer_transaction_account_credit_id\']').html(html);
+			},
+
+			error: function (xhr, ajaxOptions, thrownError) {
+				alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+			}
+		});
+	});
+
+	$('select[name=\'customer_transaction_type_id\']').trigger('change');
+
+</script>
+<script type="text/javascript">
 	$('#customer-transaction button[id^=\'button-print\']').on('click', function (e) {
 		const transaction_id = this.value;
 
@@ -246,11 +317,14 @@
 		}
 	});
 
+	let warning_pos = $('#form-customer-transaction').position();
+
 	$('#button-customer-transaction').on('click', function () {
 		let data = {
 			customer_transaction_date: encodeURIComponent($('[name=\'customer_transaction_date\']').val()),
 			customer_transaction_type_id: encodeURIComponent($('[name=\'customer_transaction_type_id\']').val()),
-			customer_transaction_asset_id: encodeURIComponent($('[name=\'customer_transaction_asset_id\']').val()),
+			customer_transaction_account_debit_id: $('[name=\'customer_transaction_account_debit_id\']').val(),
+			customer_transaction_account_credit_id: $('[name=\'customer_transaction_account_credit_id\']').val(),
 			customer_transaction_description: $('[name=\'customer_transaction_description\']').val(),
 			customer_transaction_amount: encodeURIComponent($('[name=\'customer_transaction_amount\']').val())
 		};
@@ -272,7 +346,7 @@
 
 				if (json['error']) {
 					if (json['error']['warning']) {
-						$('#order-customer').before('<div class="alert alert-danger"><i class="fa fa-exclamation-circle"></i> ' + json['error']['warning'] + ' <button type="button" class="close" data-dismiss="alert">&times;</button></div>');
+						$('#form-customer-transaction').before('<div class="alert alert-danger"><i class="fa fa-exclamation-circle"></i> ' + json['error']['warning'] + ' <button type="button" class="close" data-dismiss="alert">&times;</button></div>');
 						$('html, body').animate({ scrollTop: warning_pos.top - 70 }, 500);
 					}
 
@@ -293,10 +367,11 @@
 				}
 
 				if (json['success']) {
-					$('#order-customer').load('index.php?route=sale/customer&token=<?= $token; ?>&order_id=<?= $order_id; ?>');
+					$('#order-customer').load('index.php?route=sale/customer&token=<?= $token; ?>&order_id=<?= $order_id; ?>', function () {
 
-					$('#order-customer').before('<div class="alert alert-success"><i class="fa fa-check-circle"></i> ' + json['success'] + ' <button type="button" class="close" data-dismiss="alert">&times;</button></div>');
-					$('html, body').animate({ scrollTop: warning_pos.top - 70 }, 500);
+						$('#form-customer-transaction').before('<div class="alert alert-success"><i class="fa fa-check-circle"></i> ' + json['success'] + ' <button type="button" class="close" data-dismiss="alert">&times;</button></div>');
+						$('html, body').animate({ scrollTop: warning_pos.top - 70 }, 500);
+					});
 
 					$('input[name^=\'customer_transaction\']').val('');
 				}

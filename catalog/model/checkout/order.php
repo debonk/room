@@ -329,7 +329,13 @@ class ModelCheckoutOrder extends Model
 
 		$this->load->model('accounting/transaction');
 
-		$transaction_total = $this->model_accounting_transaction->getTransactionsTotalByOrderId($order_id, ['client_label' => 'customer']);
+		$summary_data = [
+			'client_label'		=> 'customer',
+			'category_label'	=> 'order',
+			'transaction_label'	=> 'cash'
+		];
+
+		$transaction_total = $this->model_accounting_transaction->getTransactionsTotalByOrderId($order_id, $summary_data);
 
 		foreach ($payment_phase_data as $key => $payment_phase) {
 			// Cek Pembayaran belum lunas
@@ -603,7 +609,7 @@ class ModelCheckoutOrder extends Model
 			# If old order status is the processing or complete status but new status is not then commence restock, and remove coupon, voucher and reward history
 			if (in_array($order_info['order_status_id'], array_merge($this->config->get('config_processing_status'), $this->config->get('config_complete_status'))) && !in_array($order_status_id, array_merge($this->config->get('config_processing_status'), $this->config->get('config_complete_status')))) {
 				# Delete system transaction
-				$this->db->query("DELETE t, ta FROM " . DB_PREFIX . "transaction t, " . DB_PREFIX . "transaction_account ta  WHERE client_label = 'customer' AND category_label = 'order' AND manual_select = 0 AND order_id = '" . (int)$order_id . "' AND client_id = '" . (int)$order_info['customer_id'] . "' AND ta.transaction_id = t.transaction_id");
+				$this->db->query("DELETE t, ta FROM " . DB_PREFIX . "transaction t, " . DB_PREFIX . "transaction_account ta  WHERE client_label = 'customer' AND category_label = 'order' AND transaction_label IN ('initial', 'complete', 'canceled') AND order_id = '" . (int)$order_id . "' AND client_id = '" . (int)$order_info['customer_id'] . "' AND ta.transaction_id = t.transaction_id");
 
 				// Restock
 				$product_query = $this->db->query("SELECT * FROM " . DB_PREFIX . "order_product WHERE order_id = '" . (int)$order_id . "'");

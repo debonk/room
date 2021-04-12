@@ -186,20 +186,30 @@
 								placeholder="<?php echo $entry_sort_order; ?>" id="input-sort-order" class="form-control" />
 						</div>
 					</div>
-          <div class="form-group">
-            <label class="col-sm-2 control-label" for="input-status"><?php echo $entry_status; ?></label>
-            <div class="col-sm-10">
-              <select name="status" id="input-status" class="form-control">
-                <?php if ($status) { ?>
-                <option value="1" selected="selected"><?php echo $text_enabled; ?></option>
-                <option value="0"><?php echo $text_disabled; ?></option>
-                <?php } else { ?>
-                <option value="1"><?php echo $text_enabled; ?></option>
-                <option value="0" selected="selected"><?php echo $text_disabled; ?></option>
-                <?php } ?>
-              </select>
-            </div>
-          </div>
+					<div class="form-group">
+						<label class="col-sm-2 control-label" for="input-status">
+							<?php echo $entry_status; ?>
+						</label>
+						<div class="col-sm-10">
+							<select name="status" id="input-status" class="form-control">
+								<?php if ($status) { ?>
+								<option value="1" selected="selected">
+									<?php echo $text_enabled; ?>
+								</option>
+								<option value="0">
+									<?php echo $text_disabled; ?>
+								</option>
+								<?php } else { ?>
+								<option value="1">
+									<?php echo $text_enabled; ?>
+								</option>
+								<option value="0" selected="selected">
+									<?php echo $text_disabled; ?>
+								</option>
+								<?php } ?>
+							</select>
+						</div>
+					</div>
 					<div class="form-group"></div>
 					<legend>
 						<?php echo $text_account; ?>
@@ -248,21 +258,28 @@
 											<?php echo $text_none; ?>
 										</option>
 										<?php foreach ($accounts as $account) { ?>
-										<optgroup label="<?php echo $account['text']; ?>">
-											<?php if ($account['child']) { ?>
-											<?php foreach ($account['child'] as $child) { ?>
-											<?php if ($child['account_id'] == $transaction_type_account['account_debit_id']) { ?>
-											<option value="<?php echo $child['account_id']; ?>" selected="selected">
-												<?php echo $child['text']; ?>
-											</option>
-											<?php } else { ?>
-											<option value="<?php echo $child['account_id']; ?>">
-												<?php echo $child['text']; ?>
-											</option>
-											<?php } ?>
-											<?php } ?>
-											<?php } ?>
-										</optgroup>
+										<?php if ($account['account_id'] == $transaction_type_account['account_debit_id']) { ?>
+										<option value="<?php echo $account['account_id']; ?>" selected="selected">
+											<?php echo $account['text']; ?>
+										</option>
+										<?php } else { ?>
+										<option value="<?php echo $account['account_id']; ?>">
+											<?php echo $account['text']; ?>
+										</option>
+										<?php } ?>
+										<?php if ($account['child']) { ?>
+										<?php foreach ($account['child'] as $child) { ?>
+										<?php if ($child['account_id'] == $transaction_type_account['account_debit_id']) { ?>
+										<option value="<?php echo $child['account_id']; ?>" selected="selected">&nbsp;&nbsp;&nbsp;
+											<?php echo $child['text']; ?>
+										</option>
+										<?php } else { ?>
+										<option value="<?php echo $child['account_id']; ?>">&nbsp;&nbsp;&nbsp;
+											<?php echo $child['text']; ?>
+										</option>
+										<?php } ?>
+										<?php } ?>
+										<?php } ?>
 										<?php } ?>
 									</select>
 								</td>
@@ -272,21 +289,28 @@
 											<?php echo $text_none; ?>
 										</option>
 										<?php foreach ($accounts as $account) { ?>
-										<optgroup label="<?php echo $account['text']; ?>">
-											<?php if ($account['child']) { ?>
-											<?php foreach ($account['child'] as $child) { ?>
-											<?php if ($child['account_id'] == $transaction_type_account['account_credit_id']) { ?>
-											<option value="<?php echo $child['account_id']; ?>" selected="selected">
-												<?php echo $child['text']; ?>
-											</option>
-											<?php } else { ?>
-											<option value="<?php echo $child['account_id']; ?>">
-												<?php echo $child['text']; ?>
-											</option>
-											<?php } ?>
-											<?php } ?>
-											<?php } ?>
-										</optgroup>
+										<?php if ($account['account_id'] == $transaction_type_account['account_credit_id']) { ?>
+										<option value="<?php echo $account['account_id']; ?>" selected="selected">
+											<?php echo $account['text']; ?>
+										</option>
+										<?php } else { ?>
+										<option value="<?php echo $account['account_id']; ?>">
+											<?php echo $account['text']; ?>
+										</option>
+										<?php } ?>
+										<?php if ($account['child']) { ?>
+										<?php foreach ($account['child'] as $child) { ?>
+										<?php if ($child['account_id'] == $transaction_type_account['account_credit_id']) { ?>
+										<option value="<?php echo $child['account_id']; ?>" selected="selected">&nbsp;&nbsp;&nbsp;
+											<?php echo $child['text']; ?>
+										</option>
+										<?php } else { ?>
+										<option value="<?php echo $child['account_id']; ?>">&nbsp;&nbsp;&nbsp;
+											<?php echo $child['text']; ?>
+										</option>
+										<?php } ?>
+										<?php } ?>
+										<?php } ?>
 										<?php } ?>
 									</select>
 								</td>
@@ -326,15 +350,16 @@
 			html += `  <select name="transaction_type_account[` + row + `][account_debit_id]" class="form-control">
 									<option value="0"><?php echo $text_none; ?></option>
 									<?php foreach ($accounts as $account) { ?>
-									<optgroup label="<?php echo $account['text']; ?>">
-										<?php if ($account['child']) { ?>
-										<?php foreach ($account['child'] as $child) { ?>
-										<option value="<?php echo $child['account_id']; ?>">
-											<?php echo $child['text']; ?>
-										</option>
-										<?php } ?>
-										<?php } ?>
-									</optgroup>
+									<option value="<?php echo $account['account_id']; ?>">
+										<?php echo $account['text']; ?>
+									</option>
+									<?php if ($account['child']) { ?>
+									<?php foreach ($account['child'] as $child) { ?>
+									<option value="<?php echo $child['account_id']; ?>">
+										<?php echo $child['text']; ?>
+									</option>
+									<?php } ?>
+									<?php } ?>
 									<?php } ?>'
 									</select>`;
 			html += '  </td>';
@@ -342,15 +367,16 @@
 			html += `  <select name="transaction_type_account[` + row + `][account_credit_id]" class="form-control">
 									<option value="0"><?php echo $text_none; ?></option>
 									<?php foreach ($accounts as $account) { ?>
-									<optgroup label="<?php echo $account['text']; ?>">
-										<?php if ($account['child']) { ?>
-										<?php foreach ($account['child'] as $child) { ?>
-										<option value="<?php echo $child['account_id']; ?>">
-											<?php echo $child['text']; ?>
-										</option>
-										<?php } ?>
-										<?php } ?>
-									</optgroup>
+									<option value="<?php echo $account['account_id']; ?>">
+										<?php echo $account['text']; ?>
+									</option>
+									<?php if ($account['child']) { ?>
+									<?php foreach ($account['child'] as $child) { ?>
+									<option value="<?php echo $child['account_id']; ?>">
+										<?php echo $child['text']; ?>
+									</option>
+									<?php } ?>
+									<?php } ?>
 									<?php } ?>'
 									</select>`;
 			html += '  </td>';
