@@ -220,7 +220,7 @@
 				</div>
 			</div>
 		</div>
-		<div class="form-group required" id="input-transaction-type">
+		<div class="form-group required">
 			<label class="col-sm-2 control-label" for="input-vendor-transaction-type">
 				<?= $entry_transaction_type; ?>
 			</label>
@@ -295,7 +295,7 @@
 			url: 'index.php?route=sale/vendor/transactionTypeAccounts&token=<?php echo $token; ?>&transaction_type_id=' + transaction_type_id,
 			dataType: 'json',
 			beforeSend: function () {
-				$('#input-transaction-type label').append(' <i class="fa fa-circle-o-notch fa-spin"></i>');
+				$('label[for=\'input-vendor-transaction-type\']').append(' <i class="fa fa-circle-o-notch fa-spin"></i>');
 			},
 			complete: function () {
 				$('.fa-spin').remove();

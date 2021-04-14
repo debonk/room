@@ -173,6 +173,55 @@ class ModelReportTransaction extends Model
 		return $total;
 	}
 
+	public function getTransactionsTotalByAccountId($account_id, $data = [])
+	{
+		$sql = "SELECT SUM(ta.debit) AS debit, SUM(ta.credit) AS credit FROM " . DB_PREFIX . "transaction_account ta LEFT JOIN " . DB_PREFIX . "transaction t ON (t.transaction_id = ta.transaction_id) WHERE ta.account_id = '" . (int)$account_id . "'";
+
+		$implode = array();
+
+		if (!empty($data['filter']['date_start'])) {
+			$implode[] = "DATE(t.date) >= '" . $this->db->escape($data['filter']['date_start']) . "'";
+		}
+
+		if (!empty($data['filter']['date_end'])) {
+			$implode[] = "DATE(t.date) <= '" . $this->db->escape($data['filter']['date_end']) . "'";
+		}
+
+		if ($implode) {
+			$sql .= " AND " . implode(" AND ", $implode);
+		}
+
+		$query = $this->db->query($sql);
+
+		return $query->row;
+	}
+
+	public function getTransactionsTotalByAccountComponent($component, $data = [])
+	{
+		$account_components =  $this->model_accounting_account->getAccountComponents();
+		$types = implode("', '", $account_components[$component]);
+
+		$sql = "SELECT SUM(ta.debit) AS debit, SUM(ta.credit) AS credit FROM " . DB_PREFIX . "transaction_account ta LEFT JOIN " . DB_PREFIX . "account a ON (a.account_id = ta.account_id) LEFT JOIN " . DB_PREFIX . "transaction t ON (t.transaction_id = ta.transaction_id) WHERE a.type IN ('" . $types . "')";
+
+		$implode = array();
+
+		if (!empty($data['filter']['date_start'])) {
+			$implode[] = "DATE(t.date) >= '" . $this->db->escape($data['filter']['date_start']) . "'";
+		}
+
+		if (!empty($data['filter']['date_end'])) {
+			$implode[] = "DATE(t.date) <= '" . $this->db->escape($data['filter']['date_end']) . "'";
+		}
+
+		if ($implode) {
+			$sql .= " AND " . implode(" AND ", $implode);
+		}
+
+		$query = $this->db->query($sql);
+
+		return $query->row;
+	}
+
 // Delete
 	public function getTransactionsTotalPreviousDel($data = [])
 	{

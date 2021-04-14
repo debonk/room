@@ -34,17 +34,9 @@ class ModelAccountingAccount extends Model
 	{
 		$query = $this->db->query("SELECT DISTINCT * FROM " . DB_PREFIX . "account WHERE account_id = '" . (int)$account_id . "'");
 
-		$components = array(
-			'asset' 		=> ['current_asset', 'fixed_asset', 'non_current_asset', 'prepayment'],
-			'equity' 		=> ['equity'],
-			'expense' 		=> ['depreciation', 'direct_cost', 'expense', 'overhead'],
-			'liability' 	=> ['current_liability', 'liability', 'non_current_liability'],
-			'revenue' 		=> ['sale', 'revenue', 'other_income']
-		);
-
 		$account_data = $query->row;
 
-		foreach ($components as $key => $component) {
+		foreach ($this->components as $key => $component) {
 			if (in_array($account_data['type'], $component)) {
 				$account_data['component'] = $key;
 
@@ -64,7 +56,6 @@ class ModelAccountingAccount extends Model
 
 			if (isset($data['filter_parent_id'])) {
 				$implode[] = "account_id LIKE '" . (int)$data['filter_parent_id'] . "%'"; // base menggunakan account_id agar akun itu sendiri termasuk dlm selection
-				// $implode[] = "parent_id = '" . (int)$data['filter_parent_id'] . "'";
 			}
 
 			if (isset($data['filter_status']) && !is_null($data['filter_status'])) {
@@ -74,18 +65,10 @@ class ModelAccountingAccount extends Model
 			if (!empty($data['component']) || !empty($data['filter_type'])) {
 				$types_data = array();
 
-				$components = array(
-					'asset' 		=> ['current_asset', 'fixed_asset', 'non_current_asset', 'prepayment'],
-					'equity' 		=> ['equity'],
-					'expense' 		=> ['depreciation', 'direct_cost', 'expense', 'overhead'],
-					'liability' 	=> ['current_liability', 'liability', 'non_current_liability'],
-					'revenue' 		=> ['sale', 'revenue', 'other_income']
-				);
-
 				if (!empty($data['component'])) {
 					foreach ($data['component'] as $component) {
-						if (in_array($component, array_keys($components))) {
-							$types_data = array_merge($types_data, $components[$component]);
+						if (in_array($component, array_keys($this->components))) {
+							$types_data = array_merge($types_data, $this->components[$component]);
 						}
 					}
 				}
@@ -187,18 +170,10 @@ class ModelAccountingAccount extends Model
 		if (!empty($data['component']) || !empty($data['filter_type'])) {
 			$types_data = array();
 
-			$components = array(
-				'asset' 		=> ['current_asset', 'fixed_asset', 'non_current_asset', 'prepayment'],
-				'equity' 		=> ['equity'],
-				'expense' 		=> ['depreciation', 'direct_cost', 'expense', 'overhead'],
-				'liability' 	=> ['current_liability', 'liability', 'non_current_liability'],
-				'revenue' 		=> ['sale', 'revenue', 'other_income']
-			);
-
 			if (!empty($data['component'])) {
 				foreach ($data['component'] as $component) {
-					if (in_array($component, array_keys($components))) {
-						$types_data = array_merge($types_data, $components[$component]);
+					if (in_array($component, array_keys($this->components))) {
+						$types_data = array_merge($types_data, $this->components[$component]);
 					}
 				}
 			}
@@ -269,6 +244,8 @@ class ModelAccountingAccount extends Model
 		$accounts_data = array();
 		$childs_data = array();
 
+		sort($parent_ids, SORT_NATURAL);
+		
 		foreach ($parent_ids as $parent_id) {
 			$filter_data = array(
 				'filter_parent_id'	=> $parent_id,
@@ -305,5 +282,10 @@ class ModelAccountingAccount extends Model
 		}
 
 		return $accounts_data;
+	}
+
+	public function getAccountComponents()
+	{
+		return $this->components;
 	}
 }

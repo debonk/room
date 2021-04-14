@@ -241,7 +241,7 @@
 			url: 'index.php?route=sale/customer/transactionTypeAccounts&token=<?php echo $token; ?>&transaction_type_id=' + transaction_type_id,
 			dataType: 'json',
 			beforeSend: function () {
-				$('#input-transaction-type label').append(' <i class="fa fa-circle-o-notch fa-spin"></i>');
+				$('label[for=\'input-customer-transaction-type\']').append(' <i class="fa fa-circle-o-notch fa-spin"></i>');
 			},
 			complete: function () {
 				$('.fa-spin').remove();
@@ -307,8 +307,6 @@
 
 	$('select[name=\'customer_transaction_type_id\']').trigger('change');
 
-</script>
-<script type="text/javascript">
 	$('#customer-transaction button[id^=\'button-print\']').on('click', function (e) {
 		const transaction_id = this.value;
 

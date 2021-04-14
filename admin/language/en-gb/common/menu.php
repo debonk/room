@@ -1,9 +1,9 @@
 <?php
 // Text
 $_['text_account']                     = 'Accounts';
+$_['text_account_transaction']         = 'Account Transactions';
 $_['text_accounting']                  = 'Accountings';
 $_['text_affiliate_activity']          = 'Affiliate Activity';
-$_['text_affiliate']                   = 'Affiliates';
 $_['text_affiliate']                   = 'Affiliates';
 $_['text_analytics']                   = 'Analytics';
 $_['text_api']                         = 'API';
@@ -16,6 +16,7 @@ $_['text_captcha']                     = 'Captcha';
 $_['text_catalog']                     = 'Catalog';
 $_['text_category']                    = 'Categories';
 $_['text_ceremony']                    = 'Ceremonies';
+$_['text_coa']                     	   = 'Chart Of Accounts';
 $_['text_contact']                     = 'Mail';
 $_['text_country']                     = 'Countries';
 $_['text_coupon']                      = 'Coupons';
@@ -92,6 +93,7 @@ $_['text_shipping']                    = 'Shipping';
 $_['text_supplier']                    = 'Suppliers/Vendors';
 $_['text_slot']                    	   = 'Session Slots';
 $_['text_stock_status']                = 'Stock Statuses';
+$_['text_store']                	   = 'Setting';
 $_['text_system']                      = 'System';
 $_['text_tax_class']                   = 'Tax Classes';
 $_['text_tax_rate']                    = 'Tax Rates';

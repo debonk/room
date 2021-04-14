@@ -321,7 +321,7 @@ class ControllerAccountingExpense extends Controller {
 				'description'		=> $result['description'],
 				'reference'  		=> $reference,
 				'customer_name'		=> $result['customer_name'],
-				'amount'      		=> $this->currency->format($result['amount'], $this->config->get('config_currency')),
+				'amount'      		=> $this->currency->format(-$result['amount'], $this->config->get('config_currency')),
 				'username'      	=> $result['username'],
 				'order_url'     	=> $order_url,
 				'edit'          	=> $this->url->link('accounting/expense/edit', 'token=' . $this->session->data['token'] . '&transaction_id=' . $result['transaction_id'] . $url, true)
@@ -379,7 +379,7 @@ class ControllerAccountingExpense extends Controller {
 		$data['sort'] = $sort;
 		$data['order'] = $order;
 		
-		$data['total'] = $this->currency->format($transaction_total, $this->config->get('config_currency'));
+		$data['total'] = $this->currency->format(-$transaction_total, $this->config->get('config_currency'));
 
 		$data['header'] = $this->load->controller('common/header');
 		$data['column_left'] = $this->load->controller('common/column_left');

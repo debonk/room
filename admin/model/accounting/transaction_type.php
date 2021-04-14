@@ -214,7 +214,7 @@ class ModelAccountingTransactionType extends Model
 
 	public function getAccountsType()
 	{
-		$type_data = [];
+		$account_type_data = [];
 
 		foreach ($this->type_data as $type_data) {
 			$account_type_data[] = [

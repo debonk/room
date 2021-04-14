@@ -1,8 +1,6 @@
 <?php
 class ControllerReportCoa extends Controller
 {
-	// private $error = array();
-
 	private $filter_items = [
 		'component',
 		'year'
@@ -45,9 +43,11 @@ class ControllerReportCoa extends Controller
 
 		if (is_null($filter['component'])) {
 			$filter['component'] = 'asset';
+		} elseif ($filter['component'] == '*') {
+			$filter['component'] = '';
 		}
 
-		if (is_null($filter['year'])) {
+		if (empty($filter['year'])) {
 			$filter['year'] = date('Y');
 		}
 
@@ -95,11 +95,12 @@ class ControllerReportCoa extends Controller
 		$language_items = array(
 			'text_total',
 			'text_no_results',
-			'column_date',
 			'column_account_id',
 			'column_name',
 			'column_type',
-			'column_total'
+			'column_debit',
+			'column_credit',
+			'column_balance'
 		);
 		foreach ($language_items as $language_item) {
 			$data[$language_item] = $this->language->get($language_item);
@@ -111,23 +112,25 @@ class ControllerReportCoa extends Controller
 
 		if (is_null($filter['component'])) {
 			$filter['component'] = 'asset';
+		} elseif ($filter['component'] == '*') {
+			$filter['component'] = '';
 		}
 
-		if (is_null($filter['year'])) {
+		if (empty($filter['year'])) {
 			$filter['year'] = date('Y');
 		}
 
-		// if (isset($this->request->get['page'])) {
-		// 	$page = $this->request->get['page'];
-		// } else {
-		// 	$page = 1;
-		// }
+		if (isset($this->request->get['page'])) {
+			$page = $this->request->get['page'];
+		} else {
+			$page = 1;
+		}
 
 		$url = $this->urlFilter();
 
-		// if (isset($this->request->get['page'])) {
-		// 	$url .= '&page=' . $this->request->get['page'];
-		// }
+		if (isset($this->request->get['page'])) {
+			$url .= '&page=' . $this->request->get['page'];
+		}
 
 		$data['breadcrumbs'] = array();
 
@@ -142,91 +145,108 @@ class ControllerReportCoa extends Controller
 		);
 
 		$data['accounts'] = array();
-		// $limit = 20;
 
 		$filter['date_start'] = date('Y-m-d', strtotime($filter['year'] . '-01-01'));
 		$filter['date_end'] = date('Y-m-d', strtotime($filter['year'] . '-12-31'));
 
-		$filter_data = array(
-			'filter'	=> $filter
-		);
+		$limit = $this->config->get('config_limit_admin');
 
-		$results = $this->model_report_transaction->getTransactions($filter_data);
+		$filter_data = [
+			'component'	=> $filter['component'] ? [$filter['component']] : null,
+			'filter'	=> $filter,
+			'sort'		=> 'account_id',
+			'start'     => ($page - 1) * $limit,
+			'limit'     => $limit
+		];
 
-		var_dump($results);die('---breakpoint---');
+		$result_count = $this->model_accounting_account->getAccountsCount($filter_data);
+		$results = $this->model_accounting_account->getAccounts($filter_data);
 
-
-		// $transaction_count = $this->model_report_transaction->getTransactionsCount($filter_data);
-		
-		// $balance_end = $this->model_report_transaction->getBalanceEnd($filter_data);
-		
-		// $balance = $balance_end;
-
-		$total_debit = 0;
-		$total_credit = 0;
-
-
-		// $results = $this->model_accounting_account->getAccountsMenuByComponent([$filter['component']]);
-
+		$account_components =  $this->model_accounting_account->getAccountComponents();
 
 		foreach ($results as $result) {
-			if (!empty($result['order_id'])) {
-				$reference = '#' . $result['order_id'] . ($result['reference_no'] ? ': ' . $result['reference'] : '');
-			} else {
-				$reference = $result['reference'];
-			}
-
-			$account_data = [];
-
-			$transaction_accounts = $this->model_report_transaction->getTransactionAccounts($result['transaction_id']);
-			foreach ($transaction_accounts as $transaction_account) {
-				if ($transaction_account['account_id'] != $filter['account_id']) {
-					$account_data[] = $transaction_account['account_id'] . ' - ' . $transaction_account['account'];
+			foreach ($account_components as $key => $types) {
+				if (in_array($result['type'], $types)) {
+					$component = $key;
 				}
 			}
 
-			if (empty($account_data)) {
-				$account_data[] = $this->language->get('text_none');
+			$child_count = $this->model_accounting_account->getAccountsCount(['filter_parent_id' => $result['account_id']]);
+
+			if ($child_count == 1) {
+				$header_status = false;
+
+				if ($component == 'expense' || $component == 'revenue') {
+					$transaction_total = $this->model_report_transaction->getTransactionsTotalByAccountId($result['account_id'], $filter_data);
+				} else {
+					$transaction_total = $this->model_report_transaction->getTransactionsTotalByAccountId($result['account_id']);
+				}
+
+				if ($component == 'asset' || $component == 'expense') {
+					$balance = $transaction_total['debit'] - $transaction_total['credit'];
+				} else {
+					$balance = $transaction_total['credit'] - $transaction_total['debit'];
+				}
+			} else {
+				$header_status = true;
+
+				$transaction_total = [
+					'debit'		=> 0,
+					'credit'	=> 0
+				];
+
+				$balance = 0;
 			}
 
-			$data['transactions'][] = array(
-				'transaction_id'	=> $result['transaction_id'],
-				'date'	 			=> date($this->language->get('date_format_short'), strtotime($result['date'])),
-				'transaction_type'	=> $result['transaction_type'],
-				'reference' 		=> $reference,
-				'description'		=> $result['customer_name'] . ($result['customer_name'] && $result['description'] ? ' - ' : '') . $result['description'],
-				'customer_name'		=> $result['customer_name'],
-				'account'			=> $account_data,
-				'debit'      		=> $this->currency->format($result['debit'], $this->config->get('config_currency')),
-				'credit'      		=> $this->currency->format($result['credit'], $this->config->get('config_currency')),
-				'balance'      		=> $this->currency->format($balance, $this->config->get('config_currency')),
-				'href'         		=> $this->url->link('accounting/transaction/edit', 'token=' . $this->session->data['token'] . '&transaction_id=' . $result['transaction_id'] . $url, true),
+			if ($result['retained_earnings']) {
+				$revenue_total = $this->model_report_transaction->getTransactionsTotalByAccountComponent('revenue');
+				$expense_total = $this->model_report_transaction->getTransactionsTotalByAccountComponent('expense');
+
+				$transaction_total = [
+					'debit'		=> $revenue_total['debit'] + $expense_total['debit'],
+					'credit'	=> $revenue_total['credit'] + $expense_total['credit']
+				];
+
+				$balance = $transaction_total['credit'] - $transaction_total['debit'];
+			}
+
+			$data['accounts'][$component][] = array(
+				'account_id'	=> $result['account_id'],
+				'name'			=> $result['name'],
+				'type'			=> $this->language->get('text_' . $result['type']),
+				'header_status'	=> $header_status,
+				'debit'      	=> $this->currency->format($transaction_total['debit'], $this->config->get('config_currency')),
+				'credit'      	=> $this->currency->format($transaction_total['credit'], $this->config->get('config_currency')),
+				'balance'      	=> $this->currency->format($balance, $this->config->get('config_currency')),
+				// 'href'         	=> $this->url->link('accounting/transaction/edit', 'token=' . $this->session->data['token'] . '&transaction_id=' . $result['transaction_id'] . $url, true),
 			);
+		}
 
-			$balance -= $result['debit'] - $result['credit'];
-
-			$total_debit += $result['debit'];
-			$total_credit += $result['credit'];
+		foreach (array_keys($data['accounts']) as $key) {
+			if ($key == 'expense' || $key == 'revenue') {
+				$text = $this->language->get('text_' . $key) . ' (' . $filter['year'] . ')';
+			} else {
+				$text = $this->language->get('text_' . $key);
+			}
+			$data['components'][] = [
+				'code'	=> $key,
+				'text'	=> strtoupper($text)
+			];
 		}
 
 		$url = $this->urlFilter();
 
 		$pagination = new Pagination();
-		$pagination->total = $transaction_count;
+		$pagination->total = $result_count;
 		$pagination->page = $page;
 		$pagination->limit = $limit;
 		$pagination->url = $this->url->link('report/coa/report', 'token=' . $this->session->data['token'] . $url . '&page={page}', true);
 
 		$data['pagination'] = $pagination->render();
 
-		$data['results'] = sprintf($this->language->get('text_pagination'), ($transaction_count) ? (($page - 1) * $limit) + 1 : 0, ((($page - 1) * $limit) > ($transaction_count - $limit)) ? $transaction_count : ((($page - 1) * $limit) + $limit), $transaction_count, ceil($transaction_count / $limit));
+		$data['results'] = sprintf($this->language->get('text_pagination'), ($result_count) ? (($page - 1) * $limit) + 1 : 0, ((($page - 1) * $limit) > ($result_count - $limit)) ? $result_count : ((($page - 1) * $limit) + $limit), $result_count, ceil($result_count / $limit));
 
 		$data['filter'] = $filter;
-
-		$data['balance_end'] = $this->currency->format($balance_end, $this->config->get('config_currency'));
-		$data['balance_start'] = $this->currency->format($balance, $this->config->get('config_currency'));
-		$data['total_debit'] = $this->currency->format($total_debit, $this->config->get('config_currency'));
-		$data['total_credit'] = $this->currency->format($total_credit, $this->config->get('config_currency'));
 
 		$this->response->setOutput($this->load->view('report/coa_info', $data));
 	}

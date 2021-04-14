@@ -2402,14 +2402,16 @@ class ControllerSaleOrder extends Controller
 
 			$filter_data = array(
 				'client_label'		=> 'customer',
-				'category_label'	=> 'order'
+				'category_label'	=> 'order',
+				'transaction_label'	=> 'cash'
 			);
 
 			$transactions_total['order'] = $this->model_accounting_transaction->getTransactionsTotalByOrderId($order_id, $filter_data);
 
 			$filter_data = array(
 				'client_label'		=> 'customer',
-				'category_label'	=> 'deposit'
+				'category_label'	=> 'deposit',
+				'transaction_label'	=> 'cash'
 			);
 
 			$transactions_total['deposit'] = $this->model_accounting_transaction->getTransactionsTotalByOrderId($order_id, $filter_data);

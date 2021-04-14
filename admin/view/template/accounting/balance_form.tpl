@@ -166,7 +166,7 @@
 				url: 'index.php?route=accounting/balance/transactionTypeAccounts&token=<?php echo $token; ?>&transaction_type_id=' + transaction_type_id,
 				dataType: 'json',
 				beforeSend: function () {
-					$('select[name=\'transaction_type_id\']').after(' <i class="fa fa-circle-o-notch fa-spin"></i>');
+					$('label[for=\'input-transaction-type\']').append(' <i class="fa fa-circle-o-notch fa-spin"></i>');
 				},
 				complete: function () {
 					$('.fa-spin').remove();
