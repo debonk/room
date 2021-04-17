@@ -221,38 +221,4 @@ class ModelReportTransaction extends Model
 
 		return $query->row;
 	}
-
-// Delete
-	public function getTransactionsTotalPreviousDel($data = [])
-	{
-		if (!empty($data['filter']['date_start'])) {
-			$sql = "SELECT SUM(ta.debit) AS debit, SUM(ta.credit) AS credit FROM " . DB_PREFIX . "transaction_account ta LEFT JOIN " . DB_PREFIX . "transaction t ON (t.transaction_id = ta.transaction_id) WHERE t.date < '" . $this->db->escape($data['filter']['date_start']) . "'";
-
-			$sql .= " AND ta.account_id = '" . (int)$data['filter']['account_id'] . "'";
-
-			$sql .= " GROUP BY t.transaction_label";
-
-			$query = $this->db->query($sql);
-
-			if ($query->row) {
-				$total = $query->row['debit'] - $query->row['credit'];
-			} else {
-				$total = 0;
-			}
-
-			if (isset($data['start']) && $data['start'] > 0) {
-				$data['limit'] = $data['start'];
-
-				$data['start'] = 0;
-
-				$subtotal = $this->getTransactionsSubTotal($data);
-
-				$total += $subtotal;
-			}
-		} else {
-			$total = 0;
-		}
-
-		return $total;
-	}
 }

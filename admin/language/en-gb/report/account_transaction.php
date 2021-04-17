@@ -3,6 +3,7 @@
 $_['heading_title']     		= 'Laporan Transaksi Akun';
 
 // Text		
+$_['text_subtotal']     		= 'Subtotal <cite>(halaman ini)</cite>';
 $_['text_total']     			= 'Total';
 $_['text_list']         		= 'Daftar Transaksi';
 

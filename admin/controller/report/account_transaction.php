@@ -74,6 +74,7 @@ class ControllerReportAccountTransaction extends Controller
 		$this->load->model('report/transaction');
 
 		$language_items = array(
+			'text_subtotal',
 			'text_total',
 			'text_no_results',
 			'column_date',
@@ -94,12 +95,6 @@ class ControllerReportAccountTransaction extends Controller
 			$page = $this->request->get['page'];
 		} else {
 			$page = 1;
-		}
-
-		$url = $this->urlFilter();
-
-		if (isset($this->request->get['page'])) {
-			$url .= '&page=' . $this->request->get['page'];
 		}
 
 		$data['breadcrumbs'] = array();
@@ -124,9 +119,12 @@ class ControllerReportAccountTransaction extends Controller
 		);
 
 		$transaction_count = $this->model_report_transaction->getTransactionsCount($filter_data);
+		$transaction_total = $this->model_report_transaction->getTransactionsTotal($filter_data);
 		
-		$total_debit = 0;
-		$total_credit = 0;
+		$subtotal = [
+			'debit'		=> 0,
+			'credit'	=> 0
+			];
 
 		$results = $this->model_report_transaction->getTransactions($filter_data);
 
@@ -146,13 +144,13 @@ class ControllerReportAccountTransaction extends Controller
 				'customer_name'		=> $result['customer_name'],
 				'debit'      		=> $this->currency->format($result['debit'], $this->config->get('config_currency')),
 				'credit'      		=> $this->currency->format($result['credit'], $this->config->get('config_currency')),
-				'href'         		=> $this->url->link('accounting/transaction/edit', 'token=' . $this->session->data['token'] . '&transaction_id=' . $result['transaction_id'] . $url, true),
+				'href'         		=> $this->url->link('accounting/transaction/edit', 'token=' . $this->session->data['token'] . '&transaction_id=' . $result['transaction_id'], true),
 			);
 
-			$total_debit += $result['debit'];
-			$total_credit += $result['credit'];
+			$subtotal['debit'] += $result['debit'];
+			$subtotal['credit'] += $result['credit'];
 		}
-
+		
 		$url = $this->urlFilter();
 
 		$pagination = new Pagination();
@@ -167,8 +165,10 @@ class ControllerReportAccountTransaction extends Controller
 
 		$data['filter'] = $filter;
 
-		$data['total_debit'] = $this->currency->format($total_debit, $this->config->get('config_currency'));
-		$data['total_credit'] = $this->currency->format($total_credit, $this->config->get('config_currency'));
+		$data['subtotal_debit'] = $this->currency->format($subtotal['debit'], $this->config->get('config_currency'));
+		$data['subtotal_credit'] = $this->currency->format($subtotal['credit'], $this->config->get('config_currency'));
+		$data['total_debit'] = $this->currency->format($transaction_total['debit'], $this->config->get('config_currency'));
+		$data['total_credit'] = $this->currency->format($transaction_total['credit'], $this->config->get('config_currency'));
 
 		$this->response->setOutput($this->load->view('report/account_transaction_info', $data));
 	}

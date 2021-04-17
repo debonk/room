@@ -37,6 +37,8 @@ class ControllerReportCoa extends Controller
 			$data[$language_item] = $this->language->get($language_item);
 		}
 
+		$filter = [];
+
 		foreach ($this->filter_items as $filter_item) {
 			$filter[$filter_item] = isset($this->request->get['filter_' . $filter_item]) ? $this->request->get['filter_' . $filter_item] : null;
 		}
@@ -106,6 +108,8 @@ class ControllerReportCoa extends Controller
 			$data[$language_item] = $this->language->get($language_item);
 		}
 
+		$filter = [];
+
 		foreach ($this->filter_items as $filter_item) {
 			$filter[$filter_item] = isset($this->request->get['filter_' . $filter_item]) ? $this->request->get['filter_' . $filter_item] : null;
 		}
@@ -126,34 +130,30 @@ class ControllerReportCoa extends Controller
 			$page = 1;
 		}
 
-		$url = $this->urlFilter();
-
-		if (isset($this->request->get['page'])) {
-			$url .= '&page=' . $this->request->get['page'];
-		}
-
-		$data['breadcrumbs'] = array();
-
-		$data['breadcrumbs'][] = array(
-			'text' => $this->language->get('text_home'),
-			'href' => $this->url->link('common/dashboard', 'token=' . $this->session->data['token'], true)
-		);
-
-		$data['breadcrumbs'][] = array(
-			'text' => $this->language->get('heading_title'),
-			'href' => $this->url->link('report/coa', 'token=' . $this->session->data['token'], true)
-		);
-
 		$data['accounts'] = array();
 
-		$filter['date_start'] = date('Y-m-d', strtotime($filter['year'] . '-01-01'));
-		$filter['date_end'] = date('Y-m-d', strtotime($filter['year'] . '-12-31'));
+		$filter_restricted = [
+			'filter' => [
+				'date_start' 	=> date('Y-m-d', strtotime($filter['year'] . '-01-01')),
+				'date_end' 		=> date('Y-m-d', strtotime($filter['year'] . '-12-31'))
+			]
+		];
 
+		$url_restricted = '&filter_date_start=' . $filter_restricted['filter']['date_start'] . '&filter_date_end=' . $filter_restricted['filter']['date_end'];
+		
+		$filter_unrestricted = [
+			'filter' => [
+				'date_start' 	=> false,
+				'date_end' 		=> date('Y-m-d', strtotime($filter['year'] . '-12-31'))
+			]
+		];
+
+		$url_unrestricted = '&filter_date_end=' . $filter_restricted['filter']['date_end'];
+		
 		$limit = $this->config->get('config_limit_admin');
 
 		$filter_data = [
 			'component'	=> $filter['component'] ? [$filter['component']] : null,
-			'filter'	=> $filter,
 			'sort'		=> 'account_id',
 			'start'     => ($page - 1) * $limit,
 			'limit'     => $limit
@@ -177,9 +177,11 @@ class ControllerReportCoa extends Controller
 				$header_status = false;
 
 				if ($component == 'expense' || $component == 'revenue') {
-					$transaction_total = $this->model_report_transaction->getTransactionsTotalByAccountId($result['account_id'], $filter_data);
+					$transaction_total = $this->model_report_transaction->getTransactionsTotalByAccountId($result['account_id'], $filter_restricted);
+					$href = $this->url->link('report/account_transaction', 'token=' . $this->session->data['token'] . '&filter_account_id=' . $result['account_id'] . $url_restricted, true);
 				} else {
-					$transaction_total = $this->model_report_transaction->getTransactionsTotalByAccountId($result['account_id']);
+					$transaction_total = $this->model_report_transaction->getTransactionsTotalByAccountId($result['account_id'], $filter_unrestricted);
+					$href = $this->url->link('report/account_transaction', 'token=' . $this->session->data['token'] . '&filter_account_id=' . $result['account_id'] . $url_unrestricted, true);
 				}
 
 				if ($component == 'asset' || $component == 'expense') {
@@ -196,11 +198,13 @@ class ControllerReportCoa extends Controller
 				];
 
 				$balance = 0;
+				
+				$href = '';
 			}
 
 			if ($result['retained_earnings']) {
-				$revenue_total = $this->model_report_transaction->getTransactionsTotalByAccountComponent('revenue');
-				$expense_total = $this->model_report_transaction->getTransactionsTotalByAccountComponent('expense');
+				$revenue_total = $this->model_report_transaction->getTransactionsTotalByAccountComponent('revenue', $filter_unrestricted);
+				$expense_total = $this->model_report_transaction->getTransactionsTotalByAccountComponent('expense', $filter_unrestricted);
 
 				$transaction_total = [
 					'debit'		=> $revenue_total['debit'] + $expense_total['debit'],
@@ -208,6 +212,8 @@ class ControllerReportCoa extends Controller
 				];
 
 				$balance = $transaction_total['credit'] - $transaction_total['debit'];
+
+				$href = '';
 			}
 
 			$data['accounts'][$component][] = array(
@@ -218,19 +224,19 @@ class ControllerReportCoa extends Controller
 				'debit'      	=> $this->currency->format($transaction_total['debit'], $this->config->get('config_currency')),
 				'credit'      	=> $this->currency->format($transaction_total['credit'], $this->config->get('config_currency')),
 				'balance'      	=> $this->currency->format($balance, $this->config->get('config_currency')),
-				// 'href'         	=> $this->url->link('accounting/transaction/edit', 'token=' . $this->session->data['token'] . '&transaction_id=' . $result['transaction_id'] . $url, true),
+				'href'         	=> $href
 			);
 		}
 
 		foreach (array_keys($data['accounts']) as $key) {
 			if ($key == 'expense' || $key == 'revenue') {
-				$text = $this->language->get('text_' . $key) . ' (' . $filter['year'] . ')';
+				$text = $filter['year'];
 			} else {
-				$text = $this->language->get('text_' . $key);
+				$text = sprintf($this->language->get('text_cumulative'), $filter['year']);
 			}
 			$data['components'][] = [
 				'code'	=> $key,
-				'text'	=> strtoupper($text)
+				'text'	=> strtoupper($this->language->get('text_' . $key)) . ' (' . $text . ')'
 			];
 		}
 

@@ -44,7 +44,7 @@ class ControllerCommonMenu extends Controller
 				'product'		=> ['report/product_viewed', 'report/product_purchased'],
 				'customer'		=> ['report/customer_online', 'report/customer_activity', 'report/customer_order', 'report/customer_reward', 'report/customer_credit'],
 				'marketing'		=> ['report/marketing', 'report/affiliate', 'report/affiliate_activity'],
-				'accounting'	=> ['report/coa', 'report/transaction_balance', 'report/account_transaction'],
+				'accounting'	=> ['report/coa', 'report/transaction_balance', 'report/account_transaction', 'report/sci', 'report/sfp'],
 			],
 			'extension'		=> ['extension/installer', 'extension/modification', 'extension/theme', 'extension/analytics', 'extension/captcha', 'extension/feed', 'extension/fraud', 'extension/module', 'extension/payment', 'extension/shipping', 'extension/total'],
 			'themecontrol'	=> ['module/themecontrol', 'module/pavmegamenu', 'module/pavblog', 'module/pavnewsletter'],

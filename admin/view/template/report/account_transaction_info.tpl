@@ -28,6 +28,11 @@
     </tbody>
     <tfoot>
       <tr class="info">
+        <td class="text-right" colspan="3"><?php echo $text_subtotal; ?></td>
+        <td class="text-right"><cite><?php echo $subtotal_debit; ?></cite></td>
+        <td class="text-right"><cite><?php echo $subtotal_credit; ?></cite></td>
+      </tr>
+      <tr class="info">
         <td class="text-right" colspan="3"><?php echo $text_total; ?></td>
         <td class="text-right"><cite><?php echo $total_debit; ?></cite></td>
         <td class="text-right"><cite><?php echo $total_credit; ?></cite></td>

@@ -196,11 +196,6 @@ class ModelAccountingAccount extends Model
 		return $query->row['total'];
 	}
 
-	public function getMainComponents()
-	{
-		return array_keys($this->components);
-	}
-
 	public function getAccountsMenuByComponent($component = [], $type = [])
 	{
 		$accounts_data = array();
@@ -282,6 +277,11 @@ class ModelAccountingAccount extends Model
 		}
 
 		return $accounts_data;
+	}
+
+	public function getMainComponents()
+	{
+		return array_keys($this->components);
 	}
 
 	public function getAccountComponents()

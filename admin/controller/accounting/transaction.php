@@ -586,14 +586,14 @@ class ControllerAccountingTransaction extends Controller
 					break;
 				}
 
-				if (isset($this->request->get['transaction_id'])) {
-					$transaction_info = $this->model_accounting_transaction->getTransaction($this->request->get['transaction_id']);
+				// if (isset($this->request->get['transaction_id'])) {
+				// 	$transaction_info = $this->model_accounting_transaction->getTransaction($this->request->get['transaction_id']);
 
-					if ($transaction_info['printed']) {
-						$this->error['warning'] = $this->language->get('error_printed');
+				// 	if ($transaction_info['printed']) {
+				// 		$this->error['warning'] = $this->language->get('error_printed');
 
-						break;
-					}
+				// 		break;
+				// 	}
 
 					# Aktifkan jika edit transaksi tidak diijinkan setelah status complete
 					/* 					if ($transaction_info['order_id']) {
@@ -606,7 +606,7 @@ class ControllerAccountingTransaction extends Controller
 							break;
 						}
 					} */
-				}
+				// }
 
 			default:
 				break;

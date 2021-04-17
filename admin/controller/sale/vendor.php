@@ -417,7 +417,20 @@ class ControllerSaleVendor extends Controller
 
 					break;
 
+				case 'tax':
+					$reference_prefix = 'T' . date('ym');
+
+					$last_reference_no = $this->model_accounting_transaction->getLastReferenceNo($reference_prefix);
+					$reference_no = $last_reference_no + 1;
+
+					break;
+
 				default:
+					$reference_prefix = 'X' . date('ym');
+
+					$last_reference_no = $this->model_accounting_transaction->getLastReferenceNo($reference_prefix);
+					$reference_no = $last_reference_no + 1;
+
 					break;
 			}
 
@@ -429,7 +442,6 @@ class ControllerSaleVendor extends Controller
 				} else {
 					$payment_method = $account_credit_info['account_id'] . ' - ' . $account_credit_info['name'];
 				}
-
 			} else {
 				$payment_method = '';
 			}

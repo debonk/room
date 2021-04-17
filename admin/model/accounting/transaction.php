@@ -3,7 +3,7 @@ class ModelAccountingTransaction extends Model
 {
 	private $client_data = ['system', 'customer', 'vendor', 'supplier', 'finance'];
 	private $category_data = ['order', 'deposit', 'purchase', 'expense', 'asset'];
-	private $transaction_data = ['initial', 'discount', 'cash', 'complete', 'canceled', 'charged'];
+	private $transaction_data = ['initial', 'discount', 'cash', 'complete', 'canceled', 'charged', 'tax'];
 	private $type_data = ['D', 'C'];
 
 	public function addTransaction($data)
@@ -496,35 +496,6 @@ class ModelAccountingTransaction extends Model
 		return $query->row['total'];
 	}
 
-	public function getTransactionsTotalPrevious($data = array())
-	{
-		if (!empty($data['filter_date_start'])) {
-			$sql = "SELECT SUM(amount) AS total FROM " . DB_PREFIX . "transaction WHERE DATE(date) < '" . $this->db->escape($data['filter_date_start']) . "'";
-
-			if (!empty($data['filter_payment_method'])) {
-				$sql .= " AND payment_method = '" . $this->db->escape($data['filter_payment_method']) . "'";
-			}
-
-			$query = $this->db->query($sql);
-
-			$total = $query->row['total'];
-		} else {
-			$total = 0;
-		}
-
-		if (isset($data['start']) && $data['start'] > 0) {
-			$data['limit'] = $data['start'];
-
-			$data['start'] = 0;
-
-			$subtotal = $this->getTransactionsSubTotal($data);
-
-			$total += $subtotal;
-		}
-
-		return $total;
-	}
-
 	public function getLastReferenceNo($reference_prefix)
 	{
 		$sql = "SELECT MAX(reference_no) AS total FROM `" . DB_PREFIX . "transaction` WHERE reference_prefix = '" . $this->db->escape($reference_prefix) . "'";
@@ -533,71 +504,6 @@ class ModelAccountingTransaction extends Model
 
 		return $query->row['total'];
 	}
-
-	//Cek apakah masih digunakan
-	public function getTransactionsByOrderId($order_id, $data = array())
-	{
-		$sql = "SELECT t.*, CONCAT(t.reference_prefix, LPAD(t.reference_no, 4, '0')) AS reference, tt.name AS transaction_type, u.username FROM " . DB_PREFIX . "transaction t LEFT JOIN " . DB_PREFIX . "transaction_type tt ON (tt.transaction_type_id = t.transaction_type_id) LEFT JOIN " . DB_PREFIX . "user u ON (u.user_id = t.user_id) WHERE order_id = '" . (int)$order_id . "'";
-
-		if (!empty($data['label'])) {
-			$sql .= " AND t.label = '" . $this->db->escape($data['label']) . "'";
-
-			if (!empty($data['label_id'])) {
-				$sql .= " AND t.label_id = '" . (int)$data['label_id'] . "'";
-			}
-		}
-
-		//Cek cara sort yg dibutuhkan pada account > balance
-		$sort_data = array(
-			't.order_id',
-			't.date',
-			't.date DESC, t.transaction_id'
-		);
-
-		if (isset($data['sort']) && in_array($data['sort'], $sort_data)) {
-			$sql .= " ORDER BY " . $data['sort'];
-		} else {
-			$sql .= " ORDER BY t.date DESC, t.transaction_id";
-		}
-
-		if (isset($data['order']) && ($data['order'] == 'ASC')) {
-			$sql .= " ASC";
-		} else {
-			$sql .= " DESC";
-		}
-
-		if (isset($data['start']) || isset($data['limit'])) {
-			if ($data['start'] < 0) {
-				$data['start'] = 0;
-			}
-
-			if ($data['limit'] < 1) {
-				$data['limit'] = 10;
-			}
-
-			$sql .= " LIMIT " . (int)$data['start'] . "," . (int)$data['limit'];
-		}
-
-		$query = $this->db->query($sql);
-
-		return $query->rows;
-	}
-
-	// public function getTransactionsCountByOrderId($order_id, $data = array()) {
-	// 	$sql = "SELECT COUNT(*) AS total FROM " . DB_PREFIX . "transaction WHERE order_id = '" . (int)$order_id . "'";
-
-	// 	if (!empty($data['label'])) {
-	// 		$sql .= " AND label = '" . $this->db->escape($data['label']) . "'";
-
-	// 		if (!empty($data['label_id'])) {
-	// 			$sql .= " AND label_id = '" . (int)$data['label_id'] . "'";
-	// 		}
-	// 	}
-
-	// 	$query = $this->db->query($sql);
-
-	// 	return $query->row['total'];
-	// }
 
 	public function getTransactionByTransactionTypeId($transaction_type_id, $data = [])
 	{
@@ -616,26 +522,9 @@ class ModelAccountingTransaction extends Model
 		return $query->row;
 	}
 
-	//Unused
-	public function getTransactionsByTransactionTypeId($transaction_type_id)
-	{
-		$query = $this->db->query("SELECT DISTINCT t.*, CONCAT(t.reference_prefix, LPAD(t.reference_no, 4, '0')) AS reference, tt.name AS transaction_type FROM " . DB_PREFIX . "transaction t LEFT JOIN " . DB_PREFIX . "transaction_type tt ON (tt.transaction_type_id = t.transaction_type_id) WHERE t.transaction_type_id = '" . (int)$transaction_type_id . "'");
-
-		return $query->rows;
-	}
-
 	public function getTransactionsCountByTransactionTypeId($transaction_type_id)
 	{ //Used by Transaction Type
 		$sql = "SELECT COUNT(*) AS total FROM " . DB_PREFIX . "transaction WHERE transaction_type_id = '" . (int)$transaction_type_id . "'";
-
-		$query = $this->db->query($sql);
-
-		return $query->row['total'];
-	}
-
-	public function getTransactionsCountByVendorId($vendor_id)
-	{ //Used by Vendor
-		$sql = "SELECT COUNT(*) AS total FROM " . DB_PREFIX . "transaction WHERE label = 'vendor' AND label_id = '" . (int)$vendor_id . "'";
 
 		$query = $this->db->query($sql);
 
@@ -651,8 +540,9 @@ class ModelAccountingTransaction extends Model
 		return $query->row['total'];
 	}
 
+	//Cek apakah masih digunakan
 	public function getTransactionsByLabel($label, $label_id = 0, $start = 0, $limit = 10)
-	{ //Used by Vendor
+	{ //Used by purchase/supplier
 		$label_data = array(
 			'supplier',
 			'vendor',
@@ -684,22 +574,12 @@ class ModelAccountingTransaction extends Model
 		return $query->rows;
 	}
 
-	public function getTransactionsCountByLabel($label, $label_id = 0)
-	{ //Used by Vendor
-		$label_data = array(
-			'supplier',
-			'vendor',
-			'customer'
-		);
+	public function getTransactionsCountByClientLabel($client_label, $client_id = 0)
+	{ //Used by vendor
+		$sql = "SELECT COUNT(*) AS total FROM " . DB_PREFIX . "transaction WHERE client_label = '" . $this->db->escape($client_label) . "'";
 
-		if (!isset($label) || !in_array($label, $label_data)) {
-			$label = '';
-		}
-
-		$sql = "SELECT COUNT(*) AS total FROM " . DB_PREFIX . "transaction WHERE label = '" . $this->db->escape($label) . "'";
-
-		if (!empty($label_id)) {
-			$sql .= " AND label_id = '" . (int)$label_id . "'";
+		if (!empty($client_id)) {
+			$sql .= " AND client_id = '" . (int)$client_id . "'";
 		}
 
 		$query = $this->db->query($sql);
@@ -707,65 +587,15 @@ class ModelAccountingTransaction extends Model
 		return $query->row['total'];
 	}
 
-	//Akan diganti ke getTransactionsSummary($order_id, $label)
-	public function getTransactionsLabelSummaryByOrderId($order_id, $label)
-	{
-		$label_data = array(
-			'supplier',
-			'vendor',
-			'customer'
-		);
-
-		if (!isset($label) || !in_array($label, $label_data)) {
-			$label = '';
-		}
-
-		$sql = "SELECT *, SUM(amount) AS total FROM " . DB_PREFIX . "transaction WHERE order_id = '" . (int)$order_id . "'";
-
-		$sql .= " AND label = '" . $label . "'";
-
-		$sql .= " GROUP BY label_id";
-
-		$sql .= " ORDER BY label_id ASC";
-
-		$query = $this->db->query($sql);
-
-		return $query->rows;
-	}
-
-	public function getTransactionsDescriptionSummaryByOrderId($order_id, $data = array())
-	{ //Used by Order > Agreement
-		$sql = "SELECT description, MAX(date) AS date, SUM(amount) AS amount FROM " . DB_PREFIX . "transaction WHERE order_id = '" . (int)$order_id . "'";
-
-		if (!empty($data['label'])) {
-			$sql .= " AND label = '" . $this->db->escape($data['label']) . "'";
-
-			if (!empty($data['label_id'])) {
-				$sql .= " AND label_id = '" . (int)$data['label_id'] . "'";
-			}
-		}
-
-		$sql .= " GROUP BY description ORDER BY date ASC";
-
-		$query = $this->db->query($sql);
-
-		return $query->rows;
-	}
-
 	public function editTransactionPrintStatus($transaction_id, $printed_status)
 	{
 		$this->db->query("UPDATE `" . DB_PREFIX . "transaction` SET printed = '" . (int)$printed_status . "' WHERE transaction_id = '" . (int)$transaction_id . "'");
-	}
-
-	public function setTransactionPrinted($transaction_id)
-	{
-		$this->db->query("UPDATE `" . DB_PREFIX . "transaction` SET printed = '1' WHERE transaction_id = '" . (int)$transaction_id . "'");
 	}
 
 	public function editEditPermission($transaction_id, $edit_permission)
 	{
 		$sql = "UPDATE " . DB_PREFIX . "transaction SET edit_permission = '" . (int)$edit_permission . "' WHERE transaction_id = '" . (int)$transaction_id . "'";
 
-		$query = $this->db->query($sql);
+		$this->db->query($sql);
 	}
 }

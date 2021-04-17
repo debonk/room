@@ -25,11 +25,11 @@
 		<tbody>
 			<?php if ($accounts) { ?>
 			<?php foreach ($components as $component) { ?>
-				<tr>
-					<th class="text-left" colspan="6">
-						<?php echo $component['text']; ?>
-					</th>
-				</tr>
+			<tr>
+				<th class="text-left" colspan="6">
+					<?php echo $component['text']; ?>
+				</th>
+			</tr>
 			<?php foreach ($accounts[$component['code']] as $account) { ?>
 			<tr>
 				<?php if ($account['header_status']) { ?>
@@ -41,7 +41,13 @@
 					<?php echo $account['account_id']; ?>
 				</td>
 				<td class="text-left">
+					<?php if ($account['href']) { ?>
+					<a href="<?php echo $account['href']; ?>" target="_blank">
+						<?php echo $account['name']; ?>
+					</a>
+					<?php } else { ?>
 					<?php echo $account['name']; ?>
+					<?php } ?>
 				</td>
 				<td class="text-left">
 					<?php echo $account['type']; ?>
@@ -56,8 +62,6 @@
 						<?php echo $account['balance']; ?>
 					</b></td>
 				<?php } ?>
-
-				<!-- <td class="text-left"><a href="<?php echo $account['href']; ?>" target="_blank"><?php echo $account['reference']; ?></a><br><?php echo $account['description']; ?></td> -->
 			</tr>
 			<?php } ?>
 			<?php } ?>

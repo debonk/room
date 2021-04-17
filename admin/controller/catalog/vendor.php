@@ -597,7 +597,7 @@ class ControllerCatalogVendor extends Controller
 				$this->error['warning'] = sprintf($this->language->get('error_order'), $order_count);
 			}
 
-			$transaction_count = $this->model_accounting_transaction->getTransactionsCountByVendorId($vendor_id);
+			$transaction_count = $this->model_accounting_transaction->getTransactionsCountByClientLabel('vendor', $vendor_id);
 
 			if ($transaction_count) {
 				$this->error['warning'] = $this->language->get('error_transaction');

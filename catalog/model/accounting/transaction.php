@@ -1,9 +1,6 @@
 <?php
 class ModelAccountingTransaction extends Model
 { //utk transaksi akuntansi
-	private $client_data = ['system', 'customer', 'vendor', 'supplier', 'finance'];
-	private $category_data = ['order', 'deposit', 'purchase', 'expense', 'asset'];
-	private $transaction_data = ['initial', 'discount', 'cash', 'complete', 'canceled', 'charged'];
 	private $type_data = ['D', 'C'];
 
 	public function addTransaction($data)
@@ -158,15 +155,6 @@ class ModelAccountingTransaction extends Model
 	public function getLastReferenceNo($reference_prefix)
 	{
 		$sql = "SELECT MAX(reference_no) AS total FROM `" . DB_PREFIX . "transaction` WHERE reference_prefix = '" . $this->db->escape($reference_prefix) . "'";
-
-		$query = $this->db->query($sql);
-
-		return $query->row['total'];
-	}
-
-	public function getTransactionNoMax($reference_no)
-	{
-		$sql = "SELECT MAX(transaction_no) AS total FROM `" . DB_PREFIX . "transaction` WHERE reference_no = '" . $this->db->escape($reference_no) . "'";
 
 		$query = $this->db->query($sql);
 

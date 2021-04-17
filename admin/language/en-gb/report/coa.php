@@ -14,13 +14,13 @@ $_['text_non_current_asset']		= 'Non-current Asset/Aktiva Tidak Lancar';
 $_['text_prepayment']				= 'Prepayment/Pembayaran Dimuka';
 $_['text_depreciation']				= 'Depreciation/Biaya Penyusutan';
 $_['text_direct_cost']				= 'Direct Cost';
-$_['text_expense']					= 'Expense/Biaya';
 $_['text_overhead']					= 'Overhead';
 $_['text_current_liability']		= 'Current Liability/Hutang Jangka Pendek';
 $_['text_non_current_liability']	= 'Non-current Liability';
 $_['text_other_income']				= 'Other Income';
 $_['text_sale']						= 'Sales';
 
+$_['text_cumulative']         		= 'Kumulatif ~%s';
 $_['text_list']         			= 'Account List';
 
 // Column		
