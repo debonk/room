@@ -372,8 +372,8 @@ class ControllerAccountingExpense extends Controller {
 		$this->load->model('accounting/transaction_type');
 		$data['transaction_types'] = $this->model_accounting_transaction_type->getTransactionTypesMenu(['category_label' => 'expense']);
 
-		// $this->load->model('accounting/account');
-		// $data['accounts'] = $this->model_accounting_account->getAccountsMenuByParentId([111, 5141,8121,2131]);
+		$this->load->model('accounting/account');
+		$data['accounts'] = $this->model_accounting_account->getAccountsMenuByParentId([111,2131,514]);
 
 		$data['filter'] = $filter;
 		$data['sort'] = $sort;

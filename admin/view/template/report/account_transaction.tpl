@@ -124,7 +124,8 @@
 			$('html, body').animate({ scrollTop: 150 }, 500);
 		});
 
-		var filter_account_id = encodeURIComponent($('select[name=\'filter[account_id]\']').val());
+		// var filter_account_id = encodeURIComponent($('select[name=\'filter[account_id]\']').val());
+		var filter_account_id = "<?php echo $filter['account_id']; ?>";
 
 		$('#report').load('index.php?route=report/account_transaction/report&token=<?php echo $token; ?>&filter_account_id=' + filter_account_id + '&filter_date_start=<?php echo $filter["date_start"]; ?>&filter_date_end=<?php echo $filter["date_end"]; ?>');
 

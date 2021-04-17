@@ -13,9 +13,8 @@ $_['db_database']      = DB_DATABASE;
 $_['db_port']          = DB_PORT;
 
 // Autoload Libraries
-$_['library_autoload'] = array(
-	'openbay'
-);
+// $_['library_autoload'] = array(
+// );
 
 // Actions
 $_['action_pre_action'] = array(

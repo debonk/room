@@ -533,7 +533,7 @@ class ModelAccountingTransaction extends Model
 
 	public function getTransactionsCountByAccountId($account_id)
 	{ //Used by account
-		$sql = "SELECT COUNT(*) AS total FROM " . DB_PREFIX . "transaction WHERE account_credit_id = '" . (int)$account_id . "' OR account_debit_id = '" . (int)$account_id . "'";
+		$sql = "SELECT COUNT(*) AS total FROM " . DB_PREFIX . "transaction_account WHERE account_id = '" . (int)$account_id . "'";
 
 		$query = $this->db->query($sql);
 

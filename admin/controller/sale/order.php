@@ -2465,6 +2465,7 @@ class ControllerSaleOrder extends Controller
 				$data['preview'] = 1;
 				# Agar preview only bisa diprint.
 				// $data['letter_content'] = 'letter-content';
+				$data['letter_content'] = '';
 			} else {
 				$data['preview'] = 0;
 				$data['letter_content'] = '';
