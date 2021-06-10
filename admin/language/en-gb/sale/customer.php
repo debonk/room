@@ -36,6 +36,7 @@ $_['error_order']     				= 'Warning: Order tidak ditemukan!';
 $_['error_order_not_found']     	= 'Warning: Transaksi awal pemesanan ballroom tidak ditemukan!';
 $_['error_order_status']     		= 'Warning: Order Status tidak sesuai. Update order status jika diperlukan!';
 $_['error_permission']   			= 'Warning: You do not have permission to modify order customer!';
+$_['error_reverse_entry_limit'] 	= 'Entry transaksi lebih dari %d hari tidak diizinkan!';
 $_['error_status_complete']     	= 'Warning: Order Status telah selesai dan transaksi tidak diijinkan lagi!';
 $_['error_transaction_amount']		= 'Jumlah harus diisi dan hrs lebih besar dari 0!';
 $_['error_transaction_account']		= 'Pilih akun terkait!';

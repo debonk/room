@@ -183,6 +183,10 @@ class ControllerSaleCustomer extends Controller
 				} else {
 					if (empty($this->request->post['customer_transaction_date'])) {
 						$json['error_customer_transaction']['date'] = $this->language->get('error_transaction_date');
+					} elseif ($this->config->get('config_reverse_entry_limit') >= 0) {
+						if ((date('Y-m-d', strtotime(-$this->config->get('config_reverse_entry_limit') . ' days'))) > $this->request->post['customer_transaction_date']) {
+							$json['error_customer_transaction']['date'] = sprintf($this->language->get('error_reverse_entry_limit'), $this->config->get('config_reverse_entry_limit'));
+						}
 					}
 
 					if (empty($this->request->post['customer_transaction_type_id'])) {

@@ -538,6 +538,10 @@ class ControllerAccountingExpense extends Controller {
 
 		if (empty($this->request->post['date'])) {
 			$this->error['date'] = $this->language->get('error_date');
+		} elseif ($this->config->get('config_reverse_entry_limit') >= 0) {
+			if ((date('Y-m-d', strtotime(-$this->config->get('config_reverse_entry_limit') . ' days'))) > $this->request->post['date']) {
+				$this->error['date'] = sprintf($this->language->get('error_reverse_entry_limit'), $this->config->get('config_reverse_entry_limit'));
+			}
 		}
 
 		if ((utf8_strlen($this->request->post['description']) < 5) || (utf8_strlen($this->request->post['description']) > 256)) {

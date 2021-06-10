@@ -47,6 +47,7 @@ $_['error_order']     				= 'Warning: Order tidak ditemukan!';
 $_['error_order_vendor']			= 'Vendor tidak terdaftar dalam pesanan ini!';
 $_['error_permission']   			= 'Warning: You do not have permission to modify order vendor!';
 $_['error_purchase_not_found']     	= 'Warning: Transaksi awal pemesanan jasa vendor tidak ditemukan!';
+$_['error_reverse_entry_limit'] 	= 'Entry transaksi lebih dari %d hari tidak diizinkan!';
 $_['error_status_complete']     	= 'Warning: Order Status telah selesai dan transaksi vendor tidak diijinkan lagi';
 $_['error_transaction_amount']		= 'Jumlah harus diisi dan hrs lebih besar dari 0!';
 $_['error_transaction_account']		= 'Pilih akun terkait!';

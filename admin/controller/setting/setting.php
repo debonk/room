@@ -28,7 +28,7 @@ class ControllerSettingSetting extends Controller {
 		$data['text_account'] = $this->language->get('text_account');
 		$data['text_admission'] = $this->language->get('text_admission');
 		$data['text_affiliate'] = $this->language->get('text_affiliate');
-		$data['text_auto_transaction'] = $this->language->get('text_auto_transaction');
+		$data['text_transaction'] = $this->language->get('text_transaction');
 		$data['text_captcha'] = $this->language->get('text_captcha');
 		$data['text_checkout'] = $this->language->get('text_checkout');
 		$data['text_customer'] = $this->language->get('text_customer');
@@ -60,7 +60,6 @@ class ControllerSettingSetting extends Controller {
 		$data['entry_account_mail'] = $this->language->get('entry_account_mail');
 		$data['entry_account'] = $this->language->get('entry_account');
 		$data['entry_address'] = $this->language->get('entry_address');
-		$data['entry_adjustment_account'] = $this->language->get('entry_adjustment_account');
 		$data['entry_admin_language'] = $this->language->get('entry_admin_language');
 		$data['entry_admission_order_status'] = $this->language->get('entry_admission_order_status');
 		$data['entry_admission_vendor_prefix'] = $this->language->get('entry_admission_vendor_prefix');
@@ -87,7 +86,6 @@ class ControllerSettingSetting extends Controller {
 		$data['entry_customer_group_display'] = $this->language->get('entry_customer_group_display');
 		$data['entry_customer_group'] = $this->language->get('entry_customer_group');
 		$data['entry_customer_online'] = $this->language->get('entry_customer_online');
-		$data['entry_customer_order_initial'] = $this->language->get('entry_customer_order_initial');
 		$data['entry_customer_price'] = $this->language->get('entry_customer_price');
 		$data['entry_down_payment_amount'] = $this->language->get('entry_down_payment_amount');
 		$data['entry_down_payment_limit'] = $this->language->get('entry_down_payment_limit');
@@ -145,7 +143,6 @@ class ControllerSettingSetting extends Controller {
 		$data['entry_order_status'] = $this->language->get('entry_order_status');
 		$data['entry_owner'] = $this->language->get('entry_owner');
 		$data['entry_password'] = $this->language->get('entry_password');
-		$data['entry_prepaid_account'] = $this->language->get('entry_prepaid_account');
 		$data['entry_processing_status'] = $this->language->get('entry_processing_status');
 		$data['entry_product_count'] = $this->language->get('entry_product_count');
 		$data['entry_purchase_vendor_prefix'] = $this->language->get('entry_purchase_vendor_prefix');
@@ -154,6 +151,7 @@ class ControllerSettingSetting extends Controller {
 		$data['entry_reference_start'] = $this->language->get('entry_reference_start');
 		$data['entry_return_status'] = $this->language->get('entry_return_status');
 		$data['entry_return'] = $this->language->get('entry_return');
+		$data['entry_reverse_entry_limit'] = $this->language->get('entry_reverse_entry_limit');
 		$data['entry_review_guest'] = $this->language->get('entry_review_guest');
 		$data['entry_review_mail'] = $this->language->get('entry_review_mail');
 		$data['entry_review'] = $this->language->get('entry_review');
@@ -180,7 +178,6 @@ class ControllerSettingSetting extends Controller {
 
 		$data['help_account_mail'] = $this->language->get('help_account_mail');
 		$data['help_account'] = $this->language->get('help_account');
-		$data['help_adjustment_account'] = $this->language->get('help_adjustment_account');
 		$data['help_admission_order_status'] = $this->language->get('help_admission_order_status');
 		$data['help_affiliate_approval'] = $this->language->get('help_affiliate_approval');
 		$data['help_affiliate_auto'] = $this->language->get('help_affiliate_auto');
@@ -202,7 +199,6 @@ class ControllerSettingSetting extends Controller {
 		$data['help_customer_group_display'] = $this->language->get('help_customer_group_display');
 		$data['help_customer_group'] = $this->language->get('help_customer_group');
 		$data['help_customer_online'] = $this->language->get('help_customer_online');
-		$data['help_customer_order_initial'] = $this->language->get('help_customer_order_initial');
 		$data['help_customer_price'] = $this->language->get('help_customer_price');
 		$data['help_down_payment_limit'] = $this->language->get('help_down_payment_limit');
 		$data['help_down_payment_status'] = $this->language->get('help_down_payment_status');
@@ -234,12 +230,12 @@ class ControllerSettingSetting extends Controller {
 		$data['help_order_mail'] = $this->language->get('help_order_mail');
 		$data['help_order_status'] = $this->language->get('help_order_status');
 		$data['help_password'] = $this->language->get('help_password');
-		$data['help_prepaid_account'] = $this->language->get('help_prepaid_account');
 		$data['help_processing_status'] = $this->language->get('help_processing_status');
 		$data['help_product_count'] = $this->language->get('help_product_count');
 		$data['help_reference_start'] = $this->language->get('help_reference_start');
 		$data['help_return_status'] = $this->language->get('help_return_status');
 		$data['help_return'] = $this->language->get('help_return');
+		$data['help_reverse_entry_limit'] = $this->language->get('help_reverse_entry_limit');
 		$data['help_review_guest'] = $this->language->get('help_review_guest');
 		$data['help_review_mail'] = $this->language->get('help_review_mail');
 		$data['help_review'] = $this->language->get('help_review');
@@ -757,6 +753,14 @@ class ControllerSettingSetting extends Controller {
 			$data['config_login_attempts'] = 5;
 		}
 
+		if (isset($this->request->post['config_reverse_entry_limit'])) {
+			$data['config_reverse_entry_limit'] = $this->request->post['config_reverse_entry_limit'];
+		} elseif ($this->config->has('config_reverse_entry_limit')) {
+			$data['config_reverse_entry_limit'] = $this->config->get('config_reverse_entry_limit');
+		} else {
+			$data['config_reverse_entry_limit'] = -1;
+		}
+
 		if (isset($this->request->post['config_account_id'])) {
 			$data['config_account_id'] = $this->request->post['config_account_id'];
 		} else {
@@ -771,12 +775,6 @@ class ControllerSettingSetting extends Controller {
 			$data['config_account_mail'] = $this->request->post['config_account_mail'];
 		} else {
 			$data['config_account_mail'] = $this->config->get('config_account_mail');
-		}
-
-		if (isset($this->request->post['config_customer_order_initial_id'])) {
-			$data['config_customer_order_initial_id'] = $this->request->post['config_customer_order_initial_id'];
-		} else {
-			$data['config_customer_order_initial_id'] = $this->config->get('config_customer_order_initial_id');
 		}
 
 		if (isset($this->request->post['config_vendor_purchase_initial_id'])) {
@@ -795,22 +793,8 @@ class ControllerSettingSetting extends Controller {
 			$data['config_asset_account_id'] = $this->config->get('config_asset_account_id');
 		}
 
-		if (isset($this->request->post['config_prepaid_account_id'])) {
-			$data['config_prepaid_account_id'] = $this->request->post['config_prepaid_account_id'];
-		} else {
-			$data['config_prepaid_account_id'] = $this->config->get('config_prepaid_account_id');
-		}
-
-		if (isset($this->request->post['config_adjustment_account_id'])) {
-			$data['config_adjustment_account_id'] = $this->request->post['config_adjustment_account_id'];
-		} else {
-			$data['config_adjustment_account_id'] = $this->config->get('config_adjustment_account_id');
-		}
-
 		$this->load->model('accounting/account');
 
-		$data['liability_accounts'] = $this->model_accounting_account->getAccountsMenuByComponent();
-		$data['revenue_accounts'] = $this->model_accounting_account->getAccountsMenuByComponent($component = ['revenue']);
 		$data['asset_accounts'] = $this->model_accounting_account->getAccountsMenuByComponent($component = ['asset']);
 
 		if (isset($this->request->post['config_deposit'])) {

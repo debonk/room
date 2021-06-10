@@ -428,10 +428,12 @@
                     <li>
                       <?= $text_pembatalan_acara; ?>
                       <div style="margin-left: 10px;"><b>
-                          <?= $text_pembatalan_1; ?><br />
                           <?= $text_pembatalan_2; ?><br />
                           <?= $text_pembatalan_3; ?>
                         </b></div>
+                    </li>
+                    <li>
+                      <?= $text_tambah_layanan; ?>
                     </li>
                  </ol>
                 </td>

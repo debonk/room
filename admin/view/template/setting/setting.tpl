@@ -649,30 +649,12 @@
               </fieldset>
               <fieldset>
                 <legend>
-                  <?php echo $text_auto_transaction; ?>
+                  <?php echo $text_transaction; ?>
                 </legend>
                 <div class="form-group">
-                  <label class="col-sm-2 control-label" for="input-customer-order-initial"><span data-toggle="tooltip"
-                      title="<?php echo $help_customer_order_initial; ?>">
-                      <?php echo $entry_customer_order_initial; ?>
-                    </span></label>
+                  <label class="col-sm-2 control-label" for="input-reverse-entry-limit"><span data-toggle="tooltip" title="<?php echo $help_reverse_entry_limit; ?>"><?php echo $entry_reverse_entry_limit; ?></span></label>
                   <div class="col-sm-10">
-                    <select name="config_customer_order_initial_id" id="input-customer-order_initial" class="form-control">
-                      <option value="">
-                        <?php echo $text_select; ?>
-                      </option>
-                      <?php foreach ($transaction_types as $transaction_type) { ?>
-                        <?php if ($transaction_type['transaction_type_id'] == $config_customer_order_initial_id) { ?>
-                        <option value="<?php echo $transaction_type['transaction_type_id']; ?>" selected="selected">
-                          <?php echo $transaction_type['name']; ?>
-                        </option>
-                        <?php } else { ?>
-                        <option value="<?php echo $transaction_type['transaction_type_id']; ?>">
-                          <?php echo $transaction_type['name']; ?>
-                        </option>
-                        <?php } ?>
-                      <?php } ?>
-                    </select>
+                    <input type="text" name="config_reverse_entry_limit" value="<?php echo $config_reverse_entry_limit; ?>" placeholder="<?php echo $entry_reverse_entry_limit; ?>" id="input-reverse-entry-limit" class="form-control" />
                   </div>
                 </div>
                 <div class="form-group">
@@ -695,66 +677,6 @@
                           <?php echo $transaction_type['name']; ?>
                         </option>
                         <?php } ?>
-                      <?php } ?>
-                    </select>
-                  </div>
-                </div>
-                <div class="form-group">
-                  <label class="col-sm-2 control-label" for="input-prepaid-account"><span data-toggle="tooltip"
-                      title="<?php echo $help_prepaid_account; ?>">
-                      <?php echo $entry_prepaid_account; ?>
-                    </span></label>
-                  <div class="col-sm-10">
-                    <select name="config_prepaid_account_id" id="input-prepaid-account" class="form-control">
-                      <option value="">
-                        <?php echo $text_select; ?>
-                      </option>
-                      <?php foreach ($liability_accounts as $account) { ?>
-                      <optgroup label="<?php echo $account['text']; ?>">
-                        <?php if ($account['child']) { ?>
-                        <?php foreach ($account['child'] as $child) { ?>
-                        <?php if ($child['account_id'] == $config_prepaid_account_id) { ?>
-                        <option value="<?php echo $child['account_id']; ?>" selected="selected">
-                          <?php echo $child['text']; ?>
-                        </option>
-                        <?php } else { ?>
-                        <option value="<?php echo $child['account_id']; ?>">
-                          <?php echo $child['text']; ?>
-                        </option>
-                        <?php } ?>
-                        <?php } ?>
-                        <?php } ?>
-                      </optgroup>
-                      <?php } ?>
-                    </select>
-                  </div>
-                </div>
-                <div class="form-group">
-                  <label class="col-sm-2 control-label" for="input-adjustment-account"><span data-toggle="tooltip"
-                      title="<?php echo $help_adjustment_account; ?>">
-                      <?php echo $entry_adjustment_account; ?>
-                    </span></label>
-                  <div class="col-sm-10">
-                    <select name="config_adjustment_account_id" id="input-adjustment-account" class="form-control">
-                      <option value="">
-                        <?php echo $text_select; ?>
-                      </option>
-                      <?php foreach ($revenue_accounts as $account) { ?>
-                      <optgroup label="<?php echo $account['text']; ?>">
-                        <?php if ($account['child']) { ?>
-                        <?php foreach ($account['child'] as $child) { ?>
-                        <?php if ($child['account_id'] == $config_adjustment_account_id) { ?>
-                        <option value="<?php echo $child['account_id']; ?>" selected="selected">
-                          <?php echo $child['text']; ?>
-                        </option>
-                        <?php } else { ?>
-                        <option value="<?php echo $child['account_id']; ?>">
-                          <?php echo $child['text']; ?>
-                        </option>
-                        <?php } ?>
-                        <?php } ?>
-                        <?php } ?>
-                      </optgroup>
                       <?php } ?>
                     </select>
                   </div>

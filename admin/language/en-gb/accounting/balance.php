@@ -42,6 +42,7 @@ $_['error_edit']             	= 'Warning: Data transaksi tidak diizinkan untuk d
 $_['error_account_credit']    	= 'Tentukan Akun Kredit!';
 $_['error_account_debit']    	= 'Tentukan Akun Debet!';
 $_['error_date']    			= 'Tanggal Transaksi harus diisi!';
+$_['error_reverse_entry_limit'] = 'Entry transaksi lebih dari %d hari tidak diizinkan!';
 $_['error_description']    		= 'Keterangan harus diisi 5 - 256 karakter!';
 $_['error_amount']    			= 'Jumlah harus diisi dan hrs lebih besar dari 0!';
 $_['error_order']    			= 'Warning: Transaksi tidak bisa diedit/dihapus karena merupakan transaksi otomatis!';

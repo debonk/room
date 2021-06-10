@@ -2187,6 +2187,7 @@ class ControllerSaleOrder extends Controller
 				'text_quantity',
 				'text_slot',
 				'text_snk',
+				'text_tambah_layanan',
 				'text_telah_bayar',
 				'text_telephone',
 				'text_total',
