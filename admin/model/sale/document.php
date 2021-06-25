@@ -1,76 +1,84 @@
 <?php
 class ModelSaleDocument extends Model
 {
-    public function addOrderDocumentByType($data)
-    {
-        switch ($data['client_type'] . '-' . $data['document_type']) {
-            case 'customer-agreement':
-                $data['reference_prefix'] = str_ireplace('{YEAR}',date('Y'),$this->config->get('config_invoice_prefix'));
+	public function addOrderDocumentByType($data)
+	{
+		switch ($data['client_type'] . '-' . $data['document_type']) {
+			case 'customer-agreement':
+				$data['reference_prefix'] = str_ireplace('{YEAR}', date('Y'), $this->config->get('config_invoice_prefix'));
 
-                $order_document_id = $this->addOrderDocument($data);
+				$order_document_id = $this->addOrderDocument($data);
 
-                // $this->db->query("UPDATE `" . DB_PREFIX . "order_purchase` SET order_document_id = '" . (int)$order_document_id . "' WHERE order_purchase_id = '" . (int)$data['update_idx'] . "'");
+				// $this->db->query("UPDATE `" . DB_PREFIX . "order_purchase` SET order_document_id = '" . (int)$order_document_id . "' WHERE order_purchase_id = '" . (int)$data['update_idx'] . "'");
 
-                break;
+				break;
 
-            case 'customer-receipt':
-                $data['reference_prefix'] = str_ireplace('{YEAR}',date('Y'),$this->config->get('config_receipt_customer_prefix'));
- 
-                $order_document_id = $this->addOrderDocument($data);
+			case 'customer-receipt':
+				$data['reference_prefix'] = str_ireplace('{YEAR}', date('Y'), $this->config->get('config_receipt_customer_prefix'));
 
-                // $this->db->query("UPDATE `" . DB_PREFIX . "order_purchase` SET order_document_id = '" . (int)$order_document_id . "' WHERE order_purchase_id = '" . (int)$data['update_idx'] . "'");
+				$order_document_id = $this->addOrderDocument($data);
 
-               break;
+				// $this->db->query("UPDATE `" . DB_PREFIX . "order_purchase` SET order_document_id = '" . (int)$order_document_id . "' WHERE order_purchase_id = '" . (int)$data['update_idx'] . "'");
 
-            case 'vendor-receipt':
-                $data['reference_prefix'] = str_ireplace('{YEAR}',date('Y'),$this->config->get('config_receipt_vendor_prefix'));
+				break;
 
-                $order_document_id = $this->addOrderDocument($data);
+			case 'vendor-receipt':
+				$data['reference_prefix'] = str_ireplace('{YEAR}', date('Y'), $this->config->get('config_receipt_vendor_prefix'));
 
-                // $this->db->query("UPDATE `" . DB_PREFIX . "order_purchase` SET order_document_id = '" . (int)$order_document_id . "' WHERE order_purchase_id = '" . (int)$data['update_idx'] . "'");
+				$order_document_id = $this->addOrderDocument($data);
 
-                break;
+				// $this->db->query("UPDATE `" . DB_PREFIX . "order_purchase` SET order_document_id = '" . (int)$order_document_id . "' WHERE order_purchase_id = '" . (int)$data['update_idx'] . "'");
 
-            case 'vendor-agreement':
-                $data['reference_prefix'] = str_ireplace('{YEAR}',date('Y'),$this->config->get('config_agreement_vendor_prefix'));
+				break;
 
-                $order_document_id = $this->addOrderDocument($data);
+			case 'vendor-agreement':
+				$data['reference_prefix'] = str_ireplace('{YEAR}', date('Y'), $this->config->get('config_agreement_vendor_prefix'));
 
-                break;
+				$order_document_id = $this->addOrderDocument($data);
 
-            case 'vendor-admission':
-                $data['reference_prefix'] = str_ireplace('{YEAR}',date('Y'),$this->config->get('config_admission_vendor_prefix'));
- 
-                $order_document_id = $this->addOrderDocument($data);
+				break;
 
-	            break;
+			case 'vendor-admission':
+				$data['reference_prefix'] = str_ireplace('{YEAR}', date('Y'), $this->config->get('config_admission_vendor_prefix'));
 
-            case 'vendor-purchase':
-                $data['reference_prefix'] = str_ireplace('{YEAR}',date('Y'),$this->config->get('config_purchase_vendor_prefix'));
+				$order_document_id = $this->addOrderDocument($data);
 
-                $order_document_id = $this->addOrderDocument($data);
+				break;
 
-                $this->db->query("UPDATE `" . DB_PREFIX . "order_purchase` SET order_document_id = '" . (int)$order_document_id . "' WHERE order_purchase_id = '" . (int)$data['update_idx'] . "'");
+			case 'vendor-purchase':
+				$data['reference_prefix'] = str_ireplace('{YEAR}', date('Y'), $this->config->get('config_purchase_vendor_prefix'));
 
-                break;
+				$order_document_id = $this->addOrderDocument($data);
 
-            default:
-                $data['reference_prefix'] = 'TMAP/' . date('ym') . '/';
+				$this->db->query("UPDATE `" . DB_PREFIX . "order_purchase` SET order_document_id = '" . (int)$order_document_id . "' WHERE order_purchase_id = '" . (int)$data['update_idx'] . "'");
 
-                $order_document_id = 0;
+				break;
 
-                break;
-        }
+			case 'company-checklist':
+				$data['reference_prefix'] = str_ireplace('{YEAR}', date('Y'), 'TMAP/01-CL-{YEAR}/');
+				// $data['reference_prefix'] = str_ireplace('{YEAR}', date('Y'), $this->config->get('config_checklist_company_prefix'));
 
-        // return $this->getOrderDocumentReference($order_document_id);
-        return $order_document_id;
-    }
+				$order_document_id = $this->addOrderDocument($data);
 
-    public function addOrderDocument($data)
-    {
-        if (!isset($data['date'])) {
-            $data['date'] = date('Y-m-d');
-        }
+				break;
+
+			default:
+				$data['reference_prefix'] = 'TMAP/' . date('ym') . '/';
+
+				$order_document_id = 0;
+
+				break;
+		}
+
+		// return $this->getOrderDocumentReference($order_document_id);
+		return $order_document_id;
+	}
+
+	public function addOrderDocument($data)
+	{
+		if (!isset($data['date'])) {
+			$data['date'] = date('Y-m-d');
+		}
 
 		$query = $this->db->query("SELECT MAX(reference_no) AS reference_no FROM `" . DB_PREFIX . "order_document` WHERE reference_prefix = '" . $this->db->escape($data['reference_prefix']) . "'");
 
@@ -80,28 +88,29 @@ class ModelSaleDocument extends Model
 			$reference_no = $this->config->get('config_reference_start') + 1;
 		}
 
-        $sql = "INSERT INTO " . DB_PREFIX . "order_document SET order_id = '" . (int)$data['order_id'] . "', client_type = '" . $this->db->escape($data['client_type']) . "', document_type = '" . $this->db->escape($data['document_type']) . "', client_id = '" . (int)$data['client_id'] . "', date = '" . $this->db->escape($data['date']) . "', reference_prefix = '" . $this->db->escape($data['reference_prefix']) . "', reference_no = '" . (int)$reference_no . "', printed = 0, date_added = NOW(), user_id = '" . $this->user->getId() . "'";
-        
-        $this->db->query($sql);
+		$sql = "INSERT INTO " . DB_PREFIX . "order_document SET order_id = '" . (int)$data['order_id'] . "', client_type = '" . $this->db->escape($data['client_type']) . "', document_type = '" . $this->db->escape($data['document_type']) . "', client_id = '" . (int)$data['client_id'] . "', date = '" . $this->db->escape($data['date']) . "', reference_prefix = '" . $this->db->escape($data['reference_prefix']) . "', reference_no = '" . (int)$reference_no . "', printed = 0, date_added = NOW(), user_id = '" . $this->user->getId() . "'";
 
-        $order_document_id = $this->db->getLastId();
-        
-        return $order_document_id;
-    }
+		$this->db->query($sql);
 
-    public function editDocumentPrintStatus($order_document_id, $printed_status)
-    {
-        $this->db->query("UPDATE `" . DB_PREFIX . "order_document` SET printed = '" . (int)$printed_status . "' WHERE order_document_id = '" . (int)$order_document_id . "'");
-    }
+		$order_document_id = $this->db->getLastId();
 
-    public function getOrderDocument($order_document_id)
-    {
-        $query = $this->db->query("SELECT DISTINCT *, CONCAT(reference_prefix, LPAD(reference_no, 4, '0')) AS reference FROM " . DB_PREFIX . "order_document WHERE order_document_id = '" . (int)$order_document_id . "'");
+		return $order_document_id;
+	}
 
-        return $query->row;
-    }
+	public function editDocumentPrintStatus($order_document_id, $printed_status)
+	{
+		$this->db->query("UPDATE `" . DB_PREFIX . "order_document` SET printed = '" . (int)$printed_status . "' WHERE order_document_id = '" . (int)$order_document_id . "'");
+	}
 
-	public function getOrderDocuments($data = array()) {
+	public function getOrderDocument($order_document_id)
+	{
+		$query = $this->db->query("SELECT DISTINCT *, CONCAT(reference_prefix, LPAD(reference_no, 4, '0')) AS reference FROM " . DB_PREFIX . "order_document WHERE order_document_id = '" . (int)$order_document_id . "'");
+
+		return $query->row;
+	}
+
+	public function getOrderDocuments($data = array())
+	{
 		$sql = "SELECT *, CONCAT(reference_prefix, LPAD(reference_no, 4, '0')) AS reference FROM " . DB_PREFIX . "order_document";
 
 		$implode = array();
@@ -116,11 +125,11 @@ class ModelSaleDocument extends Model
 			if (!empty($data['filter_client_id'])) {
 				$implode[] = "client_id = '" . (int)$data['filter_client_id'] . "'";
 			}
-		}		
+		}
 
 		if (!empty($data['filter_document_type'])) {
 			$implode[] = "document_type = '" . $this->db->escape($data['filter_document_type']) . "'";
-		}		
+		}
 
 		if (!empty($data['filter_date_start'])) {
 			$implode[] = "DATE(date) >= '" . $this->db->escape($data['filter_date_start']) . "'";
@@ -173,5 +182,20 @@ class ModelSaleDocument extends Model
 		$query = $this->db->query($sql);
 
 		return $query->rows;
+	}
+
+	public function getOrderDocumentByOrderId($order_id, $client_type, $document_type, $client_id = 0)
+	{
+		$sql = "SELECT DISTINCT *, CONCAT(reference_prefix, LPAD(reference_no, 4, '0')) AS reference FROM " . DB_PREFIX . "order_document WHERE order_id = '" . (int)$order_id . "' AND client_type = '" . $this->db->escape($client_type) . "' AND document_type = '" . $this->db->escape($document_type) . "'";
+
+		$implode = array();
+
+		if ($client_id) {
+			$sql .= "AND client_id = '" . (int)$client_id . "'";
+		}
+
+		$query = $this->db->query($sql);
+
+		return $query->row;
 	}
 }

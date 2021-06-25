@@ -626,7 +626,7 @@ class ControllerSalePurchase extends Controller
 				$data[$language_item] = $this->language->get($language_item);
 			}
 
-			$data['letter_head'] = HTTP_CATALOG . 'image/catalog/letter_head.png';
+			// $data['letter_head'] = HTTP_CATALOG . 'image/catalog/letter_head.png';
 
 			if ($order_purchase_info['reference']) {
 				$data['reference'] = $order_purchase_info['reference'];

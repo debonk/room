@@ -85,5 +85,16 @@ $_['text_lebih_lanjut']		= 'Untuk informasi lebih lanjut tentang fasilitas gedun
 $_['text_hormat_kami']		= 'Hormat kami,';
 $_['text_menyetujui']		= 'Menyetujui,';
 
-// Text Purchase
-// $_['title_purchase']		= 'PURCHASE ORDER';
+// Text Checklist
+$_['title_checklist']		= 'ORDER CHECKLIST';
+$_['text_comment']			= 'Catatan:';
+$_['text_order_detail']		= 'INFORMASI ACARA';
+$_['text_event_title']		= 'Nama Acara';
+$_['text_event_date']		= 'Hari/Tanggal Acara';
+$_['text_inspector']		= 'Pemeriksa';
+$_['text_checklist_detail']	= 'Rincian Checklist';
+$_['column_no']				= 'No';
+$_['column_item']			= 'Item';
+$_['column_description']	= 'Keterangan';
+$_['column_check']			= 'Check';
+$_['column_remark']			= 'Remark';

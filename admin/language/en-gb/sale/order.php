@@ -157,6 +157,7 @@ $_['entry_zone_code']            = 'Kode Propinsi';
 // Button
 $_['button_agreement']          = 'Surat Kesepakatan';
 $_['button_calendar']           = 'Tampilan Kalender';
+$_['button_checklist']          = 'Order Checklist';
 $_['button_document']           = 'Tata Tertib Vendor';
 $_['button_expired']            = 'Set Expired';
 $_['button_list']               = 'Tampilan List';

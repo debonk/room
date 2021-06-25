@@ -73,6 +73,7 @@ $_['entry_encryption']                = 'Encryption Key';
 $_['entry_error_display']             = 'Display Errors';
 $_['entry_error_filename']            = 'Error Log Filename';
 $_['entry_error_log']                 = 'Log Errors';
+$_['entry_event_status']              = 'Event Status';
 $_['entry_expired_status']            = 'Expired Status';
 $_['entry_fax']                       = 'Fax';
 $_['entry_file_ext_allowed']          = 'Allowed File Extensions';

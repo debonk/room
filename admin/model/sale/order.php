@@ -550,7 +550,7 @@ class ModelSaleOrder extends Model {
 		$payment_phase_data['initial_payment'] = array(
 			'order_status_id'	=> $this->config->get('config_initial_payment_status_id'),
 			'title'				=> $this->model_localisation_order_status->getOrderStatus($this->config->get('config_initial_payment_status_id'))['name'],
-			'amount'			=> $this->config->get('config_initial_payment_amount'),
+			'amount'			=> min($this->config->get('config_initial_payment_amount'), $order_info['total']),
 			'limit_stamp'		=> strtotime('+' . $this->config->get('config_initial_payment_limit') . ' days', strtotime($order_info['date_added'])),
 			'auto_expired'		=> true
 		);
@@ -558,7 +558,7 @@ class ModelSaleOrder extends Model {
 		$payment_phase_data['down_payment'] = array(
 			'order_status_id'	=> $this->config->get('config_down_payment_status_id'),
 			'title'				=> $this->model_localisation_order_status->getOrderStatus($this->config->get('config_down_payment_status_id'))['name'],
-			'amount'			=> round($order_info['total'] * $this->config->get('config_down_payment_amount') / 100000, 0) * 1000 - $payment_phase_data['initial_payment']['amount'],
+			'amount'			=> max(0, round($order_info['total'] * $this->config->get('config_down_payment_amount') / 100000, 0) * 1000 - $payment_phase_data['initial_payment']['amount']),
 			'limit_stamp'		=> min(strtotime('+' . $this->config->get('config_down_payment_limit') . ' days', $payment_phase_data['initial_payment']['limit_stamp']), strtotime('-2 days', strtotime($order_info['event_date']))),
 			'auto_expired'		=> false
 		);

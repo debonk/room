@@ -1,8 +1,6 @@
 <?php
 class ControllerSaleOrder extends Controller
 {
-	private $error = array();
-
 	public function index()
 	{
 		$this->load->language('sale/order');
@@ -1123,6 +1121,7 @@ class ControllerSaleOrder extends Controller
 				'button_agreement',
 				'button_receipt',
 				'button_cancel',
+				'button_checklist',
 				'button_document',
 				'button_edit',
 				'button_expired',
@@ -1388,7 +1387,7 @@ class ControllerSaleOrder extends Controller
 				'category_label'	=> 'order',
 				'transaction_label'	=> 'cash',
 			];
-	
+
 			$transaction_total = $this->model_accounting_transaction->getTransactionsTotalByOrderId($order_id, $summary_data);
 
 			foreach ($totals as $total) {
@@ -1418,7 +1417,7 @@ class ControllerSaleOrder extends Controller
 			# Maintain Version 1
 			$this->load->model('catalog/vendor');
 			# End Maintain
-			
+
 			foreach ($order_vendors as $order_vendor) {
 				# Maintain Version 1
 				if (empty($order_vendor['vendor_name'])) {
@@ -1491,6 +1490,8 @@ class ControllerSaleOrder extends Controller
 			}
 
 			$data['initial_payment'] = $payment_phases['initial_payment']['paid_status'];
+
+			$data['event_status'] = $order_info['order_status_id'] == $this->config->get('config_event_status_id');
 
 			$data['comment'] = nl2br($order_info['comment']);
 
@@ -2581,7 +2582,7 @@ class ControllerSaleOrder extends Controller
 			}
 
 			$venue_info .= ($venue_info ? ' - ' : '') . $data['store_name'];
-		
+
 			// Transaction Info
 			$transaction_date_in = $this->model_localisation_local_date->getInFormatDate($transaction_info['date']);
 			$transaction_title	= $transaction_info['transaction_type'];
@@ -2700,6 +2701,198 @@ class ControllerSaleOrder extends Controller
 			}
 		} else {
 			exit('Error: Headers already sent out!');
+		}
+	}
+
+	public function checklist()
+	{
+		$this->load->model('sale/order');
+
+		$order_id = isset($this->request->get['order_id']) ? $this->request->get['order_id'] : 0;
+
+		$order_info = $this->model_sale_order->getOrder($order_id);
+
+		if ($order_info && $order_info['order_status_id'] == $this->config->get('config_event_status_id')) {
+			$this->load->model('setting/setting');
+			$this->load->model('localisation/local_date');
+			$this->load->model('sale/document');
+
+			$this->load->language('sale/document');
+
+			$data['base'] = $this->request->server['HTTPS'] ? HTTPS_SERVER : HTTP_SERVER;
+
+			$data['direction'] = $this->language->get('direction');
+			$data['lang'] = $this->language->get('code');
+
+			$language_items = array(
+				'title_checklist',
+				'text_comment',
+				'text_customer',
+				'text_event_date',
+				'text_event_title',
+				'text_inspector',
+				'text_mark',
+				'text_order_detail',
+				'text_package',
+				'text_checklist_detail',
+				'text_reference',
+				'text_slot',
+				'text_tanda_tangan',
+				'text_venue',
+				'column_no',
+				'column_item',
+				'column_description',
+				'column_check',
+				'column_remark',
+			);
+			foreach ($language_items as $language_item) {
+				$data[$language_item] = $this->language->get($language_item);
+			}
+
+			$order_checklist_info = $this->model_sale_document->getOrderDocumentByOrderId($order_id, 'company', 'checklist');
+
+			if ($order_checklist_info) {
+				$data['reference'] = $order_checklist_info['reference'];
+			} else {
+				$document_data = [
+					'order_id'			=> $order_id,
+					'client_type'		=> 'company',
+					'document_type'		=> 'checklist',
+					'client_id'			=> 0
+				];
+
+				$order_checklist_info['order_document_id'] = $this->model_sale_document->addOrderDocumentByType($document_data);
+
+				$data['reference'] = $this->model_sale_document->getOrderDocument($order_checklist_info['order_document_id'])['reference'];
+			}
+
+			$store_info = $this->model_setting_setting->getSetting('config', $order_info['store_id']);
+
+			if ($store_info) {
+				$data['store_logo'] = HTTP_CATALOG . 'image/' . $store_info['config_logo'];
+				$data['store_name'] = $store_info['config_name'];
+				$data['store_slogan'] = htmlspecialchars_decode($store_info['config_slogan'], ENT_NOQUOTES);
+				$data['store_address'] = strtoupper($store_info['config_address']);
+				$data['store_email'] = $store_info['config_email'];
+				$data['store_telephone'] = $store_info['config_telephone'];
+				$data['store_fax'] = $store_info['config_fax'];
+				$data['store_owner'] = $store_info['config_owner'];
+			} else {
+				$data['store_logo'] = HTTP_CATALOG . 'image/' . $this->config->get('config_logo');
+				$data['store_name'] = $this->config->get('config_name');
+				$data['store_slogan'] = htmlspecialchars_decode($this->config->get('config_slogan'), ENT_NOQUOTES);
+				$data['store_address'] = strtoupper($this->config->get('config_address'));
+				$data['store_email'] = $this->config->get('config_email');
+				$data['store_telephone'] = $this->config->get('config_telephone');
+				$data['store_fax'] = $this->config->get('config_fax');
+				$data['store_owner'] = $this->config->get('config_owner');
+			}
+
+			$data['store_url'] = ltrim(rtrim($order_info['store_url'], '/'), 'http://');
+
+			# Event Data
+			if (!$order_info['title']) {
+				$order_info['title'] = sprintf($this->language->get('text_atas_nama'), $order_info['firstname'] . ' ' . $order_info['lastname']);
+			}
+			$data['event_title'] = $order_info['title'];
+
+			$primary_product_info = $this->model_sale_order->getOrderPrimaryProduct($order_id);
+			$data['package'] = $primary_product_info['name'];
+
+			$primary_attributes = $this->model_sale_order->getOrderAttributes($order_id, $primary_product_info['order_product_id']);
+			foreach ($primary_attributes as $attribute) {
+				if ($attribute['attribute'] == 'Venue') {
+					$data['venue'] = $attribute['text'];
+				}
+			}
+
+			$event_date_in = $this->model_localisation_local_date->getInFormatDate($order_info['event_date']);
+			$data['event_date'] = $event_date_in['day'] . '/' . $event_date_in['long_date'];
+
+			$data['customer'] = $order_info['firstname'] . ' ' . $order_info['lastname'];
+			$data['slot'] = $order_info['slot'];
+
+			$data['products'] = [
+				'primary'		=> [],
+				'included'		=> [],
+				'additional'	=> [],
+			];
+
+			$products = $this->model_sale_order->getOrderProducts($order_id);
+
+			foreach ($products as $product) {
+				$option_data = array();
+
+				$options = $this->model_sale_order->getOrderOptions($order_id, $product['order_product_id']);
+
+				foreach ($options as $option) {
+					if ($option['type'] != 'file') {
+						$value = $option['value'];
+					} else {
+						$upload_info = $this->model_tool_upload->getUploadByCode($option['value']);
+
+						if ($upload_info) {
+							$value = $upload_info['name'];
+						} else {
+							$value = '';
+						}
+					}
+
+					$option_data[] = array(
+						'name'  => $option['name'],
+						'value' => $value
+					);
+				}
+
+				$attribute_data = array();
+
+				$attributes = $this->model_sale_order->getOrderAttributes($order_id, $product['order_product_id']);
+
+				foreach ($attributes as $attribute) {
+					if ($product['primary_type'] && $attribute['attribute'] == 'Venue') {
+						$data['venue'] = $attribute['text'];
+					} else {
+						$attribute_data[$attribute['attribute_group']][] = array(
+							'name'	=> $attribute['attribute'],
+							'value'	=> $attribute['text']
+						);
+					}
+				}
+
+				if ($product['primary_type']) {
+					$key = 'primary';
+				} elseif ($product['category'] == 'Included in Package') {
+					$key = 'included';
+				} elseif (substr($product['category'], 0, 6) != 'Charge') {
+					$key = 'additional';
+				} else {
+					$key = '';
+				}
+
+				if ($key) {
+					$data['products'][$key][] = array(
+						'category'	=> $product['category'],
+						'name'    	=> $product['name'],
+						'quantity'	=> $product['quantity'] . '&nbsp;' . $product['unit_class'],
+						'option'  	=> $option_data,
+						'attribute'	=> $attribute_data
+					);
+				}
+			}
+			
+			$data['product_primary'] = $data['products']['primary'][0];
+
+			// $print = isset($this->request->get['print']) && $this->request->get['print'] == 1;
+			// $preview = $order_checklist_info['printed'] || !$print || !$this->user->hasPermission('modify', 'sale/order');
+			// $preview = 0;// Development Purpose
+
+			if (!$order_checklist_info['printed']) {
+				$this->model_sale_document->editDocumentPrintStatus($order_checklist_info['order_document_id'], 1);
+			}
+
+			$this->response->setOutput($this->load->view('sale/order_checklist', $data));
+		} else {
+			return false;
 		}
 	}
 

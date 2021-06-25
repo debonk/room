@@ -95,6 +95,7 @@ class ControllerSettingSetting extends Controller {
 		$data['entry_error_display'] = $this->language->get('entry_error_display');
 		$data['entry_error_filename'] = $this->language->get('entry_error_filename');
 		$data['entry_error_log'] = $this->language->get('entry_error_log');
+		$data['entry_event_status'] = $this->language->get('entry_event_status');
 		$data['entry_expired_status'] = $this->language->get('entry_expired_status');
 		$data['entry_fax'] = $this->language->get('entry_fax');
 		$data['entry_file_ext_allowed'] = $this->language->get('entry_file_ext_allowed');
@@ -758,7 +759,7 @@ class ControllerSettingSetting extends Controller {
 		} elseif ($this->config->has('config_reverse_entry_limit')) {
 			$data['config_reverse_entry_limit'] = $this->config->get('config_reverse_entry_limit');
 		} else {
-			$data['config_reverse_entry_limit'] = -1;
+			$data['config_reverse_entry_limit'] = 0;
 		}
 
 		if (isset($this->request->post['config_account_id'])) {
@@ -1114,6 +1115,12 @@ class ControllerSettingSetting extends Controller {
 			$data['config_full_payment_limit'] = $this->request->post['config_full_payment_limit'];
 		} else {
 			$data['config_full_payment_limit'] = $this->config->get('config_full_payment_limit');
+		}
+
+		if (isset($this->request->post['config_event_status_id'])) {
+			$data['config_event_status_id'] = $this->request->post['config_event_status_id'];
+		} else {
+			$data['config_event_status_id'] = $this->config->get('config_event_status_id');
 		}
 
 		if (isset($this->request->post['config_expired_status_id'])) {

@@ -4,6 +4,10 @@
 	<div class="page-header">
 		<div class="container-fluid">
 			<div class="pull-right">
+				<button type="button" class="btn btn-primary" id="button-checklist"
+				<?php echo $event_status ? '' : 'disabled' ; ?> ><i class="fa fa-list-alt"></i>
+				<?php echo $button_checklist; ?>
+				</button>
 				<a href="<?php echo $document; ?>" target="_blank" class="btn btn-primary"><i class="fa fa-file-text-o"></i>
 					<?php echo $button_document; ?>
 				</a>
@@ -685,19 +689,19 @@
 		let warning_pos = $('#history').position();
 
 		$('.nav-tabs a[href="#tab-purchase"]').on('click', function () {
-			$('.alert, .text-danger').remove();
+			$('.text-danger').remove();
 			
 			$('#order-purchase').load('index.php?route=sale/purchase&token=<?php echo $token; ?>&order_id=<?php echo $order_id; ?>');
 		});
 
 		$('.nav-tabs a[href="#tab-customer"]').on('click', function () {
-			$('.alert, .text-danger').remove();
+			$('.text-danger').remove();
 
 			$('#order-customer').load('index.php?route=sale/customer&token=<?php echo $token; ?>&order_id=<?php echo $order_id; ?>');
 		});
 
 		$('.nav-tabs a[href="#tab-vendor"]').on('click', function () {
-			$('.alert, .text-danger').remove();
+			$('.text-danger').remove();
 			
 			$('#order-vendor').load('index.php?route=sale/vendor&token=<?php echo $token; ?>&order_id=<?php echo $order_id; ?>');
 		});
@@ -711,6 +715,10 @@
 				this.closest('li').remove();
 				open(url);
 			}
+		});
+
+		$('#button-checklist').on('click', function () {
+			open('index.php?route=sale/order/checklist&token=<?php echo $token; ?>&order_id=<?php echo $order_id; ?>');
 		});
 
 		$('#order-vendors-add ul').on('click', 'a[id^=\'vendor-add\']', function (e) {
