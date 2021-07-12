@@ -538,18 +538,18 @@ class ControllerApiOrder extends Controller
 					if ($transaction_type_info && $transaction_type_info['transaction_label'] == 'complete') {
 						if ($transaction_type_info['transaction_label'] == 'complete') {
 							$filter_category_label = ['order', 'purchase', 'deposit'];
-	
+
 							foreach ($filter_category_label as $category_label) {
 								$filter_summary_data = [
 									'category_label'	=> $category_label,
 									'group'				=> 'client_id'
 								];
-			
+
 								$transactions_total = $this->model_accounting_transaction->getTransactionsTotalByOrderId($order_id, $filter_summary_data);
-	
+
 								if (!empty($transactions_total)) {
 									$json['error'] = sprintf($this->language->get('error_amount_balance'), $this->language->get('text_category_' . $category_label));
-	
+
 									break;
 								}
 							}
@@ -945,6 +945,31 @@ class ControllerApiOrder extends Controller
 					break;
 				}
 
+				# if current order status is not event status and new status is event status, check payment and deposit status
+				if (($order_info['order_status_id'] != $this->config->get('config_event_status_id')) && ($this->request->post['order_status_id'] == $this->config->get('config_event_status_id'))) {
+					$payment_phases = $this->model_checkout_order->getPaymentPhases($order_id);
+
+					if (!$payment_phases['full_payment']['paid_status']) {
+						$json['error'] = $this->language->get('error_full_payment');
+
+						break;
+					}
+
+					$summary_data = [
+						'client_label'		=> 'customer',
+						'category_label'	=> 'deposit',
+						'transaction_label'	=> 'cash'
+					];
+			
+					$transaction_total = $this->model_accounting_transaction->getTransactionsTotalByOrderId($order_id, $summary_data);
+					
+					if ($transaction_total < $this->config->get('config_customer_deposit')) {
+						$json['error'] = $this->language->get('error_customer_deposit');
+
+						break;
+					}
+				}
+
 				$this->load->model('accounting/transaction');
 				$transaction_type_info = $this->model_accounting_transaction->getTransactionType($order_status_info['transaction_type_id']);
 
@@ -970,7 +995,7 @@ class ControllerApiOrder extends Controller
 								'category_label'	=> $category_label,
 								'group'				=> 'client_id'
 							];
-		
+
 							$transactions_total = $this->model_accounting_transaction->getTransactionsTotalByOrderId($order_id, $filter_summary_data);
 
 							if (!empty($transactions_total)) {
