@@ -243,6 +243,17 @@
 									</a>
 									<?php } ?>
 								</td>
+								<td class="text-center">
+									<?php if ($sort == 't.edit_permission') { ?>
+									<a href="<?= $sort_validated; ?>" class="<?= strtolower($order); ?>">
+										<?= $column_validated; ?>
+									</a>
+									<?php } else { ?>
+									<a href="<?= $sort_validated; ?>">
+										<?= $column_validated; ?>
+									</a>
+									<?php } ?>
+								</td>
 								<td class="text-left">
 									<?php if ($sort == 'u.username') { ?>
 									<a href="<?php echo $sort_username; ?>" class="<?php echo strtolower($order); ?>">
@@ -297,6 +308,9 @@
 								</td>
 								<td class="text-right">
 									<?php echo $transaction['amount']; ?>
+								</td>
+								<td class="text-center text-success">
+									<i class="fa fa-lg <?= $transaction['validated'] ? 'fa-check-square' : 'fa-square-o'; ?>"></i>
 								</td>
 								<td class="text-left">
 									<?php echo $transaction['username']; ?>

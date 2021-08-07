@@ -822,10 +822,11 @@ class ModelSaleOrder extends Model {
 			# Add the order history
 			$this->db->query("INSERT INTO " . DB_PREFIX . "order_history SET order_id = '" . (int)$order_id . "', order_status_id = '" . (int)$order_status_id . "', notify = '" . (int)$notify . "', comment = '" . $this->db->escape($comment) . "', date_added = NOW(), user_id = '" . $this->user->getId() . "'");
 
-			# If old order status is the processing or complete status but new status is not then commence restock, and remove coupon, voucher and reward history
+			# If old order status is processing or complete but new status is not then commence restock, and remove coupon, voucher and reward history
 			if (in_array($order_info['order_status_id'], array_merge($this->config->get('config_processing_status'), $this->config->get('config_complete_status'))) && !in_array($order_status_id, array_merge($this->config->get('config_processing_status'), $this->config->get('config_complete_status')))) {
 				# Delete system transaction
-				$this->db->query("DELETE t, ta FROM " . DB_PREFIX . "transaction t, " . DB_PREFIX . "transaction_account ta  WHERE client_label = 'customer' AND category_label = 'order' AND manual_select = 0 AND order_id = '" . (int)$order_id . "' AND client_id = '" . (int)$order_info['customer_id'] . "' AND ta.transaction_id = t.transaction_id");
+				$this->db->query("DELETE t, ta FROM " . DB_PREFIX . "transaction t, " . DB_PREFIX . "transaction_account ta  WHERE client_label = 'customer' AND category_label = 'order' AND transaction_label IN ('initial', 'complete', 'canceled') AND order_id = '" . (int)$order_id . "' AND client_id = '" . (int)$order_info['customer_id'] . "' AND ta.transaction_id = t.transaction_id");
+				$this->db->query("DELETE FROM " . DB_PREFIX . "transaction WHERE client_label = 'customer' AND category_label = 'order' AND transaction_label IN ('initial', 'complete', 'canceled') AND order_id = '" . (int)$order_id . "' AND client_id = '" . (int)$order_info['customer_id'] . "'");
 
 				// Restock
 				$product_query = $this->db->query("SELECT * FROM " . DB_PREFIX . "order_product WHERE order_id = '" . (int)$order_id . "'");

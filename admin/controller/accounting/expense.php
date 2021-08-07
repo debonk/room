@@ -173,6 +173,7 @@ class ControllerAccountingExpense extends Controller {
 			'column_account_debit',
 			'column_description',
 			'column_customer_name',
+			'column_validated',
 			'column_amount',
 			'column_username',
 			'column_action',
@@ -322,6 +323,7 @@ class ControllerAccountingExpense extends Controller {
 				'reference'  		=> $reference,
 				'customer_name'		=> $result['customer_name'],
 				'amount'      		=> $this->currency->format(-$result['amount'], $this->config->get('config_currency')),
+				'validated'			=> !$result['edit_permission'],
 				'username'      	=> $result['username'],
 				'order_url'     	=> $order_url,
 				'edit'          	=> $this->url->link('accounting/expense/edit', 'token=' . $this->session->data['token'] . '&transaction_id=' . $result['transaction_id'] . $url, true)
@@ -345,6 +347,7 @@ class ControllerAccountingExpense extends Controller {
 		$data['sort_reference'] = $this->url->link('accounting/expense', 'token=' . $this->session->data['token'] . '&sort=reference' . $url, true);
 		$data['sort_customer_name'] = $this->url->link('accounting/expense', 'token=' . $this->session->data['token'] . '&sort=t.customer_name' . $url, true);
 		$data['sort_amount'] = $this->url->link('accounting/expense', 'token=' . $this->session->data['token'] . '&sort=t.amount' . $url, true);
+		$data['sort_validated'] = $this->url->link('accounting/balance', 'token=' . $this->session->data['token'] . '&sort=t.edit_permission' . $url, true);
 		$data['sort_username'] = $this->url->link('accounting/expense', 'token=' . $this->session->data['token'] . '&sort=u.username' . $url, true);
 
 		$url = $this->urlFilter();

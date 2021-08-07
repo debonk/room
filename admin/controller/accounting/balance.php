@@ -182,6 +182,7 @@ class ControllerAccountingBalance extends Controller
 			'column_amount',
 			'column_username',
 			'column_action',
+			'column_validated',
 			'entry_account',
 			'entry_date_start',
 			'entry_date_end',
@@ -327,6 +328,7 @@ class ControllerAccountingBalance extends Controller
 				'description'		=> $result['description'],
 				'reference'  		=> $reference,
 				'customer_name'		=> $result['customer_name'],
+				'validated'			=> !$result['edit_permission'],
 				'amount'      		=> $this->currency->format(abs($result['amount']), $this->config->get('config_currency')),
 				'username'      	=> $result['username'],
 				'order_url'     	=> $order_url,
@@ -351,6 +353,7 @@ class ControllerAccountingBalance extends Controller
 		$data['sort_reference'] = $this->url->link('accounting/balance', 'token=' . $this->session->data['token'] . '&sort=reference' . $url, true);
 		$data['sort_customer_name'] = $this->url->link('accounting/balance', 'token=' . $this->session->data['token'] . '&sort=t.customer_name' . $url, true);
 		$data['sort_amount'] = $this->url->link('accounting/balance', 'token=' . $this->session->data['token'] . '&sort=t.amount' . $url, true);
+		$data['sort_validated'] = $this->url->link('accounting/balance', 'token=' . $this->session->data['token'] . '&sort=t.edit_permission' . $url, true);
 		$data['sort_username'] = $this->url->link('accounting/balance', 'token=' . $this->session->data['token'] . '&sort=u.username' . $url, true);
 
 		$url = $this->urlFilter();

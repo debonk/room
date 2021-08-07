@@ -13,11 +13,6 @@
   <link href="view/javascript/font-awesome/css/font-awesome.min.css" type="text/css" rel="stylesheet" />
   <link type="text/css" href="view/stylesheet/stylesheet.css" rel="stylesheet" media="all" />
   <link type="text/css" href="view/stylesheet/print.css" rel="stylesheet" media="all" />
-  <style>
-    @page {
-      margin-top: 7mm;
-    }
-  </style>
 </head>
 
 <body>
@@ -31,7 +26,7 @@
     <?php } ?>
     <?php for ($x = 0; $x < 2; $x++) { ?>
     <div style="page-break-after: always;"
-      class="<?= $letter_content; ?> <?= $x ? 'screen-hide' : ''; ?>">
+      class="<?= $letter_content; ?> <?= $x ? 'visible-print' : ''; ?>">
       <div class="clearfix">
         <div class="col-xs-4">
           <div class="text-center"><img src="<?= $store_logo; ?>" />

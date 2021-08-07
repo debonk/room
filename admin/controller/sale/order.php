@@ -2669,6 +2669,7 @@ class ControllerSaleOrder extends Controller
 				$data['letter_content'] = '';
 
 				$this->model_accounting_transaction->editTransactionPrintStatus($transaction_id, 1);
+				$this->model_accounting_transaction->editEditPermission($transaction_id, 0);
 			}
 		} else {
 			return false;
@@ -2751,9 +2752,7 @@ class ControllerSaleOrder extends Controller
 
 			$order_checklist_info = $this->model_sale_document->getOrderDocumentByOrderId($order_id, 'company', 'checklist');
 
-			if ($order_checklist_info) {
-				$data['reference'] = $order_checklist_info['reference'];
-			} else {
+			if (!$order_checklist_info) {
 				$document_data = [
 					'order_id'			=> $order_id,
 					'client_type'		=> 'company',
@@ -2761,10 +2760,12 @@ class ControllerSaleOrder extends Controller
 					'client_id'			=> 0
 				];
 
-				$order_checklist_info['order_document_id'] = $this->model_sale_document->addOrderDocumentByType($document_data);
+				$order_document_id = $this->model_sale_document->addOrderDocumentByType($document_data);
 
-				$data['reference'] = $this->model_sale_document->getOrderDocument($order_checklist_info['order_document_id'])['reference'];
+				$order_checklist_info = $this->model_sale_document->getOrderDocument($order_document_id);
 			}
+
+			$data['reference'] = $order_checklist_info['reference'];
 
 			$store_info = $this->model_setting_setting->getSetting('config', $order_info['store_id']);
 

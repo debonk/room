@@ -6,10 +6,15 @@ $_['heading_title']     		= 'Transaksi';
 $_['text_success']       		= 'Success: You have modified transaction!';
 $_['text_account']           	= 'Akun Transaksi';
 $_['text_add']           		= 'Tambah Transaksi';
+$_['text_confirm_print']        = 'Are you sure?\nTransaksi yang telah dicetak akan ditandai telah divalidasi dan tidak bisa diedit maupun dihapus lagi.';
 $_['text_edit']          		= 'Edit Transaksi';
 $_['text_list']         		= 'Daftar Transaksi';
+$_['text_print_list']         	= 'Cetak Transaksi';
 $_['text_total']     			= 'Total';
 $_['text_reference'] 			= 'No Referensi';
+$_['text_result'] 				= 'Jumlah: %d transaksi.';
+$_['text_signature'] 			= 'Dicetak oleh %s pada tanggal %s.';
+$_['text_success_print'] 		= 'Success: You have print transaction and signed as validated!';
 		
 // Column		
 $_['column_date'] 				= 'Tanggal';
@@ -20,6 +25,7 @@ $_['column_reference']			= 'No Referensi';
 $_['column_customer_name']		= 'Nama Klien';
 $_['column_amount']				= 'Jumlah';
 $_['column_transaction_type']	= 'Jenis Transaksi';
+$_['column_validated']			= 'Validated';
 $_['column_username']			= 'Username';
 $_['column_action']				= 'Action';
 		
@@ -36,6 +42,7 @@ $_['entry_description']    		= 'Keterangan';
 $_['entry_order_id']    		= 'Order ID';
 $_['entry_reference']    		= 'No Referensi';
 $_['entry_transaction_type']  	= 'Jenis Transaksi';
+$_['entry_validated']   		= 'Validation';
 $_['entry_username']   		 	= 'Username';
 
 // Error
@@ -52,8 +59,10 @@ $_['error_not_found']	 		= 'Warning: Transaksi tidak ditemukan!';
 $_['error_order']    			= 'Warning: Transaksi tidak bisa diedit/dihapus karena merupakan transaksi otomatis!';
 $_['error_order_permission']    = 'Warning: Tidak diijinkan untuk memberi akses edit untuk Transaksi Otomatis!';
 $_['error_order_status']		= 'Warning: Transaksi tidak bisa diedit/dihapus karena status pesanan telah "Complete"!';
-$_['error_printed']				= 'Warning: Transaksi tidak bisa diedit/dihapus karena telah dicetak!';
+// $_['error_reprinted']			= 'Warning: Transaksi telah dicetak sebelumnya. Klik Set as Unprint untuk cetak ulang!';
 $_['error_transaction_type']	= 'Pilih Jenis Transaksi';
+$_['error_lock_transaction']	= 'Warning: Pengubahan status validasi transaksi tidak diijinkan!';
+$_['error_validated']			= 'Warning: Transaksi tidak bisa diedit/dihapus karena telah tervalidasi!';
 
 // Button
 $_['button_account_add']    	= 'Add Transaction Account';

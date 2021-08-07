@@ -13,23 +13,11 @@
 	<link href="view/javascript/font-awesome/css/font-awesome.min.css" type="text/css" rel="stylesheet" />
 	<link type="text/css" href="view/stylesheet/stylesheet.css" rel="stylesheet" media="all" />
 	<link type="text/css" href="view/stylesheet/print.css" rel="stylesheet" media="all" />
-	<style>
-		@page {
-			margin-top: 7mm;
-		}
-	</style>
 </head>
 
 <body>
 	<div class="container">
-		<?php if ($preview) { ?>
-		<div id="background">
-			<p class="bg-text" id="bg-purchase">
-				<?= $text_mark; ?>
-			</p>
-		</div>
-		<?php } ?>
-		<div style="page-break-after: always;" class="<?= $letter_content; ?> <?= $x ? 'screen-hide' : ''; ?>">
+		<div>
 			<div class="clearfix">
 				<div class="col-xs-4">
 					<div class="text-center"><img src="<?= $store_logo; ?>" />

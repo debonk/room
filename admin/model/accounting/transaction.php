@@ -37,7 +37,7 @@ class ModelAccountingTransaction extends Model
 			$data['reference_no'] = $this->getLastReferenceNo($data['reference_prefix']) + 1;
 		}
 
-		$this->db->query("INSERT INTO " . DB_PREFIX . "transaction SET client_label = '" . $this->db->escape($transaction_type_info['client_label']) . "', category_label = '" . $this->db->escape($transaction_type_info['category_label']) . "', transaction_label = '" . $this->db->escape($transaction_type_info['transaction_label']) . "', account_type = '" . $this->db->escape($transaction_type_info['account_type']) . "', client_id = '" . (int)$data['client_id'] . "', order_id = '" . (int)$data['order_id'] . "', transaction_type_id = '" . (int)$data['transaction_type_id'] . "', date = DATE('" . $this->db->escape($data['date']) . "'), description = '" . $this->db->escape($data['description']) . "', payment_method = '" . $this->db->escape($data['payment_method']) . "', amount = '" . (float)$data['amount'] . "', customer_name = '" . $this->db->escape($data['customer_name']) . "', reference_prefix = '" . $this->db->escape($data['reference_prefix']) . "', reference_no = '" . (int)$data['reference_no'] . "', printed = '0', transaction_tax_id = '" . (int)$data['transaction_tax_id'] . "', edit_permission = '0', date_added = NOW(), user_id = '" . $this->user->getId() . "'");
+		$this->db->query("INSERT INTO " . DB_PREFIX . "transaction SET client_label = '" . $this->db->escape($transaction_type_info['client_label']) . "', category_label = '" . $this->db->escape($transaction_type_info['category_label']) . "', transaction_label = '" . $this->db->escape($transaction_type_info['transaction_label']) . "', account_type = '" . $this->db->escape($transaction_type_info['account_type']) . "', client_id = '" . (int)$data['client_id'] . "', order_id = '" . (int)$data['order_id'] . "', transaction_type_id = '" . (int)$data['transaction_type_id'] . "', date = DATE('" . $this->db->escape($data['date']) . "'), description = '" . $this->db->escape($data['description']) . "', payment_method = '" . $this->db->escape($data['payment_method']) . "', amount = '" . (float)$data['amount'] . "', customer_name = '" . $this->db->escape($data['customer_name']) . "', reference_prefix = '" . $this->db->escape($data['reference_prefix']) . "', reference_no = '" . (int)$data['reference_no'] . "', printed = '0', transaction_tax_id = '" . (int)$data['transaction_tax_id'] . "', edit_permission = '1', date_added = NOW(), user_id = '" . $this->user->getId() . "'");
 
 		$transaction_id = $this->db->getLastId();
 
@@ -65,7 +65,7 @@ class ModelAccountingTransaction extends Model
 
 	public function editTransaction($transaction_id, $data)
 	{
-		$sql = "UPDATE " . DB_PREFIX . "transaction SET edit_permission = 0, date_added = NOW(), user_id = '" . $this->user->getId() . "'";
+		$sql = "UPDATE " . DB_PREFIX . "transaction SET edit_permission = 1, date_added = NOW(), user_id = '" . $this->user->getId() . "'";
 
 		if (isset($data['transaction_type_id'])) {
 			$this->load->model('accounting/transaction_type');
@@ -170,6 +170,10 @@ class ModelAccountingTransaction extends Model
 			$implode[] = "t.customer_name LIKE '%" . $this->db->escape($data['filter']['customer_name']) . "%'";
 		}
 
+		if (isset($data['filter']['validated']) && !is_null($data['filter']['validated'])) {
+			$implode[] = "t.edit_permission = '" . $this->db->escape(!$data['filter']['validated']) . "'";
+		}
+
 		if (!empty($data['filter']['username'])) {
 			$implode[] = "u.username = '" . $this->db->escape($data['filter']['username']) . "'";
 		}
@@ -194,6 +198,7 @@ class ModelAccountingTransaction extends Model
 			't.description',
 			'reference',
 			't.customer_name',
+			't.edit_permission',
 			'transaction_type',
 			'total',
 			'u.username',
@@ -283,6 +288,10 @@ class ModelAccountingTransaction extends Model
 			$implode[] = "t.customer_name LIKE '%" . $this->db->escape($data['filter']['customer_name']) . "%'";
 		}
 
+		if (isset($data['filter']['validated']) && !is_null($data['filter']['validated'])) {
+			$implode[] = "t.edit_permission = '" . $this->db->escape(!$data['filter']['validated']) . "'";
+		}
+
 		if (!empty($data['filter']['username'])) {
 			$implode[] = "u.username = '" . $this->db->escape($data['filter']['username']) . "'";
 		}
@@ -352,6 +361,10 @@ class ModelAccountingTransaction extends Model
 
 		if (!empty($data['filter']['customer_name'])) {
 			$implode[] = "t.customer_name LIKE '%" . $this->db->escape($data['filter']['customer_name']) . "%'";
+		}
+
+		if (isset($data['filter']['validated']) && !is_null($data['filter']['validated'])) {
+			$implode[] = "t.edit_permission = '" . $this->db->escape(!$data['filter']['validated']) . "'";
 		}
 
 		if (!empty($data['filter']['username'])) {

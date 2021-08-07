@@ -90,12 +90,6 @@ hr {
 
 /*Background*/
 
-@media screen {
-.screen-hide {
-	display: none;
-}
-}
-
 @media print {
 #background{
     position: fixed;
@@ -118,7 +112,7 @@ hr {
 
 @page {
 	size: A4;
-	margin: 75mm 5mm 10mm;
+	margin: 7mm 5mm 10mm;
 }
 
 .page-content {

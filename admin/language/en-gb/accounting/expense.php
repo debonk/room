@@ -18,6 +18,7 @@ $_['column_description']		= 'Keterangan';
 $_['column_reference']			= 'No Referensi';
 $_['column_customer_name']		= 'Nama Klien';
 $_['column_amount']				= 'Jumlah';
+$_['column_validated']			= 'Validated';
 $_['column_username']			= 'Username';
 $_['column_action']				= 'Action';
 

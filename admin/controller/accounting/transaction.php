@@ -12,6 +12,7 @@ class ControllerAccountingTransaction extends Controller
 		'reference',
 		'order_id',
 		'customer_name',
+		'validated',
 		'username'
 	);
 
@@ -115,7 +116,7 @@ class ControllerAccountingTransaction extends Controller
 
 		if (isset($this->request->post['selected']) && $this->validateDelete()) {
 			foreach ($this->request->post['selected'] as $transaction_id) {
-				$this->model_accounting_transaction->deleteTransaction($transaction_id);
+				// $this->model_accounting_transaction->deleteTransaction($transaction_id);
 			}
 
 			$this->session->data['success'] = $this->language->get('text_success');
@@ -147,10 +148,13 @@ class ControllerAccountingTransaction extends Controller
 			'text_list',
 			'text_all',
 			'text_confirm',
+			'text_confirm_print',
 			'text_total',
 			'text_no_results',
 			'text_success',
 			'text_select',
+			'text_yes',
+			'text_no',
 			'text_none',
 			'column_date',
 			'column_account_credit',
@@ -160,6 +164,7 @@ class ControllerAccountingTransaction extends Controller
 			'column_customer_name',
 			'column_amount',
 			'column_transaction_type',
+			'column_validated',
 			'column_username',
 			'column_action',
 			'entry_date_start',
@@ -170,13 +175,15 @@ class ControllerAccountingTransaction extends Controller
 			'entry_order_id',
 			'entry_customer_name',
 			'entry_transaction_type',
+			'entry_validated',
 			'entry_username',
 			'button_filter',
 			'button_add',
 			'button_edit',
 			'button_edit_lock',
 			'button_edit_unlock',
-			'button_delete'
+			'button_delete',
+			'button_print'
 		);
 		foreach ($language_items as $language_item) {
 			$data[$language_item] = $this->language->get($language_item);
@@ -206,9 +213,9 @@ class ControllerAccountingTransaction extends Controller
 			$filter[$filter_item] = isset($this->request->get['filter_' . $filter_item]) ? $this->request->get['filter_' . $filter_item] : null;
 		}
 
-		if (empty($filter['date_start'])) {
-			$filter['date_start'] = date('Y-m-d', strtotime(date('Y') . '-01-01'));
-		}
+		// if (empty($filter['date_start'])) {
+		// 	$filter['date_start'] = date('Y-m-d', strtotime(date('Y') . '-01-01'));
+		// }
 
 		if (isset($this->request->get['sort'])) {
 			$sort = $this->request->get['sort'];
@@ -256,6 +263,7 @@ class ControllerAccountingTransaction extends Controller
 
 		$data['add'] = $this->url->link('accounting/transaction/add', 'token=' . $this->session->data['token'] . $url, true);
 		$data['delete'] = $this->url->link('accounting/transaction/delete', 'token=' . $this->session->data['token'] . $url, true);
+		$data['print'] = $this->url->link('accounting/transaction/print', 'token=' . $this->session->data['token'] . $url, true);
 
 		$data['transactions'] = array();
 		$limit = $this->config->get('config_limit_admin');
@@ -272,7 +280,7 @@ class ControllerAccountingTransaction extends Controller
 		$transaction_total = $this->model_accounting_transaction->getTransactionsTotal($filter_data);
 
 		$results = $this->model_accounting_transaction->getTransactions($filter_data);
-
+		
 		foreach ($results as $result) {
 			if (!empty($result['order_id'])) {
 				$reference = '#' . $result['order_id'] . ($result['reference_no'] ? ': ' . $result['reference'] : '');
@@ -318,6 +326,7 @@ class ControllerAccountingTransaction extends Controller
 				'amount'      	=> $this->currency->format($result['amount'], $this->config->get('config_currency')),
 				'username'      => $result['username'],
 				'order_url'     => $order_url,
+				'validated'		=> !$result['edit_permission'],
 				'unlock'		=> $result['edit_permission'],
 				'edit'          => $this->url->link('accounting/transaction/edit', 'token=' . $this->session->data['token'] . '&transaction_id=' . $result['transaction_id'] . $url, true),
 				'uncomplete'    => $uncomplete
@@ -342,6 +351,7 @@ class ControllerAccountingTransaction extends Controller
 		$data['sort_reference'] = $this->url->link('accounting/transaction', 'token=' . $this->session->data['token'] . '&sort=reference' . $url, true);
 		$data['sort_customer_name'] = $this->url->link('accounting/transaction', 'token=' . $this->session->data['token'] . '&sort=t.customer_name' . $url, true);
 		$data['sort_amount'] = $this->url->link('accounting/transaction', 'token=' . $this->session->data['token'] . '&sort=t.amount' . $url, true);
+		$data['sort_validated'] = $this->url->link('accounting/transaction', 'token=' . $this->session->data['token'] . '&sort=t.edit_permission' . $url, true);
 		$data['sort_username'] = $this->url->link('accounting/transaction', 'token=' . $this->session->data['token'] . '&sort=u.username' . $url, true);
 
 		$url = $this->urlFilter();
@@ -367,11 +377,12 @@ class ControllerAccountingTransaction extends Controller
 		$data['token'] = $this->session->data['token'];
 
 		$this->load->model('accounting/transaction_type');
-		// $data['transaction_types'] = $this->model_accounting_transaction_type->getTransactionTypes();
 		$data['transaction_types'] = $this->model_accounting_transaction_type->getTransactionTypesMenu(['manual_select' => '*']);
 
 		$this->load->model('accounting/account');
 		$data['accounts'] = $this->model_accounting_account->getAccountsMenuByComponent();
+
+		$data['url'] = $url;
 
 		$data['filter'] = $filter;
 		$data['sort'] = $sort;
@@ -526,6 +537,139 @@ class ControllerAccountingTransaction extends Controller
 		$this->response->setOutput($this->load->view('accounting/transaction_form', $data));
 	}
 
+	public function print()
+	{
+		$this->document->addStyle('view/stylesheet/print.css', 'stylesheet', 'all');
+		$this->load->language('accounting/transaction');
+
+		$this->document->setTitle($this->language->get('heading_title'));
+
+		$this->load->model('accounting/transaction');
+
+		if (isset($this->request->post['selected']) && $this->validatePrint()) {
+			$language_items = array(
+				'heading_title',
+				'text_print_list',
+				'text_total',
+				'text_no_results',
+				'column_date',
+				'column_account_credit',
+				'column_account_debit',
+				'column_description',
+				'column_reference',
+				'column_customer_name',
+				'column_amount',
+				'column_transaction_type',
+				'column_username',
+				'button_back',
+				'button_print'
+			);
+			foreach ($language_items as $language_item) {
+				$data[$language_item] = $this->language->get($language_item);
+			}
+
+			$url = $this->urlFilter();
+
+			if (isset($this->request->get['sort'])) {
+				$url .= '&sort=' . $this->request->get['sort'];
+			}
+
+			if (isset($this->request->get['order'])) {
+				$url .= '&order=' . $this->request->get['order'];
+			}
+
+			if (isset($this->request->get['page'])) {
+				$url .= '&page=' . $this->request->get['page'];
+			}
+
+			$data['breadcrumbs'] = array();
+
+			$data['breadcrumbs'][] = array(
+				'text' => $this->language->get('text_home'),
+				'href' => $this->url->link('common/dashboard', 'token=' . $this->session->data['token'], true)
+			);
+
+			$data['breadcrumbs'][] = array(
+				'text' => $this->language->get('heading_title'),
+				'href' => $this->url->link('accounting/transaction', 'token=' . $this->session->data['token'], true)
+			);
+
+			$data['breadcrumbs'][] = array(
+				'text' => $this->language->get('text_print_list'),
+				'href' => $this->url->link('accounting/transaction/print', 'token=' . $this->session->data['token'], true)
+			);
+
+			$data['back'] = $this->url->link('accounting/transaction', 'token=' . $this->session->data['token'] . $url, true);
+
+			$data['transactions'] = array();
+			$transaction_total = 0;
+			$transaction_count = 0;
+
+			foreach ($this->request->post['selected'] as $transaction_id) {
+				$transaction_info = $this->model_accounting_transaction->getTransaction($transaction_id);
+
+				if (!empty($transaction_info['order_id'])) {
+					$reference = '#' . $transaction_info['order_id'] . ($transaction_info['reference_no'] ? ': ' . $transaction_info['reference'] : '');
+				} else {
+					$reference = $transaction_info['reference'];
+				}
+
+				if ($transaction_info['account_type'] == 'C') {
+					$transaction_info['amount'] = -$transaction_info['amount'];
+				}
+
+				$transaction_total += $transaction_info['amount'];
+				$transaction_count++;
+
+				$account_data = [
+					'debit'		=> [],
+					'credit'	=> []
+				];
+
+				$transaction_accounts = $this->model_accounting_transaction->getTransactionAccounts($transaction_info['transaction_id']);
+				foreach ($transaction_accounts as $transaction_account) {
+					if ($transaction_account['debit'] > 0 || $transaction_account['credit'] < 0) {
+						$account_data['debit'][] = $transaction_account['account_id'] . ' - ' . $transaction_account['account'];
+					}
+					if ($transaction_account['debit'] < 0 || $transaction_account['credit'] > 0) {
+						$account_data['credit'][] = $transaction_account['account_id'] . ' - ' . $transaction_account['account'];
+					}
+				}
+
+				if (empty($account_data['debit']) || empty($account_data['credit']) || (array_sum(array_column($transaction_accounts, 'debit')) != array_sum(array_column($transaction_accounts, 'credit')))) {
+					continue;
+				}
+
+				$data['transactions'][] = array(
+					// 'transaction_id' => $transaction_info['transaction_id'],
+					'date'	 			=> date($this->language->get('date_format_short'), strtotime($transaction_info['date'])),
+					'transaction_type'	=> $transaction_info['transaction_type'],
+					'reference'  		=> $reference,
+					'description'		=> $transaction_info['description'],
+					'customer_name'		=> $transaction_info['customer_name'],
+					'account'			=> $account_data,
+					'amount'      		=> $this->currency->format($transaction_info['amount'], $this->config->get('config_currency'))
+				);
+
+				$this->model_accounting_transaction->editTransactionPrintStatus($transaction_id, 1);
+				$this->model_accounting_transaction->editEditPermission($transaction_id, 0);
+			}
+
+			$data['results'] = sprintf($this->language->get('text_result'), $transaction_count);
+			$data['signature'] = sprintf($this->language->get('text_signature'), $this->user->getUserName(), date($this->language->get('date_format_short'), strtotime('today')));
+
+			$this->session->data['success'] = $this->language->get('text_success_print');
+
+			$data['total'] = $this->currency->format($transaction_total, $this->config->get('config_currency'));
+
+			$data['header'] = $this->load->controller('common/header');
+
+			$this->response->setOutput($this->load->view('accounting/transaction_print_list', $data));
+		} else {
+			$this->getList();
+		}
+	}
+
 	protected function validateForm()
 	{
 		switch (false) {
@@ -586,17 +730,17 @@ class ControllerAccountingTransaction extends Controller
 					break;
 				}
 
-				// if (isset($this->request->get['transaction_id'])) {
-				// 	$transaction_info = $this->model_accounting_transaction->getTransaction($this->request->get['transaction_id']);
+				if (isset($this->request->get['transaction_id'])) {
+					$transaction_info = $this->model_accounting_transaction->getTransaction($this->request->get['transaction_id']);
 
-				// 	if ($transaction_info['printed']) {
-				// 		$this->error['warning'] = $this->language->get('error_printed');
+					if (!$transaction_info['edit_permission']) {
+						$this->error['warning'] = $this->language->get('error_validated');
 
-				// 		break;
-				// 	}
+						break;
+					}
 
-					# Aktifkan jika edit transaksi tidak diijinkan setelah status complete
-					/* 					if ($transaction_info['order_id']) {
+				# Aktifkan jika edit transaksi tidak diijinkan setelah status complete
+				/* 					if ($transaction_info['order_id']) {
 						$this->load->model('sale/order');
 						$order_status_id = $this->model_sale_order->getOrderStatusId($transaction_info['order_id']);
 
@@ -606,7 +750,7 @@ class ControllerAccountingTransaction extends Controller
 							break;
 						}
 					} */
-				// }
+				}
 
 			default:
 				break;
@@ -625,9 +769,9 @@ class ControllerAccountingTransaction extends Controller
 
 		foreach ($this->request->post['selected'] as $transaction_id) {
 			$transaction_info = $this->model_accounting_transaction->getTransaction($transaction_id);
-
-			if ($transaction_info['printed']) {
-				$this->error['warning'] = $this->language->get('error_printed');
+			
+			if (!$transaction_info['edit_permission']) {
+				$this->error['warning'] = $this->language->get('error_validated');
 
 				break;
 			}
@@ -646,6 +790,26 @@ class ControllerAccountingTransaction extends Controller
 		return !$this->error;
 	}
 
+	protected function validatePrint()
+	{
+		if (!$this->user->hasPermission('modify', 'accounting/transaction')) {
+			$this->error['warning'] = $this->language->get('error_permission');
+		}
+
+		# 1x print validation
+		/* foreach ($this->request->post['selected'] as $transaction_id) {
+			$transaction_info = $this->model_accounting_transaction->getTransaction($transaction_id);
+
+			if ($transaction_info['printed']) {
+				$this->error['warning'] = $this->language->get('error_reprinted');
+
+				break;
+			}
+		} */
+
+		return !$this->error;
+	}
+
 	public function editPermission()
 	{
 		$this->load->language('accounting/transaction');
@@ -654,6 +818,8 @@ class ControllerAccountingTransaction extends Controller
 
 		if (!$this->user->hasPermission('modify', 'accounting/transaction')) {
 			$json['error'] = $this->language->get('error_permission');
+		} elseif ($this->config->get('config_lock_printed_transaction')) {
+			$json['error'] = $this->language->get('error_lock_transaction');
 		} else {
 			$this->load->model('accounting/transaction');
 			$transaction_info = $this->model_accounting_transaction->getTransaction($this->request->post['transaction_id']);
