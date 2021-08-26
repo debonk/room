@@ -83,12 +83,12 @@
             <table class="table table-bordered table-hover">
               <thead>
                 <tr>
-				  <td class="text-right"><?php if ($sort == 'o.order_id') { ?>
+				  				<td class="text-right"><?php if ($sort == 'o.order_id') { ?>
                     <a href="<?php echo $sort_order; ?>" class="<?php echo strtolower($order); ?>"><?php echo $column_order_id; ?></a>
                     <?php } else { ?>
                     <a href="<?php echo $sort_order; ?>"><?php echo $column_order_id; ?></a>
                     <?php } ?></td>
-				  <td class="text-left"><?php if ($sort == 'o.event_date') { ?>
+				  				<td class="text-left"><?php if ($sort == 'o.event_date') { ?>
                     <a href="<?php echo $sort_event_date; ?>" class="<?php echo strtolower($order); ?>"><?php echo $column_event_date; ?></a>
                     <?php } else { ?>
                     <a href="<?php echo $sort_event_date; ?>"><?php echo $column_event_date; ?></a>

@@ -136,7 +136,7 @@
     </div>
   </div>
   <?php if ($voucher_id) { ?>
-  <script type="text/javascript"><!--
+  <script type="text/javascript">
 $('#button-send').on('click', function() {
 	$.ajax({
 		url: 'index.php?route=sale/voucher/send&token=<?php echo $token; ?>',
@@ -167,8 +167,8 @@ $('#button-send').on('click', function() {
 		}
 	});	
 })
-//--></script> 
-  <script type="text/javascript"><!--
+</script> 
+  <script type="text/javascript">
 $('#history').delegate('.pagination a', 'click', function(e) {
 	e.preventDefault();
 
@@ -176,7 +176,7 @@ $('#history').delegate('.pagination a', 'click', function(e) {
 });			
 
 $('#history').load('index.php?route=sale/voucher/history&token=<?php echo $token; ?>&voucher_id=<?php echo $voucher_id; ?>');
-//--></script>
+</script>
   <?php } ?>
 </div>
 <?php echo $footer; ?>

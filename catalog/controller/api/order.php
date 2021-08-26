@@ -254,6 +254,7 @@ class ControllerApiOrder extends Controller
 						'total'        => $product['total'],
 						'tax'          => $this->tax->getTax($product['price'], $product['tax_class_id']),
 						'reward'       => $product['reward'],
+						'commission'   => $product['commission'],
 						'slot_prefix'  => $product['slot_prefix'],
 						'primary_type' => $product['primary_type']
 					);
@@ -700,6 +701,7 @@ class ControllerApiOrder extends Controller
 					'total'        => $product['total'],
 					'tax'          => $this->tax->getTax($product['price'], $product['tax_class_id']),
 					'reward'       => $product['reward'],
+					'commission'   => $product['commission'],
 					'slot_prefix'  => $product['slot_prefix'],
 					'primary_type' => $product['primary_type']
 				);

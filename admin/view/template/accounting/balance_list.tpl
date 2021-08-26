@@ -356,16 +356,7 @@
 	$('#button-filter').on('click', function () {
 		url = 'index.php?route=accounting/balance&token=<?php echo $token; ?>';
 
-		let filter_items = [
-			'date_start',
-			'date_end',
-			'account_id',
-			'transaction_type_id',
-			'description',
-			'reference',
-			'customer_name',
-			'username'
-		];
+		let filter_items = JSON.parse('<?= $filter_items; ?>');
 
 		let filter = [];
 

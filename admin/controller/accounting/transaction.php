@@ -116,7 +116,7 @@ class ControllerAccountingTransaction extends Controller
 
 		if (isset($this->request->post['selected']) && $this->validateDelete()) {
 			foreach ($this->request->post['selected'] as $transaction_id) {
-				// $this->model_accounting_transaction->deleteTransaction($transaction_id);
+				$this->model_accounting_transaction->deleteTransaction($transaction_id);
 			}
 
 			$this->session->data['success'] = $this->language->get('text_success');

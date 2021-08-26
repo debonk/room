@@ -985,6 +985,12 @@
                   </tbody>
                 </table>
               </div>
+              <div class="form-group">
+                <label class="col-sm-2 control-label" for="input-commission"><span data-toggle="tooltip" title="<?php echo $help_commission; ?>"><?php echo $entry_commission; ?></span></label>
+                <div class="col-sm-10">
+                  <input type="text" name="commission" value="<?php echo $commission; ?>" placeholder="<?php echo $entry_commission; ?>" id="input-commission" class="form-control" />
+                </div>
+              </div>
             </div>
             <div class="tab-pane" id="tab-design">
               <div class="table-responsive">

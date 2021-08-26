@@ -286,6 +286,7 @@ class Cart {
 					'total'           		=> ($price + $option_price) * $cart['quantity'],
 					'reward'          		=> $reward * $cart['quantity'],
 					'points'          		=> ($product_query->row['points'] ? ($product_query->row['points'] + $option_points) * $cart['quantity'] : 0),
+					'commission'          	=> ($product_query->row['commission'] ? $product_query->row['commission'] * $cart['quantity'] : 0),
 					'tax_class_id'    		=> $product_query->row['tax_class_id'],
 					'weight'          		=> ($product_query->row['weight'] + $option_weight) * $cart['quantity'],
 					'weight_class_id' 		=> $product_query->row['weight_class_id'],

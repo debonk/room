@@ -695,6 +695,7 @@ class ControllerCatalogProduct extends Controller {
 		$data['entry_stock_status'] = $this->language->get('entry_stock_status');
 		$data['entry_price'] = $this->language->get('entry_price');
 		$data['entry_tax_class'] = $this->language->get('entry_tax_class');
+		$data['entry_commission'] = $this->language->get('entry_commission');
 		$data['entry_points'] = $this->language->get('entry_points');
 		$data['entry_option_points'] = $this->language->get('entry_option_points');
 		$data['entry_subtract'] = $this->language->get('entry_subtract');
@@ -746,6 +747,7 @@ class ControllerCatalogProduct extends Controller {
 		$data['help_manufacturer'] = $this->language->get('help_manufacturer');
 		$data['help_stock_status'] = $this->language->get('help_stock_status');
 		$data['help_points'] = $this->language->get('help_points');
+		$data['help_commission'] = $this->language->get('help_commission');
 		$data['help_category'] = $this->language->get('help_category');
 		$data['help_filter'] = $this->language->get('help_filter');
 		$data['help_download'] = $this->language->get('help_download');
@@ -1506,6 +1508,14 @@ class ControllerCatalogProduct extends Controller {
 			$data['product_reward'] = $this->model_catalog_product->getProductRewards($this->request->get['product_id']);
 		} else {
 			$data['product_reward'] = array();
+		}
+
+		if (isset($this->request->post['commission'])) {
+			$data['commission'] = $this->request->post['commission'];
+		} elseif (!empty($product_info)) {
+			$data['commission'] = $product_info['commission'];
+		} else {
+			$data['commission'] = '';
 		}
 
 		if (isset($this->request->post['product_layout'])) {

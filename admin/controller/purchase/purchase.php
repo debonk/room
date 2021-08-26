@@ -1049,13 +1049,7 @@ class ControllerPurchasePurchase extends Controller
 				$asset_info = $this->model_accounting_account->getAccount($asset_id);
 
 				if (empty($asset_info)) {
-					$asset_id = $this->config->get('config_asset_account_id');
-
-					$asset_replacement_info = $this->model_accounting_account->getAccount($asset_id);
-
-					if (empty($asset_replacement_info)) {
-						$json['error'] = $this->language->get('error_asset_not_found');
-					}
+					$json['error'] = $this->language->get('error_asset_not_found');
 				}
 			} else {
 				$json['error'] = $this->language->get('error_action');

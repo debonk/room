@@ -483,31 +483,6 @@
 								<legend>
 									<?= $text_product; ?>
 								</legend>
-								<div class="form-group">
-									<label class="col-sm-2 control-label"><span data-toggle="tooltip" title="<?= $help_product_count; ?>">
-											<?= $entry_product_count; ?>
-										</span></label>
-									<div class="col-sm-10">
-										<label class="radio-inline">
-											<?php if ($config_product_count) { ?>
-											<input type="radio" name="config_product_count" value="1" checked="checked" />
-											<?= $text_yes; ?>
-											<?php } else { ?>
-											<input type="radio" name="config_product_count" value="1" />
-											<?= $text_yes; ?>
-											<?php } ?>
-										</label>
-										<label class="radio-inline">
-											<?php if (!$config_product_count) { ?>
-											<input type="radio" name="config_product_count" value="0" checked="checked" />
-											<?= $text_no; ?>
-											<?php } else { ?>
-											<input type="radio" name="config_product_count" value="0" />
-											<?= $text_no; ?>
-											<?php } ?>
-										</label>
-									</div>
-								</div>
 								<div class="form-group required">
 									<label class="col-sm-2 control-label" for="input-admin-limit"><span data-toggle="tooltip"
 											title="<?= $help_limit_admin; ?>">
@@ -967,36 +942,6 @@
 										</select>
 									</div>
 								</div>
-								<div class="form-group">
-									<label class="col-sm-2 control-label" for="input-asset-account"><span data-toggle="tooltip"
-											title="<?= $help_asset_account; ?>">
-											<?= $entry_asset_account; ?>
-										</span></label>
-									<div class="col-sm-10">
-										<select name="config_asset_account_id" id="input-asset-account" class="form-control">
-											<option value="">
-												<?= $text_select; ?>
-											</option>
-											<?php foreach ($asset_accounts as $account) { ?>
-											<optgroup label="<?= $account['text']; ?>">
-												<?php if ($account['child']) { ?>
-												<?php foreach ($account['child'] as $child) { ?>
-												<?php if ($child['account_id'] == $config_asset_account_id) { ?>
-												<option value="<?= $child['account_id']; ?>" selected="selected">
-													<?= $child['text']; ?>
-												</option>
-												<?php } else { ?>
-												<option value="<?= $child['account_id']; ?>">
-													<?= $child['text']; ?>
-												</option>
-												<?php } ?>
-												<?php } ?>
-												<?php } ?>
-											</optgroup>
-											<?php } ?>
-										</select>
-									</div>
-								</div>
 							</fieldset>
 							<fieldset>
 								<legend>
@@ -1336,6 +1281,94 @@
 							</fieldset>
 							<fieldset>
 								<legend>
+									<?= $text_sales_commission; ?>
+								</legend>
+								<div class="form-group">
+									<label class="col-sm-2 control-label">
+											<?= $entry_sales_commission; ?>
+										</label>
+									<div class="col-sm-10">
+										<?php foreach ($sales_commissions as $sales_commission) { ?>
+										<div class="checkbox">
+											<label>
+												<?php if (in_array($sales_commission['value'], $config_sales_commission)) { ?>
+												<input type="checkbox" name="config_sales_commission[]"
+													value="<?= $sales_commission['value']; ?>" checked="checked" />
+												<?= $sales_commission['text']; ?>
+												<?php } else { ?>
+												<input type="checkbox" name="config_sales_commission[]"
+													value="<?= $sales_commission['value']; ?>" />
+												<?= $sales_commission['text']; ?>
+												<?php } ?>
+											</label>
+										</div>
+										<?php } ?>
+									</div>
+								</div>
+								<div class="form-group">
+									<label class="col-sm-2 control-label" for="input-sales-commission1-amount"><span data-toggle="tooltip"
+											title="<?= $help_sales_commission1_amount; ?>">
+											<?= $entry_sales_commission1_amount; ?>
+										</span></label>
+									<div class="col-sm-10">
+										<input type="text" name="config_sales_commission1_amount" value="<?= $config_sales_commission1_amount; ?>"
+											placeholder="<?= $entry_sales_commission1_amount; ?>" id="input-sales-commission1-amount" class="form-control" />
+									</div>
+								</div>
+								<div class="form-group">
+									<label class="col-sm-2 control-label" for="input-sales-commission1-status"><span data-toggle="tooltip"
+											title="<?= $help_sales_commission1_status; ?>">
+											<?= $entry_sales_commission1_status; ?>
+										</span></label>
+									<div class="col-sm-10">
+										<div class="well well-sm" style="height: 150px; overflow: auto;">
+											<?php foreach ($order_statuses as $order_status) { ?>
+											<div class="checkbox col-sm-4">
+												<label>
+													<?php if (in_array($order_status['order_status_id'], $config_sales_commission1_status)) { ?>
+													<input type="checkbox" name="config_sales_commission1_status[]"
+														value="<?= $order_status['order_status_id']; ?>" checked="checked" />
+													<?= $order_status['name']; ?>
+													<?php } else { ?>
+													<input type="checkbox" name="config_sales_commission1_status[]"
+														value="<?= $order_status['order_status_id']; ?>" />
+													<?= $order_status['name']; ?>
+													<?php } ?>
+												</label>
+											</div>
+											<?php } ?>
+										</div>
+									</div>
+								</div>
+								<div class="form-group">
+									<label class="col-sm-2 control-label" for="input-sales-commission2-status"><span data-toggle="tooltip"
+											title="<?= $help_sales_commission2_status; ?>">
+											<?= $entry_sales_commission2_status; ?>
+										</span></label>
+									<div class="col-sm-10">
+										<div class="well well-sm" style="height: 150px; overflow: auto;">
+											<?php foreach ($order_statuses as $order_status) { ?>
+											<div class="checkbox col-sm-4">
+												<label>
+													<?php if (in_array($order_status['order_status_id'], $config_sales_commission2_status)) { ?>
+													<input type="checkbox" name="config_sales_commission2_status[]"
+														value="<?= $order_status['order_status_id']; ?>" checked="checked" />
+													<?= $order_status['name']; ?>
+													<?php } else { ?>
+													<input type="checkbox" name="config_sales_commission2_status[]"
+														value="<?= $order_status['order_status_id']; ?>" />
+													<?= $order_status['name']; ?>
+													<?php } ?>
+												</label>
+											</div>
+											<?php } ?>
+										</div>
+									</div>
+								</div>
+	
+							</fieldset>
+							<fieldset>
+								<legend>
 									<?= $text_affiliate; ?>
 								</legend>
 								<div class="form-group">
@@ -1454,56 +1487,6 @@
 							</fieldset>
 							<fieldset>
 								<legend>
-									<?= $text_return; ?>
-								</legend>
-								<div class="form-group">
-									<label class="col-sm-2 control-label" for="input-return"><span data-toggle="tooltip"
-											title="<?= $help_return; ?>">
-											<?= $entry_return; ?>
-										</span></label>
-									<div class="col-sm-10">
-										<select name="config_return_id" id="input-return" class="form-control">
-											<option value="0">
-												<?= $text_none; ?>
-											</option>
-											<?php foreach ($informations as $information) { ?>
-											<?php if ($information['information_id'] == $config_return_id) { ?>
-											<option value="<?= $information['information_id']; ?>" selected="selected">
-												<?= $information['title']; ?>
-											</option>
-											<?php } else { ?>
-											<option value="<?= $information['information_id']; ?>">
-												<?= $information['title']; ?>
-											</option>
-											<?php } ?>
-											<?php } ?>
-										</select>
-									</div>
-								</div>
-								<div class="form-group">
-									<label class="col-sm-2 control-label" for="input-return-status"><span data-toggle="tooltip"
-											title="<?= $help_return_status; ?>">
-											<?= $entry_return_status; ?>
-										</span></label>
-									<div class="col-sm-10">
-										<select name="config_return_status_id" id="input-return-status" class="form-control">
-											<?php foreach ($return_statuses as $return_status) { ?>
-											<?php if ($return_status['return_status_id'] == $config_return_status_id) { ?>
-											<option value="<?= $return_status['return_status_id']; ?>" selected="selected">
-												<?= $return_status['name']; ?>
-											</option>
-											<?php } else { ?>
-											<option value="<?= $return_status['return_status_id']; ?>">
-												<?= $return_status['name']; ?>
-											</option>
-											<?php } ?>
-											<?php } ?>
-										</select>
-									</div>
-								</div>
-							</fieldset>
-							<fieldset>
-								<legend>
 									<?= $text_captcha; ?>
 								</legend>
 								<div class="form-group">
@@ -1511,7 +1494,7 @@
 											<?= $entry_captcha; ?>
 										</span></label>
 									<div class="col-sm-10">
-										<select name="config_captcha" id="input-return" class="form-control">
+										<select name="config_captcha" id="input-captcha" class="form-control">
 											<option value="">
 												<?= $text_none; ?>
 											</option>
@@ -1752,7 +1735,7 @@
 								<div class="col-sm-10">
 									<div class="well well-sm" style="height: 150px; overflow: auto;">
 										<?php foreach ($order_statuses as $order_status) { ?>
-										<div class="checkbox">
+										<div class="checkbox col-sm-4">
 											<label>
 												<?php if (in_array($order_status['order_status_id'], $config_processing_status)) { ?>
 												<input type="checkbox" name="config_processing_status[]"
@@ -1782,7 +1765,7 @@
 								<div class="col-sm-10">
 									<div class="well well-sm" style="height: 150px; overflow: auto;">
 										<?php foreach ($order_statuses as $order_status) { ?>
-										<div class="checkbox">
+										<div class="checkbox col-sm-4">
 											<label>
 												<?php if (in_array($order_status['order_status_id'], $config_complete_status)) { ?>
 												<input type="checkbox" name="config_complete_status[]"
@@ -1812,7 +1795,7 @@
 								<div class="col-sm-10">
 									<div class="well well-sm" style="height: 150px; overflow: auto;">
 										<?php foreach ($order_statuses as $order_status) { ?>
-										<div class="checkbox">
+										<div class="checkbox col-sm-4">
 											<label>
 												<?php if (in_array($order_status['order_status_id'], $config_status_with_payment)) { ?>
 												<input type="checkbox" name="config_status_with_payment[]"

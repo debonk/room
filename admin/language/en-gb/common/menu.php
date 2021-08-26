@@ -72,6 +72,7 @@ $_['text_return_status']               = 'Return Statuses';
 $_['text_return']                      = 'Returns';
 $_['text_review']                      = 'Reviews';
 $_['text_sale_coupon']                 = 'Coupons';
+$_['text_sale_commission']             = 'Commissions';
 $_['text_sale_document']               = 'Documents';
 $_['text_sale_order']                  = 'Orders';
 $_['text_sale_tax']                    = 'Tax';

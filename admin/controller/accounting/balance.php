@@ -377,6 +377,7 @@ class ControllerAccountingBalance extends Controller
 		$data['results'] = sprintf($this->language->get('text_pagination'), ($transaction_count) ? (($page - 1) * $limit) + 1 : 0, ((($page - 1) * $limit) > ($transaction_count - $limit)) ? $transaction_count : ((($page - 1) * $limit) + $limit), $transaction_count, ceil($transaction_count / $limit));
 
 		$data['token'] = $this->session->data['token'];
+		$data['filter_items'] = json_encode($this->filter_items);
 
 		$this->load->model('accounting/transaction_type');
 		$data['transaction_types'] = $this->model_accounting_transaction_type->getTransactionTypesMenu(['category_label' => 'asset']);

@@ -40,7 +40,7 @@ class ControllerCommonMenu extends Controller
 			'purchase'		=> ['purchase/purchase', 'purchase/supplier'],
 			'accounting'	=> ['accounting/account', 'accounting/balance', 'accounting/expense', 'accounting/transaction', 'accounting/transaction_type'],
 			'reports'		=> [
-				'sale'			=> ['report/sale_order', 'report/sale_document', 'report/sale_tax', 'report/sale_coupon'],
+				'sale'			=> ['report/sale_order', 'report/sale_document', 'report/sale_commission', 'report/sale_tax', 'report/sale_coupon'],
 				'product'		=> ['report/product_viewed', 'report/product_purchased'],
 				'customer'		=> ['report/customer_online', 'report/customer_activity', 'report/customer_order', 'report/customer_reward', 'report/customer_credit'],
 				'marketing'		=> ['report/marketing', 'report/affiliate', 'report/affiliate_activity'],

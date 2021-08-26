@@ -32,6 +32,7 @@ $_['entry_additional_image'] = 'Additional Images';
 $_['entry_attribute_group']  = 'Attribute Group';
 $_['entry_attribute']        = 'Attribute';
 $_['entry_category']         = 'Categories';
+$_['entry_commission']       = 'Commission';
 $_['entry_customer_group']   = 'Customer Group';
 $_['entry_date_available']   = 'Date Available';
 $_['entry_date_end']         = 'Date End';
@@ -109,7 +110,8 @@ $_['help_filter']            = '(Autocomplete)';
 $_['help_download']          = '(Autocomplete)';
 $_['help_included']          = 'Products included in package (Autocomplete)';
 $_['help_related']           = '(Autocomplete)';
-$_['help_tag']              = 'Comma separated';
+$_['help_tag']               = 'Comma separated';
+$_['help_commission']        = 'Reward Point per product for user, like Sales Marketing';
 
 // Error
 $_['error_warning']          = 'Warning: Please check the form carefully for errors!';
