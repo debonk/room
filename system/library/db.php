@@ -17,7 +17,7 @@ class DB {
 	}
 
 	public function escape($value) {
-		return $this->adaptor->escape($value);
+		return $this->adaptor->escape(trim($value));
 	}
 
 	public function countAffected() {

@@ -1100,6 +1100,7 @@ class ControllerSaleOrder extends Controller
 				'entry_notify',
 				'entry_override',
 				'entry_comment',
+				'entry_vendor_add',
 				'column_category',
 				'column_model',
 				'column_price',
@@ -1130,7 +1131,6 @@ class ControllerSaleOrder extends Controller
 				'button_reward_remove',
 				'button_commission_add',
 				'button_commission_remove',
-				'button_vendor_add',
 				'button_vendor_remove',
 				'button_history_add',
 				'button_ip_add'
@@ -1432,28 +1432,6 @@ class ControllerSaleOrder extends Controller
 					'title' 			=> $order_vendor['vendor_name'] . ' - ' . $order_vendor['vendor_type'],
 					// 'document'			=> $document_data
 				);
-			}
-
-			# Vendor List
-			$this->load->model('catalog/vendor');
-
-			$data['vendors'] = array();
-
-			$filter_data = array(
-				'filter_status'	=> 1,
-				'sort'			=> 'vt.sort_order ASC, v.vendor_name',
-				'order'         => 'ASC'
-			);
-
-			$vendors = $this->model_catalog_vendor->getVendors($filter_data);
-
-			foreach ($vendors as $vendor) {
-				if (!in_array($vendor['vendor_id'], array_column($data['order_vendors'], 'vendor_id'))) {
-					$data['vendors'][] = array(
-						'vendor_id' => $vendor['vendor_id'],
-						'title' 	=> $vendor['vendor_name'] . ' - ' . $vendor['vendor_type']
-					);
-				}
 			}
 
 			# Payment Phase
@@ -1875,6 +1853,8 @@ class ControllerSaleOrder extends Controller
 				$json['title'] = $vendor_info['vendor_name'] . ' - ' . $vendor_info['vendor_type'];
 
 				$json['success'] = $this->language->get('text_vendor_added');
+			} else {
+				$json['error'] = $this->language->get('error_order_vendor');
 			}
 		}
 
@@ -2994,4 +2974,31 @@ class ControllerSaleOrder extends Controller
 		$this->response->addHeader('Content-Type: application/json');
 		$this->response->setOutput(json_encode($json));
 	}
+
+	public function vendorAutocomplete() {
+		$json = array();
+
+		if (isset($this->request->get['filter_name'])) {
+			$this->load->model('catalog/vendor');
+			
+			$filter_data = array(
+				'filter_vendor_name' 	=> $this->request->get['filter_name'],
+				'filter_status'			=> 1,
+				'sort'					=> 'vt.sort_order ASC, v.vendor_name',
+				'order'         		=> 'ASC'
+			);
+
+			$results = $this->model_catalog_vendor->getVendors($filter_data);
+
+			foreach ($results as $result) {
+				$json[] = array(
+					'vendor_id' => $result['vendor_id'],
+					'title' 	=> strip_tags(html_entity_decode($result['vendor_name'], ENT_QUOTES, 'UTF-8')) . ' - ' . $result['vendor_type']
+				);
+			}
+		}
+
+		$this->response->addHeader('Content-Type: application/json');
+		$this->response->setOutput(json_encode($json));
+	}	
 }

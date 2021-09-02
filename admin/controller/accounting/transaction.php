@@ -770,7 +770,7 @@ class ControllerAccountingTransaction extends Controller
 		foreach ($this->request->post['selected'] as $transaction_id) {
 			$transaction_info = $this->model_accounting_transaction->getTransaction($transaction_id);
 			
-			if (!$transaction_info['edit_permission']) {
+			if ($this->config->get('config_lock_printed_transaction') && !$transaction_info['edit_permission']) {
 				$this->error['warning'] = $this->language->get('error_validated');
 
 				break;

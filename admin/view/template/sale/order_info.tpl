@@ -1,44 +1,44 @@
-<?php echo $header; ?>
-<?php echo $column_left; ?>
+<?= $header; ?>
+<?= $column_left; ?>
 <div id="content">
 	<div class="page-header">
 		<div class="container-fluid">
 			<div class="pull-right">
-				<button type="button" class="btn btn-primary" id="button-checklist"
-				<?php echo $event_status ? '' : 'disabled' ; ?> ><i class="fa fa-list-alt"></i>
-				<?php echo $button_checklist; ?>
+				<button type="button" class="btn btn-primary" id="button-checklist" <?= $event_status ? '' : 'disabled' ;
+					?> ><i class="fa fa-list-alt"></i>
+					<?= $button_checklist; ?>
 				</button>
-				<a href="<?php echo $document; ?>" target="_blank" class="btn btn-primary"><i class="fa fa-file-text-o"></i>
-					<?php echo $button_document; ?>
+				<a href="<?= $document; ?>" target="_blank" class="btn btn-primary"><i class="fa fa-file-text-o"></i>
+					<?= $button_document; ?>
 				</a>
 				<div class="btn-group">
 					<button type="button" data-toggle="dropdown" class="btn btn-primary dropdown-toggle" id="button-agreement"
-						<?php echo $initial_payment ? '' : 'disabled' ; ?> ><i class="fa fa-file-o"></i>
-						<?php echo $button_agreement; ?>
+						<?= $initial_payment ? '' : 'disabled' ; ?> ><i class="fa fa-file-o"></i>
+						<?= $button_agreement; ?>
 					</button>
 					<ul class="dropdown-menu dropdown-menu-left">
-						<li><a href="<?php echo $agreement_preview; ?>" target="_blank">
-								<?php echo $text_preview; ?>
+						<li><a href="<?= $agreement_preview; ?>" target="_blank">
+								<?= $text_preview; ?>
 							</a></li>
 						<?php if (!$printed) { ?>
-						<li><a href="<?php echo $agreement_print; ?>" target="_blank" id="agreement-print">
-								<?php echo $text_print; ?>
+						<li><a href="<?= $agreement_print; ?>" target="_blank" id="agreement-print">
+								<?= $text_print; ?>
 							</a></li>
 						<?php } ?>
 					</ul>
 				</div>
-				<a href="<?php echo $edit; ?>" data-toggle="tooltip" title="<?php echo $button_edit; ?>"
+				<a href="<?= $edit; ?>" data-toggle="tooltip" title="<?= $button_edit; ?>"
 					class="btn btn-primary"><i class="fa fa-pencil"></i></a>
-				<a href="<?php echo $cancel; ?>" data-toggle="tooltip" title="<?php echo $button_cancel; ?>"
+				<a href="<?= $cancel; ?>" data-toggle="tooltip" title="<?= $button_cancel; ?>"
 					class="btn btn-default"><i class="fa fa-reply"></i></a>
 			</div>
 			<h1>
-				<?php echo $heading_title; ?>
+				<?= $heading_title; ?>
 			</h1>
 			<ul class="breadcrumb">
 				<?php foreach ($breadcrumbs as $breadcrumb) { ?>
-				<li><a href="<?php echo $breadcrumb['href']; ?>">
-						<?php echo $breadcrumb['text']; ?>
+				<li><a href="<?= $breadcrumb['href']; ?>">
+						<?= $breadcrumb['text']; ?>
 					</a></li>
 				<?php } ?>
 			</ul>
@@ -48,15 +48,15 @@
 		<?php if ($information) { ?>
 		<?php if ($auto_expired) { ?>
 		<div class="alert alert-danger"><i class="fa fa-exclamation-circle"></i>
-			<?php echo $information; ?><button type="button" id="button-expired"
-				data-loading-text="<?php echo $text_loading; ?>" class="btn btn-danger btn-xs pull-right"><i
+			<?= $information; ?><button type="button" id="button-expired"
+				data-loading-text="<?= $text_loading; ?>" class="btn btn-danger btn-xs pull-right"><i
 					class="fa fa-eraser"></i>
-				<?php echo $button_expired; ?>
+				<?= $button_expired; ?>
 			</button>
 		</div>
 		<?php } else { ?>
 		<div class="alert alert-warning"><i class="fa fa-exclamation-circle"></i>
-			<?php echo $information; ?>
+			<?= $information; ?>
 		</div>
 		<?php } ?>
 		<?php } ?>
@@ -65,44 +65,44 @@
 				<div class="panel panel-default">
 					<div class="panel-heading">
 						<h3 class="panel-title"><i class="fa fa-shopping-cart"></i>
-							<?php echo $text_order; ?>
+							<?= $text_order; ?>
 						</h3>
 					</div>
 					<table class="table">
 						<tbody>
 							<tr>
-								<td style="width: 1%;"><button data-toggle="tooltip" title="<?php echo $text_title; ?>"
+								<td style="width: 1%;"><button data-toggle="tooltip" title="<?= $text_title; ?>"
 										class="btn btn-info btn-xs"><i class="fa fa-birthday-cake fa-fw"></i></button></td>
 								<td>
-									<?php echo $title; ?>
+									<?= $title; ?>
 								</td>
 							</tr>
 							<tr>
-								<td><button data-toggle="tooltip" title="<?php echo $text_package; ?>" class="btn btn-info btn-xs"><i
+								<td><button data-toggle="tooltip" title="<?= $text_package; ?>" class="btn btn-info btn-xs"><i
 											class="fa fa-gift fa-fw"></i></button></td>
 								<td>
-									<?php echo $package; ?>
+									<?= $package; ?>
 								</td>
 							</tr>
 							<tr>
-								<td><button data-toggle="tooltip" title="<?php echo $text_venue; ?>" class="btn btn-info btn-xs"><i
+								<td><button data-toggle="tooltip" title="<?= $text_venue; ?>" class="btn btn-info btn-xs"><i
 											class="fa fa-location-arrow fa-fw"></i></button></td>
 								<td>
-									<?php echo $venue; ?>
+									<?= $venue; ?>
 								</td>
 							</tr>
 							<tr>
-								<td><button data-toggle="tooltip" title="<?php echo $text_event_date; ?>" class="btn btn-info btn-xs"><i
+								<td><button data-toggle="tooltip" title="<?= $text_event_date; ?>" class="btn btn-info btn-xs"><i
 											class="fa fa-calendar fa-fw"></i></button></td>
 								<td>
-									<?php echo $event_date; ?>
+									<?= $event_date; ?>
 								</td>
 							</tr>
 							<tr>
-								<td><button data-toggle="tooltip" title="<?php echo $text_slot; ?>" class="btn btn-info btn-xs"><i
+								<td><button data-toggle="tooltip" title="<?= $text_slot; ?>" class="btn btn-info btn-xs"><i
 											class="fa fa-clock-o fa-fw"></i></button></td>
 								<td>
-									<?php echo $slot; ?>
+									<?= $slot; ?>
 								</td>
 							</tr>
 						</tbody>
@@ -113,7 +113,7 @@
 				<div class="panel panel-default">
 					<div class="panel-heading">
 						<h3 class="panel-title"><i class="fa fa-pie-chart"></i>
-							<?php echo $text_vendor; ?>
+							<?= $text_vendor; ?>
 						</h3>
 					</div>
 					<table class="table" id="order-vendors">
@@ -121,12 +121,12 @@
 							<?php foreach ($order_vendors as $order_vendor) { ?>
 							<tr>
 								<td>
-									<?php echo $order_vendor['title']; ?>
+									<?= $order_vendor['title']; ?>
 								</td>
 								<td class="text-right nowrap">
-									<button data-toggle="tooltip" title="<?php echo $button_vendor_remove; ?>"
-										class="btn btn-danger btn-xs" id="vendor-remove<?php echo $order_vendor['vendor_id']; ?>"
-										value="<?php echo $order_vendor['vendor_id']; ?>"><i class="fa fa-minus-circle fa-fw"></i></button>
+									<button data-toggle="tooltip" title="<?= $button_vendor_remove; ?>"
+										class="btn btn-danger btn-xs" id="vendor-remove<?= $order_vendor['vendor_id']; ?>"
+										value="<?= $order_vendor['vendor_id']; ?>"><i class="fa fa-minus-circle fa-fw"></i></button>
 								</td>
 							</tr>
 							<?php } ?>
@@ -134,23 +134,8 @@
 						<tfoot>
 							<tr>
 								<td colspan="2">
-									<div class="btn-group pull-right" id="order-vendors-add">
-										<button type="button" data-toggle="dropdown" class="btn btn-primary dropdown-toggle"><i
-												class="fa fa-plus-circle"></i>
-											<?php echo $button_vendor_add; ?>
-										</button>
-										<ul class="dropdown-menu dropdown-menu-right">
-											<li class="dropdown-header">
-												<?php echo $text_vendor; ?>
-											</li>
-											<?php foreach ($vendors as $vendor) { ?>
-											<li><a href="" value="<?php echo $vendor['vendor_id']; ?>"
-													id="vendor-add<?php echo $vendor['vendor_id']; ?>">
-													<?php echo $vendor['title']; ?>
-												</a></li>
-											<?php } ?>
-										</ul>
-									</div>
+									<input type="text" name="order-vendor" value="" placeholder="<?= $entry_vendor_add; ?>"
+										id="input-order-vendor" class="form-control" />
 								</td>
 							</tr>
 						</tfoot>
@@ -161,22 +146,22 @@
 				<div class="panel panel-default">
 					<div class="panel-heading">
 						<h3 class="panel-title"><i class="fa fa-cog"></i>
-							<?php echo $text_option; ?>
+							<?= $text_option; ?>
 						</h3>
 					</div>
 					<table class="table">
 						<tbody>
 							<tr>
 								<td>
-									<?php echo $text_invoice; ?>
+									<?= $text_invoice; ?>
 								</td>
 								<td id="invoice" class="text-right">
-									<?php echo $invoice_no; ?>
+									<?= $invoice_no; ?>
 								</td>
 								<td style="width: 1%;" class="text-center">
 									<?php if (!$invoice_no) { ?>
-									<button id="button-invoice" data-loading-text="<?php echo $text_loading; ?>" data-toggle="tooltip"
-										title="<?php echo $button_generate; ?>" class="btn btn-success btn-xs"><i
+									<button id="button-invoice" data-loading-text="<?= $text_loading; ?>" data-toggle="tooltip"
+										title="<?= $button_generate; ?>" class="btn btn-success btn-xs"><i
 											class="fa fa-refresh"></i></button>
 									<?php } else { ?>
 									<button disabled="disabled" class="btn btn-success btn-xs"><i class="fa fa-refresh"></i></button>
@@ -185,20 +170,20 @@
 							</tr>
 							<tr>
 								<td>
-									<?php echo $text_reward; ?>
+									<?= $text_reward; ?>
 								</td>
 								<td class="text-right">
-									<?php echo $reward; ?>
+									<?= $reward; ?>
 								</td>
 								<td class="text-center">
 									<?php if ($customer && $reward) { ?>
 									<?php if (!$reward_total) { ?>
-									<button id="button-reward-add" data-loading-text="<?php echo $text_loading; ?>" data-toggle="tooltip"
-										title="<?php echo $button_reward_add; ?>" class="btn btn-success btn-xs"><i
+									<button id="button-reward-add" data-loading-text="<?= $text_loading; ?>" data-toggle="tooltip"
+										title="<?= $button_reward_add; ?>" class="btn btn-success btn-xs"><i
 											class="fa fa-plus-circle"></i></button>
 									<?php } else { ?>
-									<button id="button-reward-remove" data-loading-text="<?php echo $text_loading; ?>"
-										data-toggle="tooltip" title="<?php echo $button_reward_remove; ?>" class="btn btn-danger btn-xs"><i
+									<button id="button-reward-remove" data-loading-text="<?= $text_loading; ?>"
+										data-toggle="tooltip" title="<?= $button_reward_remove; ?>" class="btn btn-danger btn-xs"><i
 											class="fa fa-minus-circle"></i></button>
 									<?php } ?>
 									<?php } else { ?>
@@ -208,26 +193,26 @@
 							</tr>
 							<tr>
 								<td>
-									<?php echo $text_affiliate; ?>
+									<?= $text_affiliate; ?>
 									<?php if ($affiliate) { ?>
-									(<a href="<?php echo $affiliate; ?>">
-										<?php echo $affiliate_firstname; ?>
-										<?php echo $affiliate_lastname; ?>
+									(<a href="<?= $affiliate; ?>">
+										<?= $affiliate_firstname; ?>
+										<?= $affiliate_lastname; ?>
 									</a>)
 									<?php } ?>
 								</td>
 								<td class="text-right">
-									<?php echo $commission; ?>
+									<?= $commission; ?>
 								</td>
 								<td class="text-center">
 									<?php if ($affiliate) { ?>
 									<?php if (!$commission_total) { ?>
-									<button id="button-commission-add" data-loading-text="<?php echo $text_loading; ?>"
-										data-toggle="tooltip" title="<?php echo $button_commission_add; ?>"
+									<button id="button-commission-add" data-loading-text="<?= $text_loading; ?>"
+										data-toggle="tooltip" title="<?= $button_commission_add; ?>"
 										class="btn btn-success btn-xs"><i class="fa fa-plus-circle"></i></button>
 									<?php } else { ?>
-									<button id="button-commission-remove" data-loading-text="<?php echo $text_loading; ?>"
-										data-toggle="tooltip" title="<?php echo $button_commission_remove; ?>"
+									<button id="button-commission-remove" data-loading-text="<?= $text_loading; ?>"
+										data-toggle="tooltip" title="<?= $button_commission_remove; ?>"
 										class="btn btn-danger btn-xs"><i class="fa fa-minus-circle"></i></button>
 									<?php } ?>
 									<?php } else { ?>
@@ -237,19 +222,19 @@
 							</tr>
 							<tr>
 								<td>
-									<?php echo $text_date_added; ?>
+									<?= $text_date_added; ?>
 								</td>
 								<td class="text-right">
-									<?php echo $date_added; ?>
+									<?= $date_added; ?>
 								</td>
 								<td></td>
 							</tr>
 							<tr>
 								<td>
-									<?php echo $text_sales; ?>
+									<?= $text_sales; ?>
 								</td>
 								<td class="text-right">
-									<?php echo $sales; ?>
+									<?= $sales; ?>
 								</td>
 								<td></td>
 							</tr>
@@ -261,22 +246,22 @@
 		<div class="panel panel-default">
 			<div class="panel-heading">
 				<h3 class="panel-title"><i class="fa fa-info-circle"></i>
-					<?php echo $text_order_detail; ?>
+					<?= $text_order_detail; ?>
 				</h3>
 			</div>
 			<div class="panel-body">
 				<ul class="nav nav-tabs">
 					<li class="active"><a href="#tab-order" data-toggle="tab">
-							<?php echo $tab_order; ?>
+							<?= $tab_order; ?>
 						</a></li>
 					<li><a href="#tab-customer" data-toggle="tab">
-							<?php echo $tab_customer; ?>
+							<?= $tab_customer; ?>
 						</a></li>
 					<li><a href="#tab-purchase" data-toggle="tab">
-							<?php echo $tab_purchase; ?>
+							<?= $tab_purchase; ?>
 						</a></li>
 					<li><a href="#tab-vendor" data-toggle="tab">
-							<?php echo $tab_vendor; ?>
+							<?= $tab_vendor; ?>
 						</a></li>
 				</ul>
 				<div class="tab-content">
@@ -285,54 +270,54 @@
 							<thead>
 								<tr>
 									<td style="width: 50%;" colspan="2">
-										<?php echo $text_customer_detail; ?>
+										<?= $text_customer_detail; ?>
 									</td>
 									<td>
-										<?php echo $text_payment_address; ?>
+										<?= $text_payment_address; ?>
 									</td>
 								</tr>
 							</thead>
 							<tbody>
 								<tr>
 									<td>
-										<?php echo $text_customer; ?>
+										<?= $text_customer; ?>
 									</td>
 									<td>
 										<?php if ($customer) { ?>
-										<a href="<?php echo $customer; ?>" target="_blank">
-											<?php echo $firstname . ' ' . $lastname; ?>
+										<a href="<?= $customer; ?>" target="_blank">
+											<?= $firstname . ' ' . $lastname; ?>
 										</a>
-										<?php echo ' - ' . $customer_group; ?>
+										<?= ' - ' . $customer_group; ?>
 										<?php } else { ?>
-										<?php echo $firstname . ' ' . $lastname . ' - ' . $customer_group; ?>
+										<?= $firstname . ' ' . $lastname . ' - ' . $customer_group; ?>
 										<?php } ?>
 									</td>
 									<td rowspan="4">
-										<?php echo $payment_address; ?>
+										<?= $payment_address; ?>
 									</td>
 								</tr>
 								<tr>
 									<td>
-										<?php echo $text_email; ?>
+										<?= $text_email; ?>
 									</td>
-									<td><a href="mailto:<?php echo $email; ?>">
-											<?php echo $email; ?>
+									<td><a href="mailto:<?= $email; ?>">
+											<?= $email; ?>
 										</a></td>
 								</tr>
 								<tr>
 									<td>
-										<?php echo $text_telephone; ?>
+										<?= $text_telephone; ?>
 									</td>
 									<td>
-										<?php echo $telephone; ?>
+										<?= $telephone; ?>
 									</td>
 								</tr>
 								<tr>
 									<td>
-										<?php echo $text_payment_method; ?>
+										<?= $text_payment_method; ?>
 									</td>
 									<td>
-										<?php echo $payment_method; ?>
+										<?= $payment_method; ?>
 									</td>
 								</tr>
 							</tbody>
@@ -342,22 +327,22 @@
 								<thead>
 									<tr>
 										<td class="text-left">
-											<?php echo $column_category; ?>
+											<?= $column_category; ?>
 										</td>
 										<td class="text-left">
-											<?php echo $column_product; ?>
+											<?= $column_product; ?>
 										</td>
 										<td class="text-left">
-											<?php echo $column_model; ?>
+											<?= $column_model; ?>
 										</td>
 										<td class="text-right">
-											<?php echo $column_quantity; ?>
+											<?= $column_quantity; ?>
 										</td>
 										<td class="text-right">
-											<?php echo $column_price; ?>
+											<?= $column_price; ?>
 										</td>
 										<td class="text-right">
-											<?php echo $column_total; ?>
+											<?= $column_total; ?>
 										</td>
 									</tr>
 								</thead>
@@ -367,26 +352,26 @@
 										<td class="text-left">
 											<?php if ($product['primary_type']) { ?>
 											<strong>
-												<?php echo $product['category']; ?>
+												<?= $product['category']; ?>
 											</strong>
 											<?php } else { ?>
-											<?php echo $product['category']; ?>
+											<?= $product['category']; ?>
 											<?php } ?>
 										</td>
-										<td class="text-left"><a href="<?php echo $product['href']; ?>">
-												<?php echo $product['name']; ?>
+										<td class="text-left"><a href="<?= $product['href']; ?>">
+												<?= $product['name']; ?>
 											</a>
 											<?php foreach ($product['option'] as $option) { ?>
 											<br />
 											<?php if ($option['type'] != 'file') { ?>
 											&nbsp;<small>&nbsp;-&nbsp;
-												<?php echo $option['name']; ?>:
-												<?php echo $option['value']; ?>
+												<?= $option['name']; ?>:
+												<?= $option['value']; ?>
 											</small>
 											<?php } else { ?>
 											&nbsp;<small>&nbsp;-&nbsp;
-												<?php echo $option['name']; ?>: <a href="<?php echo $option['href']; ?>">
-													<?php echo $option['value']; ?>
+												<?= $option['name']; ?>: <a href="<?= $option['href']; ?>">
+													<?= $option['value']; ?>
 												</a>
 											</small>
 											<?php } ?>
@@ -394,38 +379,38 @@
 											<?php foreach ($product['attribute'] as $attribute_group => $attributes) { ?>
 											<br />
 											<small>
-												<?php echo $attribute_group; ?>
+												<?= $attribute_group; ?>
 											</small>
 											<?php foreach ($attributes as $attribute) { ?>
 											<br />
 											&nbsp;<small>&nbsp;-&nbsp;
-												<?php echo $attribute['name']; ?>:
-												<?php echo $attribute['value']; ?>
+												<?= $attribute['name']; ?>:
+												<?= $attribute['value']; ?>
 											</small>
 											<?php } ?>
 											<?php } ?>
 										</td>
 										<td class="text-left">
-											<?php echo $product['model']; ?>
+											<?= $product['model']; ?>
 										</td>
 										<td class="text-right">
-											<?php echo $product['quantity']; ?>
+											<?= $product['quantity']; ?>
 										</td>
 										<td class="text-right">
-											<?php echo $product['price']; ?>
+											<?= $product['price']; ?>
 										</td>
 										<td class="text-right">
-											<?php echo $product['total']; ?>
+											<?= $product['total']; ?>
 										</td>
 									</tr>
 									<?php } ?>
 									<?php foreach ($totals as $total) { ?>
 									<tr>
 										<td colspan="5" class="text-right">
-											<?php echo $total['title']; ?>
+											<?= $total['title']; ?>
 										</td>
 										<td class="text-right">
-											<?php echo $total['text']; ?>
+											<?= $total['text']; ?>
 										</td>
 									</tr>
 									<?php } ?>
@@ -437,14 +422,14 @@
 							<thead>
 								<tr>
 									<td>
-										<?php echo $text_comment; ?>
+										<?= $text_comment; ?>
 									</td>
 								</tr>
 							</thead>
 							<tbody>
 								<tr>
 									<td>
-										<?php echo $comment; ?>
+										<?= $comment; ?>
 									</td>
 								</tr>
 							</tbody>
@@ -454,16 +439,16 @@
 							<thead>
 								<tr>
 									<td class="text-left">
-										<?php echo $column_phase_title; ?>
+										<?= $column_phase_title; ?>
 									</td>
 									<td class="text-right">
-										<?php echo $column_phase_amount; ?>
+										<?= $column_phase_amount; ?>
 									</td>
 									<td class="text-left">
-										<?php echo $column_phase_limit_date; ?>
+										<?= $column_phase_limit_date; ?>
 									</td>
 									<td class="text-center">
-										<?php echo $column_phase_status; ?>
+										<?= $column_phase_status; ?>
 									</td>
 								</tr>
 							</thead>
@@ -471,16 +456,16 @@
 								<?php foreach ($payment_phases as $payment_phase) { ?>
 								<tr>
 									<td class="text-left">
-										<?php echo $payment_phase['title']; ?>
+										<?= $payment_phase['title']; ?>
 									</td>
 									<td class="text-right">
-										<?php echo $payment_phase['amount']; ?>
+										<?= $payment_phase['amount']; ?>
 									</td>
 									<td class="text-left">
-										<?php echo $payment_phase['limit_date']; ?>
+										<?= $payment_phase['limit_date']; ?>
 									</td>
 									<td class="text-center">
-										<?php echo $payment_phase['status'] ? '&check;' : '?'; ?>
+										<?= $payment_phase['status'] ? '&check;' : '?'; ?>
 									</td>
 								</tr>
 								<?php } ?>
@@ -489,21 +474,21 @@
 						<div class="panel panel-default">
 							<div class="panel-heading">
 								<h3 class="panel-title"><i class="fa fa-comment-o"></i>
-									<?php echo $text_history; ?>
+									<?= $text_history; ?>
 								</h3>
 							</div>
 							<div class="panel-body">
 								<ul class="nav nav-tabs">
 									<li class="active"><a href="#tab-history" data-toggle="tab">
-											<?php echo $tab_history; ?>
+											<?= $tab_history; ?>
 										</a></li>
-									<!-- <li><a href="#tab-vendor" data-toggle="tab"><?php echo $tab_vendor; ?></a></li> -->
+									<!-- <li><a href="#tab-vendor" data-toggle="tab"><?= $tab_vendor; ?></a></li> -->
 									<li><a href="#tab-additional" data-toggle="tab">
-											<?php echo $tab_additional; ?>
+											<?= $tab_additional; ?>
 										</a></li>
 									<?php foreach ($tabs as $tab) { ?>
-									<li><a href="#tab-<?php echo $tab['code']; ?>" data-toggle="tab">
-											<?php echo $tab['title']; ?>
+									<li><a href="#tab-<?= $tab['code']; ?>" data-toggle="tab">
+											<?= $tab['title']; ?>
 										</a></li>
 									<?php } ?>
 								</ul>
@@ -513,23 +498,23 @@
 										<br />
 										<fieldset>
 											<legend>
-												<?php echo $text_history_add; ?>
+												<?= $text_history_add; ?>
 											</legend>
 											<form class="form-horizontal">
 												<div class="form-group">
 													<label class="col-sm-2 control-label" for="input-order-status">
-														<?php echo $entry_order_status; ?>
+														<?= $entry_order_status; ?>
 													</label>
 													<div class="col-sm-10">
 														<select name="order_status_id" id="input-order-status" class="form-control">
 															<?php foreach ($order_statuses as $order_status) { ?>
 															<?php if ($order_status['order_status_id'] == $order_status_id) { ?>
-															<option value="<?php echo $order_status['order_status_id']; ?>" selected="selected">
-																<?php echo $order_status['name']; ?>
+															<option value="<?= $order_status['order_status_id']; ?>" selected="selected">
+																<?= $order_status['name']; ?>
 															</option>
 															<?php } else { ?>
-															<option value="<?php echo $order_status['order_status_id']; ?>">
-																<?php echo $order_status['name']; ?>
+															<option value="<?= $order_status['order_status_id']; ?>">
+																<?= $order_status['name']; ?>
 															</option>
 															<?php } ?>
 															<?php } ?>
@@ -538,8 +523,8 @@
 												</div>
 												<div class="form-group">
 													<label class="col-sm-2 control-label" for="input-override"><span data-toggle="tooltip"
-															title="<?php echo $help_override; ?>">
-															<?php echo $entry_override; ?>
+															title="<?= $help_override; ?>">
+															<?= $entry_override; ?>
 														</span></label>
 													<div class="col-sm-10">
 														<input type="checkbox" name="override" value="1" id="input-override" />
@@ -547,7 +532,7 @@
 												</div>
 												<div class="form-group">
 													<label class="col-sm-2 control-label" for="input-notify">
-														<?php echo $entry_notify; ?>
+														<?= $entry_notify; ?>
 													</label>
 													<div class="col-sm-10">
 														<input type="checkbox" name="notify" value="1" id="input-notify" />
@@ -555,7 +540,7 @@
 												</div>
 												<div class="form-group">
 													<label class="col-sm-2 control-label" for="input-comment">
-														<?php echo $entry_comment; ?>
+														<?= $entry_comment; ?>
 													</label>
 													<div class="col-sm-10">
 														<textarea name="comment" rows="8" id="input-comment" class="form-control"></textarea>
@@ -564,9 +549,9 @@
 											</form>
 										</fieldset>
 										<div class="text-right">
-											<button id="button-history" data-loading-text="<?php echo $text_loading; ?>"
+											<button id="button-history" data-loading-text="<?= $text_loading; ?>"
 												class="btn btn-primary"><i class="fa fa-plus-circle"></i>
-												<?php echo $button_history_add; ?>
+												<?= $button_history_add; ?>
 											</button>
 										</div>
 									</div>
@@ -576,7 +561,7 @@
 											<thead>
 												<tr>
 													<td colspan="2">
-														<?php echo $text_account_custom_field; ?>
+														<?= $text_account_custom_field; ?>
 													</td>
 												</tr>
 											</thead>
@@ -584,10 +569,10 @@
 												<?php foreach ($account_custom_fields as $custom_field) { ?>
 												<tr>
 													<td>
-														<?php echo $custom_field['name']; ?>
+														<?= $custom_field['name']; ?>
 													</td>
 													<td>
-														<?php echo $custom_field['value']; ?>
+														<?= $custom_field['value']; ?>
 													</td>
 												</tr>
 												<?php } ?>
@@ -599,7 +584,7 @@
 											<thead>
 												<tr>
 													<td colspan="2">
-														<?php echo $text_payment_custom_field; ?>
+														<?= $text_payment_custom_field; ?>
 													</td>
 												</tr>
 											</thead>
@@ -607,10 +592,10 @@
 												<?php foreach ($payment_custom_fields as $custom_field) { ?>
 												<tr>
 													<td>
-														<?php echo $custom_field['name']; ?>
+														<?= $custom_field['name']; ?>
 													</td>
 													<td>
-														<?php echo $custom_field['value']; ?>
+														<?= $custom_field['value']; ?>
 													</td>
 												</tr>
 												<?php } ?>
@@ -621,51 +606,51 @@
 											<thead>
 												<tr>
 													<td colspan="2">
-														<?php echo $text_browser; ?>
+														<?= $text_browser; ?>
 													</td>
 												</tr>
 											</thead>
 											<tbody>
 												<tr>
 													<td>
-														<?php echo $text_ip; ?>
+														<?= $text_ip; ?>
 													</td>
 													<td>
-														<?php echo $ip; ?>
+														<?= $ip; ?>
 													</td>
 												</tr>
 												<?php if ($forwarded_ip) { ?>
 												<tr>
 													<td>
-														<?php echo $text_forwarded_ip; ?>
+														<?= $text_forwarded_ip; ?>
 													</td>
 													<td>
-														<?php echo $forwarded_ip; ?>
+														<?= $forwarded_ip; ?>
 													</td>
 												</tr>
 												<?php } ?>
 												<tr>
 													<td>
-														<?php echo $text_user_agent; ?>
+														<?= $text_user_agent; ?>
 													</td>
 													<td>
-														<?php echo $user_agent; ?>
+														<?= $user_agent; ?>
 													</td>
 												</tr>
 												<tr>
 													<td>
-														<?php echo $text_accept_language; ?>
+														<?= $text_accept_language; ?>
 													</td>
 													<td>
-														<?php echo $accept_language; ?>
+														<?= $accept_language; ?>
 													</td>
 												</tr>
 											</tbody>
 										</table>
 									</div>
 									<?php foreach ($tabs as $tab) { ?>
-									<div class="tab-pane" id="tab-<?php echo $tab['code']; ?>">
-										<?php echo $tab['content']; ?>
+									<div class="tab-pane" id="tab-<?= $tab['code']; ?>">
+										<?= $tab['content']; ?>
 									</div>
 									<?php } ?>
 								</div>
@@ -690,26 +675,26 @@
 
 		$('.nav-tabs a[href="#tab-purchase"]').on('click', function () {
 			$('.text-danger').remove();
-			
-			$('#order-purchase').load('index.php?route=sale/purchase&token=<?php echo $token; ?>&order_id=<?php echo $order_id; ?>');
+
+			$('#order-purchase').load('index.php?route=sale/purchase&token=<?= $token; ?>&order_id=<?= $order_id; ?>');
 		});
 
 		$('.nav-tabs a[href="#tab-customer"]').on('click', function () {
 			$('.text-danger').remove();
 
-			$('#order-customer').load('index.php?route=sale/customer&token=<?php echo $token; ?>&order_id=<?php echo $order_id; ?>');
+			$('#order-customer').load('index.php?route=sale/customer&token=<?= $token; ?>&order_id=<?= $order_id; ?>');
 		});
 
 		$('.nav-tabs a[href="#tab-vendor"]').on('click', function () {
 			$('.text-danger').remove();
-			
-			$('#order-vendor').load('index.php?route=sale/vendor&token=<?php echo $token; ?>&order_id=<?php echo $order_id; ?>');
+
+			$('#order-vendor').load('index.php?route=sale/vendor&token=<?= $token; ?>&order_id=<?= $order_id; ?>');
 		});
 
 		$('#agreement-print').on('click', function (e) {
 			e.preventDefault();
 
-			if (confirm('<?php echo $text_print_confirm; ?>')) {
+			if (confirm('<?= $text_print_confirm; ?>')) {
 				var url = this.href;
 
 				this.closest('li').remove();
@@ -718,18 +703,32 @@
 		});
 
 		$('#button-checklist').on('click', function () {
-			open('index.php?route=sale/order/checklist&token=<?php echo $token; ?>&order_id=<?php echo $order_id; ?>');
+			open('index.php?route=sale/order/checklist&token=<?= $token; ?>&order_id=<?= $order_id; ?>');
 		});
 
-		$('#order-vendors-add ul').on('click', 'a[id^=\'vendor-add\']', function (e) {
-			e.preventDefault();
+		$('input[name=\'order-vendor\']').autocomplete({
+			'source': function (request, response) {
+				$.ajax({
+					url: 'index.php?route=sale/order/vendorAutocomplete&token=<?= $token; ?>&filter_name=' + encodeURIComponent(request),
+					dataType: 'json',
+					success: function (json) {
+						response($.map(json, function (item) {
+							return {
+								label: item['title'],
+								value: item['vendor_id']
+							}
+						}));
+					}
+				});
+			},
+			'select': function (item) {
+				addOrderVendor(item['value']);
+			}
+		});
 
-			var node = this;
-
-			vendor_id = encodeURIComponent($(node).attr('value'));
-
+		function addOrderVendor(vendor_id) {
 			$.ajax({
-				url: 'index.php?route=sale/order/addOrderVendor&token=<?php echo $token; ?>&order_id=<?php echo $order_id; ?>',
+				url: 'index.php?route=sale/order/addOrderVendor&token=<?= $token; ?>&order_id=<?= $order_id; ?>',
 				type: 'post',
 				data: 'vendor_id=' + vendor_id,
 				dataType: 'json',
@@ -743,14 +742,12 @@
 					if (json['title']) {
 						html = '<tr>';
 						html += '  <td>' + json['title'] + '</td>';
-						html += '  <td><button data-toggle="tooltip" title="<?php echo $button_vendor_remove; ?>" class="btn btn-danger btn-xs" id="vendor-remove' + vendor_id + '" value="' + vendor_id + '"><i class="fa fa-minus-circle fa-fw"></i></button></td></tr>';
+						html += '  <td><button data-toggle="tooltip" title="<?= $button_vendor_remove; ?>" class="btn btn-danger btn-xs" id="vendor-remove' + vendor_id + '" value="' + vendor_id + '"><i class="fa fa-minus-circle fa-fw"></i></button></td></tr>';
 
 						$('#order-vendors tbody').append(html);
 
-						$(node).closest('li').remove();
-
-						$('#order-purchase').load('index.php?route=sale/purchase&token=<?php echo $token; ?>&order_id=<?php echo $order_id; ?>');
-						$('#order-vendor').load('index.php?route=sale/vendor&token=<?php echo $token; ?>&order_id=<?php echo $order_id; ?>');
+						$('#order-purchase').load('index.php?route=sale/purchase&token=<?= $token; ?>&order_id=<?= $order_id; ?>');
+						$('#order-vendor').load('index.php?route=sale/vendor&token=<?= $token; ?>&order_id=<?= $order_id; ?>');
 
 						$('#content > .container-fluid').prepend('<div class="alert alert-success"><i class="fa fa-check-circle"></i> ' + json['success'] + ' <button type="button" class="close" data-dismiss="alert">&times;</button></div>');
 					}
@@ -760,16 +757,17 @@
 					alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
 				}
 			});
-		});
+
+		}
 
 		$('#order-vendors tbody').on('click', 'button[id^=\'vendor-remove\']', function () {
-			if (confirm('<?php echo $text_confirm; ?>')) {
+			if (confirm('<?= $text_confirm; ?>')) {
 				var node = this;
 
 				vendor_id = encodeURIComponent($(node).attr('value'));
 
 				$.ajax({
-					url: 'index.php?route=sale/order/deleteOrderVendor&token=<?php echo $token; ?>&order_id=<?php echo $order_id; ?>',
+					url: 'index.php?route=sale/order/deleteOrderVendor&token=<?= $token; ?>&order_id=<?= $order_id; ?>',
 					type: 'post',
 					data: 'vendor_id=' + vendor_id,
 					dataType: 'json',
@@ -787,8 +785,8 @@
 
 							$(node).closest('tr').remove();
 
-							$('#order-purchase').load('index.php?route=sale/purchase&token=<?php echo $token; ?>&order_id=<?php echo $order_id; ?>');
-							$('#order-vendor').load('index.php?route=sale/vendor&token=<?php echo $token; ?>&order_id=<?php echo $order_id; ?>');
+							$('#order-purchase').load('index.php?route=sale/purchase&token=<?= $token; ?>&order_id=<?= $order_id; ?>');
+							$('#order-vendor').load('index.php?route=sale/vendor&token=<?= $token; ?>&order_id=<?= $order_id; ?>');
 
 							$('#content > .container-fluid').prepend('<div class="alert alert-success"><i class="fa fa-check-circle"></i> ' + json['success'] + ' <button type="button" class="close" data-dismiss="alert">&times;</button></div>');
 						}
@@ -803,9 +801,9 @@
 
 		$(document).delegate('#button-ip-add', 'click', function () {
 			$.ajax({
-				url: 'index.php?route=user/api/addip&token=<?php echo $token; ?>&api_id=<?php echo $api_id; ?>',
+				url: 'index.php?route=user/api/addip&token=<?= $token; ?>&api_id=<?= $api_id; ?>',
 				type: 'post',
-				data: 'ip=<?php echo $api_ip; ?>',
+				data: 'ip=<?= $api_ip; ?>',
 				dataType: 'json',
 				beforeSend: function () {
 					$('#button-ip-add').button('loading');
@@ -832,7 +830,7 @@
 
 		$(document).delegate('#button-invoice', 'click', function () {
 			$.ajax({
-				url: 'index.php?route=sale/order/createinvoiceno&token=<?php echo $token; ?>&order_id=<?php echo $order_id; ?>',
+				url: 'index.php?route=sale/order/createinvoiceno&token=<?= $token; ?>&order_id=<?= $order_id; ?>',
 				dataType: 'json',
 				beforeSend: function () {
 					$('#button-invoice').button('loading');
@@ -861,7 +859,7 @@
 
 		$(document).delegate('#button-reward-add', 'click', function () {
 			$.ajax({
-				url: 'index.php?route=sale/order/addreward&token=<?php echo $token; ?>&order_id=<?php echo $order_id; ?>',
+				url: 'index.php?route=sale/order/addreward&token=<?= $token; ?>&order_id=<?= $order_id; ?>',
 				type: 'post',
 				dataType: 'json',
 				beforeSend: function () {
@@ -880,7 +878,7 @@
 					if (json['success']) {
 						$('#content > .container-fluid').prepend('<div class="alert alert-success"><i class="fa fa-check-circle"></i> ' + json['success'] + '</div>');
 
-						$('#button-reward-add').replaceWith('<button id="button-reward-remove" data-toggle="tooltip" title="<?php echo $button_reward_remove; ?>" class="btn btn-danger btn-xs"><i class="fa fa-minus-circle"></i></button>');
+						$('#button-reward-add').replaceWith('<button id="button-reward-remove" data-toggle="tooltip" title="<?= $button_reward_remove; ?>" class="btn btn-danger btn-xs"><i class="fa fa-minus-circle"></i></button>');
 					}
 				},
 				error: function (xhr, ajaxOptions, thrownError) {
@@ -891,7 +889,7 @@
 
 		$(document).delegate('#button-reward-remove', 'click', function () {
 			$.ajax({
-				url: 'index.php?route=sale/order/removereward&token=<?php echo $token; ?>&order_id=<?php echo $order_id; ?>',
+				url: 'index.php?route=sale/order/removereward&token=<?= $token; ?>&order_id=<?= $order_id; ?>',
 				type: 'post',
 				dataType: 'json',
 				beforeSend: function () {
@@ -910,7 +908,7 @@
 					if (json['success']) {
 						$('#content > .container-fluid').prepend('<div class="alert alert-success"><i class="fa fa-check-circle"></i> ' + json['success'] + '</div>');
 
-						$('#button-reward-remove').replaceWith('<button id="button-reward-add" data-toggle="tooltip" title="<?php echo $button_reward_add; ?>" class="btn btn-success btn-xs"><i class="fa fa-plus-circle"></i></button>');
+						$('#button-reward-remove').replaceWith('<button id="button-reward-add" data-toggle="tooltip" title="<?= $button_reward_add; ?>" class="btn btn-success btn-xs"><i class="fa fa-plus-circle"></i></button>');
 					}
 				},
 				error: function (xhr, ajaxOptions, thrownError) {
@@ -921,7 +919,7 @@
 
 		$(document).delegate('#button-commission-add', 'click', function () {
 			$.ajax({
-				url: 'index.php?route=sale/order/addcommission&token=<?php echo $token; ?>&order_id=<?php echo $order_id; ?>',
+				url: 'index.php?route=sale/order/addcommission&token=<?= $token; ?>&order_id=<?= $order_id; ?>',
 				type: 'post',
 				dataType: 'json',
 				beforeSend: function () {
@@ -940,7 +938,7 @@
 					if (json['success']) {
 						$('#content > .container-fluid').prepend('<div class="alert alert-success"><i class="fa fa-check-circle"></i> ' + json['success'] + '</div>');
 
-						$('#button-commission-add').replaceWith('<button id="button-commission-remove" data-toggle="tooltip" title="<?php echo $button_commission_remove; ?>" class="btn btn-danger btn-xs"><i class="fa fa-minus-circle"></i></button>');
+						$('#button-commission-add').replaceWith('<button id="button-commission-remove" data-toggle="tooltip" title="<?= $button_commission_remove; ?>" class="btn btn-danger btn-xs"><i class="fa fa-minus-circle"></i></button>');
 					}
 				},
 				error: function (xhr, ajaxOptions, thrownError) {
@@ -951,7 +949,7 @@
 
 		$(document).delegate('#button-commission-remove', 'click', function () {
 			$.ajax({
-				url: 'index.php?route=sale/order/removecommission&token=<?php echo $token; ?>&order_id=<?php echo $order_id; ?>',
+				url: 'index.php?route=sale/order/removecommission&token=<?= $token; ?>&order_id=<?= $order_id; ?>',
 				type: 'post',
 				dataType: 'json',
 				beforeSend: function () {
@@ -970,7 +968,7 @@
 					if (json['success']) {
 						$('#content > .container-fluid').prepend('<div class="alert alert-success"><i class="fa fa-check-circle"></i> ' + json['success'] + '</div>');
 
-						$('#button-commission-remove').replaceWith('<button id="button-commission-add" data-toggle="tooltip" title="<?php echo $button_commission_add; ?>" class="btn btn-success btn-xs"><i class="fa fa-plus-circle"></i></button>');
+						$('#button-commission-remove').replaceWith('<button id="button-commission-add" data-toggle="tooltip" title="<?= $button_commission_add; ?>" class="btn btn-success btn-xs"><i class="fa fa-plus-circle"></i></button>');
 					}
 				},
 				error: function (xhr, ajaxOptions, thrownError) {
@@ -983,10 +981,10 @@
 
 		// Login to the API
 		$.ajax({
-			url: '<?php echo $store_url; ?>index.php?route=api/login',
+			url: '<?= $store_url; ?>index.php?route=api/login',
 			type: 'post',
 			dataType: 'json',
-			data: 'key=<?php echo $api_key; ?>',
+			data: 'key=<?= $api_key; ?>',
 			crossDomain: true,
 			success: function (json) {
 				// $('.alert').remove();
@@ -997,7 +995,7 @@
 					}
 
 					if (json['error']['ip']) {
-						$('#content > .container-fluid').prepend('<div class="alert alert-danger"><i class="fa fa-exclamation-circle"></i> ' + json['error']['ip'] + ' <button type="button" id="button-ip-add" data-loading-text="<?php echo $text_loading; ?>" class="btn btn-danger btn-xs pull-right"><i class="fa fa-plus"></i> <?php echo $button_ip_add; ?></button></div>');
+						$('#content > .container-fluid').prepend('<div class="alert alert-danger"><i class="fa fa-exclamation-circle"></i> ' + json['error']['ip'] + ' <button type="button" id="button-ip-add" data-loading-text="<?= $text_loading; ?>" class="btn btn-danger btn-xs pull-right"><i class="fa fa-plus"></i> <?= $button_ip_add; ?></button></div>');
 					}
 				}
 
@@ -1016,7 +1014,7 @@
 			$('#history').load(this.href);
 		});
 
-		$('#history').load('index.php?route=sale/order/history&token=<?php echo $token; ?>&order_id=<?php echo $order_id; ?>');
+		$('#history').load('index.php?route=sale/order/history&token=<?= $token; ?>&order_id=<?= $order_id; ?>');
 
 		$('#order-customer').on('click', '.pagination a', function (e) {
 			e.preventDefault();
@@ -1032,10 +1030,10 @@
 
 		$('#button-history').on('click', function () {
 			$.ajax({
-				url: '<?php echo $store_url; ?>index.php?route=api/order/history&token=' + token + '&order_id=<?php echo $order_id; ?>',
+				url: '<?= $store_url; ?>index.php?route=api/order/history&token=' + token + '&order_id=<?= $order_id; ?>',
 				type: 'post',
 				dataType: 'json',
-				data: 'order_status_id=' + encodeURIComponent($('select[name=\'order_status_id\']').val()) + '&notify=' + ($('input[name=\'notify\']').prop('checked') ? 1 : 0) + '&override=' + ($('input[name=\'override\']').prop('checked') ? 1 : 0) + '&comment=' + encodeURIComponent($('textarea[name=\'comment\']').val()) + '&user_id=<?php echo $user_id; ?>',
+				data: 'order_status_id=' + encodeURIComponent($('select[name=\'order_status_id\']').val()) + '&notify=' + ($('input[name=\'notify\']').prop('checked') ? 1 : 0) + '&override=' + ($('input[name=\'override\']').prop('checked') ? 1 : 0) + '&comment=' + encodeURIComponent($('textarea[name=\'comment\']').val()) + '&user_id=<?= $user_id; ?>',
 				beforeSend: function () {
 					$('#button-history').button('loading');
 				},
@@ -1060,7 +1058,7 @@
 					}
 
 					if (json['success']) {
-						// $('#history').load('index.php?route=sale/order/history&token=<?php echo $token; ?>&order_id=<?php echo $order_id; ?>');
+						// $('#history').load('index.php?route=sale/order/history&token=<?= $token; ?>&order_id=<?= $order_id; ?>');
 
 						// $('#history').before('<div class="alert alert-success"><i class="fa fa-check-circle"></i> ' + json['success'] + ' <button type="button" class="close" data-dismiss="alert">&times;</button></div>');
 
@@ -1078,10 +1076,10 @@
 
 		$('#button-expired').on('click', function () {
 			$.ajax({
-				url: '<?php echo $store_url; ?>index.php?route=api/order/expired&token=' + token + '&order_id=<?php echo $order_id; ?>',
+				url: '<?= $store_url; ?>index.php?route=api/order/expired&token=' + token + '&order_id=<?= $order_id; ?>',
 				type: 'post',
 				dataType: 'json',
-				data: 'user_id=<?php echo $user_id; ?>',
+				data: 'user_id=<?= $user_id; ?>',
 				beforeSend: function () {
 					$('#button-expired').button('loading');
 				},
@@ -1130,4 +1128,4 @@
 		});
 	</script>
 </div>
-<?php echo $footer; ?>
+<?= $footer; ?>
