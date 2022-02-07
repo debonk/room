@@ -64,7 +64,6 @@ class ControllerSaleCustomer extends Controller
 
 		$filter_customer_data = [
 			'client_label'	=> 'customer',
-			'client_id'		=> $order_info['customer_id'],
 			'group'			=> 'category_label'
 		];
 

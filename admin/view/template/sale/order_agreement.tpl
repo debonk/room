@@ -13,11 +13,11 @@
   <link href="view/javascript/font-awesome/css/font-awesome.min.css" type="text/css" rel="stylesheet" />
   <link type="text/css" href="view/stylesheet/stylesheet.css" rel="stylesheet" media="all" />
   <link type="text/css" href="view/stylesheet/print.css" rel="stylesheet" media="all" />
-  <style>
-    @page {
-      margin-top: 75mm;
-    }
-  </style>
+  <!-- <style> -->
+    <!-- @page { -->
+      <!-- margin-top: 75mm; -->
+    <!-- } -->
+  <!-- </style> -->
 </head>
 
 <body>

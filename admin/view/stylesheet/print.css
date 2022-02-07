@@ -106,7 +106,11 @@ hr {
 	margin: 5% 0 0;
 }
 
-.letter-head, .letter-content {
+/* .letter-head { */
+  /* display: none; */
+/* } */
+
+.letter-content {
   display: none;
 }
 
