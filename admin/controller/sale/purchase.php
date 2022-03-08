@@ -386,6 +386,12 @@ class ControllerSalePurchase extends Controller
 
 		$this->load->language('sale/purchase');
 
+		$order_id = isset($this->request->get['order_id']) ? $this->request->get['order_id'] : 0;
+		$vendor_id = isset($this->request->post['vendor_id']) ? $this->request->post['vendor_id'] : 0;
+
+		$order_purchase_info = [];
+		$transaction_type_info = [];
+
 		switch (false) {
 			case $json:
 				if (!$this->user->hasPermission('modify', 'sale/order') || !$this->user->hasPermission('modify', 'sale/purchase')) {
@@ -395,10 +401,6 @@ class ControllerSalePurchase extends Controller
 				}
 
 				$this->load->model('sale/purchase');
-
-				$order_id = isset($this->request->get['order_id']) ? $this->request->get['order_id'] : 0;
-
-				$vendor_id = isset($this->request->post['vendor_id']) ? $this->request->post['vendor_id'] : 0;
 
 				if (!$vendor_id) {
 					$json['error'] = $this->language->get('error_development');

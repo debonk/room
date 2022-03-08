@@ -98,16 +98,16 @@
                   <?php echo $entry_customer_group; ?>
                 </label>
                 <div class="col-sm-10">
-                  <select name="customer_group_id" id="input-customer-group" class="form-control">
+                  <select name="customer_group_id" id="input-customer-group" class="form-control" readonly>
                     <?php foreach ($customer_groups as $customer_group) { ?>
                     <?php if ($customer_group['customer_group_id'] == $customer_group_id) { ?>
                     <option value="<?php echo $customer_group['customer_group_id']; ?>" selected="selected">
                       <?php echo $customer_group['name']; ?>
                     </option>
                     <?php } else { ?>
-                    <option value="<?php echo $customer_group['customer_group_id']; ?>">
+                    <!-- <option value="<?php echo $customer_group['customer_group_id']; ?>">
                       <?php echo $customer_group['name']; ?>
-                    </option>
+                    </option> -->
                     <?php } ?>
                     <?php } ?>
                   </select>
@@ -119,7 +119,7 @@
                 </label>
                 <div class="col-sm-10">
                   <input type="text" name="firstname" value="<?php echo $firstname; ?>" id="input-firstname"
-                    class="form-control" />
+                    class="form-control" readonly/>
                 </div>
               </div>
               <div class="form-group required">
@@ -128,7 +128,7 @@
                 </label>
                 <div class="col-sm-10">
                   <input type="text" name="lastname" value="<?php echo $lastname; ?>" id="input-lastname"
-                    class="form-control" />
+                    class="form-control" readonly/>
                 </div>
               </div>
               <div class="form-group required">
@@ -137,7 +137,7 @@
                 </label>
                 <div class="col-sm-10">
                   <input type="text" name="id_no" value="<?php echo $id_no; ?>"
-                    placeholder="<?php echo $entry_id_no; ?>" id="input-id-no" class="form-control" />
+                    placeholder="<?php echo $entry_id_no; ?>" id="input-id-no" class="form-control" readonly/>
                 </div>
               </div>
               <div class="form-group required">
@@ -145,7 +145,7 @@
                   <?php echo $entry_email; ?>
                 </label>
                 <div class="col-sm-10">
-                  <input type="text" name="email" value="<?php echo $email; ?>" id="input-email" class="form-control" />
+                  <input type="text" name="email" value="<?php echo $email; ?>" id="input-email" class="form-control" readonly/>
                 </div>
               </div>
               <div class="form-group required">
@@ -154,7 +154,7 @@
                 </label>
                 <div class="col-sm-10">
                   <input type="text" name="telephone" value="<?php echo $telephone; ?>" id="input-telephone"
-                    class="form-control" />
+                    class="form-control" readonly/>
                 </div>
               </div>
               <div class="form-group">
@@ -162,7 +162,7 @@
                   <?php echo $entry_fax; ?>
                 </label>
                 <div class="col-sm-10">
-                  <input type="text" name="fax" value="<?php echo $fax; ?>" id="input-fax" class="form-control" />
+                  <input type="text" name="fax" value="<?php echo $fax; ?>" id="input-fax" class="form-control" readonly/>
                 </div>
               </div>
               <?php foreach ($custom_fields as $custom_field) { ?>

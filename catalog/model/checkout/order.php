@@ -295,6 +295,19 @@ class ModelCheckoutOrder extends Model
 		return $query->rows;
 	}
 
+    public function getOrderPurchases($order_id, $completed = null)
+    {
+        $sql = "SELECT * FROM " . DB_PREFIX . "order_purchase WHERE order_id = '" . (int)$order_id . "'";
+
+		if (!is_null($completed)) {
+			$sql .= " AND completed = '" . (int)$completed . "'";
+		}
+
+        $query = $this->db->query($sql);
+
+        return $query->rows;
+    }
+
 	public function getPaymentPhases($order_id)
 	{
 		$payment_phase_data = array();

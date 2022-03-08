@@ -38,9 +38,12 @@ class ControllerApiCustomer extends Controller {
 				if (!$customer_info || !$this->customer->login($customer_info['email'], '', true)) {
 					$json['error']['warning'] = $this->language->get('error_customer');
 				}
+			} else {
+				# Data customer harus terdaftar'
+				$json['error']['warning'] = $this->language->get('error_register');
 			}
 
-			if ((utf8_strlen(trim($this->request->post['firstname'])) < 1) || (utf8_strlen(trim($this->request->post['firstname'])) > 32)) {
+/* 			if ((utf8_strlen(trim($this->request->post['firstname'])) < 1) || (utf8_strlen(trim($this->request->post['firstname'])) > 32)) {
 				$json['error']['firstname'] = $this->language->get('error_firstname');
 			}
 
@@ -76,10 +79,22 @@ class ControllerApiCustomer extends Controller {
 				if (($custom_field['location'] == 'account') && $custom_field['required'] && empty($this->request->post['custom_field'][$custom_field['custom_field_id']])) {
 					$json['error']['custom_field' . $custom_field['custom_field_id']] = sprintf($this->language->get('error_custom_field'), $custom_field['name']);
 				}
-			}
-
+			} */
+			
 			if (!$json) {
 				$this->session->data['customer'] = array(
+					'customer_id'       => $this->request->post['customer_id'],
+					'customer_group_id' => $customer_info['customer_group_id'],
+					'firstname'         => $customer_info['firstname'],
+					'lastname'          => $customer_info['lastname'],
+					'id_no'          	=> $customer_info['id_no'],
+					'email'             => $customer_info['email'],
+					'telephone'         => $customer_info['telephone'],
+					'fax'               => $customer_info['fax'],
+					'custom_field'      => $customer_info['custom_field']
+				);
+
+				/* $this->session->data['customer'] = array(
 					'customer_id'       => $this->request->post['customer_id'],
 					'customer_group_id' => $customer_group_id,
 					'firstname'         => $this->request->post['firstname'],
@@ -89,7 +104,7 @@ class ControllerApiCustomer extends Controller {
 					'telephone'         => $this->request->post['telephone'],
 					'fax'               => $this->request->post['fax'],
 					'custom_field'      => isset($this->request->post['custom_field']) ? $this->request->post['custom_field'] : array()
-				);
+				); */
 
 				$json['success'] = $this->language->get('text_success');
 			}

@@ -419,6 +419,11 @@ class ControllerApiOrder extends Controller
 
 		$json = array();
 
+		$order_id = isset($this->request->get['order_id']) ? $this->request->get['order_id'] : 0;
+
+		$order_info = [];
+		$products = [];
+
 		switch ($json) {
 			case false:
 				if (!isset($this->session->data['api_id'])) {
@@ -434,7 +439,6 @@ class ControllerApiOrder extends Controller
 				}
 
 				$this->load->model('checkout/order');
-				$order_id = isset($this->request->get['order_id']) ? $this->request->get['order_id'] : 0;
 
 				$order_info = $this->model_checkout_order->getOrder($order_id);
 
@@ -447,6 +451,15 @@ class ControllerApiOrder extends Controller
 				# lock edit order if current order status is complete
 				if ($this->config->get('config_lock_complete_order') && in_array($order_info['order_status_id'], $this->config->get('config_complete_status'))) {
 					$json['error'] = $this->language->get('error_status_complete');
+
+					break;
+				}
+
+				# lock edit order if current order have vendor PO which already been printed.
+				$order_purchases = $this->model_checkout_order->getOrderPurchases($order_id, 1);
+
+				if ($order_purchases) {
+					$json['error'] = $this->language->get('error_purchase_completed');
 
 					break;
 				}
@@ -887,6 +900,8 @@ class ControllerApiOrder extends Controller
 
 		$json = [];
 
+		$order_id = isset($this->request->get['order_id']) ? $this->request->get['order_id'] : 0;
+
 		switch ($json) {
 			case false:
 				if (!isset($this->session->data['api_id'])) {
@@ -929,8 +944,6 @@ class ControllerApiOrder extends Controller
 				}
 
 				$this->load->model('checkout/order');
-
-				$order_id = isset($this->request->get['order_id']) ? $this->request->get['order_id'] : 0;
 
 				$order_info = $this->model_checkout_order->getOrder($order_id);
 
@@ -989,6 +1002,26 @@ class ControllerApiOrder extends Controller
 
 				# If current order status is not complete but new status is complete then check for transaction
 				if (!in_array($order_info['order_status_id'], $this->config->get('config_complete_status')) && in_array($this->request->post['order_status_id'], $this->config->get('config_complete_status'))) {
+					$order_purchases = $this->model_checkout_order->getOrderPurchases($order_id);
+
+					if (!$order_purchases) {
+						$json['error'] = $this->language->get('error_purchase_not_found');
+
+						break;
+					}
+
+					foreach ($order_purchases as $order_purchase) {
+						if ($order_purchase['vendor_id'] && !$order_purchase['completed']) {
+							$json['error'] = $this->language->get('error_purchase_transaction');
+
+							break;
+						}
+					}
+
+					if ($json) {
+						break;
+					}
+
 					if ($transaction_type_info['transaction_label'] == 'complete') {
 						$filter_category_label = ['order', 'purchase', 'deposit'];
 

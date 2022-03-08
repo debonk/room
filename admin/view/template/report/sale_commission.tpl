@@ -82,7 +82,9 @@
 				</ul>
 				<div class="tab-content">
 					<div class="tab-pane active" id="tab-commission">
-						<legend><?= $text_summary; ?></legend>
+						<legend>
+							<?= $text_summary; ?>
+						</legend>
 						<div class="table-responsive">
 							<table class="table table-bordered table-hover">
 								<thead>
@@ -174,10 +176,10 @@
 						</div>
 					</div>
 					<div class="tab-pane" id="tab-commission1">
-						<div id="order-commission1"></div>
+						<div class="commission-detail"></div>
 					</div>
 					<div class="tab-pane" id="tab-commission2">
-						<div id="order-commission2"></div>
+						<div class="commission-detail"></div>
 					</div>
 				</div>
 
@@ -204,23 +206,18 @@
 		});
 
 		$('.nav-tabs a[href="#tab-commission1"]').on('click', function () {
-			$('#order-commission1').load('index.php?route=report/sale_commission/commissionOrder&token=<?= $token . $url; ?>');
-		});
-
-		$('#order-commission1').on('click', 'td a, .pagination a', function (e) {
-			e.preventDefault();
-
-			$('#order-commission1').load(this.href);
+			$('#tab-commission1 > .commission-detail').load('index.php?route=report/sale_commission/commissionOrder&token=<?= $token . $url; ?>');
 		});
 
 		$('.nav-tabs a[href="#tab-commission2"]').on('click', function () {
-			$('#order-commission2').load('index.php?route=report/sale_commission/commissionProduct&token=<?= $token . $url; ?>');
+			$('#tab-commission2 > .commission-detail').load('index.php?route=report/sale_commission/commissionProduct&token=<?= $token . $url; ?>');
 		});
 
-		$('#order-commission2').on('click', 'td a, .pagination a', function (e) {
+		$('.commission-detail').on('click', 'td > a, .pagination a', function (e) {
 			e.preventDefault();
 
-			$('#order-commission2').load(this.href);
+			let node = this;
+			$(this).closest('.commission-detail').load(node.href);
 		});
 
 		$('.date').datetimepicker({
