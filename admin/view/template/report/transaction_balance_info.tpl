@@ -23,7 +23,7 @@
       <tr>
         <td class="text-left"><?php echo $transaction['date']; ?></td>
         <td class="text-left"><?php echo $transaction['transaction_type']; ?></td>
-        <td class="text-left"><a href="<?php echo $transaction['href']; ?>" target="_blank"><?php echo $transaction['reference']; ?></a><br><?php echo $transaction['description']; ?></td>
+        <td class="text-left"><a href="<?php echo $transaction['href']; ?>" target="_blank" rel="noopener noreferrer"><?php echo $transaction['reference']; ?></a><br><?php echo $transaction['description']; ?></td>
         <td class="text-right"><?php echo $transaction['debit']; ?></td>
         <td class="text-right"><?php echo $transaction['credit']; ?></td>
         <td class="text-right"><b><?php echo $transaction['balance']; ?></b></td>

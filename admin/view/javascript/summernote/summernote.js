@@ -5949,7 +5949,7 @@
         className: 'note-link-popover',
         callback: function ($node) {
           var $content = $node.find('.popover-content');
-          $content.prepend('<span><a target="_blank"></a>&nbsp;</span>');
+          $content.prepend('<span><a target="_blank" rel="noopener noreferrer"></a>&nbsp;</span>');
         }
       }).render().appendTo('body');
       var $content = this.$popover.find('.popover-content');
@@ -6354,9 +6354,9 @@
 
       var body = [
         '<p class="text-center">',
-        '<a href="//summernote.org/" target="_blank">Summernote 0.7.3</a> · ',
-        '<a href="//github.com/summernote/summernote" target="_blank">Project</a> · ',
-        '<a href="//github.com/summernote/summernote/issues" target="_blank">Issues</a>',
+        '<a href="//summernote.org/" target="_blank" rel="noopener noreferrer">Summernote 0.7.3</a> · ',
+        '<a href="//github.com/summernote/summernote" target="_blank" rel="noopener noreferrer">Project</a> · ',
+        '<a href="//github.com/summernote/summernote/issues" target="_blank" rel="noopener noreferrer">Issues</a>',
         '</p>'
       ].join('');
 

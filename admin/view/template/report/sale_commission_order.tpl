@@ -77,7 +77,7 @@
 				<td>
 					<?= $order['primary_product']; ?><br />
 					<?= $text_title . ': ' . $order['title']; ?><br />
-					<i><?= $text_invoice . ': '; ?><a href="<?= $order['href']; ?>" target="_blank" rel="noopener noreferrer">
+					<i><?= $text_invoice . ': '; ?><a href="<?= $order['href']; ?>" target="_blank" rel="noopener noreferrer" rel="noopener noreferrer">
 						<?= $order['invoice_no']; ?>
 					</a></i>
 				</td>

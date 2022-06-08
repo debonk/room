@@ -23,7 +23,7 @@
 			<?php if ($vendor_transaction_summary) { ?>
 			<?php foreach ($vendor_transaction_summary as $vendor_id => $transaction_summary) { ?>
 			<tr>
-				<td class="text-left" colspan="4"><a href="<?php echo $transaction_summary['href']; ?>" target="_blank">
+				<td class="text-left" colspan="4"><a href="<?php echo $transaction_summary['href']; ?>" target="_blank" rel="noopener noreferrer">
 						<?php echo $transaction_summary['title']; ?>
 					</a>
 					<div class="pull-right">
@@ -35,11 +35,11 @@
 								<?php echo $document['button_text']; ?>
 							</button>
 							<ul class="dropdown-menu dropdown-menu-right">
-								<li><a href="<?php echo $document['href']; ?>" target="_blank">
+								<li><a href="<?php echo $document['href']; ?>" target="_blank" rel="noopener noreferrer">
 										<?php echo $button_view; ?>
 									</a></li>
 								<?php if (empty($document['printed'])) { ?>
-								<li><a href="<?php echo $document['href']; ?>" target="_blank"
+								<li><a href="<?php echo $document['href']; ?>" target="_blank" rel="noopener noreferrer"
 										id="button-print-<?php echo $type . $vendor_id; ?>">
 										<?php echo $button_print; ?>
 									</a></li>
@@ -150,7 +150,7 @@
 				</td>
 				<td class="text-right nowrap">
 					<?php if ($vendor_transaction['receipt']) { ?>
-					<a href="<?= $vendor_transaction['receipt']; ?>" target="_blank" class="btn btn-info btn-sm"
+					<a href="<?= $vendor_transaction['receipt']; ?>" target="_blank" rel="noopener noreferrer" class="btn btn-info btn-sm"
 						data-toggle="tooltip" title="<?= $button_view; ?>"><i class="fa fa-eye"></i>
 					</a>
 					<?php if ($vendor_transaction['print']) { ?>

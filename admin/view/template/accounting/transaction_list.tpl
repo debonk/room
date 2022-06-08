@@ -332,7 +332,7 @@
 											</strong><br>
 
 											<?php if ($transaction['order_url']) { ?>
-											<a href="<?= $transaction['order_url']; ?>" target="_blank">
+											<a href="<?= $transaction['order_url']; ?>" target="_blank" rel="noopener noreferrer">
 												<?= $transaction['reference']; ?>
 											</a>
 											<?php } else { ?>

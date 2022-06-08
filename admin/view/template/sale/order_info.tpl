@@ -8,7 +8,7 @@
 					?> ><i class="fa fa-list-alt"></i>
 					<?= $button_checklist; ?>
 				</button>
-				<a href="<?= $document; ?>" target="_blank" class="btn btn-primary"><i class="fa fa-file-text-o"></i>
+				<a href="<?= $document; ?>" target="_blank" rel="noopener noreferrer" class="btn btn-primary"><i class="fa fa-file-text-o"></i>
 					<?= $button_document; ?>
 				</a>
 				<div class="btn-group">
@@ -17,11 +17,11 @@
 						<?= $button_agreement; ?>
 					</button>
 					<ul class="dropdown-menu dropdown-menu-left">
-						<li><a href="<?= $agreement_preview; ?>" target="_blank">
+						<li><a href="<?= $agreement_preview; ?>" target="_blank" rel="noopener noreferrer">
 								<?= $text_preview; ?>
 							</a></li>
 						<?php if (!$printed) { ?>
-						<li><a href="<?= $agreement_print; ?>" target="_blank" id="agreement-print">
+						<li><a href="<?= $agreement_print; ?>" target="_blank" rel="noopener noreferrer" id="agreement-print">
 								<?= $text_print; ?>
 							</a></li>
 						<?php } ?>
@@ -284,7 +284,7 @@
 									</td>
 									<td>
 										<?php if ($customer) { ?>
-										<a href="<?= $customer; ?>" target="_blank">
+										<a href="<?= $customer; ?>" target="_blank" rel="noopener noreferrer">
 											<?= $firstname . ' ' . $lastname; ?>
 										</a>
 										<?= ' - ' . $customer_group; ?>

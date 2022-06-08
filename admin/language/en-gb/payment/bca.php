@@ -6,7 +6,7 @@ $_['heading_title']		 = 'BCA 010.367.1717';
 $_['text_payment']		 = 'Payment';
 $_['text_success']		 = 'Success: You have modified BCA transfer details!';
 $_['text_edit']          = 'Edit BCA Transfer';
-$_['text_bca']			 = '<a href="https://www.bca.co.id/" target="_blank"><img src="view/image/payment/bca.jpg" alt="Bank Central Asia" title="Bank Central Asia" style="border: 1px solid #EEEEEE;" /></a>';
+$_['text_bca']			 = '<a href="https://www.bca.co.id/" target="_blank" rel="noopener noreferrer"><img src="view/image/payment/bca.jpg" alt="Bank Central Asia" title="Bank Central Asia" style="border: 1px solid #EEEEEE;" /></a>';
 
 // Entry
 $_['entry_bank']		 = 'BCA Transfer Instructions';

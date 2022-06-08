@@ -1,5 +1,7 @@
-# room
-gk ballroom software
+# room > gk ballroom software
+
+2.7.7	08/06/2022
+Security Issue: Add rel="noopener noreferrer" on <a> with target="_blank".
 
 2.7.6	08/03/2022
 Modify: Sale > Order: Order customer must be registered.

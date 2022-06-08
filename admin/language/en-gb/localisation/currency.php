@@ -25,7 +25,7 @@ $_['entry_decimal_place']  = 'Decimal Places';
 $_['entry_status']         = 'Status';
 
 // Help
-$_['help_code']            = 'Do not change if this is your default currency. Must be valid <a href="http://www.xe.com/iso4217.php" target="_blank">ISO code</a>.';
+$_['help_code']            = 'Do not change if this is your default currency. Must be valid <a href="http://www.xe.com/iso4217.php" target="_blank" rel="noopener noreferrer">ISO code</a>.';
 $_['help_value']           = 'Set to 1.00000 if this is your default currency.';
 
 // Error

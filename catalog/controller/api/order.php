@@ -1011,7 +1011,7 @@ class ControllerApiOrder extends Controller
 					}
 
 					foreach ($order_purchases as $order_purchase) {
-						if ($order_purchase['vendor_id'] && !$order_purchase['completed']) {
+						if (!$order_purchase['completed']) {
 							$json['error'] = $this->language->get('error_purchase_transaction');
 
 							break;
@@ -1032,7 +1032,7 @@ class ControllerApiOrder extends Controller
 							];
 
 							$transactions_total = $this->model_accounting_transaction->getTransactionsTotalByOrderId($order_id, $filter_summary_data);
-
+	
 							if (!empty($transactions_total)) {
 								$json['error'] = sprintf($this->language->get('error_amount_balance'), $this->language->get('text_category_' . $category_label));
 

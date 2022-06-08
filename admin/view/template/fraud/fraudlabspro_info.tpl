@@ -4,7 +4,7 @@
   </tr>
   <tr>
     <td><span data-toggle="tooltip" data-container="#tab-general" title="<?php echo $help_transaction_id; ?>"><?php echo $text_transaction_id; ?></span></td>
-    <td><a href="https://www.fraudlabspro.com/merchant/transaction-details/<?php echo $flp_id; ?>/" target="_blank"><?php echo $flp_id; ?></a></td>
+    <td><a href="https://www.fraudlabspro.com/merchant/transaction-details/<?php echo $flp_id; ?>/" target="_blank" rel="noopener noreferrer"><?php echo $flp_id; ?></a></td>
   </tr>
   <tr>
     <td><span data-toggle="tooltip" data-container="#tab-general" title="<?php echo $help_score; ?>"><?php echo $text_score; ?></span></td>

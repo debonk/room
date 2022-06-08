@@ -114,7 +114,7 @@
 				</td>
 				<td class="text-right nowrap">
 					<?php if ($customer_transaction['receipt']) { ?>
-					<a href="<?= $customer_transaction['receipt']; ?>" target="_blank" class="btn btn-info btn-sm"
+					<a href="<?= $customer_transaction['receipt']; ?>" target="_blank" rel="noopener noreferrer" class="btn btn-info btn-sm"
 						data-toggle="tooltip" title="<?= $button_view; ?>"><i class="fa fa-eye"></i>
 					</a>
 					<?php if ($customer_transaction['print']) { ?>

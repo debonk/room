@@ -17,7 +17,7 @@
 		<td class="text-left"><?php echo $transaction['date']; ?></td>
 		<td class="text-left"><?php echo $transaction['payment_method']; ?></td>
 		<td class="text-left"><?php echo $transaction['description']; ?></td>
-		<td class="text-left"><a href="<?php echo $transaction['order_url']; ?>" target="_blank"><?php echo $transaction['invoice_no']; ?></a></td>
+		<td class="text-left"><a href="<?php echo $transaction['order_url']; ?>" target="_blank" rel="noopener noreferrer"><?php echo $transaction['invoice_no']; ?></a></td>
 		<td class="text-right"><?php echo $transaction['amount']; ?></td>
 		<td class="text-left"><?php echo $transaction['username']; ?></td>
       </tr>

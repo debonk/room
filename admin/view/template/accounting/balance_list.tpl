@@ -286,7 +286,7 @@
 									<?php echo $transaction['date']; ?>
 								</td>
 								<?php if ($transaction['order_url']) { ?>
-								<td class="text-left"><a href="<?php echo $transaction['order_url']; ?>" target="_blank">
+								<td class="text-left"><a href="<?php echo $transaction['order_url']; ?>" target="_blank" rel="noopener noreferrer">
 										<?php echo $transaction['reference']; ?>
 									</a></td>
 								<?php } else { ?>

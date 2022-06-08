@@ -18,8 +18,8 @@ The Opencart Template included three skin colors, great Layer Slider Module havi
  		<![CDATA[
  			<p>If you have any issue while using please keep contact us via:
  			<ul>
- 				<li>Helpdesk: <a target="_blank" href="http://www.pavothemes.com/supports/pavo-framework-2.html">Submit a Ticket</a> </li>
- 				<li>Email: Send us for<a target="_blank" href="mailto:pavothemes@gmail.com"> pavothemes@gmail.com</a>
+ 				<li>Helpdesk: <a target="_blank" rel="noopener noreferrer" href="http://www.pavothemes.com/supports/pavo-framework-2.html">Submit a Ticket</a> </li>
+ 				<li>Email: Send us for<a target="_blank" rel="noopener noreferrer" href="mailto:pavothemes@gmail.com"> pavothemes@gmail.com</a>
  				</li>
  			</ul>
  			</p>

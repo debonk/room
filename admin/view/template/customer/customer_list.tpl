@@ -169,9 +169,9 @@
                     <div class="btn-group" data-toggle="tooltip" title="<?php echo $button_login; ?>">
                       <button type="button" data-toggle="dropdown" class="btn btn-info dropdown-toggle"><i class="fa fa-lock"></i></button>
                       <ul class="dropdown-menu pull-right">
-                        <li><a href="index.php?route=customer/customer/login&token=<?php echo $token; ?>&customer_id=<?php echo $customer['customer_id']; ?>&store_id=0" target="_blank"><?php echo $text_default; ?></a></li>
+                        <li><a href="index.php?route=customer/customer/login&token=<?php echo $token; ?>&customer_id=<?php echo $customer['customer_id']; ?>&store_id=0" target="_blank" rel="noopener noreferrer"><?php echo $text_default; ?></a></li>
                         <?php foreach ($stores as $store) { ?>
-                        <li><a href="index.php?route=customer/customer/login&token=<?php echo $token; ?>&customer_id=<?php echo $customer['customer_id']; ?>&store_id=<?php echo $store['store_id']; ?>" target="_blank"><?php echo $store['name']; ?></a></li>
+                        <li><a href="index.php?route=customer/customer/login&token=<?php echo $token; ?>&customer_id=<?php echo $customer['customer_id']; ?>&store_id=<?php echo $store['store_id']; ?>" target="_blank" rel="noopener noreferrer"><?php echo $store['name']; ?></a></li>
                         <?php } ?>
                       </ul>
                     </div>

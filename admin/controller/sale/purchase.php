@@ -400,13 +400,13 @@ class ControllerSalePurchase extends Controller
 					break;
 				}
 
+				// if (!$vendor_id) {
+				// 	$json['error'] = $this->language->get('error_development');
+
+				// 	break;
+				// }
+
 				$this->load->model('sale/purchase');
-
-				if (!$vendor_id) {
-					$json['error'] = $this->language->get('error_development');
-
-					break;
-				}
 
 				$order_purchase_info = $this->model_sale_purchase->getOrderPurchase($order_id, $vendor_id);
 

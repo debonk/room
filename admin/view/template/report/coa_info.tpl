@@ -42,7 +42,7 @@
 				</td>
 				<td class="text-left">
 					<?php if ($account['href']) { ?>
-					<a href="<?php echo $account['href']; ?>" target="_blank">
+					<a href="<?php echo $account['href']; ?>" target="_blank" rel="noopener noreferrer">
 						<?php echo $account['name']; ?>
 					</a>
 					<?php } else { ?>

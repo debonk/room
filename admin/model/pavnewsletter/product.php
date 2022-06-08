@@ -459,8 +459,8 @@ class ModelPavnewsletterProduct extends Model {
 			$html .= '<table border="0" cellpadding="1" cellspacing="1" style="width: 600px;">';
 			foreach ($data as $item) {
 				$html .= '<tr>';
-				$html .= '<td><a target="_blank" href="'.$item['href'].'"><img title="' .$item['name']. '" src="'.$item['thumb'].'"/></a></td>';
-				$html .= '<td><a target="_blank" href="'.$item['href'].'">' .$item['name']. '</a></td>';
+				$html .= '<td><a target="_blank" rel="noopener noreferrer" href="'.$item['href'].'"><img title="' .$item['name']. '" src="'.$item['thumb'].'"/></a></td>';
+				$html .= '<td><a target="_blank" rel="noopener noreferrer" href="'.$item['href'].'">' .$item['name']. '</a></td>';
 				if(!empty($item['price'])){
 					$html .= '<td>' .$setting['tprice'] . $item['price']. '</td>';
 					if(!empty($item['special'])){

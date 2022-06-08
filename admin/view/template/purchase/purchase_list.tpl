@@ -213,7 +213,7 @@
                     <?php echo $purchase['telephone']; ?>
                   </td>
                   <?php if ($purchase['order_url']) { ?>
-                  <td class="text-left"><a href="<?php echo $purchase['order_url']; ?>" target="_blank">
+                  <td class="text-left"><a href="<?php echo $purchase['order_url']; ?>" target="_blank" rel="noopener noreferrer">
                       <?php echo $purchase['invoice']; ?>
                     </a></td>
                   <?php } else { ?>

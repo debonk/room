@@ -72,7 +72,7 @@
 										<?= $account['account_id']; ?>
 									</td>
 									<td class="text-left">
-										<a href="<?php echo $account['href']; ?>" target="_blank">
+										<a href="<?php echo $account['href']; ?>" target="_blank" rel="noopener noreferrer">
 											<?= $account['name']; ?>
 										</a>
 									</td>
@@ -119,7 +119,7 @@
 										<?= $account['account_id']; ?>
 									</td>
 									<td class="text-left">
-										<a href="<?php echo $account['href']; ?>" target="_blank">
+										<a href="<?php echo $account['href']; ?>" target="_blank" rel="noopener noreferrer">
 											<?= $account['name']; ?>
 										</a>
 									</td>
@@ -165,7 +165,7 @@
 									</td>
 									<td class="text-left">
 										<?php if ( $account['href']) { ?>
-										<a href="<?php echo $account['href']; ?>" target="_blank">
+										<a href="<?php echo $account['href']; ?>" target="_blank" rel="noopener noreferrer">
 											<?= $account['name']; ?>
 										</a>
 										<?php } else { ?>

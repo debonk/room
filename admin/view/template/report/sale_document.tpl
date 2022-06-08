@@ -74,7 +74,7 @@
                 <?php if ($documents) { ?>
                 <?php foreach ($documents as $document) { ?>
                 <tr>
-                  <td class="text-left"><a href="<?php echo $document['url']; ?>" target="_blank"><?php echo $document['order_id']; ?></a></td>
+                  <td class="text-left"><a href="<?php echo $document['url']; ?>" target="_blank" rel="noopener noreferrer"><?php echo $document['order_id']; ?></a></td>
                   <td class="text-left"><?php echo $document['document_type']; ?></td>
                   <td class="text-left"><?php echo $document['reference']; ?></td>
                   <td class="text-left"><?php echo $document['date']; ?></td>
