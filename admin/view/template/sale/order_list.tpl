@@ -35,18 +35,22 @@
             </div>
             <div class="col-sm-4">
               <div class="form-group">
-                <label class="control-label" for="input-event-date"><?php echo $entry_event_date; ?></label>
+                <label class="control-label" for="input-date-start"><?php echo $entry_date_start; ?></label>
                 <div class="input-group date">
-                  <input type="text" name="filter_event_date" value="<?php echo $filter_event_date; ?>" placeholder="<?php echo $entry_event_date; ?>" data-date-format="YYYY-MM-DD" id="input-event-date" class="form-control" />
+                  <input type="text" name="filter_date_start" value="<?php echo $filter_date_start; ?>" placeholder="<?php echo $entry_date_start; ?>" data-date-format="YYYY-MM-DD" id="input-date-start" class="form-control" />
                   <span class="input-group-btn">
                   <button type="button" class="btn btn-default"><i class="fa fa-calendar"></i></button>
                   </span></div>
               </div>
               <div class="form-group">
-                <label class="control-label" for="input-total"><?php echo $entry_total; ?></label>
-                <input type="text" name="filter_total" value="<?php echo $filter_total; ?>" placeholder="<?php echo $entry_total; ?>" id="input-total" class="form-control" />
+                <label class="control-label" for="input-date-start"><?php echo $entry_date_end; ?></label>
+                <div class="input-group date">
+                  <input type="text" name="filter_date_end" value="<?php echo $filter_date_end; ?>" placeholder="<?php echo $entry_date_end; ?>" data-date-format="YYYY-MM-DD" id="input-date-start" class="form-control" />
+                  <span class="input-group-btn">
+                  <button type="button" class="btn btn-default"><i class="fa fa-calendar"></i></button>
+                  </span></div>
               </div>
-            </div>
+           </div>
             <div class="col-sm-4">
               <div class="form-group">
                 <label class="control-label" for="input-order-status"><?php echo $entry_order_status; ?></label>
@@ -199,10 +203,16 @@ $('#button-filter').on('click', function() {
 		url += '&filter_total=' + encodeURIComponent(filter_total);
 	}
 
-	var filter_event_date = $('input[name=\'filter_event_date\']').val();
+	var filter_date_start = $('input[name=\'filter_date_start\']').val();
 
-	if (filter_event_date) {
-		url += '&filter_event_date=' + encodeURIComponent(filter_event_date);
+	if (filter_date_start) {
+		url += '&filter_date_start=' + encodeURIComponent(filter_date_start);
+	}
+
+	var filter_date_end = $('input[name=\'filter_date_end\']').val();
+
+	if (filter_date_end) {
+		url += '&filter_date_end=' + encodeURIComponent(filter_date_end);
 	}
 
 	var filter_date_added = $('input[name=\'filter_date_added\']').val();

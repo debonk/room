@@ -3,6 +3,10 @@ class ControllerCommonDashboard extends Controller {
 	public function index() {
 		$this->load->language('common/dashboard');
 
+		# Yearly Order Overview
+		$this->document->addScript('view/javascript/yearcalendar/js-year-calendar.js');
+		$this->document->addStyle('view/javascript/yearcalendar/js-year-calendar.css');
+
 		$this->document->setTitle($this->language->get('heading_title'));
 
 		$data['heading_title'] = $this->language->get('heading_title');
@@ -37,6 +41,7 @@ class ControllerCommonDashboard extends Controller {
 		$data['column_left'] = $this->load->controller('common/column_left');
 		$data['order'] = $this->load->controller('dashboard/order');
 		$data['sale'] = $this->load->controller('dashboard/sale');
+		$data['yearly'] = $this->load->controller('dashboard/yearly');
 		$data['customer'] = $this->load->controller('dashboard/customer');
 		$data['online'] = $this->load->controller('dashboard/online');
 		$data['map'] = $this->load->controller('dashboard/map');

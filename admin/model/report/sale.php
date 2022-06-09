@@ -145,45 +145,50 @@ class ModelReportSale extends Model
 
 	public function getOrders($data = array())
 	{
-		$sql = "SELECT MIN(o.date_added) AS date_start, MAX(o.date_added) AS date_end, COUNT(*) AS `orders`, SUM((SELECT SUM(op.quantity) FROM `" . DB_PREFIX . "order_product` op WHERE op.order_id = o.order_id GROUP BY op.order_id)) AS products, SUM((SELECT SUM(ot.value) FROM `" . DB_PREFIX . "order_total` ot WHERE ot.order_id = o.order_id AND ot.code = 'tax' GROUP BY ot.order_id)) AS tax, SUM(o.total) AS `total` FROM `" . DB_PREFIX . "order` o";
+		// $sql = "SELECT MIN(o.date_added) AS date_start, MAX(o.date_added) AS date_end, COUNT(*) AS `orders`, SUM((SELECT SUM(op.quantity) FROM `" . DB_PREFIX . "order_product` op WHERE op.order_id = o.order_id GROUP BY op.order_id)) AS products, SUM((SELECT SUM(ot.value) FROM `" . DB_PREFIX . "order_total` ot WHERE ot.order_id = o.order_id AND ot.code = 'tax' GROUP BY ot.order_id)) AS tax, SUM(o.total) AS `total` FROM `" . DB_PREFIX . "order` o";
+		$sql = "SELECT YEAR(o.event_date) AS year, MONTHNAME(o.event_date) AS month, WEEK(o.event_date) AS week, o.event_date, MIN(o.event_date) AS date_start, MAX(o.event_date) AS date_end, op.model AS venue_code, COUNT(*) AS `orders`, SUM((SELECT SUM(ot.value) FROM `" . DB_PREFIX . "order_total` ot WHERE ot.order_id = o.order_id AND ot.code = 'tax' GROUP BY ot.order_id)) AS tax, SUM(o.total) AS `total` FROM `" . DB_PREFIX . "order` o LEFT JOIN `" . DB_PREFIX . "order_product` op ON (op.order_id = o.order_id) WHERE op.primary_type = 1";
 
 		if (!empty($data['filter_order_status_id'])) {
-			$sql .= " WHERE o.order_status_id = '" . (int)$data['filter_order_status_id'] . "'";
+			$sql .= " AND o.order_status_id = '" . (int)$data['filter_order_status_id'] . "'";
 		} else {
-			$sql .= " WHERE o.order_status_id > '0'";
+			$sql .= " AND o.order_status_id > '0'";
 		}
 
 		if (!empty($data['filter_date_start'])) {
-			$sql .= " AND DATE(o.date_added) >= '" . $this->db->escape($data['filter_date_start']) . "'";
+			$sql .= " AND DATE(o.event_date) >= '" . $this->db->escape($data['filter_date_start']) . "'";
 		}
 
 		if (!empty($data['filter_date_end'])) {
-			$sql .= " AND DATE(o.date_added) <= '" . $this->db->escape($data['filter_date_end']) . "'";
+			$sql .= " AND DATE(o.event_date) <= '" . $this->db->escape($data['filter_date_end']) . "'";
 		}
 
 		if (!empty($data['filter_group'])) {
 			$group = $data['filter_group'];
 		} else {
-			$group = 'week';
+			$group = 'month';
 		}
 
 		switch ($group) {
 			case 'day';
-				$sql .= " GROUP BY YEAR(o.date_added), MONTH(o.date_added), DAY(o.date_added)";
+				$sql .= " GROUP BY venue_code, o.event_date";
 				break;
-			default:
+
 			case 'week':
-				$sql .= " GROUP BY YEAR(o.date_added), WEEK(o.date_added)";
+				$sql .= " GROUP BY venue_code, YEAR(o.event_date), WEEK(o.event_date)";
 				break;
+
 			case 'month':
-				$sql .= " GROUP BY YEAR(o.date_added), MONTH(o.date_added)";
+				$sql .= " GROUP BY venue_code, YEAR(o.event_date), MONTH(o.event_date)";
 				break;
+				
 			case 'year':
-				$sql .= " GROUP BY YEAR(o.date_added)";
+				$sql .= " GROUP BY venue_code, YEAR(o.event_date)";
 				break;
+
+			default:
 		}
 
-		$sql .= " ORDER BY o.date_added DESC";
+		$sql .= " ORDER BY o.event_date DESC";
 
 		if (isset($data['start']) || isset($data['limit'])) {
 			if ($data['start'] < 0) {
@@ -212,32 +217,38 @@ class ModelReportSale extends Model
 
 		switch ($group) {
 			case 'day';
-				$sql = "SELECT COUNT(DISTINCT YEAR(date_added), MONTH(date_added), DAY(date_added)) AS total FROM `" . DB_PREFIX . "order`";
+				$sql = "SELECT COUNT(DISTINCT op.model, o.event_date) AS total";
 				break;
-			default:
+
 			case 'week':
-				$sql = "SELECT COUNT(DISTINCT YEAR(date_added), WEEK(date_added)) AS total FROM `" . DB_PREFIX . "order`";
+				$sql = "SELECT COUNT(DISTINCT op.model, YEAR(o.event_date), WEEK(o.event_date)) AS total";
 				break;
+
 			case 'month':
-				$sql = "SELECT COUNT(DISTINCT YEAR(date_added), MONTH(date_added)) AS total FROM `" . DB_PREFIX . "order`";
+				$sql = "SELECT COUNT(DISTINCT op.model, YEAR(o.event_date), MONTH(o.event_date)) AS total";
 				break;
+
 			case 'year':
-				$sql = "SELECT COUNT(DISTINCT YEAR(date_added)) AS total FROM `" . DB_PREFIX . "order`";
+				$sql = "SELECT COUNT(DISTINCT op.model, YEAR(o.event_date)) AS total";
 				break;
+
+			default:
 		}
 
+		$sql .= " FROM `" . DB_PREFIX . "order` o LEFT JOIN `" . DB_PREFIX . "order_product` op ON (op.order_id = o.order_id) WHERE op.primary_type = 1";
+
 		if (!empty($data['filter_order_status_id'])) {
-			$sql .= " WHERE order_status_id = '" . (int)$data['filter_order_status_id'] . "'";
+			$sql .= " AND order_status_id = '" . (int)$data['filter_order_status_id'] . "'";
 		} else {
-			$sql .= " WHERE order_status_id > '0'";
+			$sql .= " AND order_status_id > '0'";
 		}
 
 		if (!empty($data['filter_date_start'])) {
-			$sql .= " AND DATE(date_added) >= '" . $this->db->escape($data['filter_date_start']) . "'";
+			$sql .= " AND DATE(o.event_date) >= '" . $this->db->escape($data['filter_date_start']) . "'";
 		}
 
 		if (!empty($data['filter_date_end'])) {
-			$sql .= " AND DATE(date_added) <= '" . $this->db->escape($data['filter_date_end']) . "'";
+			$sql .= " AND DATE(o.event_date) <= '" . $this->db->escape($data['filter_date_end']) . "'";
 		}
 
 		$query = $this->db->query($sql);
@@ -354,7 +365,8 @@ class ModelReportSale extends Model
 		return $query->row['total'];
 	}
 
-	public function getOrderProductsCommission($order_id) {
+	public function getOrderProductsCommission($order_id)
+	{
 		$sql = "SELECT SUM(commission) AS total FROM " . DB_PREFIX . "order_product WHERE order_id = '" . (int)$order_id . "'";
 
 		$query = $this->db->query($sql);

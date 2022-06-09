@@ -250,10 +250,10 @@ class ControllerSaleOrder extends Controller
 			'text_title',
 			'text_slot',
 			'entry_order_id',
-			'entry_event_date',
+			'entry_date_start',
+			'entry_date_end',
 			'entry_order_status',
 			'entry_customer',
-			'entry_total',
 			'entry_date_added',
 			'column_order_id',
 			'column_event_date',
@@ -280,6 +280,18 @@ class ControllerSaleOrder extends Controller
 			$data[$language_item] = $this->language->get($language_item);
 		}
 
+		$data['breadcrumbs'] = array();
+
+		$data['breadcrumbs'][] = array(
+			'text' => $this->language->get('text_home'),
+			'href' => $this->url->link('common/dashboard', 'token=' . $this->session->data['token'], true)
+		);
+
+		$data['breadcrumbs'][] = array(
+			'text' => $this->language->get('heading_title'),
+			'href' => $this->url->link('sale/order/list', 'token=' . $this->session->data['token'], true)
+		);
+
 		if (isset($this->request->get['filter_order_id'])) {
 			$filter_order_id = $this->request->get['filter_order_id'];
 		} else {
@@ -298,22 +310,28 @@ class ControllerSaleOrder extends Controller
 			$filter_order_status = null;
 		}
 
-		if (isset($this->request->get['filter_total'])) {
-			$filter_total = $this->request->get['filter_total'];
-		} else {
-			$filter_total = null;
-		}
-
 		if (isset($this->request->get['filter_date_added'])) {
 			$filter_date_added = $this->request->get['filter_date_added'];
 		} else {
 			$filter_date_added = null;
 		}
 
-		if (isset($this->request->get['filter_event_date'])) {
-			$filter_event_date = $this->request->get['filter_event_date'];
+		if (isset($this->request->get['filter_date_start'])) {
+			$filter_date_start = $this->request->get['filter_date_start'];
 		} else {
-			$filter_event_date = null;
+			$filter_date_start = null;
+		}
+
+		if (isset($this->request->get['filter_date_end'])) {
+			$filter_date_end = $this->request->get['filter_date_end'];
+		} else {
+			$filter_date_end = null;
+		}
+
+		if (isset($this->request->get['filter_model'])) {
+			$filter_model = $this->request->get['filter_model'];
+		} else {
+			$filter_model = null;
 		}
 
 		if (isset($this->request->get['sort'])) {
@@ -348,16 +366,20 @@ class ControllerSaleOrder extends Controller
 			$url .= '&filter_order_status=' . $this->request->get['filter_order_status'];
 		}
 
-		if (isset($this->request->get['filter_total'])) {
-			$url .= '&filter_total=' . $this->request->get['filter_total'];
-		}
-
 		if (isset($this->request->get['filter_date_added'])) {
 			$url .= '&filter_date_added=' . $this->request->get['filter_date_added'];
 		}
 
-		if (isset($this->request->get['filter_event_date'])) {
-			$url .= '&filter_event_date=' . $this->request->get['filter_event_date'];
+		if (isset($this->request->get['filter_date_start'])) {
+			$url .= '&filter_date_start=' . $this->request->get['filter_date_start'];
+		}
+
+		if (isset($this->request->get['filter_date_end'])) {
+			$url .= '&filter_date_end=' . $this->request->get['filter_date_end'];
+		}
+
+		if (isset($this->request->get['filter_model'])) {
+			$url .= '&filter_model=' . $this->request->get['filter_model'];
 		}
 
 		if (isset($this->request->get['sort'])) {
@@ -372,18 +394,6 @@ class ControllerSaleOrder extends Controller
 			$url .= '&page=' . $this->request->get['page'];
 		}
 
-		$data['breadcrumbs'] = array();
-
-		$data['breadcrumbs'][] = array(
-			'text' => $this->language->get('text_home'),
-			'href' => $this->url->link('common/dashboard', 'token=' . $this->session->data['token'], true)
-		);
-
-		$data['breadcrumbs'][] = array(
-			'text' => $this->language->get('heading_title'),
-			'href' => $this->url->link('sale/order/list', 'token=' . $this->session->data['token'] . $url, true)
-		);
-
 		$data['year_view'] = $this->url->link('sale/order/yearView', 'token=' . $this->session->data['token'], true);
 		$data['calendar'] = $this->url->link('sale/order', 'token=' . $this->session->data['token'], true);
 		$data['add'] = $this->url->link('sale/order/add', 'token=' . $this->session->data['token'] . $url, true);
@@ -392,16 +402,17 @@ class ControllerSaleOrder extends Controller
 		$this->load->model('accounting/transaction');
 
 		$filter_data = array(
-			'filter_order_id'      => $filter_order_id,
-			'filter_customer'	   => $filter_customer,
-			'filter_order_status'  => $filter_order_status,
-			'filter_total'         => $filter_total,
-			'filter_date_added'    => $filter_date_added,
-			'filter_event_date'    => $filter_event_date,
-			'sort'                 => $sort,
-			'order'                => $order,
-			'start'                => ($page - 1) * $this->config->get('config_limit_admin'),
-			'limit'                => $this->config->get('config_limit_admin')
+			'filter_order_id'    	=> $filter_order_id,
+			'filter_customer'	 	=> $filter_customer,
+			'filter_order_status'	=> $filter_order_status,
+			'filter_date_added'  	=> $filter_date_added,
+			'filter_date_start'  	=> $filter_date_start,
+			'filter_date_end'		=> $filter_date_end,
+			'filter_model'			=> $filter_model,
+			'sort'               	=> $sort,
+			'order'              	=> $order,
+			'start'              	=> ($page - 1) * $this->config->get('config_limit_admin'),
+			'limit'              	=> $this->config->get('config_limit_admin')
 		);
 
 		$order_total = $this->model_sale_order->getTotalOrders($filter_data);
@@ -409,6 +420,8 @@ class ControllerSaleOrder extends Controller
 		$results = $this->model_sale_order->getOrders($filter_data);
 
 		$processing_statuses = $this->config->get('config_processing_status');
+
+		$this->load->model('localisation/local_date');
 
 		foreach ($results as $result) {
 			$transaction_total['customer'] = $this->model_accounting_transaction->getTransactionsTotalByOrderId($result['order_id'], ['client_label' => 'customer']);
@@ -431,7 +444,7 @@ class ControllerSaleOrder extends Controller
 				'order_id'        => $result['order_id'],
 				'title'        	  => $result['title'],
 				'invoice_no'      => $result['invoice_no'] ? $result['invoice_prefix'] . str_pad($result['invoice_no'], 4, 0, STR_PAD_LEFT) : '',
-				'event_date'      => date($this->language->get('date_format_short'), strtotime($result['event_date'])),
+				'event_date'      => $this->model_localisation_local_date->getInFormatDate($result['event_date'])['long_date'],
 				'slot'      	  => $result['slot'],
 				'primary_product' => $result['primary_product'],
 				// 'ceremony'        => $result['ceremony'],
@@ -465,16 +478,20 @@ class ControllerSaleOrder extends Controller
 			$url .= '&filter_order_status=' . $this->request->get['filter_order_status'];
 		}
 
-		if (isset($this->request->get['filter_total'])) {
-			$url .= '&filter_total=' . $this->request->get['filter_total'];
-		}
-
 		if (isset($this->request->get['filter_date_added'])) {
 			$url .= '&filter_date_added=' . $this->request->get['filter_date_added'];
 		}
 
-		if (isset($this->request->get['filter_event_date'])) {
-			$url .= '&filter_event_date=' . $this->request->get['filter_event_date'];
+		if (isset($this->request->get['filter_date_start'])) {
+			$url .= '&filter_date_start=' . $this->request->get['filter_date_start'];
+		}
+
+		if (isset($this->request->get['filter_date_end'])) {
+			$url .= '&filter_date_end=' . $this->request->get['filter_date_end'];
+		}
+
+		if (isset($this->request->get['filter_model'])) {
+			$url .= '&filter_model=' . $this->request->get['filter_model'];
 		}
 
 		if ($order == 'ASC') {
@@ -510,16 +527,20 @@ class ControllerSaleOrder extends Controller
 			$url .= '&filter_order_status=' . $this->request->get['filter_order_status'];
 		}
 
-		if (isset($this->request->get['filter_total'])) {
-			$url .= '&filter_total=' . $this->request->get['filter_total'];
-		}
-
 		if (isset($this->request->get['filter_date_added'])) {
 			$url .= '&filter_date_added=' . $this->request->get['filter_date_added'];
 		}
 
-		if (isset($this->request->get['filter_event_date'])) {
-			$url .= '&filter_event_date=' . $this->request->get['filter_event_date'];
+		if (isset($this->request->get['filter_date_start'])) {
+			$url .= '&filter_date_start=' . $this->request->get['filter_date_start'];
+		}
+
+		if (isset($this->request->get['filter_date_end'])) {
+			$url .= '&filter_date_end=' . $this->request->get['filter_date_end'];
+		}
+
+		if (isset($this->request->get['filter_model'])) {
+			$url .= '&filter_model=' . $this->request->get['filter_model'];
 		}
 
 		if (isset($this->request->get['sort'])) {
@@ -543,9 +564,10 @@ class ControllerSaleOrder extends Controller
 		$data['filter_order_id'] = $filter_order_id;
 		$data['filter_customer'] = $filter_customer;
 		$data['filter_order_status'] = $filter_order_status;
-		$data['filter_total'] = $filter_total;
 		$data['filter_date_added'] = $filter_date_added;
-		$data['filter_event_date'] = $filter_event_date;
+		$data['filter_date_start'] = $filter_date_start;
+		$data['filter_date_end'] = $filter_date_end;
+		$data['filter_model'] = $filter_model;
 
 		$data['sort'] = $sort;
 		$data['order'] = $order;
@@ -676,16 +698,20 @@ class ControllerSaleOrder extends Controller
 			$url .= '&filter_order_status=' . $this->request->get['filter_order_status'];
 		}
 
-		if (isset($this->request->get['filter_total'])) {
-			$url .= '&filter_total=' . $this->request->get['filter_total'];
-		}
-
 		if (isset($this->request->get['filter_date_added'])) {
 			$url .= '&filter_date_added=' . $this->request->get['filter_date_added'];
 		}
 
-		if (isset($this->request->get['filter_event_date'])) {
-			$url .= '&filter_event_date=' . $this->request->get['filter_event_date'];
+		if (isset($this->request->get['filter_date_start'])) {
+			$url .= '&filter_date_start=' . $this->request->get['filter_date_start'];
+		}
+
+		if (isset($this->request->get['filter_date_end'])) {
+			$url .= '&filter_date_end=' . $this->request->get['filter_date_end'];
+		}
+
+		if (isset($this->request->get['filter_model'])) {
+			$url .= '&filter_model=' . $this->request->get['filter_model'];
 		}
 
 		if (isset($this->request->get['sort'])) {
@@ -1159,19 +1185,23 @@ class ControllerSaleOrder extends Controller
 				$url .= '&filter_order_status=' . $this->request->get['filter_order_status'];
 			}
 
-			if (isset($this->request->get['filter_total'])) {
-				$url .= '&filter_total=' . $this->request->get['filter_total'];
-			}
-
 			if (isset($this->request->get['filter_date_added'])) {
 				$url .= '&filter_date_added=' . $this->request->get['filter_date_added'];
 			}
 
-			if (isset($this->request->get['filter_event_date'])) {
-				$url .= '&filter_event_date=' . $this->request->get['filter_event_date'];
+			if (isset($this->request->get['filter_date_start'])) {
+				$url .= '&filter_date_start=' . $this->request->get['filter_date_start'];
+			}
+	
+			if (isset($this->request->get['filter_date_end'])) {
+				$url .= '&filter_date_end=' . $this->request->get['filter_date_end'];
 			}
 
-			if (isset($this->request->get['sort'])) {
+			if (isset($this->request->get['filter_model'])) {
+				$url .= '&filter_model=' . $this->request->get['filter_model'];
+			}
+	
+				if (isset($this->request->get['sort'])) {
 				$url .= '&sort=' . $this->request->get['sort'];
 			}
 
@@ -1700,7 +1730,7 @@ class ControllerSaleOrder extends Controller
 
 		$results = $this->model_sale_order->getOrdersEventDate($filter_data);
 
-		$json['results'] = array_unique(array_column($results, 'event_date'));
+		$json['results'] = array_values(array_unique(array_column($results, 'event_date')));
 
 		$this->response->addHeader('Content-Type: application/json');
 		$this->response->setOutput(json_encode($json));
@@ -1729,14 +1759,11 @@ class ControllerSaleOrder extends Controller
 
 		$results = $this->model_sale_order->getOrders($filter_data);
 
-		// $processing_statuses = $this->config->get('config_processing_status');
 		$processing_statuses = array_merge($this->config->get('config_processing_status'), $this->config->get('config_complete_status'));
 
 		foreach ($results as $result) {
-			// $session_slot = explode(': ', $result['session_slot']);
-			// $slot_idx = strtolower($session_slot[0]);
-			$slot_idx = strtolower((empty($result['slot_prefix']) ? $result['model'] : $result['slot_prefix']) . $result['slot_code']);
-
+			$slot_idx = strtolower((empty($result['slot_prefix']) ? substr($result['model'], -2) : $result['slot_prefix']) . $result['slot_code']);
+			
 			if (in_array($result['order_status_id'], $processing_statuses)) {
 				$slot_remove = $this->model_sale_order->getSlotUsed($slot_idx);
 

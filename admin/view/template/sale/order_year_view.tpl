@@ -49,7 +49,7 @@ function updateCalendar(year)	{
 		dataType: 'json',
 		success: function(json) {
 			if (json['results']) {
-				eventDates = json['results'];
+				let eventDates = json['results'];
 
 				if (eventDates.length) {
 					for (i = 0; i < eventDates.length; i++) {

@@ -41,7 +41,19 @@ class ControllerCatalogVendor extends Controller
 				$url .= '&filter_status=' . $this->request->get['filter_status'];
 			}
 
-			$this->response->redirect($this->url->link('catalog/vendor', 'token=' . $this->session->data['token'] . $url, true));
+			if (isset($this->request->get['sort'])) {
+				$url .= '&sort=' . $this->request->get['sort'];
+			}
+	
+			if (isset($this->request->get['order'])) {
+				$url .= '&order=' . $this->request->get['order'];
+			}
+	
+			if (isset($this->request->get['page'])) {
+				$url .= '&page=' . $this->request->get['page'];
+			}
+	
+				$this->response->redirect($this->url->link('catalog/vendor', 'token=' . $this->session->data['token'] . $url, true));
 		}
 
 		$this->getForm();
@@ -74,6 +86,18 @@ class ControllerCatalogVendor extends Controller
 				$url .= '&filter_status=' . $this->request->get['filter_status'];
 			}
 
+			if (isset($this->request->get['sort'])) {
+				$url .= '&sort=' . $this->request->get['sort'];
+			}
+	
+			if (isset($this->request->get['order'])) {
+				$url .= '&order=' . $this->request->get['order'];
+			}
+	
+			if (isset($this->request->get['page'])) {
+				$url .= '&page=' . $this->request->get['page'];
+			}
+	
 			$this->response->redirect($this->url->link('catalog/vendor', 'token=' . $this->session->data['token'] . $url, true));
 		}
 
@@ -109,6 +133,18 @@ class ControllerCatalogVendor extends Controller
 				$url .= '&filter_status=' . $this->request->get['filter_status'];
 			}
 
+			if (isset($this->request->get['sort'])) {
+				$url .= '&sort=' . $this->request->get['sort'];
+			}
+	
+			if (isset($this->request->get['order'])) {
+				$url .= '&order=' . $this->request->get['order'];
+			}
+	
+			if (isset($this->request->get['page'])) {
+				$url .= '&page=' . $this->request->get['page'];
+			}
+	
 			$this->response->redirect($this->url->link('catalog/vendor', 'token=' . $this->session->data['token'] . $url, true));
 		}
 

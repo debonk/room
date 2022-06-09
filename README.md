@@ -1,5 +1,14 @@
 # room > gk ballroom software
 
+2.7.8	09/06/2022
+Modul: Dashboard > Yearly
+Bug Fixed: Catalog > Vendor: Pagination always reset to page 1
+Bug Fixed: Sale > Order: Add order not save slot prefix
+Bug Fixed: Sale > Order > Monthly view: Some order not shown in monthly calendar
+Bug Fixed: Sale > Order > Yearly view: Some order not shown in yearly calendar
+Modify: Sale > Order: Add Date Start/End Filter
+Modify: Report > Order: Give a better report
+
 2.7.7	08/06/2022
 Security Issue: Add rel="noopener noreferrer" on <a> with target="_blank".
 

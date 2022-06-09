@@ -11,6 +11,8 @@ $_['text_day']          = 'Days';
 $_['text_all_status']   = 'All Statuses';
 
 // Column
+$_['column_period']		= 'Period';
+$_['column_venue']		= 'Venue Code';
 $_['column_date_start'] = 'Date Start';
 $_['column_date_end']   = 'Date End';
 $_['column_orders']     = 'No. Orders';

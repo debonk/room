@@ -1,6 +1,8 @@
 <?php
-class ControllerReportSaleOrder extends Controller {
-	public function index() {
+class ControllerReportSaleOrder extends Controller
+{
+	public function index()
+	{
 		$this->load->language('report/sale_order');
 
 		$this->document->setTitle($this->language->get('heading_title'));
@@ -20,7 +22,7 @@ class ControllerReportSaleOrder extends Controller {
 		if (isset($this->request->get['filter_group'])) {
 			$filter_group = $this->request->get['filter_group'];
 		} else {
-			$filter_group = 'week';
+			$filter_group = 'month';
 		}
 
 		if (isset($this->request->get['filter_order_status_id'])) {
@@ -35,27 +37,27 @@ class ControllerReportSaleOrder extends Controller {
 			$page = 1;
 		}
 
-		$url = '';
+		// $url = '';
 
-		if (isset($this->request->get['filter_date_start'])) {
-			$url .= '&filter_date_start=' . $this->request->get['filter_date_start'];
-		}
+		// if (isset($this->request->get['filter_date_start'])) {
+		// 	$url .= '&filter_date_start=' . $this->request->get['filter_date_start'];
+		// }
 
-		if (isset($this->request->get['filter_date_end'])) {
-			$url .= '&filter_date_end=' . $this->request->get['filter_date_end'];
-		}
+		// if (isset($this->request->get['filter_date_end'])) {
+		// 	$url .= '&filter_date_end=' . $this->request->get['filter_date_end'];
+		// }
 
-		if (isset($this->request->get['filter_group'])) {
-			$url .= '&filter_group=' . $this->request->get['filter_group'];
-		}
+		// if (isset($this->request->get['filter_group'])) {
+		// 	$url .= '&filter_group=' . $this->request->get['filter_group'];
+		// }
 
-		if (isset($this->request->get['filter_order_status_id'])) {
-			$url .= '&filter_order_status_id=' . $this->request->get['filter_order_status_id'];
-		}
+		// if (isset($this->request->get['filter_order_status_id'])) {
+		// 	$url .= '&filter_order_status_id=' . $this->request->get['filter_order_status_id'];
+		// }
 
-		if (isset($this->request->get['page'])) {
-			$url .= '&page=' . $this->request->get['page'];
-		}
+		// if (isset($this->request->get['page'])) {
+		// 	$url .= '&page=' . $this->request->get['page'];
+		// }
 
 		$data['breadcrumbs'] = array();
 
@@ -66,7 +68,7 @@ class ControllerReportSaleOrder extends Controller {
 
 		$data['breadcrumbs'][] = array(
 			'text' => $this->language->get('heading_title'),
-			'href' => $this->url->link('report/sale_order', 'token=' . $this->session->data['token'] . $url, true)
+			'href' => $this->url->link('report/sale_order', 'token=' . $this->session->data['token'], true)
 		);
 
 		$this->load->model('report/sale');
@@ -87,36 +89,66 @@ class ControllerReportSaleOrder extends Controller {
 		$results = $this->model_report_sale->getOrders($filter_data);
 
 		foreach ($results as $result) {
-			$data['orders'][] = array(
-				'date_start' => date($this->language->get('date_format_short'), strtotime($result['date_start'])),
-				'date_end'   => date($this->language->get('date_format_short'), strtotime($result['date_end'])),
-				'orders'     => $result['orders'],
-				'products'   => $result['products'],
-				'tax'        => $this->currency->format($result['tax'], $this->config->get('config_currency')),
-				'total'      => $this->currency->format($result['total'], $this->config->get('config_currency'))
+			switch ($filter_group) {
+				case 'day';
+					$key = date($this->language->get('date_format_long'), strtotime($result['event_date']));
+					break;
+
+				case 'week':
+					$key = $result['year'] . ' - Week: ' . $result['week'];
+					break;
+
+				case 'month':
+					$key =  $result['month'] . ' ' . $result['year'];
+					break;
+
+				case 'year':
+					$key = $result['year'];
+					break;
+
+				default:
+			}
+
+			$url = '&filter_model=' . $result['venue_code'] . '&filter_date_start=' . $result['date_start'] . '&filter_date_end=' . $result['date_end'];
+	
+			if (!empty($filter_order_status_id)) {
+				$url .= '&filter_order_status=' . $filter_order_status_id;
+			}
+	
+			$data['orders'][$key][] = array(
+				'venue_code'	=> $result['venue_code'],
+				'date_start'	=> date($this->language->get('date_format_short'), strtotime($result['date_start'])),
+				'date_end'		=> date($this->language->get('date_format_short'), strtotime($result['date_end'])),
+				'orders'  		=> $result['orders'],
+				'tax'     		=> $this->currency->format($result['tax'], $this->config->get('config_currency')),
+				'total'   		=> $this->currency->format($result['total'], $this->config->get('config_currency')),
+				'href'			=> $this->url->link('sale/order/list', 'token=' . $this->session->data['token'] . $url, true)
 			);
 		}
 
-		$data['heading_title'] = $this->language->get('heading_title');
-
-		$data['text_list'] = $this->language->get('text_list');
-		$data['text_no_results'] = $this->language->get('text_no_results');
-		$data['text_confirm'] = $this->language->get('text_confirm');
-		$data['text_all_status'] = $this->language->get('text_all_status');
-
-		$data['column_date_start'] = $this->language->get('column_date_start');
-		$data['column_date_end'] = $this->language->get('column_date_end');
-		$data['column_orders'] = $this->language->get('column_orders');
-		$data['column_products'] = $this->language->get('column_products');
-		$data['column_tax'] = $this->language->get('column_tax');
-		$data['column_total'] = $this->language->get('column_total');
-
-		$data['entry_date_start'] = $this->language->get('entry_date_start');
-		$data['entry_date_end'] = $this->language->get('entry_date_end');
-		$data['entry_group'] = $this->language->get('entry_group');
-		$data['entry_status'] = $this->language->get('entry_status');
-
-		$data['button_filter'] = $this->language->get('button_filter');
+		$language_items = [
+			'heading_title',
+			'text_list',
+			'text_no_results',
+			'text_confirm',
+			'text_all_status',
+			'column_period',
+			'column_venue',
+			'column_date_start',
+			'column_date_end',
+			'column_orders',
+			'column_products',
+			'column_tax',
+			'column_total',
+			'entry_date_start',
+			'entry_date_end',
+			'entry_group',
+			'entry_status',	
+			'button_filter'	
+		];
+		foreach ($language_items as $language_item) {
+			$data[$language_item] = $this->language->get($language_item);
+		}
 
 		$data['token'] = $this->session->data['token'];
 

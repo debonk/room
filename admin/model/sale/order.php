@@ -207,16 +207,20 @@ class ModelSaleOrder extends Model {
 			$sql .= " AND CONCAT(o.firstname, ' ', o.lastname) LIKE '%" . $this->db->escape($data['filter_customer']) . "%'";
 		}
 
-		if (!empty($data['filter_event_date'])) {
-			$sql .= " AND DATE(o.event_date) = DATE('" . $this->db->escape($data['filter_event_date']) . "')";
-		}
-
 		if (!empty($data['filter_date_added'])) {
 			$sql .= " AND DATE(o.date_added) = DATE('" . $this->db->escape($data['filter_date_added']) . "')";
 		}
 
-		if (!empty($data['filter_total'])) {
-			$sql .= " AND o.total = '" . (float)$data['filter_total'] . "'";
+		if (!empty($data['filter_date_start'])) {
+			$sql .= " AND DATE(o.event_date) >= '" . $this->db->escape($data['filter_date_start']) . "'";
+		}
+
+		if (!empty($data['filter_date_end'])) {
+			$sql .= " AND DATE(o.event_date) <= '" . $this->db->escape($data['filter_date_end']) . "'";
+		}
+
+		if (!empty($data['filter_model'])) {
+			$sql .= " AND op.model = '" . $this->db->escape($data['filter_model']) . "'";
 		}
 
 		$sort_data = array(
@@ -381,14 +385,8 @@ class ModelSaleOrder extends Model {
 		return $query->rows;
 	}
 
-	// public function getOrderAdmission($order_id, $vendor_id) {
-		// $query = $this->db->query("SELECT DISTINCT * FROM " . DB_PREFIX . "order_admission WHERE order_id = '" . (int)$order_id . "' AND vendor_id = '" . (int)$vendor_id . "'");
-
-		// return $query->row;
-	// }
-
 	public function getTotalOrders($data = array()) {
-		$sql = "SELECT COUNT(*) AS total FROM `" . DB_PREFIX . "order`";
+		$sql = "SELECT COUNT(o.order_id) AS total FROM `" . DB_PREFIX . "order` o LEFT JOIN `" . DB_PREFIX . "order_product` op ON (op.order_id = o.order_id AND op.primary_type = 1)";
 
 		if (isset($data['filter_order_status'])) {
 			$implode = array();
@@ -396,34 +394,38 @@ class ModelSaleOrder extends Model {
 			$order_statuses = explode(',', $data['filter_order_status']);
 
 			foreach ($order_statuses as $order_status_id) {
-				$implode[] = "order_status_id = '" . (int)$order_status_id . "'";
+				$implode[] = "o.order_status_id = '" . (int)$order_status_id . "'";
 			}
 
 			if ($implode) {
 				$sql .= " WHERE (" . implode(" OR ", $implode) . ")";
 			}
 		} else {
-			$sql .= " WHERE order_status_id > '0'";
+			$sql .= " WHERE o.order_status_id > '0'";
 		}
 
 		if (!empty($data['filter_order_id'])) {
-			$sql .= " AND order_id = '" . (int)$data['filter_order_id'] . "'";
+			$sql .= " AND o.order_id = '" . (int)$data['filter_order_id'] . "'";
 		}
 
 		if (!empty($data['filter_customer'])) {
-			$sql .= " AND CONCAT(firstname, ' ', lastname) LIKE '%" . $this->db->escape($data['filter_customer']) . "%'";
+			$sql .= " AND CONCAT(o.firstname, ' ', o.lastname) LIKE '%" . $this->db->escape($data['filter_customer']) . "%'";
 		}
 
 		if (!empty($data['filter_date_added'])) {
-			$sql .= " AND DATE(date_added) = DATE('" . $this->db->escape($data['filter_date_added']) . "')";
+			$sql .= " AND DATE(o.date_added) = DATE('" . $this->db->escape($data['filter_date_added']) . "')";
 		}
 
-		if (!empty($data['filter_event_date'])) {
-			$sql .= " AND DATE(event_date) = DATE('" . $this->db->escape($data['filter_event_date']) . "')";
+		if (!empty($data['filter_date_start'])) {
+			$sql .= " AND DATE(o.event_date) >= '" . $this->db->escape($data['filter_date_start']) . "'";
 		}
 
-		if (!empty($data['filter_total'])) {
-			$sql .= " AND total = '" . (float)$data['filter_total'] . "'";
+		if (!empty($data['filter_date_end'])) {
+			$sql .= " AND DATE(o.event_date) <= '" . $this->db->escape($data['filter_date_end']) . "'";
+		}
+
+		if (!empty($data['filter_model'])) {
+			$sql .= " AND op.model = '" . $this->db->escape($data['filter_model']) . "'";
 		}
 
 		$query = $this->db->query($sql);
@@ -917,63 +919,17 @@ class ModelSaleOrder extends Model {
 	}
 
 	public function getSlotUsed($slot_idx) {
-		switch ($slot_idx) {
-			case 'prf':
-				$slot_used = array(
-					'prp',
-					'prm'
-				);
-				
-				break;
-				
-			case 'cdf':
-				$slot_used = array(
-					'cdp',
-					'cdm'
-				);
-				
-				break;
-				
-			case 'krp':
-				$slot_used = array(
-					'prp',
-					'cdp'
-				);
-				
-				break;
-				
-			case 'krm':
-				$slot_used = array(
-					'prm',
-					'cdm'
-				);
-				
-				break;
-				
-			case 'krf':
-				$slot_used = array(
-					'prp',
-					'prm',
-					'cdp',
-					'cdm'
-				);
-				
-				break;
-				
-			case 'pof':
-				$slot_used = array(
-					'pop',
-					'pom'
-				);
-				
-				break;
-				
-			default:
-				$slot_used = array(
-					$slot_idx
-				);
-		}
-		
-		return $slot_used;
+		$data_slot = [
+			'prf'	=> ['prp', 'prm'],
+			'cdf'	=> ['cdp', 'cdm'],
+			'krp'	=> ['prp', 'cdp'],
+			'krm'	=> ['prm', 'cdm'],
+			'krf'	=> ['prp', 'prm', 'cdp', 'cdm'],
+			'pof'	=> ['pop', 'pom'],
+		];
+
+		$slot_data = !empty($data_slot[$slot_idx]) ? $data_slot[$slot_idx] : $slot_idx;
+
+		return $slot_data;
 	}
 }

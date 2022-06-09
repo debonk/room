@@ -23,6 +23,9 @@
       <div class="col-lg-3 col-md-3 col-sm-6"><?php echo $online; ?></div>
     </div>
     <div class="row">
+      <div class="col-sm-12"><?php echo $yearly; ?></div>
+    </div>
+    <div class="row">
       <div class="col-lg-6 col-md-12 col-sx-12 col-sm-12"><?php echo $map; ?></div>
       <div class="col-lg-6 col-md-12 col-sx-12 col-sm-12"><?php echo $chart; ?></div>
     </div>

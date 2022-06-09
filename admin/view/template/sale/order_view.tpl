@@ -100,7 +100,6 @@ $(document).ready(function(){
 					let order = json['orders'][i];
 					let date_slot_idx = order['event_date'] + order['slot_idx'];
 					
-					console.log(order);
 					for	 (j in order['slot_remove']) {
 						$('#slot-' + order['event_date'] + order['slot_remove'][j]).replaceWith('<a id="slot-' + order['event_date'] + order['slot_remove'][j] + '"></a>');
 					}

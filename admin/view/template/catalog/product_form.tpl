@@ -471,7 +471,7 @@
                     <tr id="vendor-row<?php echo $key; ?>" value="<?php echo $key; ?>">
                       <td class="text-left">
                         <input type="text" name="product_vendor[<?php echo $key; ?>][name]"
-                          value="<?php echo $product_vendor['vendor_name']; ?>" placeholder="<?php echo $entry_vendor?>"
+                          value="<?php echo $product_vendor['vendor_name'] . ' - ' . $product_vendor['vendor_type']; ?>" placeholder="<?php echo $entry_vendor?>"
                           class="form-control" />
                         <input type="hidden" name="product_vendor[<?php echo $key; ?>][vendor_id]"
                           value="<?php echo $product_vendor['vendor_id']; ?>" />
