@@ -666,6 +666,12 @@ class ControllerCatalogProduct extends Controller
 
 	protected function getForm()
 	{
+		if (!$this->user->hasPermission('modify', 'catalog/product')) {
+			$this->error['warning'] = $this->language->get('error_permission');
+			
+			return $this->getList();
+		}
+
 		$data['heading_title'] = $this->language->get('heading_title');
 
 		$data['text_form'] = !isset($this->request->get['product_id']) ? $this->language->get('text_add') : $this->language->get('text_edit');

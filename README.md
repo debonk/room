@@ -1,5 +1,9 @@
 # room > gk ballroom software
 
+2.7.9b 14/06/2022
+Modify Modul: Product Form: User without modify permission can not view form
+Bug Fixed: Transaction List: Sort amount not working
+
 2.7.9	14/06/2022
 Modify Modul: Product List: Add Print feature for product list
 Modul: Localisation > Venue

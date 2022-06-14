@@ -198,6 +198,7 @@ class ModelAccountingTransaction extends Model
 			't.description',
 			'reference',
 			't.customer_name',
+			't.amount',
 			't.edit_permission',
 			'transaction_type',
 			'total',
