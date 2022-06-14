@@ -14,6 +14,7 @@ $_['text_option']            = 'Option';
 $_['text_option_value']      = 'Option Value';
 $_['text_percent']           = 'Percentage';
 $_['text_amount']            = 'Fixed Amount';
+$_['text_include']           = '%s by %s';
 
 // Column
 $_['column_name']            = 'Product Name';
@@ -26,6 +27,8 @@ $_['column_price']           = 'Price';
 $_['column_quantity']        = 'Quantity';
 $_['column_status']          = 'Status';
 $_['column_action']          = 'Action';
+$_['column_product_detail']  = 'Product Detail';
+$_['column_capacity']        = 'Capacity';
 
 // Entry
 $_['entry_additional_image'] = 'Additional Images';

@@ -2,7 +2,9 @@
 <div id="content">
   <div class="page-header">
     <div class="container-fluid">
-      <div class="pull-right"><a href="<?php echo $add; ?>" data-toggle="tooltip" title="<?php echo $button_add; ?>" class="btn btn-primary"><i class="fa fa-plus"></i></a>
+      <div class="pull-right">
+        <button id="button-prints" type="button" data-toggle="tooltip" title="<?php echo $button_print; ?>" class="btn btn-default" onclick="$('#form-product').attr({'action': '<?php echo $print; ?>',  'target': '_blank'}).submit()"><i class="fa fa-print"></i></button>
+				<a href="<?php echo $add; ?>" data-toggle="tooltip" title="<?php echo $button_add; ?>" class="btn btn-primary"><i class="fa fa-plus"></i></a>
         <button type="button" data-toggle="tooltip" title="<?php echo $button_copy; ?>" class="btn btn-default" onclick="$('#form-product').attr('action', '<?php echo $copy; ?>').submit()"><i class="fa fa-copy"></i></button>
         <button type="button" data-toggle="tooltip" title="<?php echo $button_delete; ?>" class="btn btn-danger" onclick="confirm('<?php echo $text_confirm; ?>') ? $('#form-product').submit() : false;"><i class="fa fa-trash-o"></i></button>
       </div>
@@ -218,7 +220,7 @@
       </div>
     </div>
   </div>
-  <script type="text/javascript"><!--
+  <script type="text/javascript">
 $('#button-filter').on('click', function() {
 	var url = 'index.php?route=catalog/product&token=<?php echo $token; ?>';
 
@@ -278,9 +280,8 @@ $(document).keypress(function(e) {
     $("#button-filter").click();
   }
 });
-
-//--></script>
-  <script type="text/javascript"><!--
+</script>
+  <script type="text/javascript">
 $('input[name=\'filter_name\']').autocomplete({
 	'source': function(request, response) {
 		$.ajax({
@@ -320,5 +321,5 @@ $('input[name=\'filter_model\']').autocomplete({
 		$('input[name=\'filter_model\']').val(item['label']);
 	}
 });
-//--></script></div>
+</script></div>
 <?php echo $footer; ?>

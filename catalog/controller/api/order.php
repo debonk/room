@@ -112,19 +112,6 @@ class ControllerApiOrder extends Controller
 			if (!$json) {
 				$order_data = array();
 
-				// $inv_prefix = current($primary_products)['model'];
-				// $inv_prefix .= '-' . date('y/m', strtotime($this->session->data['event']['event_date'])) . '-';
-
-				// $this->load->model('localisation/ceremony');
-				// $ceremony_code = $this->model_localisation_ceremony->getCeremony($this->session->data['event']['ceremony_id'])['code'];
-
-				// $inv_prefix .= $ceremony_code . '-';
-
-				// $inv_prefix = str_ireplace('{YEAR}',date('Y', strtotime($this->session->data['event']['event_date'])),$this->config->get('config_invoice_prefix'));
-
-				// Store Details
-				// $order_data['invoice_prefix'] = $this->config->get('config_invoice_prefix');
-				// $order_data['invoice_prefix'] = $inv_prefix;
 				$order_data['invoice_prefix'] = str_ireplace('{YEAR}', date('Y'), $this->config->get('config_invoice_prefix'));
 				$order_data['store_id'] = $this->config->get('config_store_id');
 				$order_data['store_name'] = $this->config->get('config_name');
@@ -145,7 +132,6 @@ class ControllerApiOrder extends Controller
 				$order_data['title'] = $this->session->data['event']['title'];
 				$order_data['event_date'] = $this->session->data['event']['event_date'];
 				$order_data['slot_id'] = $this->session->data['event']['slot_id'];
-				// $order_data['ceremony_id'] = $this->session->data['event']['ceremony_id'];
 
 				// Payment Details
 				$order_data['payment_firstname'] = $this->session->data['payment_address']['firstname'];
@@ -605,7 +591,6 @@ class ControllerApiOrder extends Controller
 			$order_data['title'] = $this->session->data['event']['title'];
 			$order_data['event_date'] = $this->session->data['event']['event_date'];
 			$order_data['slot_id'] = $this->session->data['event']['slot_id'];
-			// $order_data['ceremony_id'] = $this->session->data['event']['ceremony_id'];
 
 			// Payment Details
 			$order_data['payment_firstname'] = $this->session->data['payment_address']['firstname'];

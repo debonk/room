@@ -2,7 +2,6 @@
 class ModelSaleOrder extends Model {
 	public function getOrder($order_id) {
 		$order_query = $this->db->query("SELECT *, s.name AS slot, (SELECT CONCAT(c.firstname, ' ', c.lastname) FROM " . DB_PREFIX . "customer c WHERE c.customer_id = o.customer_id) AS customer, (SELECT os.name FROM " . DB_PREFIX . "order_status os WHERE os.order_status_id = o.order_status_id AND os.language_id = '" . (int)$this->config->get('config_language_id') . "') AS order_status, (SELECT u.username FROM " . DB_PREFIX . "user u WHERE o.user_id = u.user_id) AS username FROM `" . DB_PREFIX . "order` o LEFT JOIN `" . DB_PREFIX . "slot` s ON (s.slot_id = o.slot_id) WHERE o.order_id = '" . (int)$order_id . "'");
-		// $order_query = $this->db->query("SELECT *, oo.value AS session_slot, s.name AS slot, cr.name AS ceremony, (SELECT CONCAT(c.firstname, ' ', c.lastname) FROM " . DB_PREFIX . "customer c WHERE c.customer_id = o.customer_id) AS customer, (SELECT os.name FROM " . DB_PREFIX . "order_status os WHERE os.order_status_id = o.order_status_id AND os.language_id = '" . (int)$this->config->get('config_language_id') . "') AS order_status, (SELECT u.username FROM " . DB_PREFIX . "user u WHERE o.user_id = u.user_id) AS username FROM `" . DB_PREFIX . "order` o LEFT JOIN `" . DB_PREFIX . "order_option` oo ON (oo.order_id = o.order_id AND name = 'Session Slot') LEFT JOIN `" . DB_PREFIX . "slot` s ON (s.slot_id = o.slot_id) LEFT JOIN `" . DB_PREFIX . "ceremony` cr ON (cr.ceremony_id = o.ceremony_id) WHERE o.order_id = '" . (int)$order_id . "'");
 
 		if ($order_query->num_rows) {
 			$customer_group_query = $this->db->query("SELECT name FROM " . DB_PREFIX . "customer_group_description WHERE customer_group_id = '" . (int)$order_query->row['customer_group_id'] . "' AND language_id = '" . (int)$this->config->get('config_language_id') . "'");
@@ -108,8 +107,6 @@ class ModelSaleOrder extends Model {
 				'event_date'              => $order_query->row['event_date'],
 				'slot_id'             	  => $order_query->row['slot_id'],
 				'slot'             	  	  => $order_query->row['slot'],
-				// 'ceremony_id'             => $order_query->row['ceremony_id'],
-				// 'ceremony'                => $order_query->row['ceremony'],
 				'payment_firstname'       => $order_query->row['payment_firstname'],
 				'payment_lastname'        => $order_query->row['payment_lastname'],
 				'payment_company'         => $order_query->row['payment_company'],
@@ -176,7 +173,6 @@ class ModelSaleOrder extends Model {
 	}
 
 	public function getOrders($data = array()) {
-		// $sql = "SELECT o.order_id, o.title, o.event_date, oo.value AS session_slot, s.code AS slot_code, s.name AS slot, cr.name AS ceremony, CONCAT(o.firstname, ' ', o.lastname) AS customer, o.order_status_id, os.name AS order_status, os.class AS order_status_class, o.invoice_no, o.invoice_prefix, o.shipping_code, o.total, o.currency_code, o.currency_value, o.date_added, o.date_modified, op.name AS primary_product, op.model, u.username, (SELECT SUM(t.amount) FROM `" . DB_PREFIX . "transaction` t WHERE t.order_id = o.order_id AND t.label IN('customer', 'vendor')) AS total_paid FROM `" . DB_PREFIX . "order` o LEFT JOIN `" . DB_PREFIX . "slot` s ON (s.slot_id = o.slot_id) LEFT JOIN `" . DB_PREFIX . "ceremony` cr ON (cr.ceremony_id = o.ceremony_id) LEFT JOIN `" . DB_PREFIX . "order_product` op ON (op.order_id = o.order_id AND op.primary_type = 1) LEFT JOIN `" . DB_PREFIX . "order_option` oo ON (oo.order_id = o.order_id) LEFT JOIN `" . DB_PREFIX . "order_status` os ON (os.order_status_id = o.order_status_id AND os.language_id = '" . (int)$this->config->get('config_language_id') . "') LEFT JOIN `" . DB_PREFIX . "user` u ON (u.user_id = o.user_id)";
 		$sql = "SELECT o.order_id, o.title, o.event_date, s.code AS slot_code, s.name AS slot, CONCAT(o.firstname, ' ', o.lastname) AS customer, o.order_status_id, os.name AS order_status, os.class AS order_status_class, o.invoice_no, o.invoice_prefix, o.shipping_code, o.total, o.currency_code, o.currency_value, o.date_added, o.date_modified, op.name AS primary_product, op.model, op.slot_prefix, u.username FROM `" . DB_PREFIX . "order` o LEFT JOIN `" . DB_PREFIX . "slot` s ON (s.slot_id = o.slot_id) LEFT JOIN `" . DB_PREFIX . "order_product` op ON (op.order_id = o.order_id AND op.primary_type = 1) LEFT JOIN `" . DB_PREFIX . "order_status` os ON (os.order_status_id = o.order_status_id AND os.language_id = '" . (int)$this->config->get('config_language_id') . "') LEFT JOIN `" . DB_PREFIX . "user` u ON (u.user_id = o.user_id)";
 
 		if (isset($data['filter_order_status'])) {
@@ -221,6 +217,10 @@ class ModelSaleOrder extends Model {
 
 		if (!empty($data['filter_model'])) {
 			$sql .= " AND op.model = '" . $this->db->escape($data['filter_model']) . "'";
+		}
+
+		if (!empty($data['filter_username'])) {
+			$sql .= " AND u.username LIKE '%" . $this->db->escape($data['filter_username']) . "%'";
 		}
 
 		$sort_data = array(
@@ -386,7 +386,7 @@ class ModelSaleOrder extends Model {
 	}
 
 	public function getTotalOrders($data = array()) {
-		$sql = "SELECT COUNT(o.order_id) AS total FROM `" . DB_PREFIX . "order` o LEFT JOIN `" . DB_PREFIX . "order_product` op ON (op.order_id = o.order_id AND op.primary_type = 1)";
+		$sql = "SELECT COUNT(o.order_id) AS total FROM `" . DB_PREFIX . "order` o LEFT JOIN `" . DB_PREFIX . "order_product` op ON (op.order_id = o.order_id AND op.primary_type = 1) LEFT JOIN `" . DB_PREFIX . "user` u ON (u.user_id = o.user_id)";
 
 		if (isset($data['filter_order_status'])) {
 			$implode = array();
@@ -426,6 +426,10 @@ class ModelSaleOrder extends Model {
 
 		if (!empty($data['filter_model'])) {
 			$sql .= " AND op.model = '" . $this->db->escape($data['filter_model']) . "'";
+		}
+
+		if (!empty($data['filter_username'])) {
+			$sql .= " AND u.username LIKE '%" . $this->db->escape($data['filter_username']) . "%'";
 		}
 
 		$query = $this->db->query($sql);

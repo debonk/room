@@ -12,5 +12,4 @@ $_['error_title']   	    = 'Tentukan judul acara!';
 $_['error_event_date']   	= 'Tentukan tanggal acara!';
 $_['error_slot']   	     	= 'Pilih sesi yang direncanakan!';
 $_['error_slot_used']    	= 'Sebagian atau seluruh Slot telah digunakan. Pilih slot lainnya!';
-// $_['error_ceremony']     	= 'Pilih jenis acara!';
 $_['error_primary_product'] = 'Salah satu produk utama harus dipilih!';

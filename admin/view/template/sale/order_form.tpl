@@ -2010,7 +2010,7 @@
       $.ajax({
         url: '<?php echo $store_url; ?>index.php?route=api/cart/event&token=' + token + '&store_id=' + $('select[name=\'store_id\'] option:selected').val(),
         type: 'post',
-        data: $('#tab-cart input[name=\'title\'], #tab-cart input[name=\'event_date\'], #tab-cart select[name=\'slot_id\'], #tab-cart select[name=\'ceremony_id\'], input[name=\'order_id\']'),
+        data: $('#tab-cart input[name=\'title\'], #tab-cart input[name=\'event_date\'], #tab-cart select[name=\'slot_id\'], input[name=\'order_id\']'),
         dataType: 'json',
         crossDomain: true,
         beforeSend: function () {

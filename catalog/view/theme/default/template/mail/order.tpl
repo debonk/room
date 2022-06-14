@@ -29,7 +29,6 @@
         <td style="font-size: 12px;	border-right: 1px solid #DDDDDD; border-bottom: 1px solid #DDDDDD; text-align: left; padding: 7px;">
           <b><?php echo $text_event_date; ?></b> <?php echo $event_date; ?><br />
           <b><?php echo $text_slot; ?></b> <?php echo $slot; ?><br />
-          <b><?php echo $text_ceremony; ?></b> <?php echo $ceremony; ?><br />
         </td>
       </tr>
     </tbody>

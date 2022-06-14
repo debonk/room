@@ -201,7 +201,6 @@ class ControllerApiCart extends Controller
 				'title',
 				'event_date',
 				'slot_id'
-				// 'ceremony_id'
 			);
 			foreach ($keys as $key) {
 				if (!isset($this->request->post[$key])) {
@@ -221,10 +220,6 @@ class ControllerApiCart extends Controller
 			if (empty($this->request->post['slot_id'])) {
 				$json['error']['slot'] = $this->language->get('error_slot');
 			}
-
-			// if (empty($this->request->post['ceremony_id'])) {
-			// 	$json['error']['ceremony'] = $this->language->get('error_ceremony');
-			// }
 
 			$primary_products = $this->cart->getPrimaryProducts();
 
@@ -268,7 +263,6 @@ class ControllerApiCart extends Controller
 					'title'   	   => $this->request->post['title'],
 					'event_date'   => $this->request->post['event_date'],
 					'slot_id'      => $this->request->post['slot_id']
-					// 'ceremony_id'  => $this->request->post['ceremony_id']
 				);
 
 				$json['success'] = $this->language->get('text_success');
@@ -371,7 +365,6 @@ class ControllerApiCart extends Controller
 
 			if (isset($this->session->data['event'])) {
 				$this->load->model('localisation/slot');
-				// $this->load->model('localisation/ceremony');
 				$this->load->model('localisation/local_date');
 
 				$json['event'] = array(
@@ -379,8 +372,6 @@ class ControllerApiCart extends Controller
 					'event_date'	=> $this->model_localisation_local_date->getInFormatDate($this->session->data['event']['event_date'])['long_date'],
 					'slot_id'		=> $this->session->data['event']['slot_id'],
 					'slot'			=> $this->model_localisation_slot->getSlot($this->session->data['event']['slot_id'])['name']
-					// 'ceremony_id'	=> $this->session->data['event']['ceremony_id'],
-					// 'ceremony'		=> $this->model_localisation_ceremony->getCeremony($this->session->data['event']['ceremony_id'])['name']
 				);
 			}
 

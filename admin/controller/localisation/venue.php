@@ -1,68 +1,68 @@
 <?php
-class ControllerLocalisationCeremony extends Controller {
+class ControllerLocalisationVenue extends Controller {
 	private $error = array();
 
 	public function index() {
-		$this->load->language('localisation/ceremony');
+		$this->load->language('localisation/venue');
 
 		$this->document->setTitle($this->language->get('heading_title'));
 
-		$this->load->model('localisation/ceremony');
+		$this->load->model('localisation/venue');
 
 		$this->getList();
 	}
 
 	public function add() {
-		$this->load->language('localisation/ceremony');
+		$this->load->language('localisation/venue');
 
 		$this->document->setTitle($this->language->get('heading_title'));
 
-		$this->load->model('localisation/ceremony');
+		$this->load->model('localisation/venue');
 
 		if (($this->request->server['REQUEST_METHOD'] == 'POST') && $this->validateForm()) {
-			$this->model_localisation_ceremony->addCeremony($this->request->post);
+			$this->model_localisation_venue->addVenue($this->request->post);
 
 			$this->session->data['success'] = $this->language->get('text_success');
 
-			$this->response->redirect($this->url->link('localisation/ceremony', 'token=' . $this->session->data['token'], true));
+			$this->response->redirect($this->url->link('localisation/venue', 'token=' . $this->session->data['token'], true));
 		}
 
 		$this->getForm();
 	}
 
 	public function edit() {
-		$this->load->language('localisation/ceremony');
+		$this->load->language('localisation/venue');
 
 		$this->document->setTitle($this->language->get('heading_title'));
 
-		$this->load->model('localisation/ceremony');
+		$this->load->model('localisation/venue');
 
 		if (($this->request->server['REQUEST_METHOD'] == 'POST') && $this->validateForm()) {
-			$this->model_localisation_ceremony->editCeremony($this->request->get['ceremony_id'], $this->request->post);
+			$this->model_localisation_venue->editVenue($this->request->get['venue_id'], $this->request->post);
 
 			$this->session->data['success'] = $this->language->get('text_success');
 
-			$this->response->redirect($this->url->link('localisation/ceremony', 'token=' . $this->session->data['token'], true));
+			$this->response->redirect($this->url->link('localisation/venue', 'token=' . $this->session->data['token'], true));
 		}
 
 		$this->getForm();
 	}
 
 	public function delete() {
-		$this->load->language('localisation/ceremony');
+		$this->load->language('localisation/venue');
 
 		$this->document->setTitle($this->language->get('heading_title'));
 
-		$this->load->model('localisation/ceremony');
+		$this->load->model('localisation/venue');
 
 		if (isset($this->request->post['selected']) && $this->validateDelete()) {
-			foreach ($this->request->post['selected'] as $ceremony_id) {
-				$this->model_localisation_ceremony->deleteCeremony($ceremony_id);
+			foreach ($this->request->post['selected'] as $venue_id) {
+				$this->model_localisation_venue->deleteVenue($venue_id);
 			}
 
 			$this->session->data['success'] = $this->language->get('text_success');
 
-			$this->response->redirect($this->url->link('localisation/ceremony', 'token=' . $this->session->data['token'], true));
+			$this->response->redirect($this->url->link('localisation/venue', 'token=' . $this->session->data['token'], true));
 		}
 
 		$this->getList();
@@ -96,25 +96,25 @@ class ControllerLocalisationCeremony extends Controller {
 
 		$data['breadcrumbs'][] = array(
 			'text' => $this->language->get('heading_title'),
-			'href' => $this->url->link('localisation/ceremony', 'token=' . $this->session->data['token'], true)
+			'href' => $this->url->link('localisation/venue', 'token=' . $this->session->data['token'], true)
 		);
 
-		$data['add'] = $this->url->link('localisation/ceremony/add', 'token=' . $this->session->data['token'], true);
-		$data['delete'] = $this->url->link('localisation/ceremony/delete', 'token=' . $this->session->data['token'], true);
+		$data['add'] = $this->url->link('localisation/venue/add', 'token=' . $this->session->data['token'], true);
+		$data['delete'] = $this->url->link('localisation/venue/delete', 'token=' . $this->session->data['token'], true);
 
-		$data['ceremonies'] = array();
+		$data['venues'] = array();
 
-		$ceremony_count = $this->model_localisation_ceremony->getCeremoniesCount();
+		$venue_count = $this->model_localisation_venue->getVenuesCount();
 
-		$results = $this->model_localisation_ceremony->getCeremonies();
+		$results = $this->model_localisation_venue->getVenues();
 
 		foreach ($results as $result) {
-			$data['ceremonies'][] = array(
-				'ceremony_id' 	=> $result['ceremony_id'],
+			$data['venues'][] = array(
+				'venue_id' 	=> $result['venue_id'],
 				'name'          => $result['name'],
 				'code'          => $result['code'],
 				'sort_order'    => $result['sort_order'],
-				'edit'          => $this->url->link('localisation/ceremony/edit', 'token=' . $this->session->data['token'] . '&ceremony_id=' . $result['ceremony_id'], true)
+				'edit'          => $this->url->link('localisation/venue/edit', 'token=' . $this->session->data['token'] . '&venue_id=' . $result['venue_id'], true)
 			);
 		}
 
@@ -138,23 +138,25 @@ class ControllerLocalisationCeremony extends Controller {
 			$data['selected'] = array();
 		}
 
-		$data['records'] = sprintf($this->language->get('text_records'), $ceremony_count);
+		$data['records'] = sprintf($this->language->get('text_records'), $venue_count);
 
 		$data['header'] = $this->load->controller('common/header');
 		$data['column_left'] = $this->load->controller('common/column_left');
 		$data['footer'] = $this->load->controller('common/footer');
 
-		$this->response->setOutput($this->load->view('localisation/ceremony_list', $data));
+		$this->response->setOutput($this->load->view('localisation/venue_list', $data));
 	}
 
 	protected function getForm() {
-		$data['text_form'] = !isset($this->request->get['ceremony_id']) ? $this->language->get('text_add') : $this->language->get('text_edit');
+		$data['text_form'] = !isset($this->request->get['venue_id']) ? $this->language->get('text_add') : $this->language->get('text_edit');
 
 		$language_items = array(
 			'heading_title',
 			'entry_name',
 			'entry_code',
+			'entry_slots',
 			'entry_sort_order',
+			'help_slots',
 			'button_save',
 			'button_cancel'
 		);
@@ -189,56 +191,75 @@ class ControllerLocalisationCeremony extends Controller {
 
 		$data['breadcrumbs'][] = array(
 			'text' => $this->language->get('heading_title'),
-			'href' => $this->url->link('localisation/ceremony', 'token=' . $this->session->data['token'], true)
+			'href' => $this->url->link('localisation/venue', 'token=' . $this->session->data['token'], true)
 		);
 
-		if (!isset($this->request->get['ceremony_id'])) {
-			$data['action'] = $this->url->link('localisation/ceremony/add', 'token=' . $this->session->data['token'], true);
+		if (!isset($this->request->get['venue_id'])) {
+			$data['action'] = $this->url->link('localisation/venue/add', 'token=' . $this->session->data['token'], true);
 		} else {
-			$data['action'] = $this->url->link('localisation/ceremony/edit', 'token=' . $this->session->data['token'] . '&ceremony_id=' . $this->request->get['ceremony_id'], true);
+			$data['action'] = $this->url->link('localisation/venue/edit', 'token=' . $this->session->data['token'] . '&venue_id=' . $this->request->get['venue_id'], true);
 		}
 
-		$data['cancel'] = $this->url->link('localisation/ceremony', 'token=' . $this->session->data['token'], true);
+		$data['cancel'] = $this->url->link('localisation/venue', 'token=' . $this->session->data['token'], true);
 
-		if (isset($this->request->get['ceremony_id']) && ($this->request->server['REQUEST_METHOD'] != 'POST')) {
-			$ceremony_info = $this->model_localisation_ceremony->getCeremony($this->request->get['ceremony_id']);
+		if (isset($this->request->get['venue_id']) && ($this->request->server['REQUEST_METHOD'] != 'POST')) {
+			$venue_info = $this->model_localisation_venue->getVenue($this->request->get['venue_id']);
 		}
 
 		$data['token'] = $this->session->data['token'];
 
 		if (isset($this->request->post['name'])) {
 			$data['name'] = $this->request->post['name'];
-		} elseif (!empty($ceremony_info)) {
-			$data['name'] = $ceremony_info['name'];
+		} elseif (!empty($venue_info)) {
+			$data['name'] = $venue_info['name'];
 		} else {
 			$data['name'] = '';
 		}
 
 		if (isset($this->request->post['code'])) {
 			$data['code'] = $this->request->post['code'];
-		} elseif (!empty($ceremony_info)) {
-			$data['code'] = $ceremony_info['code'];
+		} elseif (!empty($venue_info)) {
+			$data['code'] = $venue_info['code'];
 		} else {
 			$data['code'] = '';
 		}
 
 		if (isset($this->request->post['sort_order'])) {
 			$data['sort_order'] = $this->request->post['sort_order'];
-		} elseif (!empty($ceremony_info)) {
-			$data['sort_order'] = $ceremony_info['sort_order'];
+		} elseif (!empty($venue_info)) {
+			$data['sort_order'] = $venue_info['sort_order'];
 		} else {
 			$data['sort_order'] = '';
 		}
 
+		if (isset($this->request->post['slots'])) {
+			$data['slots'] = $this->request->post['slots'];
+		} elseif (!empty($venue_info['slots'])) {
+			$data['slots'] = json_encode($venue_info['slots']);
+		} else {
+			$data['slots'] = [];
+		}
+		// var_dump($data['slots']);
+		// die('---breakpoint---');
+		
+		$data['slots_data'] = array_map(function($e) {
+			$slot[$e] = [
+				'code'	=> $e,
+				'name'	=> $this->language->get('text_' . $e)
+			];
+
+			return $slot[$e];
+		}, $this->model_localisation_venue->getSlots());
+		
 		$data['header'] = $this->load->controller('common/header');
 		$data['column_left'] = $this->load->controller('common/column_left');
 		$data['footer'] = $this->load->controller('common/footer');
 
-		$this->response->setOutput($this->load->view('localisation/ceremony_form', $data));
+		$this->response->setOutput($this->load->view('localisation/venue_form', $data));
 	}
 
 	protected function validateForm() {
-		if (!$this->user->hasPermission('modify', 'localisation/ceremony')) {
+		if (!$this->user->hasPermission('modify', 'localisation/venue')) {
 			$this->error['warning'] = $this->language->get('error_permission');
 		}
 
@@ -254,15 +275,15 @@ class ControllerLocalisationCeremony extends Controller {
 	}
 
 	protected function validateDelete() {
-		if (!$this->user->hasPermission('modify', 'localisation/ceremony')) {
+		if (!$this->user->hasPermission('modify', 'localisation/venue')) {
 			$this->error['warning'] = $this->language->get('error_permission');
 		}
 
-//Check orders by ceremony id
+//Check orders by venue id
 /* 		$this->load->model('sale/order');
 
-		foreach ($this->request->post['selected'] as $ceremony_id) {
-			$order_count = $this->model_sale_order->getOrdersCountByCeremonyId($ceremony_id);
+		foreach ($this->request->post['selected'] as $venue_id) {
+			$order_count = $this->model_sale_order->getOrdersCountByVenueId($venue_id);
 
 			if ($order_count) {
 				$this->error['warning'] = sprintf($this->language->get('error_order'), $order_count);

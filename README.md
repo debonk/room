@@ -1,5 +1,16 @@
 # room > gk ballroom software
 
+2.7.9	14/06/2022
+Modify Modul: Product List: Add Print feature for product list
+Modul: Localisation > Venue
+	Table Rename: Ceremony > Venue
+	ALTER TABLE `oc_venue` CHANGE `ceremony_id` `venue_id` INT(11) NOT NULL AUTO_INCREMENT;
+	ALTER TABLE `oc_venue` ADD `slots` TINYTEXT NOT NULL AFTER `code`;
+	ALTER TABLE `oc_order` CHANGE `ceremony_id` `venue_id` INT(11) NOT NULL;
+
+Modify: Sale > Order List: Add Venue and Username filter features
+Remove Modul: Localisation > Ceremony
+
 2.7.8	09/06/2022
 Modul: Dashboard > Yearly
 Bug Fixed: Catalog > Vendor: Pagination always reset to page 1

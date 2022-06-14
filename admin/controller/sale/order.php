@@ -240,6 +240,7 @@ class ControllerSaleOrder extends Controller
 	{
 		$language_items = array(
 			'heading_title',
+			'text_all',
 			'text_balance',
 			'text_loading',
 			'text_no_results',
@@ -255,6 +256,8 @@ class ControllerSaleOrder extends Controller
 			'entry_order_status',
 			'entry_customer',
 			'entry_date_added',
+			'entry_venue',
+			'entry_username',
 			'column_order_id',
 			'column_event_date',
 			'column_primary_product',
@@ -334,6 +337,12 @@ class ControllerSaleOrder extends Controller
 			$filter_model = null;
 		}
 
+		if (isset($this->request->get['filter_username'])) {
+			$filter_username = $this->request->get['filter_username'];
+		} else {
+			$filter_username = null;
+		}
+
 		if (isset($this->request->get['sort'])) {
 			$sort = $this->request->get['sort'];
 		} else {
@@ -382,6 +391,10 @@ class ControllerSaleOrder extends Controller
 			$url .= '&filter_model=' . $this->request->get['filter_model'];
 		}
 
+		if (isset($this->request->get['filter_username'])) {
+			$url .= '&filter_username=' . $this->request->get['filter_username'];
+		}
+
 		if (isset($this->request->get['sort'])) {
 			$url .= '&sort=' . $this->request->get['sort'];
 		}
@@ -409,6 +422,7 @@ class ControllerSaleOrder extends Controller
 			'filter_date_start'  	=> $filter_date_start,
 			'filter_date_end'		=> $filter_date_end,
 			'filter_model'			=> $filter_model,
+			'filter_username'		=> $filter_username,
 			'sort'               	=> $sort,
 			'order'              	=> $order,
 			'start'              	=> ($page - 1) * $this->config->get('config_limit_admin'),
@@ -446,8 +460,7 @@ class ControllerSaleOrder extends Controller
 				'invoice_no'      => $result['invoice_no'] ? $result['invoice_prefix'] . str_pad($result['invoice_no'], 4, 0, STR_PAD_LEFT) : '',
 				'event_date'      => $this->model_localisation_local_date->getInFormatDate($result['event_date'])['long_date'],
 				'slot'      	  => $result['slot'],
-				'primary_product' => $result['primary_product'],
-				// 'ceremony'        => $result['ceremony'],
+				'primary_product' => $result['primary_product'] . ' [' . $result['model'] . ']',
 				'customer'        => $result['customer'],
 				'order_status'    => $result['order_status'],
 				'payment_status'  => $payment_status,
@@ -492,6 +505,10 @@ class ControllerSaleOrder extends Controller
 
 		if (isset($this->request->get['filter_model'])) {
 			$url .= '&filter_model=' . $this->request->get['filter_model'];
+		}
+
+		if (isset($this->request->get['filter_username'])) {
+			$url .= '&filter_username=' . $this->request->get['filter_username'];
 		}
 
 		if ($order == 'ASC') {
@@ -543,6 +560,10 @@ class ControllerSaleOrder extends Controller
 			$url .= '&filter_model=' . $this->request->get['filter_model'];
 		}
 
+		if (isset($this->request->get['filter_username'])) {
+			$url .= '&filter_username=' . $this->request->get['filter_username'];
+		}
+
 		if (isset($this->request->get['sort'])) {
 			$url .= '&sort=' . $this->request->get['sort'];
 		}
@@ -568,12 +589,15 @@ class ControllerSaleOrder extends Controller
 		$data['filter_date_start'] = $filter_date_start;
 		$data['filter_date_end'] = $filter_date_end;
 		$data['filter_model'] = $filter_model;
+		$data['filter_username'] = $filter_username;
 
 		$data['sort'] = $sort;
 		$data['order'] = $order;
 
+		$this->load->model('localisation/venue');
+		$data['venues'] = $this->model_localisation_venue->getVenues();
+		
 		$this->load->model('localisation/order_status');
-
 		$data['order_statuses'] = $this->model_localisation_order_status->getOrderStatuses();
 
 		$data['store_url'] = $this->request->server['HTTPS'] ? HTTPS_CATALOG : HTTP_CATALOG;
@@ -714,6 +738,10 @@ class ControllerSaleOrder extends Controller
 			$url .= '&filter_model=' . $this->request->get['filter_model'];
 		}
 
+		if (isset($this->request->get['filter_username'])) {
+			$url .= '&filter_username=' . $this->request->get['filter_username'];
+		}
+
 		if (isset($this->request->get['sort'])) {
 			$url .= '&sort=' . $this->request->get['sort'];
 		}
@@ -771,8 +799,6 @@ class ControllerSaleOrder extends Controller
 			$data['title'] = $order_info['title'];
 			$data['event_date'] = date('Y-m-d', strtotime($order_info['event_date']));
 			$data['slot_id'] = $order_info['slot_id'];
-			// $data['ceremony_id'] = $order_info['ceremony_id'];
-			// $data['primary_type'] = $order_info['primary_type'];
 
 			$data['payment_firstname'] = $order_info['payment_firstname'];
 			$data['payment_lastname'] = $order_info['payment_lastname'];
@@ -887,8 +913,6 @@ class ControllerSaleOrder extends Controller
 			}
 
 			$data['slot_id'] = '';
-			// $data['ceremony_id'] = '';
-			// $data['primary_type'] = '';
 
 			$data['payment_firstname'] = '';
 			$data['payment_lastname'] = '';
@@ -995,11 +1019,6 @@ class ControllerSaleOrder extends Controller
 				'name'			=> $slot['name'] . $text_price
 			);
 		}
-
-		// Ceremonies
-		// $this->load->model('localisation/ceremony');
-
-		// $data['ceremonies'] = $this->model_localisation_ceremony->getCeremonies();
 
 		// Custom Fields
 		$this->load->model('customer/custom_field');
@@ -1201,7 +1220,11 @@ class ControllerSaleOrder extends Controller
 				$url .= '&filter_model=' . $this->request->get['filter_model'];
 			}
 	
-				if (isset($this->request->get['sort'])) {
+			if (isset($this->request->get['filter_username'])) {
+				$url .= '&filter_username=' . $this->request->get['filter_username'];
+			}
+	
+			if (isset($this->request->get['sort'])) {
 				$url .= '&sort=' . $this->request->get['sort'];
 			}
 
@@ -2303,7 +2326,6 @@ class ControllerSaleOrder extends Controller
 
 			$data['event_date'] = $event_date_in['day'] . '/' . $event_date_in['long_date'];
 			$data['slot'] = $order_info['slot'];
-			// $data['ceremony'] = $order_info['ceremony'];
 
 			// Product Data
 			$data['products'] = array();

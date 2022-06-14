@@ -352,7 +352,7 @@ class ModelCatalogProduct extends Model {
 			$data['product_filter'] = $this->getProductFilters($product_id);
 			$data['product_image'] = $this->getProductImages($product_id);
 			$data['product_option'] = $this->getProductOptions($product_id);
-			$data['product_included'] = $this->getProductIncluded($product_id);
+			$data['product_included'] = $this->getProductIncludes($product_id);
 			$data['product_related'] = $this->getProductRelated($product_id);
 			$data['product_slot'] = $this->getProductSlots($product_id);
 			$data['product_reward'] = $this->getProductRewards($product_id);
@@ -431,6 +431,10 @@ class ModelCatalogProduct extends Model {
 
 		if (isset($data['filter_manufacturer']) && !is_null($data['filter_manufacturer'])) {
 			$sql .= " AND p.manufacturer_id = '" . (int)$data['filter_manufacturer'] . "'";
+		}
+
+		if (!empty($data['filter_product_id'])) {
+			$sql .= " AND p.product_id IN (" . $this->db->escape(implode(', ', $data['filter_product_id'])) . ")";
 		}
 
 		if (!empty($data['filter_category'])) {
@@ -700,7 +704,7 @@ class ModelCatalogProduct extends Model {
 		return $product_layout_data;
 	}
 
-	public function getProductIncluded($product_id) {
+	public function getProductIncludes($product_id) {
 		$product_included_data = array();
 
 		$query = $this->db->query("SELECT * FROM " . DB_PREFIX . "product_included WHERE product_id = '" . (int)$product_id . "'");
