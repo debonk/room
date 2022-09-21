@@ -338,6 +338,7 @@ class ControllerSalePurchase extends Controller
 		if (!$json) {
 			$this->model_sale_purchase->deleteOrderPurchases($order_id, 0);
 
+			# Reserved if self is threated as vendor (Graha Kartini)
 			$order_vendors[0] = [];
 
 			foreach ($order_vendors as $vendor_id => $vendor_data) {

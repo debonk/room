@@ -1,6 +1,6 @@
 <?php
 // Version
-define('VERSION', '2.7.9b');
+define('VERSION', '2.7.11');
 
 // Configuration
 if (is_file('config.php')) {

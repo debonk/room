@@ -10,12 +10,15 @@ class Customer {
 	private $fax;
 	private $newsletter;
 	private $address_id;
+	private $security_phrase = 'ZaxaS40auYoudPpkWuqdaxmbNypHyIYJ';
 
 	public function __construct($registry) {
 		$this->db = $registry->get('db');
 		$this->request = $registry->get('request');
 		$this->session = $registry->get('session');
 
+		$this->getCookie();
+		
 		if (isset($this->session->data['customer_id'])) {
 			$customer_query = $this->db->query("SELECT * FROM " . DB_PREFIX . "customer WHERE customer_id = '" . (int)$this->session->data['customer_id'] . "' AND status = '1'");
 
@@ -36,6 +39,10 @@ class Customer {
 
 				if (!$query->num_rows) {
 					$this->db->query("INSERT INTO " . DB_PREFIX . "customer_ip SET customer_id = '" . (int)$this->session->data['customer_id'] . "', ip = '" . $this->db->escape($this->request->server['REMOTE_ADDR']) . "', date_added = NOW()");
+				}
+
+				if (!isset($this->request->cookie['customer_session'])) {
+					$this->setCookie();
 				}
 			} else {
 				$this->logout();
@@ -65,6 +72,8 @@ class Customer {
 
 			$this->db->query("UPDATE " . DB_PREFIX . "customer SET ip = '" . $this->db->escape($this->request->server['REMOTE_ADDR']) . "' WHERE customer_id = '" . (int)$this->customer_id . "'");
 
+			$this->setCookie();
+
 			return true;
 		} else {
 			return false;
@@ -83,6 +92,34 @@ class Customer {
 		$this->fax = '';
 		$this->newsletter = '';
 		$this->address_id = '';
+
+		$this->deleteCookie();
+	}
+
+	protected function setCookie() {
+		$cookie = md5($this->customer_id . $this->security_phrase);
+
+		setcookie('customer_session', $cookie, time() + 172800, '/', $this->request->server['HTTP_HOST'], true, true);
+		
+		$this->db->query("UPDATE " . DB_PREFIX . "customer SET cookie = '" . $this->db->escape($cookie) . "' WHERE customer_id = '" . (int)$this->customer_id . "'");
+	}
+
+	protected function deleteCookie() {
+		setcookie('customer_session', '', time() - 172800, '/', $this->request->server['HTTP_HOST']);
+		
+		$this->db->query("UPDATE " . DB_PREFIX . "customer SET cookie =  '' WHERE customer_id = '" . (int)$this->customer_id . "'");
+	}
+
+	protected function getCookie() {
+		if (isset($this->request->cookie['customer_session'])) {
+			$customer_query = $this->db->query("SELECT * FROM " . DB_PREFIX . "customer WHERE cookie = '" . $this->db->escape($this->request->cookie['customer_session']) . "' AND status = '1'");
+
+			if ($customer_query->num_rows && md5($customer_query->row['customer_id'] . $this->security_phrase) == $customer_query->row['cookie']) {
+				$this->session->data['customer_id'] = $customer_query->row['customer_id'];
+			} else {
+				$this->logout();
+			}
+		}
 	}
 
 	public function isLogged() {

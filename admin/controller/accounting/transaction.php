@@ -731,10 +731,10 @@ class ControllerAccountingTransaction extends Controller
 				}
 
 				if (isset($this->request->get['transaction_id'])) {
-					$transaction_info = $this->model_accounting_transaction->getTransaction($this->request->get['transaction_id']);
+					// $transaction_info = $this->model_accounting_transaction->getTransaction($this->request->get['transaction_id']);
 
-					if (!$transaction_info['edit_permission']) {
-						$this->error['warning'] = $this->language->get('error_validated');
+					if ($this->config->get('config_lock_printed_transaction')) {
+						$this->error['warning'] = $this->language->get('error_lock_transaction');
 
 						break;
 					}

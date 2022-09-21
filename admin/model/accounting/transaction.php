@@ -298,7 +298,11 @@ class ModelAccountingTransaction extends Model
 		}
 
 		if (!empty($data['filter']['account_id'])) {
-			$implode[] = "ta.account_id LIKE '" . (int)$data['filter']['account_id'] . "%'";
+			if ($data['filter']['account_id'] === '-') {
+				$implode[] = "ta.account_id IS NULL";
+			} else {
+				$implode[] = "ta.account_id LIKE '" . (int)$data['filter']['account_id'] . "%'";
+			}
 		}
 
 		if ($implode) {
@@ -373,7 +377,11 @@ class ModelAccountingTransaction extends Model
 		}
 
 		if (!empty($data['filter']['account_id'])) {
-			$implode[] = "ta.account_id LIKE '" . (int)$data['filter']['account_id'] . "%'";
+			if ($data['filter']['account_id'] === '-') {
+				$implode[] = "ta.account_id IS NULL";
+			} else {
+				$implode[] = "ta.account_id LIKE '" . (int)$data['filter']['account_id'] . "%'";
+			}
 		}
 
 		if ($implode) {

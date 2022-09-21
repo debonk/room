@@ -49,14 +49,20 @@ class ControllerReportSci extends Controller
 			$filter[$filter_item] = isset($this->request->get['filter_' . $filter_item]) ? $this->request->get['filter_' . $filter_item] : null;
 		}
 
+		$url = $this->urlFilter();
+
 		if (is_null($filter['date_start'])) {
 			$filter['date_start'] = date('Y-m-d', strtotime(date('Y') . '-01-01'));
+
+			$url .= '&filter_date_start=' . $filter['date_start'];
 		}
 
 		if (is_null($filter['date_end'])) {
 			$filter['date_end'] = date('Y-m-d');
-		}
 
+			$url .= '&filter_date_end=' . $filter['date_end'];
+		}
+		
 		$data['breadcrumbs'] = array();
 
 		$data['breadcrumbs'][] = array(
@@ -116,7 +122,7 @@ class ControllerReportSci extends Controller
 						'name'			=> $result['name'],
 						'type'			=> $this->language->get('text_' . $result['type']),
 						'balance'      	=> $this->currency->format($balance, $this->config->get('config_currency')),
-						'href'			=> $this->url->link('report/account_transaction', 'token=' . $this->session->data['token'] . '&filter_account_id=' . $result['account_id'] . $this->urlFilter(), true)
+						'href'			=> $this->url->link('report/account_transaction', 'token=' . $this->session->data['token'] . '&filter_account_id=' . $result['account_id'] . $url, true)
 					];
 				}
 			}

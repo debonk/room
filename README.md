@@ -1,5 +1,19 @@
 # room > gk ballroom software
 
+2.7.11	21/09/2022
+Bug Fixed: Report > SCI: Account hyperlink does not set properly.
+Bug Fixed: Account > Transaction: Repair validateForm.
+
+2.7.10
+Extend Customer expiration time (Hard Code: 2 days)
+	Modify Table: Customer
+		ALTER TABLE `oc_customer` ADD `cookie` VARCHAR(32) NOT NULL AFTER `code`;
+Extend Admin expiration time (Hard Code: 2 hours)
+	Modify Table: User
+		ALTER TABLE `oc_user` ADD `cookie` VARCHAR(32) NOT NULL AFTER `code`;
+
+APP > Startup > Startup: Replace header(Setcookie:) to setcookie
+
 2.7.9b 14/06/2022
 Modify Modul: Product Form: User without modify permission can not view form
 Bug Fixed: Transaction List: Sort amount not working

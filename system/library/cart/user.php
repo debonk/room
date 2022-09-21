@@ -10,6 +10,8 @@ class User {
 		$this->request = $registry->get('request');
 		$this->session = $registry->get('session');
 
+		$this->getCookie();
+
 		if (isset($this->session->data['user_id'])) {
 			$user_query = $this->db->query("SELECT * FROM " . DB_PREFIX . "user WHERE user_id = '" . (int)$this->session->data['user_id'] . "' AND status = '1'");
 
@@ -29,6 +31,10 @@ class User {
 						$this->permission[$key] = $value;
 					}
 				}
+
+				if (isset($this->session->data['token']) && !isset($this->request->cookie['code'])) {
+					$this->setCookie();
+				}
 			} else {
 				$this->logout();
 			}
@@ -40,6 +46,7 @@ class User {
 
 		if ($user_query->num_rows) {
 			$this->session->data['user_id'] = $user_query->row['user_id'];
+			$this->session->data['token'] = token(32);
 
 			$this->user_id = $user_query->row['user_id'];
 			$this->username = $user_query->row['username'];
@@ -55,6 +62,8 @@ class User {
 				}
 			}
 
+			$this->setCookie();
+
 			return true;
 		} else {
 			return false;
@@ -66,6 +75,35 @@ class User {
 
 		$this->user_id = '';
 		$this->username = '';
+
+		$this->deleteCookie();
+	}
+
+	protected function setCookie() {
+		$cookie = md5($this->user_id . $this->session->data['token']);
+
+		setcookie('code', $cookie, time() + 60, '/', $this->request->server['HTTP_HOST'], true, true);
+		
+		$this->db->query("UPDATE " . DB_PREFIX . "user SET cookie = '" . $this->db->escape($cookie) . "' WHERE user_id = '" . (int)$this->user_id . "'");
+	}
+
+	protected function deleteCookie() {
+		setcookie('code', '', time() - 172800, '/', $this->request->server['HTTP_HOST']);
+		
+		$this->db->query("UPDATE " . DB_PREFIX . "user SET cookie =  '' WHERE user_id = '" . (int)$this->user_id . "'");
+	}
+
+	protected function getCookie() {
+		if (isset($this->request->get['token']) && isset($this->request->cookie['code'])) {
+			$user_query = $this->db->query("SELECT * FROM " . DB_PREFIX . "user WHERE cookie = '" . $this->db->escape($this->request->cookie['code']) . "' AND status = '1'");
+
+			if ($user_query->num_rows && md5($user_query->row['user_id'] . $this->request->get['token']) == $user_query->row['cookie']) {
+				$this->session->data['user_id'] = $user_query->row['user_id'];
+				$this->session->data['token'] = $this->request->get['token'];
+			} else {
+				$this->logout();
+			}
+		}
 	}
 
 	public function hasPermission($key, $value) {
