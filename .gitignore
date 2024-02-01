@@ -13,7 +13,6 @@ admin/config.php
 
 !index.html
 
-document/
 image/
 system/cache/
 system/logs/

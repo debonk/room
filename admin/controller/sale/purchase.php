@@ -16,7 +16,7 @@ class ControllerSalePurchase extends Controller
 			'text_preview',
 			'text_print',
 			'text_print_confirm',
-			'text_process',
+			// 'text_process',
 			'text_product_list',
 			'text_purchase',
 			'text_vendor_excluded',
@@ -290,6 +290,7 @@ class ControllerSalePurchase extends Controller
 			foreach ($this->request->post['purchase'] as $vendor_id => $products) {
 				$order_purchase_info[$vendor_id] = $this->model_sale_purchase->getOrderPurchase($order_id, $vendor_id);
 
+				// Cek ulang untuk Order Purchase yg telah complete maupun udah printed
 				foreach ($products as $product_id => $product) {
 					if (!in_array($product_id, $order_products_id)) {
 						$json['error'] = $this->language->get('error_product_excluded');

@@ -65,7 +65,7 @@ class ModelMenuMegamenu extends Model {
 	/**
 	 *
 	 */
-	public function getTree( $parent=1 , $edit=false, $params, $store_id = 0){
+	public function getTree( $parent=1 , $edit=false, $params = [], $store_id = 0){
 		$this->load->language("menu/megamenu");
 		
 		if( !$this->isInstalled() ){

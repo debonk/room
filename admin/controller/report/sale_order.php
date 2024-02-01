@@ -110,20 +110,32 @@ class ControllerReportSaleOrder extends Controller
 			}
 
 			$url = '&filter_model=' . $result['venue_code'] . '&filter_date_start=' . $result['date_start'] . '&filter_date_end=' . $result['date_end'];
-	
+
 			if (!empty($filter_order_status_id)) {
 				$url .= '&filter_order_status=' . $filter_order_status_id;
 			}
-	
+
 			$data['orders'][$key][] = array(
 				'venue_code'	=> $result['venue_code'],
 				'date_start'	=> date($this->language->get('date_format_short'), strtotime($result['date_start'])),
 				'date_end'		=> date($this->language->get('date_format_short'), strtotime($result['date_end'])),
 				'orders'  		=> $result['orders'],
 				'tax'     		=> $this->currency->format($result['tax'], $this->config->get('config_currency')),
+				'tax_value'		=> $result['tax'],
 				'total'   		=> $this->currency->format($result['total'], $this->config->get('config_currency')),
+				'total_value'	=> $result['total'],
 				'href'			=> $this->url->link('sale/order/list', 'token=' . $this->session->data['token'] . $url, true)
 			);
+		}
+
+		$data['subtotal'] = [];
+
+		foreach (array_keys($data['orders']) as $key) {
+			$data['subtotal'][$key] = [
+				'orders_count'	=> array_sum(array_column($data['orders'][$key], 'orders')),
+				'taxes_total'	=> $this->currency->format(array_sum(array_column($data['orders'][$key], 'tax_value')), $this->config->get('config_currency')),
+				'totals_total'	=> $this->currency->format(array_sum(array_column($data['orders'][$key], 'total_value')), $this->config->get('config_currency'))
+			];
 		}
 
 		$language_items = [
@@ -132,6 +144,7 @@ class ControllerReportSaleOrder extends Controller
 			'text_no_results',
 			'text_confirm',
 			'text_all_status',
+			'text_subtotal',
 			'column_period',
 			'column_venue',
 			'column_date_start',
@@ -143,8 +156,8 @@ class ControllerReportSaleOrder extends Controller
 			'entry_date_start',
 			'entry_date_end',
 			'entry_group',
-			'entry_status',	
-			'button_filter'	
+			'entry_status',
+			'button_filter'
 		];
 		foreach ($language_items as $language_item) {
 			$data[$language_item] = $this->language->get($language_item);

@@ -9,6 +9,7 @@ $_['text_month']        = 'Months';
 $_['text_week']         = 'Weeks';
 $_['text_day']          = 'Days';
 $_['text_all_status']   = 'All Statuses';
+$_['text_subtotal']   	= 'Subtotal';
 
 // Column
 $_['column_period']		= 'Period';

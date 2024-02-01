@@ -135,7 +135,7 @@ class ModelCheckoutOrder extends Model
 		$this->db->query("DELETE FROM `" . DB_PREFIX . "order_option` WHERE order_id = '" . (int)$order_id . "'");
 		$this->db->query("DELETE FROM `" . DB_PREFIX . "order_product` WHERE order_id = '" . (int)$order_id . "'");
 		$this->db->query("DELETE FROM `" . DB_PREFIX . "order_vendor` WHERE order_id = '" . (int)$order_id . "'");
-		$this->db->query("DELETE `op`, opp FROM `" . DB_PREFIX . "order_purchase` `op`, `" . DB_PREFIX . "order_purchase_product` `opp` WHERE order_id = '" . (int)$order_id . "' AND opp.order_purchase_id = `or`.order_purchase_id");
+		$this->db->query("DELETE `op`, opp FROM `" . DB_PREFIX . "order_purchase` `op`, `" . DB_PREFIX . "order_purchase_product` `opp` WHERE order_id = '" . (int)$order_id . "' AND opp.order_purchase_id = `op`.order_purchase_id");
 		$this->db->query("DELETE FROM `" . DB_PREFIX . "order_total` WHERE order_id = '" . (int)$order_id . "'");
 		$this->db->query("DELETE FROM `" . DB_PREFIX . "order_voucher` WHERE order_id = '" . (int)$order_id . "'");
 		$this->db->query("DELETE `or`, ort FROM `" . DB_PREFIX . "order_recurring` `or`, `" . DB_PREFIX . "order_recurring_transaction` `ort` WHERE order_id = '" . (int)$order_id . "' AND ort.order_recurring_id = `or`.order_recurring_id");
@@ -290,18 +290,22 @@ class ModelCheckoutOrder extends Model
 		return $query->rows;
 	}
 
-    public function getOrderPurchases($order_id, $completed = null)
-    {
-        $sql = "SELECT * FROM " . DB_PREFIX . "order_purchase WHERE order_id = '" . (int)$order_id . "'";
+	public function getOrderPurchases($order_id, $completed = null, $printed = null)
+	{
+		$sql = "SELECT * FROM " . DB_PREFIX . "order_purchase op LEFT JOIN " . DB_PREFIX . "order_document od ON od.order_document_id = op.order_document_id WHERE op.order_id = '" . (int)$order_id . "'";
 
 		if (!is_null($completed)) {
-			$sql .= " AND completed = '" . (int)$completed . "'";
+			$sql .= " AND op.completed = '" . (int)$completed . "'";
 		}
 
-        $query = $this->db->query($sql);
+		if (!is_null($printed)) {
+			$sql .= " AND od.printed = '" . (int)$printed . "'";
+		}
 
-        return $query->rows;
-    }
+		$query = $this->db->query($sql);
+
+		return $query->rows;
+	}
 
 	public function getPaymentPhases($order_id)
 	{
@@ -1156,6 +1160,30 @@ class ModelCheckoutOrder extends Model
 			}
  */
 		}
+	}
+
+	public function deleteOrderPurchases($order_id, $completed = null)
+	{
+		if (isset($completed)) {
+			$this->db->query("DELETE FROM " . DB_PREFIX . "order_document WHERE order_id = '" . (int)$order_id . "' AND client_type = 'vendor' AND document_type = 'purchase'");
+			$this->db->query("DELETE `op`, opp FROM `" . DB_PREFIX . "order_purchase` `op`, `" . DB_PREFIX . "order_purchase_product` `opp` WHERE order_id = '" . (int)$order_id . "' AND opp.order_purchase_id = `op`.order_purchase_id AND completed = '" . (int)$completed . "'");
+		} else {
+			$this->db->query("DELETE `op`, opp FROM `" . DB_PREFIX . "order_purchase` `op`, `" . DB_PREFIX . "order_purchase_product` `opp` WHERE order_id = '" . (int)$order_id . "' AND opp.order_purchase_id = `op`.order_purchase_id");
+		}
+
+		// $order_purchases = $this->getOrderPurchases($order_id);
+
+		// foreach ($order_purchases as $order_purchase) {
+		// 	if (isset($completed)) {
+		// 		if ($order_purchase['completed'] == $completed) {
+		// 			$this->db->query("DELETE FROM " . DB_PREFIX . "order_purchase_product WHERE order_purchase_id = '" . (int)$order_purchase['order_purchase_id'] . "'");
+		// 			$this->db->query("DELETE FROM " . DB_PREFIX . "order_purchase WHERE order_id = '" . (int)$order_id . "' AND completed = '" . (int)$completed . "'");
+		// 		}
+		// 	} else {
+		// 		$this->db->query("DELETE FROM " . DB_PREFIX . "order_purchase_product WHERE order_purchase_id = '" . (int)$order_purchase['order_purchase_id'] . "'");
+		// 		$this->db->query("DELETE FROM " . DB_PREFIX . "order_purchase WHERE order_id = '" . (int)$order_id . "'");
+		// 	}
+		// }
 	}
 
 	public function getSlotUsed($slot_idx)

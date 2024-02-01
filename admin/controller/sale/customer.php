@@ -172,6 +172,12 @@ class ControllerSaleCustomer extends Controller
 		$this->load->language('sale/customer');
 
 		$json = array();
+		$order_id = isset($this->request->get['order_id']) ? $this->request->get['order_id'] : 0;
+
+		$order_info = [];
+		$transaction_type_info = [];
+		$account_debit_info = [];
+		$account_credit_info = [];
 
 		switch (false) {
 			case $json:
@@ -214,8 +220,6 @@ class ControllerSaleCustomer extends Controller
 						break;
 					}
 				}
-
-				$order_id = isset($this->request->get['order_id']) ? $this->request->get['order_id'] : 0;
 
 				$this->load->model('sale/order');
 				$order_info = $this->model_sale_order->getOrder($order_id);

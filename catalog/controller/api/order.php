@@ -442,7 +442,7 @@ class ControllerApiOrder extends Controller
 				}
 
 				# lock edit order if current order have vendor PO which already been printed.
-				$order_purchases = $this->model_checkout_order->getOrderPurchases($order_id, 1);
+				$order_purchases = $this->model_checkout_order->getOrderPurchases($order_id, null, 1);
 
 				if ($order_purchases) {
 					$json['error'] = $this->language->get('error_purchase_completed');
@@ -799,17 +799,26 @@ class ControllerApiOrder extends Controller
 			$this->model_checkout_order->addOrderHistory($order_id, $this->config->get('config_order_status_id'), '', 0, 0, $this->request->post['user_id']);
 
 			if (isset($this->request->post['order_status_id']) && $this->request->post['order_status_id'] != $this->config->get('config_order_status_id')) {
-				$payment_phases = $this->model_checkout_order->getPaymentPhases($order_id);
-				foreach ($payment_phases as $payment_phase) {
-					if ($payment_phase['paid_status']) {
-						$order_status_id = $payment_phase['order_status_id'];
+				$this->load->model('account/order');
+				$order_histories = $this->model_account_order->getOrderHistories($this->request->get['order_id']);
+
+				if (!in_array($this->config->get('config_event_status_id'), array_column($order_histories, 'order_status_id'))) {
+					$payment_phases = $this->model_checkout_order->getPaymentPhases($order_id);
+					foreach ($payment_phases as $payment_phase) {
+						if ($payment_phase['paid_status']) {
+							$order_status_id = $payment_phase['order_status_id'];
+						}
 					}
+				} else {
+					$order_status_id = $this->request->post['order_status_id'];
 				}
 
 				if ($this->config->get('config_order_status_id') != $order_status_id) {
 					$this->model_checkout_order->addOrderHistory($order_id, $order_status_id, '', 0, 0, $this->request->post['user_id']);
 				}
 			}
+
+			$this->model_checkout_order->deleteOrderPurchases($order_id, 0);
 
 			$this->cart->clear();
 			unset($this->session->data['event']);
@@ -960,9 +969,9 @@ class ControllerApiOrder extends Controller
 						'category_label'	=> 'deposit',
 						'transaction_label'	=> 'cash'
 					];
-			
+
 					$transaction_total = $this->model_accounting_transaction->getTransactionsTotalByOrderId($order_id, $summary_data);
-					
+
 					if ($transaction_total < $this->config->get('config_customer_deposit')) {
 						$json['error'] = $this->language->get('error_customer_deposit');
 
@@ -1017,7 +1026,7 @@ class ControllerApiOrder extends Controller
 							];
 
 							$transactions_total = $this->model_accounting_transaction->getTransactionsTotalByOrderId($order_id, $filter_summary_data);
-	
+
 							if (!empty($transactions_total)) {
 								$json['error'] = sprintf($this->language->get('error_amount_balance'), $this->language->get('text_category_' . $category_label));
 

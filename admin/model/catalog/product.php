@@ -747,13 +747,12 @@ class ModelCatalogProduct extends Model {
 	}
 
 	public function getTotalProducts($data = array()) {
-		// $sql = "SELECT COUNT(DISTINCT p.product_id) AS total FROM " . DB_PREFIX . "product p LEFT JOIN " . DB_PREFIX . "product_description pd ON (p.product_id = pd.product_id)";
 		$sql = "SELECT COUNT(DISTINCT p.product_id) AS total FROM " . DB_PREFIX . "product p LEFT JOIN " . DB_PREFIX . "product_description pd ON (p.product_id = pd.product_id) LEFT JOIN " . DB_PREFIX . "product_to_category p2c ON (p.product_id = p2c.product_id)";
 
 		$sql .= " WHERE pd.language_id = '" . (int)$this->config->get('config_language_id') . "'";
 
 		if (!empty($data['filter_name'])) {
-			$sql .= " AND pd.name LIKE '" . $this->db->escape($data['filter_name']) . "%'";
+			$sql .= " AND pd.name LIKE '%" . $this->db->escape($data['filter_name']) . "%'";
 		}
 
 		if (!empty($data['filter_model'])) {
@@ -780,9 +779,31 @@ class ModelCatalogProduct extends Model {
 			$sql .= " AND p.manufacturer_id = '" . (int)$data['filter_manufacturer'] . "'";
 		}
 
-		if (isset($data['filter_category']) && !is_null($data['filter_category'])) {
-			$sql .= " AND p2c.category_id = '" . (int)$data['filter_category'] . "'";
+		if (!empty($data['filter_product_id'])) {
+			$sql .= " AND p.product_id IN (" . $this->db->escape(implode(', ', $data['filter_product_id'])) . ")";
 		}
+
+		if (!empty($data['filter_category'])) {
+			if (!empty($data['filter_sub_category'])) {
+				$implode_data = array();
+				
+				$implode_data[] = "category_id = '" . (int)$data['filter_category'] . "'";
+				
+				$this->load->model('catalog/category');
+				
+				$categories = $this->model_catalog_category->getCategories($data['filter_category']);
+				
+				foreach ($categories as $category) {
+					$implode_data[] = "p2c.category_id = '" . (int)$category['category_id'] . "'";
+				}
+				
+				$sql .= " AND (" . implode(' OR ', $implode_data) . ")";			
+			} else {
+				$sql .= " AND p2c.category_id = '" . (int)$data['filter_category'] . "'";
+			}
+		}
+
+		// $sql .= " GROUP BY p.product_id";
 
 		$query = $this->db->query($sql);
 

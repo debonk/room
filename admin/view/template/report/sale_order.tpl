@@ -130,7 +130,7 @@
 							<?php if ($orders) { ?>
 							<?php foreach ($orders as $key => $order_data) { ?>
 								<tr>
-									<td colspan="8"><b><?= $key; ?></b></td>
+									<th colspan="8"><?= $key; ?></th>
 								</tr>
 							<?php foreach ($order_data as $order) { ?>
 							<tr>
@@ -157,7 +157,19 @@
 								</td>
 							</tr>
 							<?php } ?>
-							<?php } ?>
+							<tr>
+								<th colspan="4" class="text-right"><cite><?= $text_subtotal; ?></cite></th>
+								<th class="text-right">
+									<cite><?= $subtotal[$key]['orders_count']; ?></cite>
+								</th>
+								<th class="text-right">
+									<cite><?= $subtotal[$key]['taxes_total']; ?></cite>
+								</th>
+								<th class="text-right">
+									<cite><?= $subtotal[$key]['totals_total']; ?></cite>
+								</th>
+							</tr>
+						<?php } ?>
 							<?php } else { ?>
 							<tr>
 								<td class="text-center" colspan="8">

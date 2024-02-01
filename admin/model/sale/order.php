@@ -882,6 +882,13 @@ class ModelSaleOrder extends Model {
 		}
 
 		$query = $this->db->query("SELECT oh.date_added, os.name AS status, oh.comment, oh.notify, u.username FROM " . DB_PREFIX . "order_history oh LEFT JOIN " . DB_PREFIX . "order_status os ON (oh.order_status_id = os.order_status_id) LEFT JOIN " . DB_PREFIX . "user u ON (u.user_id = oh.user_id) WHERE oh.order_id = '" . (int)$order_id . "' AND os.language_id = '" . (int)$this->config->get('config_language_id') . "' ORDER BY oh.date_added DESC, oh.order_history_id DESC LIMIT " . (int)$start . "," . (int)$limit);
+		// $sql = "SELECT oh.date_added, os.name AS status, oh.comment, oh.notify, u.username FROM " . DB_PREFIX . "order_history oh LEFT JOIN " . DB_PREFIX . "order_status os ON (oh.order_status_id = os.order_status_id) LEFT JOIN " . DB_PREFIX . "user u ON (u.user_id = oh.user_id) WHERE oh.order_id = '" . (int)$order_id . "' AND os.language_id = '" . (int)$this->config->get('config_language_id') . "' ORDER BY oh.date_added DESC, oh.order_history_id DESC";
+
+		// if ($limit) {
+		// 	$sql .= " LIMIT " . (int)$start . "," . (int)$limit;
+		// }
+
+		// $query = $this->db->query($sql);
 
 		return $query->rows;
 	}

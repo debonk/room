@@ -1,5 +1,11 @@
 # room > gk ballroom software
 
+2.7.12	30/01/2024
+Report > Sale Order: Menambah subtotal pada laporan.
+Order: Edit untuk order yang telah selesai pelaksanaan acara, statusnya skip pembayaran.
+Order: Edit harus menghapus PO dan dokumen yang sudah di-generate sblmnya.
+Bug Fixed: Call to undefined function cal_days_in_month(). Change PHP native to PHP 7.4
+
 2.7.11	21/09/2022
 Bug Fixed: Report > SCI: Account hyperlink does not set properly.
 Bug Fixed: Account > Transaction: Repair validateForm.

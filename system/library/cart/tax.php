@@ -1,5 +1,6 @@
 <?php
 namespace Cart;
+#[\AllowDynamicProperties]
 final class Tax {
 	private $tax_rates = array();
 

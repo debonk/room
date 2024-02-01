@@ -32,7 +32,7 @@ class ModelLocalisationLocalDate extends Model {
 		
 		$word = '';
 		$loop = true;
-		
+
 		while ($loop) {
 			switch (true) {
 				case ($value < 2000):
@@ -43,14 +43,16 @@ class ModelLocalisationLocalDate extends Model {
 				
 				case ($value < 1000000):
 					$word .= ' '. $this->getInWordPart($value / 1000). ' ribu';
-					$value %= 1000;
+					// $value %= 1000;
+					$value = fmod($value, 1000);
 
 					$loop = true;
 					break;
 				
 				case ($value < 1000000000):
 					$word .= ' '. $this->getInWordPart($value / 1000000). ' juta';
-					$value %= 1000000;
+					// $value %= 1000000;
+					$value = fmod($value, 1000000);
 
 					$loop = true;
 					break;
@@ -86,21 +88,22 @@ class ModelLocalisationLocalDate extends Model {
 		while ($loop) {
 			switch (true) {
 				case ($value < 12):
-					$word_part .= ' '. $huruf[$value];
+					$word_part .= ' '. $huruf[(int)$value];
 					
 					$loop = false;
 					break;
 				
 				case ($value < 20):
 					$value -= 10;
-					$word_part .= ' '. $huruf[$value]. ' belas';
+					$word_part .= ' '. $huruf[(int)$value]. ' belas';
 					
 					$loop = false;
 					break;
 				
 				case ($value < 100):
-					$word_part .= ' '. $huruf[$value / 10]. ' puluh';
-					$value %= 10;
+					$word_part .= ' '. $huruf[(int)($value / 10)]. ' puluh';
+					// $value %= 10;
+					$value = fmod($value, 10);
 
 					$loop = true;
 					break;
@@ -113,8 +116,9 @@ class ModelLocalisationLocalDate extends Model {
 					break;
 				
 				case ($value < 1000):
-					$word_part .= ' '. $huruf[$value / 100]. ' ratus';
-					$value %= 100;
+					$word_part .= ' '. $huruf[(int)($value / 100)]. ' ratus';
+					// $value %= 100;
+					$value = fmod($value, 100);
 
 					$loop = true;
 					break;

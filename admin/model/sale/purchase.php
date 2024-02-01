@@ -29,19 +29,26 @@ class ModelSalePurchase extends Model
 
     public function deleteOrderPurchases($order_id, $completed = null)
     {
-        $order_purchases = $this->getOrderPurchases($order_id);
+		if (isset($completed)) {
+			$this->db->query("DELETE FROM " . DB_PREFIX . "order_document WHERE order_id = '" . (int)$order_id . "' AND client_type = 'vendor' AND document_type = 'purchase'");
+			$this->db->query("DELETE `op`, opp FROM `" . DB_PREFIX . "order_purchase` `op`, `" . DB_PREFIX . "order_purchase_product` `opp` WHERE order_id = '" . (int)$order_id . "' AND opp.order_purchase_id = `op`.order_purchase_id AND completed = '" . (int)$completed . "'");
+		} else {
+			$this->db->query("DELETE `op`, opp FROM `" . DB_PREFIX . "order_purchase` `op`, `" . DB_PREFIX . "order_purchase_product` `opp` WHERE order_id = '" . (int)$order_id . "' AND opp.order_purchase_id = `op`.order_purchase_id");
+		}
 
-        foreach ($order_purchases as $order_purchase) {
-            if (isset($completed)) {
-                if ($order_purchase['completed'] == $completed) {
-                    $this->db->query("DELETE FROM " . DB_PREFIX . "order_purchase_product WHERE order_purchase_id = '" . (int)$order_purchase['order_purchase_id'] . "'");
-                    $this->db->query("DELETE FROM " . DB_PREFIX . "order_purchase WHERE order_id = '" . (int)$order_id . "' AND completed = '" . (int)$completed . "'");
-                }
-            } else {
-                $this->db->query("DELETE FROM " . DB_PREFIX . "order_purchase_product WHERE order_purchase_id = '" . (int)$order_purchase['order_purchase_id'] . "'");
-                $this->db->query("DELETE FROM " . DB_PREFIX . "order_purchase WHERE order_id = '" . (int)$order_id . "'");
-            }
-        }
+        // $order_purchases = $this->getOrderPurchases($order_id);
+
+        // foreach ($order_purchases as $order_purchase) {
+        //     if (isset($completed)) {
+        //         if ($order_purchase['completed'] == $completed) {
+        //             $this->db->query("DELETE FROM " . DB_PREFIX . "order_purchase_product WHERE order_purchase_id = '" . (int)$order_purchase['order_purchase_id'] . "'");
+        //             $this->db->query("DELETE FROM " . DB_PREFIX . "order_purchase WHERE order_id = '" . (int)$order_id . "' AND completed = '" . (int)$completed . "'");
+        //         }
+        //     } else {
+        //         $this->db->query("DELETE FROM " . DB_PREFIX . "order_purchase_product WHERE order_purchase_id = '" . (int)$order_purchase['order_purchase_id'] . "'");
+        //         $this->db->query("DELETE FROM " . DB_PREFIX . "order_purchase WHERE order_id = '" . (int)$order_id . "'");
+        //     }
+        // }
     }
 
     public function getOrderPurchase($order_id, $vendor_id)

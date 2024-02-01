@@ -688,7 +688,7 @@ if(!class_exists("ThemeControlHelper") ) {
 		 * @param Array $ospan 
 		 * @param Numberic $cols number of columns
 		 */
-		public function calculateSpans( $ospans=array(), $cols ){
+		public function calculateSpans( $ospans=array(), $cols = 0 ){
 			$tmp = array_sum($ospans);
 			$spans = array();
 			$t = 0; 

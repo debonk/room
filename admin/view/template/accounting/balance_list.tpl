@@ -322,7 +322,7 @@
 							<?php } ?>
 							<?php } else { ?>
 							<tr>
-								<td class="text-center" colspan="10">
+								<td class="text-center" colspan="11">
 									<?php echo $text_no_results; ?>
 								</td>
 							</tr>

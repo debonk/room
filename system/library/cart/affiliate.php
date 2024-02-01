@@ -1,5 +1,6 @@
 <?php
 namespace Cart;
+#[\AllowDynamicProperties]
 class Affiliate {
 	private $affiliate_id;
 	private $firstname;

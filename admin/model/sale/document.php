@@ -188,7 +188,7 @@ class ModelSaleDocument extends Model
 	{
 		$sql = "SELECT DISTINCT *, CONCAT(reference_prefix, LPAD(reference_no, 4, '0')) AS reference FROM " . DB_PREFIX . "order_document WHERE order_id = '" . (int)$order_id . "' AND client_type = '" . $this->db->escape($client_type) . "' AND document_type = '" . $this->db->escape($document_type) . "'";
 
-		$implode = array();
+		// $implode = array();
 
 		if ($client_id) {
 			$sql .= "AND client_id = '" . (int)$client_id . "'";
