@@ -464,7 +464,15 @@ class ModelAccountingTransaction extends Model
 				$transaction_summary_data[$value[$label]] = $transaction_data;
 			}
 			
-			$transaction_summary_data[$value[$label]][$value['account_type']] += $value['total'];
+			if ($value['total'] < 0) {
+				if ($value['account_type'] == $this->type_data[0]) {
+					$transaction_summary_data[$value[$label]][$this->type_data[1]] -= $value['total'];
+				} else {
+					$transaction_summary_data[$value[$label]][$this->type_data[0]] -= $value['total'];
+				}
+			} else {
+				$transaction_summary_data[$value[$label]][$value['account_type']] += $value['total'];
+			}
 		}
 
 		return $transaction_summary_data;

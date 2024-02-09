@@ -1,5 +1,8 @@
 # room > gk ballroom software
 
+2.7.13	09/02/2024
+Order: Penyesuaian jika vendor membayar untuk charge
+
 2.7.12	30/01/2024
 Report > Sale Order: Menambah subtotal pada laporan.
 Order: Edit untuk order yang telah selesai pelaksanaan acara, statusnya skip pembayaran.
