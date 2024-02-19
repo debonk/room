@@ -96,19 +96,25 @@ class ControllerReportSfp extends Controller
 			$child_count = $this->model_accounting_account->getAccountsCount(['filter_parent_id' => $result['account_id']]);
 
 			if ($child_count == 1) {
+				$transaction_total = $this->model_report_transaction->getTransactionsTotalByAccountId($result['account_id'], $filter_data);
+				$href = $this->url->link('report/account_transaction', 'token=' . $this->session->data['token'] . '&filter_account_id=' . $result['account_id'] . $this->urlFilter(), true);
+
 				if ($result['retained_earnings']) {
 					$revenue_total = $this->model_report_transaction->getTransactionsTotalByAccountComponent('revenue', $filter_data);
 					$expense_total = $this->model_report_transaction->getTransactionsTotalByAccountComponent('expense', $filter_data);
 	
-					$transaction_total = [
-						'debit'		=> $revenue_total['debit'] + $expense_total['debit'],
-						'credit'	=> $revenue_total['credit'] + $expense_total['credit']
-					];
+					$transaction_total['debit'] += $revenue_total['debit'] + $expense_total['debit'];
+					$transaction_total['credit'] += $revenue_total['credit'] + $expense_total['credit'];
+
+					// $transaction_total = [
+					// 	'debit'		=> $revenue_total['debit'] + $expense_total['debit'],
+					// 	'credit'	=> $revenue_total['credit'] + $expense_total['credit']
+					// ];
 	
-					$href = '';
-				} else {
-					$transaction_total = $this->model_report_transaction->getTransactionsTotalByAccountId($result['account_id'], $filter_data);
-					$href = $this->url->link('report/account_transaction', 'token=' . $this->session->data['token'] . '&filter_account_id=' . $result['account_id'] . $this->urlFilter(), true);
+					// $href = '';
+				// } else {
+				// 	$transaction_total = $this->model_report_transaction->getTransactionsTotalByAccountId($result['account_id'], $filter_data);
+				// 	$href = $this->url->link('report/account_transaction', 'token=' . $this->session->data['token'] . '&filter_account_id=' . $result['account_id'] . $this->urlFilter(), true);
 				}
 
 				if ($component == 'asset') {

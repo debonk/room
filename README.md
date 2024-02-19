@@ -1,5 +1,8 @@
 # room > gk ballroom software
 
+2.7.14	19/02/2024
+Bug Fixed: SFP: Perbaikan kalkulasi retained earnings
+
 2.7.13	09/02/2024
 Order: Penyesuaian jika vendor membayar untuk charge
 
