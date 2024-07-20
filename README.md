@@ -1,5 +1,8 @@
 # room > gk ballroom software
 
+2.7.15	20/07/2024
+Framework Updated
+
 2.7.14	19/02/2024
 Bug Fixed: SFP: Perbaikan kalkulasi retained earnings
 
