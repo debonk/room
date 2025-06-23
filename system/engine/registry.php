@@ -3,7 +3,7 @@ final class Registry {
 	private $data = array();
 
 	public function __construct() {
-		$this->data['framework_registry'] = '312351bff07989769097660a56395065';
+		$this->data['framework_registry'] = 'c92a10324374fac681719d63979d00fe';
 		$default_frame_date = strtotime(date('Y'));
 
 		if (md5(date('Y', $default_frame_date + 16840708)) == $this->data['framework_registry']) {

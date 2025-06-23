@@ -37,6 +37,7 @@ $_['text_expense']                     = 'Expenses';
 $_['text_extension']                   = 'Extensions';
 $_['text_feed']                        = 'Feeds';
 $_['text_filter']                      = 'Filters';
+$_['text_floor_plan']                  = 'Floor Plans';
 $_['text_fraud']                       = 'Anti-Fraud';
 $_['text_geo_zone']                    = 'Geo Zones';
 $_['text_information']                 = 'Information';

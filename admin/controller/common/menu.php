@@ -16,6 +16,7 @@ class ControllerCommonMenu extends Controller
 
 		$menu_groups = [
 			'catalog'		=> [
+				'catalog/floor_plan',
 				'catalog/category',
 				'catalog/product',
 				'catalog/recurring',

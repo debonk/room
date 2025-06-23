@@ -1,5 +1,9 @@
 # room > gk ballroom software
 
+2.7.16	23/06/2025
+Bug Fixed: Order > Product: round() cannot be null
+Framework Updated
+
 2.7.15	20/07/2024
 Framework Updated
 
